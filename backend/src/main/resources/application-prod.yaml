@@ -1,0 +1,45 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    show-sql: false
+
+  mail:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-ms: 3600000
+    refresh-expiration-ms: 604800000
+
+  storage:
+    endpoint: https://s3.amazonaws.com
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
+    bucket: ndobaak-media
+    region: ${AWS_REGION}
+
+  cors:
+    allowed-origins: ${CORS_ORIGINS}
+
+logging:
+  level:
+    cm.ndobaak: INFO
+    org.springframework.security: WARN

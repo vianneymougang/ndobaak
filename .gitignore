@@ -1,0 +1,37 @@
+# === Java / Spring Boot ===
+backend/target/
+backend/*.jar
+backend/.mvn/wrapper/maven-wrapper.jar
+*.class
+*.log
+
+# === Angular ===
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# === IDE / Tools ===
+.idea/
+*.iml
+.vscode/
+.zed/
+.claude/
+*.swp
+*.swo
+*~
+
+# === Environment ===
+.env
+backend/.env
+frontend/.env
+
+# === OS ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Documentation (locale uniquement) ===
+docs/
+
+# === Docker ===
+docker-data/

@@ -1,0 +1,24 @@
+# Normalise les fins de ligne — évite les diff fantômes entre macOS et Windows
+* text=auto eol=lf
+
+# Fichiers binaires
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.jar binary
+
+# Forcer LF même sur Windows pour ces fichiers
+*.java text eol=lf
+*.ts text eol=lf
+*.html text eol=lf
+*.scss text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.xml text eol=lf
+*.properties text eol=lf
+*.sql text eol=lf
+*.sh text eol=lf
+Dockerfile text eol=lf
+docker-compose.yml text eol=lf

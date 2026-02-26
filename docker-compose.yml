@@ -1,0 +1,106 @@
+services:
+  # --- Base de données PostgreSQL ---
+  postgres:
+    image: postgres:18-alpine
+    container_name: ndobaak-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ndobaak_dev
+      POSTGRES_USER: ndobaak
+      POSTGRES_PASSWORD: ndobaak_dev_2026
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ndobaak -d ndobaak_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
+
+  # --- pgAdmin (interface web pour PostgreSQL) ---
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ndobaak-pgadmin
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@ndobaak.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - default
+
+  mailtrap:
+    image: dbck/mailtrap:latest
+    container_name: ndobaak-mail
+    ports:
+      - "1080:80" # Web UI - http://localhost:1080
+      - "1025:25" # SMTP
+      - "1587:587" # SMTP with StartTLS
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.2"
+
+  # --- MinIO (alternative locale à S3 pour les fichiers/photos) ---
+  minio:
+    image: minio/minio:latest
+    container_name: ndobaak-storage
+    restart: unless-stopped
+    ports:
+      - "9000:9000" # API S3
+      - "9001:9001" # Console web
+    environment:
+      MINIO_ROOT_USER: ndobaak
+      MINIO_ROOT_PASSWORD: ndobaak_minio_2026
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - default
+
+  # --- Backend ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ndobaak-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ndobaak_dev
+      SPRING_DATASOURCE_USERNAME: ndobaak
+      SPRING_DATASOURCE_PASSWORD: ndobaak_dev_2026
+      SPRING_MAIL_HOST: mailtrap
+      SPRING_MAIL_PORT: 25
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailtrap:
+        condition: service_healthy
+    networks:
+      - default
+
+volumes:
+  postgres_data:
+  minio_data:
+
+networks:
+  default:
+    name: ndobaak_network
