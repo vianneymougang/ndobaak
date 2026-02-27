@@ -1,10 +1,14 @@
-/* ─────────────────────────────────────────────
-   Ndobaâk — Global Styles
-   Override PrimeNG primary to orange (#E8762B)
-   ───────────────────────────────────────────── */
+/* ──────────────────────────────────────────────
+   Ndobaâk — Global Styles & PrimeNG Token Overrides
+   ────────────────────────────────────────────── */
 
-/* PrimeNG primary color override — unlayered, wins over @layer primeng */
 :root {
+
+  /* ════════════════════════════════════════════
+     PRIMARY PALETTE — Ndobaâk orange (#E8762B)
+     Overrides PrimeNG's default blue palette.
+     Unlayered so it wins over @layer primeng.
+     ════════════════════════════════════════════ */
   --p-primary-50:             #fef6ee;
   --p-primary-100:            #fce8d0;
   --p-primary-200:            #f9cda1;
@@ -19,47 +23,273 @@
   --p-primary-color:          #E8762B;
   --p-primary-contrast-color: #ffffff;
 
-  /* Surface / input border radius */
-  --p-inputtext-border-radius: 6px;
-  --p-button-border-radius:    8px;
-  --p-border-radius-md:        8px;
+  /* Force light mode — dark mode not yet implemented */
+  color-scheme: light;
+
+  /* ════════════════════════════════════════════
+     SHAPE
+     ════════════════════════════════════════════ */
+  --p-border-radius-sm:  4px;
+  --p-border-radius-md:  8px;
+  --p-border-radius-lg:  12px;
+  --p-border-radius-xl:  16px;
+
+  /* ════════════════════════════════════════════
+     BUTTON
+     ════════════════════════════════════════════ */
+  --p-button-border-radius:      8px;
+  --p-button-label-font-weight:  600;
+  --p-button-gap:                0.5rem;
+  --p-button-padding-x:          1.25rem;
+  --p-button-padding-y:          0.625rem;
+
+  /* Secondary → navy */
+  --p-button-secondary-background:         #1B3A5C;
+  --p-button-secondary-hover-background:   #2D5F8A;
+  --p-button-secondary-active-background:  #14304e;
+  --p-button-secondary-border-color:       #1B3A5C;
+  --p-button-secondary-hover-border-color: #2D5F8A;
+  --p-button-secondary-active-border-color:#14304e;
+  --p-button-secondary-color:              #ffffff;
+  --p-button-secondary-hover-color:        #ffffff;
+  --p-button-secondary-active-color:       #ffffff;
+
+  /* Success → brand green */
+  --p-button-success-background:           #1A7A5C;
+  --p-button-success-hover-background:     #155e47;
+  --p-button-success-active-background:    #0f4433;
+  --p-button-success-border-color:         #1A7A5C;
+  --p-button-success-hover-border-color:   #155e47;
+  --p-button-success-active-border-color:  #0f4433;
+  --p-button-success-color:                #ffffff;
+  --p-button-success-hover-color:          #ffffff;
+  --p-button-success-active-color:         #ffffff;
+
+  /* Danger → error red */
+  --p-button-danger-background:            #DC3545;
+  --p-button-danger-hover-background:      #c82333;
+  --p-button-danger-active-background:     #bd2130;
+  --p-button-danger-border-color:          #DC3545;
+  --p-button-danger-hover-border-color:    #c82333;
+  --p-button-danger-active-border-color:   #bd2130;
+  --p-button-danger-color:                 #ffffff;
+  --p-button-danger-hover-color:           #ffffff;
+  --p-button-danger-active-color:          #ffffff;
+
+  /* Outlined primary */
+  --p-button-outlined-primary-border-color:       #E8762B;
+  --p-button-outlined-primary-color:              #E8762B;
+  --p-button-outlined-primary-hover-background:   rgba(232, 118, 43, 0.08);
+  --p-button-outlined-primary-active-background:  rgba(232, 118, 43, 0.16);
+
+  /* Outlined secondary (navy outline) */
+  --p-button-outlined-secondary-border-color:       #1B3A5C;
+  --p-button-outlined-secondary-color:              #1B3A5C;
+  --p-button-outlined-secondary-hover-background:   rgba(27, 58, 92, 0.06);
+  --p-button-outlined-secondary-active-background:  rgba(27, 58, 92, 0.12);
+
+  /* Text variants — use brand palette */
+  --p-button-text-primary-color:              #E8762B;
+  --p-button-text-primary-hover-background:   rgba(232, 118, 43, 0.08);
+  --p-button-text-primary-active-background:  rgba(232, 118, 43, 0.16);
+  --p-button-text-secondary-color:            #1B3A5C;
+  --p-button-text-secondary-hover-background: rgba(27, 58, 92, 0.06);
+  --p-button-text-secondary-active-background:rgba(27, 58, 92, 0.12);
+
+  /* Link variant */
+  --p-button-link-color:        #E8762B;
+  --p-button-link-hover-color:  #C9611B;
+  --p-button-link-active-color: #C9611B;
+
+  /* ════════════════════════════════════════════
+     INPUT TEXT
+     ════════════════════════════════════════════ */
+  --p-inputtext-border-radius:       6px;
+  --p-inputtext-border-color:        #DEE2E6;
+  --p-inputtext-hover-border-color:  #adb5bd;
+  --p-inputtext-focus-border-color:  #2D5F8A;
+  --p-inputtext-invalid-border-color:#DC3545;
+  --p-inputtext-color:               #2C3E50;
+  --p-inputtext-placeholder-color:   #6C757D;
+  --p-inputtext-focus-ring-width:    3px;
+  --p-inputtext-focus-ring-style:    solid;
+  --p-inputtext-focus-ring-color:    rgba(45, 95, 138, 0.15);
+  --p-inputtext-focus-ring-offset:   0;
+  --p-inputtext-focus-ring-shadow:   0 0 0 3px rgba(45, 95, 138, 0.15);
+
+  /* ════════════════════════════════════════════
+     SELECT (DROPDOWN)
+     ════════════════════════════════════════════ */
+  --p-select-border-radius:                 6px;
+  --p-select-border-color:                  #DEE2E6;
+  --p-select-hover-border-color:            #adb5bd;
+  --p-select-focus-border-color:            #2D5F8A;
+  --p-select-invalid-border-color:          #DC3545;
+  --p-select-color:                         #2C3E50;
+  --p-select-placeholder-color:             #6C757D;
+  --p-select-focus-ring-width:              3px;
+  --p-select-focus-ring-style:              solid;
+  --p-select-focus-ring-color:              rgba(45, 95, 138, 0.15);
+  --p-select-focus-ring-offset:             0;
+  --p-select-focus-ring-shadow:             0 0 0 3px rgba(45, 95, 138, 0.15);
+  --p-select-dropdown-color:                #6C757D;
+  /* Overlay panel */
+  --p-select-overlay-border-color:          #DEE2E6;
+  --p-select-overlay-border-radius:         10px;
+  --p-select-overlay-shadow:                0 8px 24px rgba(0, 0, 0, 0.12);
+  /* Options */
+  --p-select-option-border-radius:          6px;
+  --p-select-option-focus-background:       rgba(27, 58, 92, 0.06);
+  --p-select-option-focus-color:            #1B3A5C;
+  --p-select-option-selected-background:    rgba(232, 118, 43, 0.10);
+  --p-select-option-selected-color:         #E8762B;
+  --p-select-option-selected-focus-background: rgba(232, 118, 43, 0.16);
+  --p-select-option-selected-focus-color:   #C9611B;
+  --p-select-checkmark-color:               #E8762B;
+
+  /* ════════════════════════════════════════════
+     CHIP
+     ════════════════════════════════════════════ */
+  --p-chip-border-radius:  8px;
+  --p-chip-background:     rgba(27, 58, 92, 0.07);
+  --p-chip-color:          #1B3A5C;
+  --p-chip-padding-x:      0.75rem;
+  --p-chip-padding-y:      0.3rem;
+  --p-chip-icon-color:     #2D5F8A;
+
+  /* ════════════════════════════════════════════
+     TAG / BADGE
+     ════════════════════════════════════════════ */
+  --p-tag-border-radius:     6px;
+  --p-tag-font-size:         0.7rem;
+  --p-tag-font-weight:       600;
+  --p-tag-padding:           0.25rem 0.6rem;
+  /* Severity mapping */
+  --p-tag-primary-background:  rgba(232, 118, 43, 0.12);
+  --p-tag-primary-color:       #E8762B;
+  --p-tag-secondary-background:rgba(27, 58, 92, 0.08);
+  --p-tag-secondary-color:     #1B3A5C;
+  --p-tag-success-background:  #E8F5E9;
+  --p-tag-success-color:       #1A7A5C;
+  --p-tag-info-background:     rgba(45, 95, 138, 0.10);
+  --p-tag-info-color:          #2D5F8A;
+  --p-tag-warn-background:     #FFF3E0;
+  --p-tag-warn-color:          #E8762B;
+  --p-tag-danger-background:   #FFEBEE;
+  --p-tag-danger-color:        #DC3545;
+  --p-tag-contrast-background: #1B3A5C;
+  --p-tag-contrast-color:      #ffffff;
+
+  /* ════════════════════════════════════════════
+     STEPPER
+     ════════════════════════════════════════════ */
+  /* Inactive step */
+  --p-stepper-step-number-background:          #F5F7FA;
+  --p-stepper-step-number-border-color:        #DEE2E6;
+  --p-stepper-step-number-color:               #6C757D;
+  --p-stepper-step-number-font-weight:         600;
+  --p-stepper-step-title-color:                #6C757D;
+  /* Active step → orange */
+  --p-stepper-step-number-active-background:   #E8762B;
+  --p-stepper-step-number-active-border-color: #E8762B;
+  --p-stepper-step-number-active-color:        #ffffff;
+  --p-stepper-step-title-active-color:         #1B3A5C;
+  --p-stepper-step-title-font-weight:          500;
+  /* Separator */
+  --p-stepper-separator-background:            #DEE2E6;
+  --p-stepper-separator-active-background:     #E8762B;
+
+  /* ════════════════════════════════════════════
+     TABS
+     ════════════════════════════════════════════ */
+  --p-tabs-tablist-border-color:   #DEE2E6;
+  --p-tabs-tablist-border-width:   2px;
+  --p-tabs-tab-color:              #6C757D;
+  --p-tabs-tab-hover-color:        #1B3A5C;
+  --p-tabs-tab-active-color:       #1B3A5C;
+  --p-tabs-tab-border-color:       transparent;
+  --p-tabs-tab-hover-border-color: #DEE2E6;
+  --p-tabs-tab-active-border-color:#E8762B;
+  --p-tabs-tab-font-weight:        500;
+  --p-tabs-active-bar-background:  #E8762B;
+  --p-tabs-active-bar-height:      2px;
+
+  /* ════════════════════════════════════════════
+     PAGINATOR
+     ════════════════════════════════════════════ */
+  --p-paginator-background:                     transparent;
+  --p-paginator-border-radius:                  8px;
+  --p-paginator-nav-button-border-radius:        8px;
+  --p-paginator-nav-button-background:           transparent;
+  --p-paginator-nav-button-color:                #6C757D;
+  --p-paginator-nav-button-hover-background:     rgba(27, 58, 92, 0.06);
+  --p-paginator-nav-button-hover-color:          #1B3A5C;
+  --p-paginator-nav-button-selected-background:  #E8762B;
+  --p-paginator-nav-button-selected-color:       #ffffff;
+  --p-paginator-current-page-report-color:       #6C757D;
+
+  /* ════════════════════════════════════════════
+     AVATAR
+     ════════════════════════════════════════════ */
+  --p-avatar-background:   #1B3A5C;
+  --p-avatar-color:        #ffffff;
+  --p-avatar-border-radius:50%;
+
+  /* ════════════════════════════════════════════
+     FLOAT LABEL
+     ════════════════════════════════════════════ */
+  --p-floatlabel-color:         #6C757D;
+  --p-floatlabel-focus-color:   #2D5F8A;
+  --p-floatlabel-active-color:  #2D5F8A;
+  --p-floatlabel-invalid-color: #DC3545;
+
+  /* ════════════════════════════════════════════
+     CHECKBOX
+     ════════════════════════════════════════════ */
+  --p-checkbox-border-radius:              4px;
+  --p-checkbox-border-color:               #DEE2E6;
+  --p-checkbox-hover-border-color:         #2D5F8A;
+  --p-checkbox-focus-border-color:         #2D5F8A;
+  --p-checkbox-checked-background:         #E8762B;
+  --p-checkbox-checked-hover-background:   #C9611B;
+  --p-checkbox-checked-border-color:       #E8762B;
+  --p-checkbox-checked-hover-border-color: #C9611B;
+  --p-checkbox-icon-checked-color:         #ffffff;
+  --p-checkbox-icon-checked-hover-color:   #ffffff;
+  --p-checkbox-focus-ring-color:           rgba(232, 118, 43, 0.2);
+  --p-checkbox-focus-ring-width:           3px;
+  --p-checkbox-focus-ring-shadow:          0 0 0 3px rgba(232, 118, 43, 0.2);
 }
 
-/* ── Global button base enhancement ── */
+/* ════════════════════════════════════════════
+   BUTTON — Poppins font (no design token exists for this)
+   ════════════════════════════════════════════ */
 .p-button {
   font-family: 'Poppins', sans-serif !important;
-  font-weight: 600 !important;
   letter-spacing: 0.025em;
   transition: all 0.2s ease !important;
   min-height: 44px;
 }
 
-/* ── Form field global enhancements ── */
+/* ════════════════════════════════════════════
+   INPUTS — fixed height (no design token for height)
+   ════════════════════════════════════════════ */
 .p-inputtext,
 .p-select,
 .p-password input {
   height: 44px !important;
-  border-color: #DEE2E6 !important;
-  border-radius: 6px !important;
-  transition: border-color 0.2s, box-shadow 0.2s !important;
-
-  &:focus {
-    border-color: #2D5F8A !important;
-    box-shadow: 0 0 0 3px rgba(45, 95, 138, 0.15) !important;
-  }
 }
 
-/* ── PrimeNG Tabs underline style fix ── */
-.p-tablist-tab-list {
-  border-bottom: 2px solid #DEE2E6 !important;
-}
-
-/* ── Smooth global scrolling ── */
+/* ════════════════════════════════════════════
+   SMOOTH SCROLLING
+   ════════════════════════════════════════════ */
 html {
   scroll-behavior: smooth;
 }
 
-/* ── Skeleton pulse animation ── */
+/* ════════════════════════════════════════════
+   SKELETON — pulse animation
+   ════════════════════════════════════════════ */
 @keyframes skeleton-pulse {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.4; }
@@ -71,7 +301,10 @@ html {
   animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
 
-/* ── PrimeNG Tag overrides for status badges ── */
+/* ════════════════════════════════════════════
+   UTILITY BADGE CLASSES
+   Applied via styleClass on p-tag to override severity colors
+   ════════════════════════════════════════════ */
 .badge-verified {
   --p-tag-background: #E8F5E9;
   --p-tag-color:      #1A7A5C;
@@ -85,4 +318,9 @@ html {
 .badge-rejected {
   --p-tag-background: #FFEBEE;
   --p-tag-color:      #DC3545;
+}
+
+.badge-draft {
+  --p-tag-background: rgba(27, 58, 92, 0.08);
+  --p-tag-color:      #1B3A5C;
 }

@@ -83,17 +83,18 @@
 }
 
 .search-btn {
-  @apply flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-white font-semibold text-sm transition-all cursor-pointer border-0;
-  background: var(--color-ndb-orange);
+  @apply flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm transition-all cursor-pointer border-0;
+  background: #E8762B;
+  color: #ffffff;
   font-family: 'Poppins', sans-serif;
   letter-spacing: 0.04em;
   white-space: nowrap;
   min-height: 48px;
 
   &:hover {
-    background: var(--color-ndb-orange-dark);
+    background: #C9611B;
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(232, 118, 43, 0.45);
+    box-shadow: 0 6px 20px rgba(232, 118, 43, 0.4);
   }
 
   &:active {
@@ -238,7 +239,7 @@
 ═══════════════════════════════════════ */
 .landlord-cta {
   @apply py-20;
-  background: var(--color-ndb-navy);
+  background: #1B3A5C;
 }
 
 .cta-content {
@@ -254,7 +255,8 @@
   }
 
   p {
-    @apply text-white/60 m-0;
+    color: rgba(255, 255, 255, 0.82);
+    @apply m-0;
     font-family: 'Inter', sans-serif;
   }
 }
@@ -264,24 +266,26 @@
 }
 
 .cta-btn-primary {
-  @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white text-sm font-semibold no-underline transition-all;
-  background: var(--color-ndb-orange);
+  @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold no-underline transition-all;
+  background: #E8762B;
+  color: #ffffff;
   font-family: 'Poppins', sans-serif;
 
   &:hover {
-    background: var(--color-ndb-orange-dark);
+    background: #C9611B;
     transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(232, 118, 43, 0.45);
   }
 }
 
 .cta-btn-secondary {
-  @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white text-sm font-semibold no-underline transition-all border;
-  border-color: rgba(255, 255, 255, 0.25);
+  @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold no-underline transition-all;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.7);
   font-family: 'Poppins', sans-serif;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.9);
   }
 }

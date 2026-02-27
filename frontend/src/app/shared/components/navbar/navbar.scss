@@ -65,26 +65,28 @@
 }
 
 .btn-cta {
-  @apply inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-white text-sm font-semibold no-underline transition-all;
-  background: var(--color-ndb-orange);
+  @apply inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold no-underline transition-all;
+  background: #E8762B;
+  color: #ffffff;
   font-family: 'Poppins', sans-serif;
   letter-spacing: 0.02em;
 
   &:hover {
-    background: var(--color-ndb-orange-dark);
+    background: #C9611B;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(232, 118, 43, 0.4);
   }
 }
 
 .btn-cta-outline {
-  @apply inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-white text-sm font-semibold no-underline transition-all border;
-  border-color: rgba(255, 255, 255, 0.3);
+  @apply inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold no-underline transition-all;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.7);
   font-family: 'Poppins', sans-serif;
 
   &:hover {
-    border-color: rgba(255, 255, 255, 0.6);
-    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.12);
   }
 }
 
