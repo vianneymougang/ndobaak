@@ -1,5 +1,4 @@
 <div class="login-page">
-
   <!-- Visual panel -->
   <div class="login-visual">
     <div class="visual-logo">
@@ -39,7 +38,7 @@
       <p class="login-subtitle">Connectez-vous à votre compte Ndobaâk</p>
 
       @if (errorMessage()) {
-        <p-message severity="error" [text]="errorMessage()!" />
+      <p-message severity="error" [text]="errorMessage()!" />
       }
 
       <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
@@ -52,14 +51,32 @@
           <p-tabpanel value="email">
             <form [formGroup]="emailForm" (ngSubmit)="onEmailLogin()" class="login-form">
               <p-floatlabel>
-                <input pInputText id="loginEmail" formControlName="email" type="email" class="w-full" />
+                <input
+                  pInputText
+                  id="loginEmail"
+                  formControlName="email"
+                  type="email"
+                  class="w-full"
+                />
                 <label for="loginEmail">Email</label>
               </p-floatlabel>
               <p-floatlabel>
-                <p-password id="loginPassword" formControlName="password" [toggleMask]="true" [feedback]="false" [fluid]="true" />
+                <p-password
+                  id="loginPassword"
+                  formControlName="password"
+                  [toggleMask]="true"
+                  [feedback]="false"
+                  [fluid]="true"
+                />
                 <label for="loginPassword">Mot de passe</label>
               </p-floatlabel>
-              <p-button type="submit" label="Se connecter" [loading]="loading()" [fluid]="true" severity="primary" />
+              <p-button
+                type="submit"
+                label="Se connecter"
+                [loading]="loading()"
+                [fluid]="true"
+                severity="primary"
+              />
             </form>
           </p-tabpanel>
 
@@ -70,18 +87,28 @@
                 <label for="loginPhone">Téléphone</label>
               </p-floatlabel>
               <p-floatlabel>
-                <p-password id="loginPhonePassword" formControlName="password" [toggleMask]="true" [feedback]="false" [fluid]="true" />
+                <p-password
+                  id="loginPhonePassword"
+                  formControlName="password"
+                  [toggleMask]="true"
+                  [feedback]="false"
+                  [fluid]="true"
+                />
                 <label for="loginPhonePassword">Mot de passe</label>
               </p-floatlabel>
-              <p-button type="submit" label="Se connecter" [loading]="loading()" [fluid]="true" severity="primary" />
+              <p-button
+                type="submit"
+                label="Se connecter"
+                [loading]="loading()"
+                [fluid]="true"
+                severity="primary"
+              />
             </form>
           </p-tabpanel>
         </p-tabpanels>
       </p-tabs>
 
-      <p class="register-link">
-        Pas de compte ? <a routerLink="/register">Créer un compte</a>
-      </p>
+      <p class="register-link">Pas de compte ? <a routerLink="/register">Créer un compte</a></p>
     </div>
   </div>
 </div>
