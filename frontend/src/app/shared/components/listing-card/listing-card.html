@@ -1,0 +1,70 @@
+<div class="listing-card" [routerLink]="['/listings', listing().id]">
+  <div class="card-image">
+    @if (listing().thumbnailUrl) {
+      <img [src]="listing().thumbnailUrl" [alt]="listing().title" loading="lazy" />
+    } @else {
+      <div class="no-image">
+        <i class="pi pi-image"></i>
+        <span>Photo non disponible</span>
+      </div>
+    }
+
+    @if (listing().verified) {
+      <span class="verified-badge">
+        <i class="pi pi-verified"></i> VÉRIFIÉ
+      </span>
+    }
+
+    <span class="type-badge">{{ roomTypeLabel() }}</span>
+  </div>
+
+  <div class="card-content">
+    <div class="card-header-row">
+      <h3 class="card-title">{{ listing().title }}</h3>
+      @if (listing().avgRating) {
+        <div class="card-rating">
+          <i class="pi pi-star-fill" style="color: #FFC107; font-size: 13px;"></i>
+          <span class="rating-value">{{ listing().avgRating!.toFixed(1) }}</span>
+          <span class="review-count">({{ listing().reviewCount }})</span>
+        </div>
+      }
+    </div>
+
+    <p class="card-price">
+      {{ formattedPrice() }}
+    </p>
+
+    @if (listing().neighborhood || distanceLabel()) {
+      <p class="card-location">
+        <i class="pi pi-map-marker"></i>
+        <span>{{ listing().neighborhood }}</span>
+        @if (distanceLabel()) {
+          <span class="distance">— {{ distanceLabel() }}</span>
+        }
+      </p>
+    }
+
+    @if (listing().amenities.length > 0) {
+      <div class="card-amenities">
+        @for (amenity of listing().amenities | slice: 0 : 3; track amenity) {
+          <span class="amenity-tag">{{ amenity }}</span>
+        }
+        @if (listing().amenities.length > 3) {
+          <span class="amenity-more">+{{ listing().amenities.length - 3 }}</span>
+        }
+      </div>
+    }
+
+    <div class="card-footer">
+      <button class="voir-details-btn" (click)="$event.stopPropagation()">
+        VOIR DÉTAILS
+      </button>
+
+      @if (listing().availableRooms > 0) {
+        <span class="rooms-available">
+          {{ listing().availableRooms }} place{{ listing().availableRooms > 1 ? 's' : '' }}
+        </span>
+      }
+    </div>
+  </div>
+</div>

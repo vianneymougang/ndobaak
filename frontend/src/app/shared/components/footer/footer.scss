@@ -1,0 +1,123 @@
+@reference "../../../../tailwind.css";
+
+.footer {
+  @apply bg-ndb-navy text-white pt-14 pb-0 mt-auto;
+}
+
+.footer-container {
+  @apply max-w-7xl mx-auto px-6 grid gap-10;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+/* ── Brand column ── */
+.footer-brand {
+  @apply space-y-4;
+}
+
+.footer-logo {
+  @apply flex items-center gap-2;
+}
+
+.footer-logo-icon {
+  @apply flex items-center justify-center w-8 h-8 rounded-lg bg-ndb-orange text-white text-sm;
+}
+
+.footer-logo-text {
+  font-family: 'Poppins', sans-serif;
+  @apply text-xl font-bold text-white;
+}
+
+.footer-desc {
+  @apply text-white/60 text-sm leading-relaxed m-0;
+  max-width: 260px;
+}
+
+.social-links {
+  @apply flex gap-3;
+}
+
+.social-icon {
+  @apply flex items-center justify-center w-9 h-9 rounded-full text-white/70 no-underline transition-all text-base;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  &:hover {
+    @apply text-white;
+    background: var(--color-ndb-orange);
+    border-color: transparent;
+    transform: translateY(-2px);
+  }
+}
+
+/* ── Content columns ── */
+.footer-col {
+  @apply py-2;
+
+  @media (max-width: 768px) {
+    @apply border-t pt-6;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.footer-heading {
+  @apply text-sm font-semibold text-white uppercase tracking-wider mb-4;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.08em;
+}
+
+.footer-links {
+  @apply list-none p-0 m-0 space-y-2.5;
+
+  li {
+    @apply text-sm;
+
+    a {
+      @apply text-white/55 no-underline transition-colors;
+
+      &:hover {
+        @apply text-ndb-orange;
+      }
+    }
+  }
+}
+
+.footer-contact {
+  li {
+    @apply flex items-start gap-2 text-white/55;
+
+    i {
+      @apply text-ndb-orange mt-0.5 flex-shrink-0 text-xs;
+    }
+
+    span {
+      @apply leading-snug;
+    }
+  }
+}
+
+/* ── Bottom bar ── */
+.footer-bottom {
+  @apply max-w-7xl mx-auto px-6 mt-10 py-5 flex items-center justify-between flex-wrap gap-3;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  p {
+    @apply text-white/40 text-sm m-0;
+  }
+}
+
+.footer-bottom-links {
+  @apply flex gap-4;
+
+  a {
+    @apply text-white/40 text-sm no-underline transition-colors;
+
+    &:hover {
+      @apply text-white/70;
+    }
+  }
+}

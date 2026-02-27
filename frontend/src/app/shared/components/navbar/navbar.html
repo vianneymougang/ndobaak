@@ -1,0 +1,72 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <a routerLink="/" class="navbar-brand">
+      <span class="brand-icon"><i class="pi pi-home"></i></span>
+      <span class="brand-text">Ndobaâk</span>
+    </a>
+
+    <button class="menu-toggle" (click)="toggleMenu()" aria-label="Toggle menu">
+      <i class="pi" [class.pi-bars]="!menuOpen" [class.pi-times]="menuOpen"></i>
+    </button>
+
+    <div class="navbar-links" [class.open]="menuOpen">
+      <a routerLink="/search" routerLinkActive="active" (click)="menuOpen = false">
+        <i class="pi pi-search"></i> Rechercher
+      </a>
+
+      @if (isLandlord()) {
+        <a routerLink="/my-listings" routerLinkActive="active" (click)="menuOpen = false">
+          <i class="pi pi-list"></i> Mes annonces
+        </a>
+        <a routerLink="/listings/create" routerLinkActive="active" (click)="menuOpen = false">
+          <i class="pi pi-plus"></i> Publier une annonce
+        </a>
+      }
+    </div>
+
+    <div class="navbar-auth">
+      @if (isAuthenticated()) {
+        <div class="user-menu">
+          <div class="user-avatar">{{ userInitials() }}</div>
+          <div class="user-info">
+            <span class="user-name">{{ user()?.firstName }} {{ user()?.lastName }}</span>
+            <span class="user-role">{{ user()?.role === 'STUDENT' ? 'Étudiant' : 'Propriétaire' }}</span>
+          </div>
+          <button class="logout-btn" (click)="logout()" title="Déconnexion">
+            <i class="pi pi-sign-out"></i>
+          </button>
+        </div>
+      } @else {
+        <a routerLink="/login" class="nav-link-auth">Se connecter</a>
+        <a routerLink="/register" class="btn-cta">S'inscrire</a>
+      }
+    </div>
+  </div>
+
+  <!-- Mobile menu overlay -->
+  @if (menuOpen) {
+    <div class="mobile-nav">
+      <a routerLink="/search" (click)="menuOpen = false">
+        <i class="pi pi-search"></i> Rechercher
+      </a>
+      @if (isLandlord()) {
+        <a routerLink="/my-listings" (click)="menuOpen = false">
+          <i class="pi pi-list"></i> Mes annonces
+        </a>
+        <a routerLink="/listings/create" (click)="menuOpen = false">
+          <i class="pi pi-plus"></i> Publier une annonce
+        </a>
+      }
+      <div class="mobile-auth">
+        @if (isAuthenticated()) {
+          <button class="btn-cta-outline" (click)="logout(); menuOpen = false">
+            <i class="pi pi-sign-out"></i> Déconnexion
+          </button>
+        } @else {
+          <a routerLink="/login" class="btn-cta-outline" (click)="menuOpen = false">Se connecter</a>
+          <a routerLink="/register" class="btn-cta" (click)="menuOpen = false">S'inscrire</a>
+        }
+      </div>
+    </div>
+  }
+</nav>
