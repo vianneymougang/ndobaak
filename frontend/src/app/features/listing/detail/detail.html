@@ -1,0 +1,143 @@
+@if (loading()) {
+  <div class="loading-container">
+    <p-progressSpinner />
+  </div>
+} @else if (listing(); as l) {
+  <div class="detail-page">
+    <div class="detail-main">
+
+      <!-- ── Airbnb-style photo grid ── -->
+      @if (l.photos.length > 0) {
+        <div class="photo-grid">
+          <div class="photo-main">
+            <img [src]="l.photos[0].mediumUrl || l.photos[0].url" [alt]="l.title" />
+          </div>
+          @if (l.photos.length > 1) {
+            <div class="photo-secondary">
+              <img [src]="l.photos[1].mediumUrl || l.photos[1].url" [alt]="l.title" />
+            </div>
+          }
+          @if (l.photos.length > 2) {
+            <div class="photo-secondary">
+              <img [src]="l.photos[2].mediumUrl || l.photos[2].url" [alt]="l.title" />
+            </div>
+          }
+          @if (l.photos.length > 3) {
+            <div
+              class="photo-secondary photo-overlay-more"
+              [attr.data-extra]="l.photos.length - 3"
+            >
+              <img [src]="l.photos[3].mediumUrl || l.photos[3].url" [alt]="l.title" />
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="photo-grid">
+          <div class="photo-placeholder">
+            <i class="pi pi-image"></i>
+          </div>
+        </div>
+      }
+
+      <div class="detail-content">
+        <div class="detail-badges">
+          <span class="detail-badge-type">{{ roomTypeLabel() }}</span>
+          @if (l.status === 'PUBLISHED') {
+            <span class="detail-badge-verified">
+              <i class="pi pi-verified"></i> VÉRIFIÉ
+            </span>
+          }
+        </div>
+
+        <h1 class="detail-title">{{ l.title }}</h1>
+
+        @if (l.location) {
+          <p class="detail-location">
+            <i class="pi pi-map-marker"></i>
+            {{ l.location.address }}
+            @if (l.location.distanceToCampus) {
+              — {{ l.location.distanceToCampus }} km du campus
+            }
+          </p>
+        }
+
+        <section class="detail-section">
+          <h2>Description</h2>
+          <p class="detail-description">{{ l.description }}</p>
+        </section>
+
+        @if (l.amenities.length > 0) {
+          <section class="detail-section">
+            <h2>Équipements</h2>
+            <div class="amenities-list">
+              @for (amenity of l.amenities; track amenity.id) {
+                <p-chip [label]="amenity.name" [icon]="amenity.icon" />
+              }
+            </div>
+          </section>
+        }
+
+        @if (l.location) {
+          <section class="detail-section">
+            <h2>Localisation</h2>
+            <div #detailMap class="detail-map"></div>
+          </section>
+        }
+      </div>
+    </div>
+
+    <aside class="detail-sidebar">
+      <div class="sidebar-card">
+        <p class="sidebar-price">{{ formattedPrice() }}</p>
+
+        <div class="sidebar-info">
+          <div class="info-row">
+            <span class="info-label">Type</span>
+            <span class="info-value">{{ roomTypeLabel() }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Chambres disponibles</span>
+            <span class="info-value">{{ l.availableRooms }}</span>
+          </div>
+          @if (l.availableDate) {
+            <div class="info-row">
+              <span class="info-label">Disponible le</span>
+              <span class="info-value">{{ l.availableDate }}</span>
+            </div>
+          }
+        </div>
+
+        <p-button label="Réserver" [fluid]="true" severity="primary" icon="pi pi-calendar" [disabled]="true" />
+        <p-button
+          label="Contacter le propriétaire"
+          [fluid]="true"
+          [outlined]="true"
+          severity="secondary"
+          icon="pi pi-phone"
+          [disabled]="true"
+        />
+
+        @if (l.landlord) {
+          <div class="landlord-card">
+            <p-avatar [label]="landlordInitials()" shape="circle" size="large" />
+            <div class="landlord-info">
+              <p class="landlord-name">{{ l.landlord.firstName }} {{ l.landlord.lastName }}</p>
+              @if (l.landlord.phone) {
+                <p class="landlord-contact"><i class="pi pi-phone"></i> {{ l.landlord.phone }}</p>
+              }
+              @if (l.landlord.email) {
+                <p class="landlord-contact"><i class="pi pi-envelope"></i> {{ l.landlord.email }}</p>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </aside>
+  </div>
+
+  <!-- Mobile sticky bar -->
+  <div class="mobile-bottom-bar">
+    <span class="mobile-price">{{ formattedPrice() }}</span>
+    <p-button label="Réserver" severity="primary" [disabled]="true" />
+  </div>
+}

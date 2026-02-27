@@ -1,0 +1,66 @@
+<div class="my-listings-page">
+  <div class="page-header">
+    <h1>Mes annonces</h1>
+    <a routerLink="/listings/create">
+      <p-button label="Nouvelle annonce" icon="pi pi-plus" severity="primary" />
+    </a>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <p-progressSpinner />
+    </div>
+  } @else if (listings().length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-home"></i>
+      <h3>Aucune annonce</h3>
+      <p>Creez votre premiere annonce pour commencer a louer.</p>
+      <a routerLink="/listings/create">
+        <p-button label="Creer une annonce" icon="pi pi-plus" severity="primary" />
+      </a>
+    </div>
+  } @else {
+    <div class="listings-list">
+      @for (listing of listings(); track listing.id) {
+        <div class="listing-item">
+          <div class="listing-image">
+            @if (listing.photos.length > 0) {
+              <img [src]="listing.photos[0].thumbnailUrl || listing.photos[0].url" [alt]="listing.title" />
+            } @else {
+              <div class="no-image"><i class="pi pi-image"></i></div>
+            }
+          </div>
+
+          <div class="listing-info">
+            <div class="listing-header">
+              <h3>{{ listing.title || 'Sans titre' }}</h3>
+              <p-tag [value]="statusLabel(listing.status)" [severity]="statusSeverity(listing.status)" />
+            </div>
+            <p class="listing-price">{{ formatPrice(listing.monthlyPrice) }}/mois</p>
+            @if (listing.location) {
+              <p class="listing-location"><i class="pi pi-map-marker"></i> {{ listing.location.address }}</p>
+            }
+            <p class="listing-meta">{{ listing.photos.length }} photos — {{ listing.amenities.length }} equipements</p>
+          </div>
+
+          <div class="listing-actions">
+            <a [routerLink]="['/listings', listing.id]">
+              <p-button icon="pi pi-eye" [text]="true" severity="secondary" />
+            </a>
+            @if (listing.status === 'DRAFT') {
+              <p-button
+                label="Soumettre"
+                size="small"
+                severity="primary"
+                (onClick)="submitForReview(listing)"
+              />
+            }
+            @if (listing.status === 'REJECTED' && listing.rejectionReason) {
+              <p class="rejection-reason">Motif : {{ listing.rejectionReason }}</p>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,147 @@
+@reference "../../../../tailwind.css";
+
+.my-listings-page {
+  @apply max-w-5xl mx-auto px-6 py-8;
+}
+
+/* ── Page header ── */
+.page-header {
+  @apply flex items-center justify-between mb-8;
+
+  h1 {
+    @apply text-3xl font-bold text-ndb-navy m-0;
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
+/* ── Loading ── */
+.loading-container {
+  @apply flex items-center justify-center py-24;
+}
+
+/* ── Empty state ── */
+.empty-state {
+  @apply flex flex-col items-center justify-center py-24 text-center;
+
+  .pi {
+    @apply text-6xl mb-4;
+    color: var(--color-ndb-border);
+  }
+
+  h3 {
+    @apply text-xl font-semibold text-ndb-navy mb-2;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  p {
+    @apply text-ndb-muted mb-6;
+  }
+}
+
+/* ── Listings list ── */
+.listings-list {
+  @apply flex flex-col gap-4;
+}
+
+.listing-item {
+  @apply flex items-center gap-5 bg-white rounded-2xl p-4 transition-all;
+  border: 1px solid var(--color-ndb-border);
+  box-shadow: var(--shadow-card);
+
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+    border-color: rgba(27, 58, 92, 0.15);
+  }
+
+  @media (max-width: 640px) {
+    @apply flex-col items-start;
+  }
+}
+
+.listing-image {
+  @apply flex-shrink-0 rounded-xl overflow-hidden;
+  width: 120px;
+  height: 80px;
+  background: var(--color-ndb-page);
+
+  img {
+    @apply w-full h-full object-cover;
+  }
+
+  .no-image {
+    @apply w-full h-full flex items-center justify-center;
+
+    i {
+      @apply text-3xl;
+      color: var(--color-ndb-border);
+    }
+  }
+}
+
+.listing-info {
+  @apply flex-1 min-w-0;
+}
+
+.listing-header {
+  @apply flex items-start gap-3 mb-1 flex-wrap;
+
+  h3 {
+    @apply text-base font-semibold text-ndb-navy m-0 flex-1;
+    font-family: 'Poppins', sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.listing-price {
+  @apply font-bold text-lg m-0 leading-tight;
+  font-family: 'Poppins', sans-serif;
+  color: var(--color-ndb-orange);
+}
+
+.listing-location {
+  @apply text-sm text-ndb-muted flex items-center gap-1 m-0 mt-0.5;
+
+  i {
+    @apply text-xs;
+    color: var(--color-ndb-orange);
+  }
+}
+
+.listing-meta {
+  @apply text-xs text-ndb-muted m-0 mt-1;
+}
+
+.listing-actions {
+  @apply flex items-center gap-2 flex-shrink-0;
+}
+
+.rejection-reason {
+  @apply text-xs mt-1 m-0;
+  color: #DC3545;
+
+  &::before {
+    content: '⚠ ';
+  }
+}
+
+/* ── Status badge overrides ── */
+::ng-deep {
+  .p-tag-success {
+    background: #E8F5E9 !important;
+    color: #1A7A5C !important;
+  }
+  .p-tag-warn {
+    background: #FFF3E0 !important;
+    color: #E8762B !important;
+  }
+  .p-tag-danger {
+    background: #FFEBEE !important;
+    color: #DC3545 !important;
+  }
+  .p-tag-secondary {
+    background: rgba(27, 58, 92, 0.08) !important;
+    color: #1B3A5C !important;
+  }
+}

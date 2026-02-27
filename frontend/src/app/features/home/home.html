@@ -1,0 +1,121 @@
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-text">
+      <span class="hero-badge">
+        <i class="pi pi-check-circle"></i> 100% annonces vérifiées
+      </span>
+      <h1 class="hero-title">Trouvez votre logement étudiant à Eyang</h1>
+      <p class="hero-subtitle">
+        Annonces vérifiées, photos réelles, réservation en ligne — la référence pour les étudiants de l'IUSJC.
+      </p>
+    </div>
+
+    <div class="hero-search-card">
+      <p class="search-card-label">Rechercher un logement</p>
+      <div class="search-inputs">
+        <p-select
+          [options]="roomTypes"
+          [(ngModel)]="selectedRoomType"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Type de chambre"
+          class="search-select"
+        />
+        <p-select
+          [options]="budgetRanges"
+          [(ngModel)]="selectedBudget"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Budget (FCFA)"
+          class="search-select"
+        />
+        <button class="search-btn" (click)="onSearch()">
+          <i class="pi pi-search"></i>
+          RECHERCHER
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── COMMENT ÇA MARCHE ── -->
+<section class="how-it-works">
+  <div class="section-container">
+    <h2 class="section-title">Comment ça marche</h2>
+    <p class="section-subtitle">Trouvez et réservez votre logement en 3 étapes simples</p>
+
+    <div class="features-grid">
+      @for (feature of features; track feature.title) {
+        <div class="feature-card">
+          <div class="feature-icon-wrap">
+            <i class="pi" [class]="feature.icon"></i>
+          </div>
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.description }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ── ANNONCES POPULAIRES ── -->
+@if (popularListings().length > 0) {
+  <section class="popular-listings">
+    <div class="section-container">
+      <div class="section-header">
+        <h2 class="section-title left">Annonces populaires</h2>
+        <a routerLink="/search" class="see-all-link">
+          Voir tout <i class="pi pi-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="listings-grid">
+        @for (listing of popularListings(); track listing.id) {
+          <app-listing-card [listing]="listing" />
+        }
+      </div>
+    </div>
+  </section>
+}
+
+<!-- ── STATS ── -->
+<section class="stats-section">
+  <div class="section-container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <span class="stat-number">150+</span>
+        <span class="stat-label">Logements disponibles</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">1 500</span>
+        <span class="stat-label">Étudiants logés</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">100%</span>
+        <span class="stat-label">Annonces vérifiées</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA PROPRIÉTAIRES ── -->
+<section class="landlord-cta">
+  <div class="section-container">
+    <div class="cta-content">
+      <div class="cta-text">
+        <h2>Vous avez un logement à louer ?</h2>
+        <p>Rejoignez plus de 50 propriétaires qui font confiance à Ndobaâk pour trouver des locataires fiables.</p>
+      </div>
+      <div class="cta-actions">
+        <a routerLink="/register" class="cta-btn-primary">
+          <i class="pi pi-plus"></i> Publier une annonce
+        </a>
+        <a href="#" class="cta-btn-secondary">En savoir plus</a>
+      </div>
+    </div>
+  </div>
+</section>

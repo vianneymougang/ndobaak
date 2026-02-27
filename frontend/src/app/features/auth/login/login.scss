@@ -1,0 +1,139 @@
+@reference "../../../../tailwind.css";
+
+/* ── Split-screen layout ── */
+.login-page {
+  @apply min-h-screen flex;
+  background: var(--color-ndb-page);
+}
+
+/* Visual panel — hidden on mobile */
+.login-visual {
+  @apply hidden lg:flex flex-1 flex-col justify-between p-12;
+  background: linear-gradient(145deg, #1B3A5C 0%, #2D5F8A 60%, #1A7A5C 100%);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -20%;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: rgba(232, 118, 43, 0.15);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.visual-logo {
+  @apply flex items-center gap-2 relative z-10;
+
+  .logo-icon {
+    @apply flex items-center justify-center w-10 h-10 rounded-xl text-white text-lg;
+    background: var(--color-ndb-orange);
+  }
+
+  .logo-name {
+    font-family: 'Poppins', sans-serif;
+    @apply text-2xl font-bold text-white;
+  }
+}
+
+.visual-quote {
+  @apply relative z-10;
+
+  blockquote {
+    @apply text-white/90 text-2xl font-light leading-relaxed mb-4;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  cite {
+    @apply text-white/60 text-sm;
+  }
+}
+
+.visual-stats {
+  @apply flex gap-8 relative z-10;
+
+  .stat {
+    .num {
+      @apply block text-3xl font-bold text-white;
+      font-family: 'Poppins', sans-serif;
+    }
+    .lbl {
+      @apply text-white/60 text-sm;
+    }
+  }
+}
+
+/* Form panel */
+.login-form-panel {
+  @apply flex items-center justify-center p-6;
+  flex: 0 0 480px;
+  background: #fff;
+
+  @media (max-width: 1024px) {
+    @apply flex-1 px-4;
+  }
+}
+
+.login-card {
+  @apply w-full;
+  max-width: 400px;
+}
+
+.login-brand-mobile {
+  @apply flex items-center gap-2 mb-8 lg:hidden;
+
+  .logo-icon {
+    @apply flex items-center justify-center w-9 h-9 rounded-xl text-white;
+    background: var(--color-ndb-orange);
+  }
+
+  .logo-name {
+    font-family: 'Poppins', sans-serif;
+    @apply text-xl font-bold text-ndb-navy;
+  }
+}
+
+.login-title {
+  @apply text-3xl font-bold text-ndb-navy mb-1;
+  font-family: 'Poppins', sans-serif;
+}
+
+.login-subtitle {
+  @apply text-ndb-muted text-sm mb-6;
+}
+
+.login-form {
+  @apply flex flex-col gap-5 pt-4;
+}
+
+.register-link {
+  @apply text-center text-sm text-ndb-muted mt-6 m-0;
+
+  a {
+    @apply font-semibold no-underline;
+    color: var(--color-ndb-orange);
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+/* PrimeNG Tabs tweaks */
+::ng-deep .p-tabs .p-tablist {
+  margin-bottom: 4px;
+}

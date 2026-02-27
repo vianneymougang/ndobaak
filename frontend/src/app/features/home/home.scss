@@ -1,0 +1,287 @@
+@reference "../../../tailwind.css";
+
+/* ═══════════════════════════════════════
+   HERO
+═══════════════════════════════════════ */
+.hero {
+  position: relative;
+  min-height: 82vh;
+  display: flex;
+  align-items: center;
+  background-image: url('https://images.pexels.com/photos/20600296/pexels-photo-20600296.jpeg?auto=compress&cs=tinysrgb&w=1920');
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(27, 58, 92, 0.82) 0%,
+    rgba(27, 58, 92, 0.65) 60%,
+    rgba(45, 95, 138, 0.5) 100%
+  );
+}
+
+.hero-content {
+  @apply relative z-10 max-w-5xl mx-auto px-6 w-full py-16;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 40px;
+}
+
+.hero-badge {
+  @apply inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-4;
+  background: rgba(26, 122, 92, 0.9);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.02em;
+
+  i {
+    @apply text-xs;
+  }
+}
+
+.hero-title {
+  @apply text-4xl md:text-6xl font-bold text-white mb-4;
+  font-family: 'Poppins', sans-serif;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  line-height: 1.15;
+}
+
+.hero-subtitle {
+  @apply text-lg text-white/80 max-w-2xl mx-auto;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── Search Card ── */
+.hero-search-card {
+  @apply w-full max-w-2xl bg-white rounded-2xl p-6;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+}
+
+.search-card-label {
+  @apply text-sm font-semibold text-ndb-navy mb-4 m-0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.search-inputs {
+  @apply flex flex-col md:flex-row gap-3;
+}
+
+.search-select {
+  @apply flex-1;
+
+  ::ng-deep .p-select {
+    width: 100%;
+    height: 48px;
+  }
+}
+
+.search-btn {
+  @apply flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-white font-semibold text-sm transition-all cursor-pointer border-0;
+  background: var(--color-ndb-orange);
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  min-height: 48px;
+
+  &:hover {
+    background: var(--color-ndb-orange-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(232, 118, 43, 0.45);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════
+   SHARED LAYOUT
+═══════════════════════════════════════ */
+.section-container {
+  @apply max-w-7xl mx-auto px-6;
+}
+
+.section-title {
+  @apply text-3xl font-bold text-ndb-navy text-center mb-3 m-0;
+  font-family: 'Poppins', sans-serif;
+
+  &.left {
+    @apply text-left;
+  }
+}
+
+.section-subtitle {
+  @apply text-ndb-muted text-center mb-10;
+  font-family: 'Inter', sans-serif;
+}
+
+.section-header {
+  @apply flex items-center justify-between mb-8;
+}
+
+.see-all-link {
+  @apply text-ndb-orange text-sm font-semibold no-underline flex items-center gap-1 transition-all;
+  font-family: 'Poppins', sans-serif;
+
+  &:hover {
+    @apply text-ndb-orange-dark;
+    gap: 6px;
+  }
+
+  i {
+    @apply text-xs;
+    transition: transform 0.2s;
+  }
+
+  &:hover i {
+    transform: translateX(3px);
+  }
+}
+
+/* ═══════════════════════════════════════
+   HOW IT WORKS
+═══════════════════════════════════════ */
+.how-it-works {
+  @apply py-20;
+  background: #fff;
+}
+
+.features-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-6;
+}
+
+.feature-card {
+  @apply rounded-2xl p-8 text-center transition-all;
+  background: var(--color-ndb-page);
+  border: 1px solid var(--color-ndb-border);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: rgba(45, 95, 138, 0.2);
+  }
+}
+
+.feature-icon-wrap {
+  @apply flex items-center justify-center w-16 h-16 rounded-2xl mx-auto mb-5;
+  background: rgba(27, 58, 92, 0.08);
+
+  i {
+    @apply text-2xl text-ndb-navy;
+  }
+}
+
+.feature-card h3 {
+  @apply text-lg font-semibold text-ndb-navy mb-2 m-0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.feature-card p {
+  @apply text-sm text-ndb-muted leading-relaxed m-0;
+}
+
+/* ═══════════════════════════════════════
+   POPULAR LISTINGS
+═══════════════════════════════════════ */
+.popular-listings {
+  @apply py-20;
+  background: var(--color-ndb-page);
+}
+
+.listings-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+/* ═══════════════════════════════════════
+   STATS SECTION
+═══════════════════════════════════════ */
+.stats-section {
+  @apply py-20;
+  background: var(--color-ndb-stats);
+}
+
+.stats-grid {
+  @apply flex flex-col md:flex-row items-center justify-center gap-0 md:gap-0;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.stat-item {
+  @apply flex-1 text-center py-8 md:py-4;
+
+  .stat-number {
+    @apply block text-5xl font-bold text-ndb-navy;
+    font-family: 'Poppins', sans-serif;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    @apply block text-sm text-ndb-muted;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+.stat-divider {
+  @apply hidden md:block w-px h-16 bg-ndb-border;
+}
+
+/* ═══════════════════════════════════════
+   LANDLORD CTA
+═══════════════════════════════════════ */
+.landlord-cta {
+  @apply py-20;
+  background: var(--color-ndb-navy);
+}
+
+.cta-content {
+  @apply flex flex-col lg:flex-row items-center justify-between gap-8 max-w-5xl mx-auto px-6 py-12 rounded-3xl;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.cta-text {
+  h2 {
+    @apply text-2xl font-bold text-white mb-2;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  p {
+    @apply text-white/60 m-0;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+.cta-actions {
+  @apply flex flex-col sm:flex-row gap-3 flex-shrink-0;
+}
+
+.cta-btn-primary {
+  @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white text-sm font-semibold no-underline transition-all;
+  background: var(--color-ndb-orange);
+  font-family: 'Poppins', sans-serif;
+
+  &:hover {
+    background: var(--color-ndb-orange-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(232, 118, 43, 0.45);
+  }
+}
+
+.cta-btn-secondary {
+  @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white text-sm font-semibold no-underline transition-all border;
+  border-color: rgba(255, 255, 255, 0.25);
+  font-family: 'Poppins', sans-serif;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+}

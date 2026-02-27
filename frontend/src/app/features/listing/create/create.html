@@ -1,0 +1,385 @@
+<div class="create-listing-page">
+  <h1>Creer une annonce</h1>
+
+  <p-stepper [(value)]="activeStep" class="w-full">
+    <p-step-list>
+      <p-step [value]="1">Informations</p-step>
+      <p-step [value]="2">Photos</p-step>
+      <p-step [value]="3">Localisation</p-step>
+      <p-step [value]="4">Recapitulatif</p-step>
+    </p-step-list>
+
+    <p-step-panels>
+      <!-- Step 1: Information -->
+      <p-step-panel [value]="1">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="step-content">
+            <form [formGroup]="infoForm" class="info-form">
+              <div class="form-grid">
+                <div class="field full-width">
+                  <p-floatlabel variant="on">
+                    <input pInputText id="title" formControlName="title" class="w-full" />
+                    <label for="title">Titre de l'annonce</label>
+                  </p-floatlabel>
+                  <small class="char-counter" [class.error]="titleLength() > 0 && titleLength() < 10">
+                    {{ titleLength() }}/10 caracteres min.
+                  </small>
+                </div>
+
+                <div class="field full-width">
+                  <p-floatlabel variant="on">
+                    <textarea pTextarea id="description" formControlName="description" [rows]="5" class="w-full"></textarea>
+                    <label for="description">Description detaillee</label>
+                  </p-floatlabel>
+                  <small class="char-counter" [class.error]="descriptionLength() > 0 && descriptionLength() < 50">
+                    {{ descriptionLength() }}/50 caracteres min.
+                  </small>
+                </div>
+
+                <div class="field">
+                  <p-floatlabel variant="on">
+                    <p-select
+                      id="roomType"
+                      formControlName="roomType"
+                      [options]="roomTypeOptions"
+                      optionLabel="label"
+                      optionValue="value"
+                      class="w-full"
+                    />
+                    <label for="roomType">Type de logement</label>
+                  </p-floatlabel>
+                </div>
+
+                <div class="field">
+                  <p-floatlabel variant="on">
+                    <p-inputnumber
+                      id="monthlyPrice"
+                      formControlName="monthlyPrice"
+                      mode="decimal"
+                      [useGrouping]="true"
+                      suffix=" FCFA"
+                      class="w-full"
+                    />
+                    <label for="monthlyPrice">Loyer mensuel</label>
+                  </p-floatlabel>
+                </div>
+
+                <div class="field">
+                  <p-floatlabel variant="on">
+                    <p-inputnumber
+                      id="availableRooms"
+                      formControlName="availableRooms"
+                      [min]="1"
+                      [showButtons]="true"
+                      class="w-full"
+                    />
+                    <label for="availableRooms">Chambres disponibles</label>
+                  </p-floatlabel>
+                </div>
+
+                <div class="field">
+                  <p-floatlabel variant="on">
+                    <p-datepicker
+                      id="availableDate"
+                      formControlName="availableDate"
+                      dateFormat="dd/mm/yy"
+                      class="w-full"
+                    />
+                    <label for="availableDate">Date de disponibilite</label>
+                  </p-floatlabel>
+                </div>
+              </div>
+
+              <div class="amenities-section">
+                <h3>Equipements</h3>
+                <div class="amenities-grid">
+                  @for (amenity of amenities(); track amenity.name; let i = $index) {
+                    <div
+                      class="amenity-chip"
+                      [class.selected]="amenity.selected"
+                      (click)="toggleAmenity(i)"
+                      (keydown.enter)="toggleAmenity(i)"
+                      (keydown.space)="toggleAmenity(i)"
+                      tabindex="0"
+                      role="checkbox"
+                      [attr.aria-checked]="amenity.selected"
+                      [attr.aria-label]="amenity.name"
+                    >
+                      <i [class]="amenity.icon"></i>
+                      <span>{{ amenity.name }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="step-actions">
+            <span></span>
+            <div class="actions-right">
+              <p-button
+                label="Sauvegarder le brouillon"
+                icon="pi pi-save"
+                severity="secondary"
+                [loading]="saving()"
+                (onClick)="saveDraft()"
+              />
+              <p-button
+                label="Suivant"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                (onClick)="saveDraft(); activateCallback(2)"
+              />
+            </div>
+          </div>
+        </ng-template>
+      </p-step-panel>
+
+      <!-- Step 2: Photos -->
+      <p-step-panel [value]="2">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="step-content">
+            <div class="photos-section">
+              <div class="photos-header">
+                <h3>Photos du logement</h3>
+                <p>Minimum 3, maximum 10 photos. La premiere photo sera la couverture.</p>
+              </div>
+
+              @if (!listing()) {
+                <p-message severity="warn" text="Sauvegardez d'abord le brouillon (etape 1) avant d'ajouter des photos." />
+              } @else {
+                <div class="upload-zone">
+                  <label for="photo-upload" class="upload-area" (dragover)="$event.preventDefault()" (drop)="$event.preventDefault()">
+                    <i class="pi pi-cloud-upload"></i>
+                    <span>Cliquez ou deposez vos photos ici</span>
+                    <small>JPG, PNG — max 5 Mo par photo</small>
+                    <input
+                      id="photo-upload"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      (change)="onFileSelect($event)"
+                      [disabled]="photoCount() >= 10 || uploadingPhoto()"
+                      hidden
+                    />
+                  </label>
+                </div>
+
+                @if (uploadingPhoto()) {
+                  <div class="uploading-indicator">
+                    <p-progressSpinner [style]="{ width: '30px', height: '30px' }" />
+                    <span>Upload en cours...</span>
+                  </div>
+                }
+
+                <div class="photos-counter">
+                  <p-tag
+                    [value]="photoCount() + '/10 photos'"
+                    [severity]="photoCount() < 3 ? 'danger' : 'success'"
+                  />
+                  @if (photoCount() < 3) {
+                    <small class="photo-warning">Encore {{ 3 - photoCount() }} photo(s) requise(s)</small>
+                  }
+                </div>
+
+                <div class="photos-grid">
+                  @for (photo of photos(); track photo.id; let i = $index) {
+                    <div class="photo-card">
+                      <img [src]="photo.thumbnailUrl || photo.url" [alt]="'Photo ' + (i + 1)" />
+                      @if (i === 0) {
+                        <p-tag value="Couverture" severity="info" class="cover-badge" />
+                      }
+                      <button class="remove-btn" (click)="removePhoto(photo)" aria-label="Supprimer la photo">
+                        <i class="pi pi-times"></i>
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+          <div class="step-actions">
+            <p-button
+              label="Precedent"
+              icon="pi pi-arrow-left"
+              severity="secondary"
+              (onClick)="activateCallback(1)"
+            />
+            <p-button
+              label="Suivant"
+              icon="pi pi-arrow-right"
+              iconPos="right"
+              (onClick)="activateCallback(3)"
+            />
+          </div>
+        </ng-template>
+      </p-step-panel>
+
+      <!-- Step 3: Location -->
+      <p-step-panel [value]="3">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="step-content">
+            <div class="location-section">
+              <form [formGroup]="locationForm" class="location-form">
+                <div class="form-grid">
+                  <div class="field full-width">
+                    <p-floatlabel variant="on">
+                      <input pInputText id="address" formControlName="address" class="w-full" />
+                      <label for="address">Adresse</label>
+                    </p-floatlabel>
+                  </div>
+
+                  <div class="field">
+                    <p-floatlabel variant="on">
+                      <input pInputText id="neighborhood" formControlName="neighborhood" class="w-full" />
+                      <label for="neighborhood">Quartier</label>
+                    </p-floatlabel>
+                  </div>
+
+                  <div class="field">
+                    <p-floatlabel variant="on">
+                      <input pInputText id="city" formControlName="city" class="w-full" />
+                      <label for="city">Ville</label>
+                    </p-floatlabel>
+                  </div>
+                </div>
+
+                <div class="map-info">
+                  <p><i class="pi pi-info-circle"></i> Cliquez sur la carte ou deplacez le marqueur pour definir l'emplacement exact.</p>
+                  <p-tag [value]="distanceToCampus() + ' km du campus'" severity="info" />
+                </div>
+
+                <div id="location-map" class="map-container" (click)="initMap()"></div>
+                @if (!map) {
+                  <div class="map-placeholder" (click)="initMap()">
+                    <i class="pi pi-map"></i>
+                    <span>Cliquez pour charger la carte</span>
+                  </div>
+                }
+              </form>
+            </div>
+          </div>
+          <div class="step-actions">
+            <p-button
+              label="Precedent"
+              icon="pi pi-arrow-left"
+              severity="secondary"
+              (onClick)="activateCallback(2)"
+            />
+            <p-button
+              label="Suivant"
+              icon="pi pi-arrow-right"
+              iconPos="right"
+              (onClick)="saveDraft(); activateCallback(4)"
+            />
+          </div>
+        </ng-template>
+      </p-step-panel>
+
+      <!-- Step 4: Summary -->
+      <p-step-panel [value]="4">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="step-content">
+            <div class="summary-section">
+              <h3>Recapitulatif de l'annonce</h3>
+
+              <div class="summary-card">
+                <div class="summary-group">
+                  <h4>Informations generales</h4>
+                  <div class="summary-row">
+                    <span class="label">Titre</span>
+                    <span class="value">{{ infoForm.get('title')?.value || '—' }}</span>
+                  </div>
+                  <div class="summary-row">
+                    <span class="label">Type</span>
+                    <span class="value">{{ roomTypeLabel(infoForm.get('roomType')?.value ?? null) }}</span>
+                  </div>
+                  <div class="summary-row">
+                    <span class="label">Loyer</span>
+                    <span class="value price">{{ formatPrice(infoForm.get('monthlyPrice')?.value ?? null) }}/mois</span>
+                  </div>
+                  <div class="summary-row">
+                    <span class="label">Chambres</span>
+                    <span class="value">{{ infoForm.get('availableRooms')?.value }}</span>
+                  </div>
+                </div>
+
+                <div class="summary-group">
+                  <h4>Description</h4>
+                  <p class="description-preview">{{ infoForm.get('description')?.value || 'Aucune description' }}</p>
+                </div>
+
+                <div class="summary-group">
+                  <h4>Photos</h4>
+                  <div class="summary-photos">
+                    @for (photo of photos(); track photo.id) {
+                      <img [src]="photo.thumbnailUrl || photo.url" alt="Photo" class="summary-thumb" />
+                    }
+                    @if (photos().length === 0) {
+                      <span class="no-data">Aucune photo</span>
+                    }
+                  </div>
+                  @if (photoCount() < 3) {
+                    <p-message severity="warn" text="Minimum 3 photos requises pour soumettre." />
+                  }
+                </div>
+
+                <div class="summary-group">
+                  <h4>Localisation</h4>
+                  <div class="summary-row">
+                    <span class="label">Adresse</span>
+                    <span class="value">{{ locationForm.get('address')?.value || '—' }}</span>
+                  </div>
+                  <div class="summary-row">
+                    <span class="label">Quartier</span>
+                    <span class="value">{{ locationForm.get('neighborhood')?.value || '—' }}</span>
+                  </div>
+                  <div class="summary-row">
+                    <span class="label">Distance campus</span>
+                    <span class="value">{{ distanceToCampus() }} km</span>
+                  </div>
+                </div>
+
+                <div class="summary-group">
+                  <h4>Equipements</h4>
+                  <div class="amenity-tags">
+                    @for (name of selectedAmenityNames(); track name) {
+                      <p-tag [value]="name" severity="info" />
+                    }
+                    @if (selectedAmenityNames().length === 0) {
+                      <span class="no-data">Aucun equipement selectionne</span>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step-actions">
+            <p-button
+              label="Precedent"
+              icon="pi pi-arrow-left"
+              severity="secondary"
+              (onClick)="activateCallback(3)"
+            />
+            <div class="actions-right">
+              <p-button
+                label="Sauvegarder le brouillon"
+                icon="pi pi-save"
+                severity="secondary"
+                [loading]="saving()"
+                (onClick)="saveDraft()"
+              />
+              <p-button
+                label="Soumettre pour validation"
+                icon="pi pi-check"
+                severity="primary"
+                [loading]="submitting()"
+                [disabled]="!canSubmit() || infoForm.invalid"
+                (onClick)="submitForReview()"
+              />
+            </div>
+          </div>
+        </ng-template>
+      </p-step-panel>
+    </p-step-panels>
+  </p-stepper>
+</div>

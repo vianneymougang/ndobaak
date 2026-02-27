@@ -1,0 +1,126 @@
+<div class="register-page">
+
+  <!-- Visual panel -->
+  <div class="register-visual">
+    <div class="visual-logo">
+      <span class="logo-icon"><i class="pi pi-home"></i></span>
+      <span class="logo-name">Ndobaâk</span>
+    </div>
+    <div class="visual-features">
+      <div class="feature">
+        <div class="feature-icon"><i class="pi pi-verified"></i></div>
+        <div class="feature-text">
+          <h4>Annonces 100% vérifiées</h4>
+          <p>Chaque logement est contrôlé par notre équipe avant publication.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon"><i class="pi pi-shield"></i></div>
+        <div class="feature-text">
+          <h4>Paiements sécurisés</h4>
+          <p>Réservez en toute sécurité grâce à notre système de paiement protégé.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon"><i class="pi pi-users"></i></div>
+        <div class="feature-text">
+          <h4>Communauté étudiante</h4>
+          <p>Rejoignez plus de 1 500 étudiants qui ont trouvé leur logement avec Ndobaâk.</p>
+        </div>
+      </div>
+    </div>
+    <p class="visual-bottom-text">© 2026 Ndobaâk — Yaoundé, Cameroun</p>
+  </div>
+
+  <!-- Form panel -->
+  <div class="register-form-panel">
+    <div class="register-card">
+      <!-- Mobile brand -->
+      <div class="register-brand-mobile">
+        <span class="logo-icon"><i class="pi pi-home"></i></span>
+        <span class="logo-name">Ndobaâk</span>
+      </div>
+
+      <h1 class="register-title">Créer un compte</h1>
+      <p class="register-subtitle">Rejoignez Ndobaâk pour trouver ou publier un logement</p>
+
+      <div class="role-selector">
+        <p-selectbutton
+          [options]="roleOptions"
+          [ngModel]="selectedRole()"
+          (ngModelChange)="onRoleChange($event)"
+          optionLabel="label"
+          optionValue="value"
+        />
+      </div>
+
+      @if (errorMessage()) {
+        <p-message severity="error" [text]="errorMessage()!" />
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="register-form">
+        <div class="form-row">
+          <p-floatlabel>
+            <input pInputText id="firstName" formControlName="firstName" class="w-full" />
+            <label for="firstName">Prénom</label>
+          </p-floatlabel>
+          <p-floatlabel>
+            <input pInputText id="lastName" formControlName="lastName" class="w-full" />
+            <label for="lastName">Nom</label>
+          </p-floatlabel>
+        </div>
+
+        <p-floatlabel>
+          <input pInputText id="email" formControlName="email" type="email" class="w-full" />
+          <label for="email">Email</label>
+        </p-floatlabel>
+
+        <p-floatlabel>
+          <input pInputText id="phone" formControlName="phone" class="w-full" />
+          <label for="phone">Téléphone</label>
+        </p-floatlabel>
+
+        <p-floatlabel>
+          <p-password id="password" formControlName="password" [toggleMask]="true" [fluid]="true" />
+          <label for="password">Mot de passe</label>
+        </p-floatlabel>
+
+        @if (selectedRole() === 'STUDENT') {
+          <div class="student-fields">
+            <p-floatlabel>
+              <input pInputText id="matricule" formControlName="matricule" class="w-full" />
+              <label for="matricule">Matricule</label>
+            </p-floatlabel>
+            <p-floatlabel>
+              <input pInputText id="fieldOfStudy" formControlName="fieldOfStudy" class="w-full" />
+              <label for="fieldOfStudy">Filière</label>
+            </p-floatlabel>
+            <p-floatlabel>
+              <p-inputNumber id="yearOfStudy" formControlName="yearOfStudy" [min]="1" [max]="7" [fluid]="true" />
+              <label for="yearOfStudy">Année d'étude</label>
+            </p-floatlabel>
+          </div>
+        }
+
+        @if (selectedRole() === 'LANDLORD') {
+          <div class="landlord-fields">
+            <p-floatlabel>
+              <input pInputText id="idCardNumber" formControlName="idCardNumber" class="w-full" />
+              <label for="idCardNumber">Numéro CNI</label>
+            </p-floatlabel>
+            <p-floatlabel>
+              <input pInputText id="taxId" formControlName="taxId" class="w-full" />
+              <label for="taxId">Numéro contribuable</label>
+            </p-floatlabel>
+          </div>
+        }
+
+        <p-button type="submit" label="S'inscrire" [loading]="loading()" [fluid]="true" severity="primary" />
+      </form>
+
+      <p class="login-link">
+        Déjà inscrit ? <a routerLink="/login">Se connecter</a>
+      </p>
+    </div>
+  </div>
+</div>

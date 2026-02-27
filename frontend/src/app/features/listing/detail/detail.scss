@@ -1,0 +1,256 @@
+@reference "../../../../tailwind.css";
+
+/* ── Loading ── */
+.loading-container {
+  @apply flex items-center justify-center min-h-screen;
+}
+
+/* ── Detail page layout ── */
+.detail-page {
+  @apply max-w-7xl mx-auto px-6 py-8 flex gap-8;
+
+  @media (max-width: 1024px) {
+    @apply flex-col;
+  }
+}
+
+.detail-main {
+  @apply flex-1 min-w-0;
+}
+
+/* ── Airbnb-style photo grid ── */
+.photo-grid {
+  @apply rounded-2xl overflow-hidden mb-8;
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  grid-template-rows: 280px 280px;
+  gap: 6px;
+  height: 566px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: 280px;
+    height: 280px;
+  }
+}
+
+.photo-main {
+  grid-row: 1 / 3;
+  overflow: hidden;
+
+  img {
+    @apply w-full h-full object-cover transition-transform duration-500;
+
+    &:hover {
+      transform: scale(1.03);
+    }
+  }
+}
+
+.photo-secondary {
+  overflow: hidden;
+  position: relative;
+
+  img {
+    @apply w-full h-full object-cover transition-transform duration-500;
+
+    &:hover {
+      transform: scale(1.03);
+    }
+  }
+
+  &:nth-child(4) {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  &.photo-overlay-more {
+    cursor: pointer;
+
+    &::after {
+      content: '+' attr(data-extra) ' photos';
+      position: absolute;
+      inset: 0;
+      background: rgba(27, 58, 92, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+    }
+  }
+}
+
+.photo-placeholder {
+  @apply bg-ndb-page flex items-center justify-center;
+  grid-row: 1 / 3;
+
+  i {
+    @apply text-6xl;
+    color: var(--color-ndb-border);
+  }
+}
+
+/* ── Content ── */
+.detail-content {
+  @apply pb-8;
+}
+
+.detail-badges {
+  @apply flex items-center gap-2 mb-4;
+}
+
+.detail-badge-type {
+  @apply inline-flex items-center px-3 py-1 rounded-lg text-sm font-semibold;
+  background: rgba(27, 58, 92, 0.1);
+  color: var(--color-ndb-navy);
+  font-family: 'Poppins', sans-serif;
+}
+
+.detail-badge-verified {
+  @apply inline-flex items-center gap-1 px-3 py-1 rounded-lg text-sm font-semibold;
+  background: #E8F5E9;
+  color: #1A7A5C;
+  font-family: 'Poppins', sans-serif;
+
+  i { @apply text-xs; }
+}
+
+.detail-title {
+  @apply text-3xl font-bold text-ndb-navy mb-2;
+  font-family: 'Poppins', sans-serif;
+}
+
+.detail-location {
+  @apply flex items-center gap-1.5 text-ndb-muted text-sm mb-6;
+
+  i {
+    color: var(--color-ndb-orange);
+    @apply flex-shrink-0;
+  }
+}
+
+/* ── Section ── */
+.detail-section {
+  @apply mb-8 pb-8 border-b;
+  border-color: var(--color-ndb-border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  h2 {
+    @apply text-xl font-semibold text-ndb-navy mb-4;
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
+.detail-description {
+  @apply text-ndb-body leading-relaxed m-0;
+}
+
+.amenities-list {
+  @apply flex flex-wrap gap-2;
+
+  ::ng-deep .p-chip {
+    background: rgba(27, 58, 92, 0.07) !important;
+    color: var(--color-ndb-navy) !important;
+    border-radius: 8px !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+  }
+}
+
+.detail-map {
+  @apply w-full rounded-xl overflow-hidden;
+  height: 260px;
+  border: 1px solid var(--color-ndb-border);
+}
+
+/* ── Sidebar ── */
+.detail-sidebar {
+  @apply flex-shrink-0;
+  width: 340px;
+
+  @media (max-width: 1024px) {
+    width: 100%;
+  }
+}
+
+.sidebar-card {
+  @apply bg-white rounded-2xl p-6 flex flex-col gap-4;
+  border: 1px solid var(--color-ndb-border);
+  box-shadow: 0 8px 24px rgba(27, 58, 92, 0.1);
+  position: sticky;
+  top: calc(64px + 20px);
+}
+
+.sidebar-price {
+  @apply text-3xl font-bold m-0;
+  font-family: 'Poppins', sans-serif;
+  color: var(--color-ndb-orange);
+}
+
+.sidebar-info {
+  @apply flex flex-col gap-2;
+}
+
+.info-row {
+  @apply flex items-center justify-between py-2 border-b text-sm;
+  border-color: var(--color-ndb-border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .info-label {
+    @apply text-ndb-muted;
+  }
+
+  .info-value {
+    @apply font-semibold text-ndb-navy;
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
+/* ── Landlord card ── */
+.landlord-card {
+  @apply flex items-center gap-3 pt-2;
+  border-top: 1px solid var(--color-ndb-border);
+
+  ::ng-deep .p-avatar {
+    background: var(--color-ndb-navy) !important;
+    color: #fff !important;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+  }
+}
+
+.landlord-info {
+  @apply flex flex-col;
+
+  .landlord-name {
+    @apply text-sm font-semibold text-ndb-navy m-0;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .landlord-contact {
+    @apply text-xs text-ndb-muted m-0;
+  }
+}
+
+/* ── Mobile bottom bar ── */
+.mobile-bottom-bar {
+  @apply lg:hidden fixed bottom-0 left-0 right-0 bg-white flex items-center justify-between px-6 py-4 z-50;
+  border-top: 1px solid var(--color-ndb-border);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+
+  .mobile-price {
+    @apply text-xl font-bold;
+    font-family: 'Poppins', sans-serif;
+    color: var(--color-ndb-orange);
+  }
+}

@@ -1,0 +1,119 @@
+<div class="search-page">
+
+  <!-- ── Filter Bar ── -->
+  <div class="filter-bar">
+    <div class="filter-inner">
+      <div class="filter-search">
+        <i class="pi pi-search filter-search-icon"></i>
+        <input
+          pInputText
+          [(ngModel)]="keyword"
+          placeholder="Rechercher un logement..."
+          class="filter-input-search"
+        />
+      </div>
+
+      <div class="filter-separator"></div>
+
+      <p-select
+        [options]="roomTypeOptions"
+        [(ngModel)]="roomType"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Type de chambre"
+        class="filter-select"
+      />
+
+      <div class="filter-price-range">
+        <p-inputNumber
+          [(ngModel)]="priceMin"
+          placeholder="Min"
+          [useGrouping]="true"
+          mode="decimal"
+          class="filter-price-input"
+        />
+        <span class="price-dash">—</span>
+        <p-inputNumber
+          [(ngModel)]="priceMax"
+          placeholder="Max FCFA"
+          [useGrouping]="true"
+          mode="decimal"
+          class="filter-price-input"
+        />
+      </div>
+
+      <p-select
+        [options]="sortOptions"
+        [(ngModel)]="sortBy"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Trier par"
+        class="filter-select"
+      />
+
+      <button class="filter-btn-search" (click)="doSearch()">
+        <i class="pi pi-search"></i>
+        RECHERCHER
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Main content ── -->
+  <div class="search-body">
+    <div class="search-results">
+
+      @if (loading()) {
+        <div class="results-header">
+          <div class="skeleton skeleton-text" style="width: 180px; height: 20px;"></div>
+        </div>
+        <div class="results-grid">
+          @for (item of [1,2,3,4]; track item) {
+            <div class="listing-skeleton">
+              <div class="skeleton" style="aspect-ratio: 16/9; border-radius: 12px;"></div>
+              <div class="skeleton-content">
+                <div class="skeleton" style="height: 18px; width: 75%;"></div>
+                <div class="skeleton" style="height: 22px; width: 50%; margin-top: 4px;"></div>
+                <div class="skeleton" style="height: 14px; width: 60%; margin-top: 4px;"></div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (results().length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon"><i class="pi pi-search"></i></div>
+          <h3>Aucun résultat trouvé</h3>
+          <p>Essayez de modifier vos critères de recherche pour trouver des logements disponibles.</p>
+          <button class="empty-cta" (click)="keyword=''; roomType=''; priceMin=null; priceMax=null; doSearch()">
+            Réinitialiser les filtres
+          </button>
+        </div>
+      } @else {
+        <div class="results-header">
+          <span class="results-count">
+            <strong>{{ totalElements() }}</strong> logement{{ totalElements() > 1 ? 's' : '' }} trouvé{{ totalElements() > 1 ? 's' : '' }}
+          </span>
+        </div>
+
+        <div class="results-grid">
+          @for (listing of results(); track listing.id) {
+            <app-listing-card [listing]="listing" />
+          }
+        </div>
+
+        <div class="paginator-wrap">
+          <p-paginator
+            [rows]="size"
+            [totalRecords]="totalElements()"
+            [first]="page * size"
+            (onPageChange)="onPageChange($event)"
+          />
+        </div>
+      }
+    </div>
+
+    <!-- ── Map panel ── -->
+    <div class="search-map-panel">
+      <div #mapContainer class="map-container"></div>
+    </div>
+  </div>
+</div>
