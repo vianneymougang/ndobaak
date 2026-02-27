@@ -1,2 +1,88 @@
-/* Global SCSS styles */
+/* ─────────────────────────────────────────────
+   Ndobaâk — Global Styles
+   Override PrimeNG primary to orange (#E8762B)
+   ───────────────────────────────────────────── */
 
+/* PrimeNG primary color override — unlayered, wins over @layer primeng */
+:root {
+  --p-primary-50:             #fef6ee;
+  --p-primary-100:            #fce8d0;
+  --p-primary-200:            #f9cda1;
+  --p-primary-300:            #f5a96a;
+  --p-primary-400:            #f08035;
+  --p-primary-500:            #E8762B;
+  --p-primary-600:            #d35e1a;
+  --p-primary-700:            #af4916;
+  --p-primary-800:            #8c3c16;
+  --p-primary-900:            #723217;
+  --p-primary-950:            #3e180a;
+  --p-primary-color:          #E8762B;
+  --p-primary-contrast-color: #ffffff;
+
+  /* Surface / input border radius */
+  --p-inputtext-border-radius: 6px;
+  --p-button-border-radius:    8px;
+  --p-border-radius-md:        8px;
+}
+
+/* ── Global button base enhancement ── */
+.p-button {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.025em;
+  transition: all 0.2s ease !important;
+  min-height: 44px;
+}
+
+/* ── Form field global enhancements ── */
+.p-inputtext,
+.p-select,
+.p-password input {
+  height: 44px !important;
+  border-color: #DEE2E6 !important;
+  border-radius: 6px !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+
+  &:focus {
+    border-color: #2D5F8A !important;
+    box-shadow: 0 0 0 3px rgba(45, 95, 138, 0.15) !important;
+  }
+}
+
+/* ── PrimeNG Tabs underline style fix ── */
+.p-tablist-tab-list {
+  border-bottom: 2px solid #DEE2E6 !important;
+}
+
+/* ── Smooth global scrolling ── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── Skeleton pulse animation ── */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.skeleton {
+  background: #E9ECEF;
+  border-radius: 6px;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+/* ── PrimeNG Tag overrides for status badges ── */
+.badge-verified {
+  --p-tag-background: #E8F5E9;
+  --p-tag-color:      #1A7A5C;
+}
+
+.badge-pending {
+  --p-tag-background: #FFF3E0;
+  --p-tag-color:      #E8762B;
+}
+
+.badge-rejected {
+  --p-tag-background: #FFEBEE;
+  --p-tag-color:      #DC3545;
+}

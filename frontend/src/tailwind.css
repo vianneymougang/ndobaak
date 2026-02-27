@@ -1,2 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap');
+
 @import "tailwindcss";
 @import "tailwindcss-primeui";
+
+@theme {
+  /* ── Ndobaâk brand colors (ndb prefix to avoid Tailwind conflicts) ── */
+  --color-ndb-navy:        #1B3A5C;
+  --color-ndb-navy-light:  #2D5F8A;
+  --color-ndb-green:       #1A7A5C;
+  --color-ndb-orange:      #E8762B;
+  --color-ndb-orange-dark: #C9611B;
+  --color-ndb-page:        #F5F7FA;
+  --color-ndb-stats:       #EBF3FA;
+  --color-ndb-body:        #2C3E50;
+  --color-ndb-muted:       #6C757D;
+  --color-ndb-border:      #DEE2E6;
+  --color-ndb-star:        #FFC107;
+
+  /* Status badge backgrounds */
+  --color-ndb-green-bg:    #E8F5E9;
+  --color-ndb-warn-bg:     #FFF3E0;
+  --color-ndb-error-bg:    #FFEBEE;
+
+  /* ── Fonts ── */
+  --font-poppins: 'Poppins', sans-serif;
+  --font-inter:   'Inter', sans-serif;
+
+  /* ── Design tokens ── */
+  --shadow-card:       0 2px 12px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-elevated:   0 16px 40px rgba(27, 58, 92, 0.15);
+}
+
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F5F7FA;
+    color: #2C3E50;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.3;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
