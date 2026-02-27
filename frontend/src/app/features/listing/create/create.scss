@@ -9,21 +9,6 @@
   }
 }
 
-/* ── Stepper custom theme ── */
-::ng-deep {
-  .p-stepper {
-    .p-stepitem.p-stepitem-active .p-step-number {
-      background: var(--color-ndb-orange) !important;
-      border-color: var(--color-ndb-orange) !important;
-      color: #fff !important;
-    }
-
-    .p-stepitem.p-stepitem-active .p-step-title {
-      color: var(--color-ndb-navy) !important;
-      font-weight: 600;
-    }
-  }
-}
 
 /* ── Step content ── */
 .step-content {

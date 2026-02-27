@@ -123,14 +123,7 @@
 
 /* ── Paginator ── */
 .paginator-wrap {
-  @apply mt-6;
-
-  ::ng-deep .p-paginator {
-    background: transparent;
-    border: none;
-    padding: 0;
-    justify-content: center;
-  }
+  @apply mt-6 flex justify-center;
 }
 
 /* ── Empty state ── */

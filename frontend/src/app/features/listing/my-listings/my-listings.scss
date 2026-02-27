@@ -126,22 +126,3 @@
   }
 }
 
-/* ── Status badge overrides ── */
-::ng-deep {
-  .p-tag-success {
-    background: #E8F5E9 !important;
-    color: #1A7A5C !important;
-  }
-  .p-tag-warn {
-    background: #FFF3E0 !important;
-    color: #E8762B !important;
-  }
-  .p-tag-danger {
-    background: #FFEBEE !important;
-    color: #DC3545 !important;
-  }
-  .p-tag-secondary {
-    background: rgba(27, 58, 92, 0.08) !important;
-    color: #1B3A5C !important;
-  }
-}
