@@ -166,6 +166,44 @@
   @apply flex flex-col gap-2;
 }
 
+.phone-field-wrap {
+  @apply flex flex-col gap-2;
+}
+
+.country-option {
+  @apply flex items-center gap-2;
+
+  .country-flag {
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+
+  .country-code {
+    @apply font-medium text-sm;
+    color: var(--color-ndb-navy);
+    font-family: 'Poppins', sans-serif;
+
+    &--muted {
+      @apply ml-auto text-xs font-normal;
+      color: var(--color-ndb-muted);
+    }
+  }
+
+  .country-name {
+    @apply text-sm flex-1;
+    color: var(--color-ndb-body);
+  }
+}
+
+::ng-deep .country-select {
+  min-width: 90px;
+  max-width: 100px;
+
+  .p-select-label {
+    padding-right: 0;
+  }
+}
+
 .social-divider {
   @apply flex items-center gap-3 my-4;
 
