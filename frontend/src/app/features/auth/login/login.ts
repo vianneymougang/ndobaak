@@ -1,12 +1,14 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
-import { TabsModule } from 'primeng/tabs';
-import { MessageModule } from 'primeng/message';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
+import { PasswordModule } from 'primeng/password';
+import { TabsModule } from 'primeng/tabs';
+import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth';
 
 @Component({
@@ -20,15 +22,17 @@ import { AuthService } from '../../../core/services/auth';
     TabsModule,
     MessageModule,
     FloatLabelModule,
+    AutoFocusModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login {
+export class Login implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   protected activeTab = signal<string>('email');
   protected loading = signal(false);
@@ -43,6 +47,13 @@ export class Login {
     phone: ['', [Validators.required, Validators.minLength(9)]],
     password: ['', [Validators.required]],
   });
+
+  ngOnInit(): void {
+    const oauthError = this.route.snapshot.queryParamMap.get('oauthError');
+    if (oauthError) {
+      this.errorMessage.set('La connexion avec Google a échoué. Veuillez réessayer.');
+    }
+  }
 
   protected onTabChange(tab: string | number | undefined): void {
     this.activeTab.set(String(tab ?? 'email'));
@@ -85,6 +96,10 @@ export class Login {
     this.loading.set(false);
     this.authService.loadCurrentUser().subscribe();
     this.router.navigate(['/']);
+  }
+
+  protected onGoogleLogin(): void {
+    window.location.href = `${environment.apiUrl}/oauth2/authorization/google?from=login`;
   }
 
   private onError(err: unknown): void {

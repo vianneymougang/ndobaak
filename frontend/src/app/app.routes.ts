@@ -12,6 +12,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/register/register').then((m) => m.Register),
   },
   {
+    path: 'auth/oauth2/callback',
+    loadComponent: () =>
+      import('./features/auth/oauth-callback/oauth-callback').then((m) => m.OauthCallback),
+  },
+  {
     path: '',
     loadComponent: () => import('./shared/components/layout/layout').then((m) => m.Layout),
     children: [

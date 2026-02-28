@@ -1,0 +1,26 @@
+@reference "../../../../tailwind.css";
+
+.oauth-callback-page {
+  @apply min-h-screen flex items-center justify-center;
+  background: var(--color-ndb-page);
+}
+
+.callback-content {
+  @apply flex flex-col items-center gap-4 text-center p-8;
+
+  p {
+    @apply text-ndb-muted text-sm m-0;
+  }
+}
+
+.callback-error {
+  h2 {
+    @apply text-xl font-semibold text-ndb-navy m-0;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .error-icon {
+    @apply text-5xl;
+    color: var(--p-red-500);
+  }
+}
