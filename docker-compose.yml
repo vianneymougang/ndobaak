@@ -51,11 +51,6 @@ services:
     networks:
       - default
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-          cpus: "0.2"
 
   # --- MinIO (alternative locale à S3 pour les fichiers/photos) ---
   minio:
@@ -89,6 +84,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: ndobaak_dev_2026
       SPRING_MAIL_HOST: mailtrap
       SPRING_MAIL_PORT: 25
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-dev-placeholder}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-dev-placeholder}
+      JWT_SECRET: ${JWT_SECRET:-ndobaak-dev-secret-key-change-in-production-2026}
     depends_on:
       postgres:
         condition: service_healthy
