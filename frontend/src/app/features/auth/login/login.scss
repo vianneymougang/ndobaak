@@ -183,6 +183,20 @@
   }
 }
 
+.password-field-wrap {
+  @apply flex flex-col gap-1;
+}
+
+.forgot-link {
+  @apply text-xs font-medium no-underline self-end;
+  color: var(--color-ndb-muted);
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-ndb-orange);
+  }
+}
+
 .register-link {
   @apply text-center text-sm text-ndb-muted mt-6 m-0;
 

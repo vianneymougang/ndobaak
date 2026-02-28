@@ -66,16 +66,19 @@
                 />
                 <label for="loginEmail">Email</label>
               </p-floatlabel>
-              <p-floatlabel>
-                <p-password
-                  id="loginPassword"
-                  formControlName="password"
-                  [toggleMask]="true"
-                  [feedback]="false"
-                  [fluid]="true"
-                />
-                <label for="loginPassword">Mot de passe</label>
-              </p-floatlabel>
+              <div class="password-field-wrap">
+                <p-floatlabel>
+                  <p-password
+                    id="loginPassword"
+                    formControlName="password"
+                    [toggleMask]="true"
+                    [feedback]="false"
+                    [fluid]="true"
+                  />
+                  <label for="loginPassword">Mot de passe</label>
+                </p-floatlabel>
+                <a routerLink="/auth/forgot-password" class="forgot-link">Mot de passe oublié ?</a>
+              </div>
               <p-button
                 type="submit"
                 label="Se connecter"
@@ -98,16 +101,19 @@
                 />
                 <label for="loginPhone">Téléphone</label>
               </p-floatlabel>
-              <p-floatlabel>
-                <p-password
-                  id="loginPhonePassword"
-                  formControlName="password"
-                  [toggleMask]="true"
-                  [feedback]="false"
-                  [fluid]="true"
-                />
-                <label for="loginPhonePassword">Mot de passe</label>
-              </p-floatlabel>
+              <div class="password-field-wrap">
+                <p-floatlabel>
+                  <p-password
+                    id="loginPhonePassword"
+                    formControlName="password"
+                    [toggleMask]="true"
+                    [feedback]="false"
+                    [fluid]="true"
+                  />
+                  <label for="loginPhonePassword">Mot de passe</label>
+                </p-floatlabel>
+                <a routerLink="/auth/forgot-password" class="forgot-link">Mot de passe oublié ?</a>
+              </div>
               <p-button
                 type="submit"
                 label="Se connecter"
