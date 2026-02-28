@@ -1,14 +1,31 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
-import { SelectButtonModule } from 'primeng/selectbutton';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { MessageModule } from 'primeng/message';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
+import { PasswordModule } from 'primeng/password';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth';
+
+function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
+  const password = control.get('password');
+  const confirmPassword = control.get('confirmPassword');
+  if (password && confirmPassword && password.value !== confirmPassword.value) {
+    return { passwordMismatch: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-register',
@@ -20,18 +37,19 @@ import { AuthService } from '../../../core/services/auth';
     PasswordModule,
     ButtonModule,
     SelectButtonModule,
-    InputNumberModule,
     MessageModule,
     FloatLabelModule,
+    AutoFocusModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './register.html',
   styleUrl: './register.scss',
 })
-export class Register {
+export class Register implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   protected roleOptions = [
     { label: 'Etudiant', value: 'STUDENT' },
@@ -42,18 +60,24 @@ export class Register {
   protected loading = signal(false);
   protected errorMessage = signal<string | null>(null);
 
-  protected form = this.fb.nonNullable.group({
-    firstName: ['', [Validators.required, Validators.minLength(2)]],
-    lastName: ['', [Validators.required, Validators.minLength(2)]],
-    email: ['', [Validators.required, Validators.email]],
-    phone: ['', [Validators.required, Validators.minLength(9)]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
-    matricule: [''],
-    fieldOfStudy: [''],
-    yearOfStudy: [null as number | null],
-    idCardNumber: [''],
-    taxId: [''],
-  });
+  protected form = this.fb.nonNullable.group(
+    {
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', [Validators.required, Validators.minLength(9)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', [Validators.required]],
+    },
+    { validators: passwordsMatchValidator },
+  );
+
+  ngOnInit(): void {
+    const oauthError = this.route.snapshot.queryParamMap.get('oauthError');
+    if (oauthError) {
+      this.errorMessage.set('La connexion avec Google a échoué. Veuillez réessayer.');
+    }
+  }
 
   protected onRoleChange(role: string): void {
     this.selectedRole.set(role);
@@ -67,39 +91,18 @@ export class Register {
 
     this.loading.set(true);
     this.errorMessage.set(null);
-    const formValue = this.form.getRawValue();
+    const { firstName, lastName, email, phone, password } = this.form.getRawValue();
 
     if (this.selectedRole() === 'STUDENT') {
-      this.authService
-        .registerStudent({
-          firstName: formValue.firstName,
-          lastName: formValue.lastName,
-          email: formValue.email,
-          phone: formValue.phone,
-          password: formValue.password,
-          matricule: formValue.matricule || undefined,
-          fieldOfStudy: formValue.fieldOfStudy || undefined,
-          yearOfStudy: formValue.yearOfStudy || undefined,
-        })
-        .subscribe({
-          next: () => this.onSuccess(),
-          error: (err) => this.onError(err),
-        });
+      this.authService.registerStudent({ firstName, lastName, email, phone, password }).subscribe({
+        next: () => this.onSuccess(),
+        error: (err) => this.onError(err),
+      });
     } else {
-      this.authService
-        .registerLandlord({
-          firstName: formValue.firstName,
-          lastName: formValue.lastName,
-          email: formValue.email,
-          phone: formValue.phone,
-          password: formValue.password,
-          idCardNumber: formValue.idCardNumber || undefined,
-          taxId: formValue.taxId || undefined,
-        })
-        .subscribe({
-          next: () => this.onSuccess(),
-          error: (err) => this.onError(err),
-        });
+      this.authService.registerLandlord({ firstName, lastName, email, phone, password }).subscribe({
+        next: () => this.onSuccess(),
+        error: (err) => this.onError(err),
+      });
     }
   }
 
@@ -107,6 +110,10 @@ export class Register {
     this.loading.set(false);
     this.authService.loadCurrentUser().subscribe();
     this.router.navigate(['/']);
+  }
+
+  protected onGoogleLogin(): void {
+    window.location.href = `${environment.apiUrl}/oauth2/authorization/google?from=register`;
   }
 
   private onError(err: unknown): void {

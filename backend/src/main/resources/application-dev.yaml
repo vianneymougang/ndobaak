@@ -50,6 +50,8 @@ app:
   cors:
     allowed-origins: http://localhost:4200
 
+  frontend-url: http://localhost:4200
+
 logging:
   level:
     cm.ndobaak: DEBUG

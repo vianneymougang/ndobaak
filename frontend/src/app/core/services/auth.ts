@@ -54,6 +54,13 @@ export class AuthService {
       .pipe(tap((user) => this.currentUser.set(user)));
   }
 
+  handleOAuthCallback(token: string, refreshToken: string): Observable<UserProfile> {
+    localStorage.setItem('access_token', token);
+    localStorage.setItem('refresh_token', refreshToken);
+    this.tokenSignal.set(token);
+    return this.loadCurrentUser();
+  }
+
   logout(): void {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');

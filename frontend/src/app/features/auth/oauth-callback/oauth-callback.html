@@ -1,0 +1,15 @@
+<div class="oauth-callback-page">
+  @if (status() === 'loading') {
+    <div class="callback-content">
+      <p-progressSpinner strokeWidth="4" />
+      <p>Connexion en cours...</p>
+    </div>
+  } @else {
+    <div class="callback-content callback-error">
+      <i class="pi pi-times-circle error-icon"></i>
+      <h2>Connexion impossible</h2>
+      <p>Une erreur est survenue lors de la connexion avec Google.</p>
+      <p-button label="Retour à la connexion" routerLink="/login" severity="primary" />
+    </div>
+  }
+</div>

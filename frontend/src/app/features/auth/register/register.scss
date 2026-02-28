@@ -25,7 +25,12 @@
 }
 
 .visual-logo {
-  @apply flex items-center gap-2 relative z-10;
+  @apply flex items-center gap-2 relative z-10 no-underline;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
 
   .logo-icon {
     @apply flex items-center justify-center w-10 h-10 rounded-xl text-white text-lg;
@@ -79,17 +84,35 @@
 
   @media (max-width: 1024px) {
     @apply flex-1 px-4;
-    flex: none;
   }
 }
 
 .register-card {
   @apply w-full py-10;
-  max-width: 460px;
+  max-width: 400px;
+}
+
+.back-home-link {
+  @apply flex items-center gap-1.5 text-sm font-medium no-underline mb-6;
+  color: var(--color-ndb-muted);
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-ndb-navy);
+  }
+
+  i {
+    @apply text-xs;
+  }
 }
 
 .register-brand-mobile {
-  @apply flex items-center gap-2 mb-8 lg:hidden;
+  @apply flex items-center gap-2 mb-8 lg:hidden no-underline;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.75;
+  }
 
   .logo-icon {
     @apply flex items-center justify-center w-9 h-9 rounded-xl text-white;
@@ -139,11 +162,56 @@
   @apply grid grid-cols-2 gap-4;
 }
 
-.student-fields,
-.landlord-fields {
-  @apply flex flex-col gap-5 p-4 rounded-xl;
-  background: rgba(27, 58, 92, 0.04);
-  border: 1px dashed var(--color-ndb-border);
+.confirm-password-group {
+  @apply flex flex-col gap-2;
+}
+
+.social-divider {
+  @apply flex items-center gap-3 my-4;
+
+  &::before,
+  &::after {
+    content: '';
+    @apply flex-1 h-px;
+    background: var(--color-ndb-border);
+  }
+
+  span {
+    @apply text-xs text-ndb-muted flex-shrink-0;
+  }
+}
+
+.btn-google {
+  @apply w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg text-sm font-medium cursor-pointer;
+  border: 1.5px solid #DADCE0;
+  background: #fff;
+  color: var(--color-ndb-navy);
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #BBBFC4;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-ndb-orange);
+    outline-offset: 2px;
+  }
+
+  .google-icon {
+    @apply w-5 h-5 flex-shrink-0;
+  }
+}
+
+.google-role-hint {
+  @apply flex items-center justify-center gap-1.5 text-xs text-center m-0;
+  color: var(--color-ndb-muted);
+  margin-top: 10px;
+
+  i {
+    @apply text-xs flex-shrink-0;
+  }
 }
 
 .login-link {

@@ -37,7 +37,12 @@
 }
 
 .visual-logo {
-  @apply flex items-center gap-2 relative z-10;
+  @apply flex items-center gap-2 relative z-10 no-underline;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
 
   .logo-icon {
     @apply flex items-center justify-center w-10 h-10 rounded-xl text-white text-lg;
@@ -91,10 +96,30 @@
 .login-card {
   @apply w-full;
   max-width: 400px;
+  --p-tabs-tabpanel-padding: 0;
+}
+
+.back-home-link {
+  @apply flex items-center gap-1.5 text-sm font-medium no-underline mb-6;
+  color: var(--color-ndb-muted);
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-ndb-navy);
+  }
+
+  i {
+    @apply text-xs;
+  }
 }
 
 .login-brand-mobile {
-  @apply flex items-center gap-2 mb-8 lg:hidden;
+  @apply flex items-center gap-2 mb-8 lg:hidden no-underline;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.75;
+  }
 
   .logo-icon {
     @apply flex items-center justify-center w-9 h-9 rounded-xl text-white;
@@ -118,6 +143,44 @@
 
 .login-form {
   @apply flex flex-col gap-5 pt-4;
+}
+
+.social-divider {
+  @apply flex items-center gap-3 my-4;
+
+  &::before,
+  &::after {
+    content: '';
+    @apply flex-1 h-px;
+    background: var(--color-ndb-border);
+  }
+
+  span {
+    @apply text-xs text-ndb-muted flex-shrink-0;
+  }
+}
+
+.btn-google {
+  @apply w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg text-sm font-medium cursor-pointer;
+  border: 1.5px solid #DADCE0;
+  background: #fff;
+  color: var(--color-ndb-navy);
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #BBBFC4;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-ndb-orange);
+    outline-offset: 2px;
+  }
+
+  .google-icon {
+    @apply w-5 h-5 flex-shrink-0;
+  }
 }
 
 .register-link {
