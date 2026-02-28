@@ -41,6 +41,21 @@ public class StorageService {
         return endpoint + "/" + bucket + "/" + key;
     }
 
+    public String uploadNamed(String folder, String filename, InputStream inputStream,
+                              long contentLength, String contentType) {
+        String key = folder + "/" + filename;
+
+        PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .contentType(contentType)
+                .build();
+
+        s3Client.putObject(request, RequestBody.fromInputStream(inputStream, contentLength));
+
+        return endpoint + "/" + bucket + "/" + key;
+    }
+
     public void delete(String fileUrl) {
         String key = extractKey(fileUrl);
         if (key != null) {

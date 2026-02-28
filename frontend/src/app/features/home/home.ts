@@ -1,4 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { environment } from '../../../environments/environment';
+import { EMPTY, catchError } from 'rxjs';
 import { Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
@@ -17,6 +19,8 @@ import { ListingCard } from '../../shared/components/listing-card/listing-card';
 export class Home implements OnInit {
   private router = inject(Router);
   private listingService = inject(ListingService);
+
+  protected readonly heroImageUrl = `url('${environment.mediaBaseUrl}/static/hero.jpg')`;
 
   protected popularListings = signal<ListingSearchResponse[]>([]);
 
@@ -60,6 +64,7 @@ export class Home implements OnInit {
   ngOnInit(): void {
     this.listingService
       .search({ sortBy: 'RATING_DESC', size: 3 })
+      .pipe(catchError(() => EMPTY))
       .subscribe((res) => this.popularListings.set(res.content));
   }
 
