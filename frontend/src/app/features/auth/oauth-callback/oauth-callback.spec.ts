@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { OauthCallback } from './oauth-callback';
 
@@ -8,7 +9,8 @@ describe('OauthCallback', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [OauthCallback]
+      imports: [OauthCallback],
+      providers: [provideRouter([])],
     })
     .compileComponents();
 
