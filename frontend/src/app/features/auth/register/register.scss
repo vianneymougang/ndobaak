@@ -162,7 +162,10 @@
 
     .role-card__icon {
       background: var(--color-ndb-orange);
-      color: #fff;
+
+      i {
+        color: #fff;
+      }
     }
 
     .role-card__title {
@@ -173,11 +176,12 @@
   &__icon {
     @apply flex items-center justify-center w-12 h-12 rounded-xl flex-shrink-0;
     background: #F3F4F6;
-    color: #6B7280;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition: background 0.15s ease;
 
     i {
       font-size: 1.25rem;
+      color: #6B7280;
+      transition: color 0.15s ease;
     }
   }
 
