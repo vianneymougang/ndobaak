@@ -1,6 +1,7 @@
 package com.ndobaak.backend.listing.service;
 
 import com.ndobaak.backend.common.enums.ListingStatus;
+import com.ndobaak.backend.common.enums.ReviewStatus;
 import com.ndobaak.backend.common.enums.RoomType;
 import com.ndobaak.backend.listing.dto.ListingSearchRequest;
 import com.ndobaak.backend.listing.dto.ListingSearchResponse;
@@ -43,7 +44,7 @@ class ListingSearchServiceTest {
     void searchShouldReturnPaginatedResults() {
         Listing listing = buildPublishedListing(1L, "Studio Eyang", new BigDecimal("35000"), RoomType.STUDIO);
         when(listingRepository.findAll(any(Specification.class))).thenReturn(List.of(listing));
-        when(reviewRepository.findAverageRatingsByListingIds(List.of(1L)))
+        when(reviewRepository.findAverageRatingsByListingIds(List.of(1L), ReviewStatus.APPROVED))
                 .thenReturn(Collections.emptyList());
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -69,7 +70,7 @@ class ListingSearchServiceTest {
 
         when(listingRepository.findAll(any(Specification.class)))
                 .thenReturn(List.of(nearListing, farListing));
-        when(reviewRepository.findAverageRatingsByListingIds(anyList()))
+        when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -90,7 +91,7 @@ class ListingSearchServiceTest {
 
         when(listingRepository.findAll(any(Specification.class)))
                 .thenReturn(List.of(expensiveListing, cheapListing));
-        when(reviewRepository.findAverageRatingsByListingIds(anyList()))
+        when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -111,7 +112,7 @@ class ListingSearchServiceTest {
 
         when(listingRepository.findAll(any(Specification.class)))
                 .thenReturn(List.of(cheapListing, expensiveListing));
-        when(reviewRepository.findAverageRatingsByListingIds(anyList()))
+        when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -143,7 +144,7 @@ class ListingSearchServiceTest {
 
         when(listingRepository.findAll(any(Specification.class)))
                 .thenReturn(List.of(withBoth, withOnlyWifi));
-        when(reviewRepository.findAverageRatingsByListingIds(anyList()))
+        when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -166,7 +167,7 @@ class ListingSearchServiceTest {
         );
 
         when(listingRepository.findAll(any(Specification.class))).thenReturn(listings);
-        when(reviewRepository.findAverageRatingsByListingIds(anyList()))
+        when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -194,7 +195,7 @@ class ListingSearchServiceTest {
 
         List<Object[]> ratingResults = new ArrayList<>();
         ratingResults.add(new Object[]{1L, 4.5, 10L});
-        when(reviewRepository.findAverageRatingsByListingIds(List.of(1L)))
+        when(reviewRepository.findAverageRatingsByListingIds(List.of(1L), ReviewStatus.APPROVED))
                 .thenReturn(ratingResults);
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -215,7 +216,7 @@ class ListingSearchServiceTest {
 
         List<Object[]> ratingResults = new ArrayList<>();
         ratingResults.add(new Object[]{1L, 3.0, 5L});
-        when(reviewRepository.findAverageRatingsByListingIds(List.of(1L)))
+        when(reviewRepository.findAverageRatingsByListingIds(List.of(1L), ReviewStatus.APPROVED))
                 .thenReturn(ratingResults);
 
         ListingSearchRequest request = new ListingSearchRequest();
