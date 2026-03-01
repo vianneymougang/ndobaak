@@ -175,11 +175,11 @@ class AuthServiceTest {
         request.setPassword("password123");
 
         Student student = Student.builder()
-                .email("jean@test.com").phone("690000001")
+                .email("jean@test.com").phone("+237690000001")
                 .password("$2a$10$hashed").build();
         student.setId(1L);
 
-        when(userRepository.findByPhone("690000001")).thenReturn(Optional.of(student));
+        when(userRepository.findByPhone("+237690000001")).thenReturn(Optional.of(student));
         when(passwordEncoder.matches("password123", "$2a$10$hashed")).thenReturn(true);
         when(jwtTokenProvider.generateAccessToken(eq(1L), eq("jean@test.com"), eq("STUDENT")))
                 .thenReturn("access-token");
