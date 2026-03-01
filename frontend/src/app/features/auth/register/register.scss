@@ -141,13 +141,18 @@
 
 .role-card {
   @apply flex flex-col items-center gap-3 p-4 rounded-xl w-full cursor-pointer;
+  position: relative;
   border: 1.5px solid #D1D5DB;
-  background: #fff;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 
   --icon-bg: #F3F4F6;
   --icon-color: #6B7280;
   --title-color: var(--color-ndb-navy);
+  --card-bg: #fff;
+  --check-opacity: 0;
+  --check-scale: 0.6;
+
+  background: var(--card-bg);
 
   &:hover {
     border-color: var(--color-ndb-orange);
@@ -160,11 +165,26 @@
 
   &--active {
     border: 2px solid var(--color-ndb-orange);
-    box-shadow: 0 0 0 4px rgba(232, 118, 43, 0.15);
+    box-shadow: 0 0 0 4px rgba(232, 118, 43, 0.12);
 
     --icon-bg: var(--color-ndb-orange);
     --icon-color: #fff;
     --title-color: var(--color-ndb-orange);
+    --card-bg: rgba(232, 118, 43, 0.04);
+    --check-opacity: 1;
+    --check-scale: 1;
+  }
+
+  &__check {
+    position: absolute;
+    top: 8px;
+    right: 9px;
+    font-size: 0.9rem;
+    color: var(--color-ndb-orange);
+    opacity: var(--check-opacity);
+    transform: scale(var(--check-scale));
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    pointer-events: none;
   }
 
   &__icon {
@@ -198,7 +218,7 @@
 
 /* ── Form ── */
 .register-form {
-  @apply flex flex-col gap-7 pt-3;
+  @apply flex flex-col gap-9 pt-3;
 }
 
 .form-row {

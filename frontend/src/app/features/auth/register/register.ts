@@ -102,7 +102,9 @@ export class Register implements OnInit {
   }
 
   protected onRoleChange(role: string): void {
-    this.selectedRole.set(role);
+    if (this.selectedRole() !== role) {
+      this.selectedRole.set(role);
+    }
   }
 
   protected onCountryChange(country: Country): void {
