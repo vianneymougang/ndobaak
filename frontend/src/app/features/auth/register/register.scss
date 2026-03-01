@@ -159,18 +159,6 @@
     border: 2px solid var(--color-ndb-orange);
     background: #fff;
     box-shadow: 0 0 0 4px rgba(232, 118, 43, 0.15);
-
-    .role-card__icon {
-      background: var(--color-ndb-orange);
-
-      i {
-        color: #fff;
-      }
-    }
-
-    .role-card__title {
-      color: var(--color-ndb-orange);
-    }
   }
 
   &__icon {
@@ -183,6 +171,14 @@
       color: #6B7280;
       transition: color 0.15s ease;
     }
+
+    &--active {
+      background: var(--color-ndb-orange);
+
+      i {
+        color: #fff;
+      }
+    }
   }
 
   &__body {
@@ -194,6 +190,10 @@
     @apply text-sm font-semibold;
     color: var(--color-ndb-navy);
     transition: color 0.15s ease;
+
+    &--active {
+      color: var(--color-ndb-orange);
+    }
   }
 
   &__desc {
