@@ -78,16 +78,37 @@
         <span>ou</span>
       </div>
 
-      <div class="role-selector">
-        <p-selectbutton
-          [options]="roleOptions"
-          [ngModel]="selectedRole()"
-          (ngModelChange)="onRoleChange($event)"
-          optionLabel="label"
-          optionValue="value"
-          [allowEmpty]="false"
-          [fluid]="true"
-        />
+      <div class="role-cards" role="group" aria-label="Type de compte">
+        <button
+          type="button"
+          class="role-card"
+          [class.role-card--active]="selectedRole() === 'STUDENT'"
+          (click)="onRoleChange('STUDENT')"
+          [attr.aria-pressed]="selectedRole() === 'STUDENT'"
+        >
+          <div class="role-card__icon">
+            <i class="pi pi-book"></i>
+          </div>
+          <div class="role-card__body">
+            <span class="role-card__title">Étudiant</span>
+            <span class="role-card__desc">Je cherche un logement</span>
+          </div>
+        </button>
+        <button
+          type="button"
+          class="role-card"
+          [class.role-card--active]="selectedRole() === 'LANDLORD'"
+          (click)="onRoleChange('LANDLORD')"
+          [attr.aria-pressed]="selectedRole() === 'LANDLORD'"
+        >
+          <div class="role-card__icon">
+            <i class="pi pi-home"></i>
+          </div>
+          <div class="role-card__body">
+            <span class="role-card__title">Propriétaire</span>
+            <span class="role-card__desc">Je propose un logement</span>
+          </div>
+        </button>
       </div>
 
       @if (errorMessage()) {

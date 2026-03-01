@@ -16,7 +16,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
 import { SelectModule } from 'primeng/select';
-import { SelectButtonModule } from 'primeng/selectbutton';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth';
 
@@ -64,7 +63,6 @@ export const COUNTRIES: Country[] = [
     SelectModule,
     PasswordModule,
     ButtonModule,
-    SelectButtonModule,
     MessageModule,
     FloatLabelModule,
     AutoFocusModule,
@@ -78,11 +76,6 @@ export class Register implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-
-  protected roleOptions = [
-    { label: 'Etudiant', value: 'STUDENT' },
-    { label: 'Proprietaire', value: 'LANDLORD' },
-  ];
 
   protected countries = COUNTRIES;
   protected selectedCountry = signal<Country>(COUNTRIES[0]);

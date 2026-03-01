@@ -134,22 +134,67 @@
   @apply text-ndb-muted text-sm mb-6;
 }
 
-/* ── Role selector (tuiles) ── */
-.role-selector {
-  @apply mb-6;
+/* ── Role cards ── */
+.role-cards {
+  @apply grid grid-cols-2 gap-3 mb-6;
+}
 
-  ::ng-deep .p-selectbutton {
-    width: 100%;
+.role-card {
+  @apply flex flex-col items-center gap-3 p-4 rounded-xl w-full cursor-pointer;
+  border: 2px solid var(--color-ndb-border);
+  background: #fff;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 
-    .p-togglebutton {
-      flex: 1;
-      justify-content: center;
-      height: 44px;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      border-radius: 8px !important;
+  &:hover {
+    border-color: var(--color-ndb-orange);
+    background: #FFF8F3;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-ndb-orange);
+    outline-offset: 2px;
+  }
+
+  &--active {
+    border-color: var(--color-ndb-orange);
+    background: #FFF5EE;
+    box-shadow: 0 0 0 3px rgba(232, 118, 43, 0.12);
+
+    .role-card__icon {
+      background: var(--color-ndb-orange);
+      color: #fff;
     }
+
+    .role-card__title {
+      color: var(--color-ndb-orange);
+    }
+  }
+
+  &__icon {
+    @apply flex items-center justify-center w-12 h-12 rounded-xl flex-shrink-0;
+    background: var(--color-ndb-page);
+    color: var(--color-ndb-navy);
+    transition: background 0.15s ease, color 0.15s ease;
+
+    i {
+      font-size: 1.25rem;
+    }
+  }
+
+  &__body {
+    @apply flex flex-col items-center gap-1 text-center;
+  }
+
+  &__title {
+    font-family: 'Poppins', sans-serif;
+    @apply text-sm font-semibold;
+    color: var(--color-ndb-navy);
+    transition: color 0.15s ease;
+  }
+
+  &__desc {
+    @apply text-xs;
+    color: var(--color-ndb-muted);
   }
 }
 
