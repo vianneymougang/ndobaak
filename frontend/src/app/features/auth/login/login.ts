@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
@@ -7,19 +7,20 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
-import { TabsModule } from 'primeng/tabs';
+import { SelectButtonModule } from 'primeng/selectbutton';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-login',
   imports: [
+    FormsModule,
     ReactiveFormsModule,
     RouterLink,
     InputTextModule,
     PasswordModule,
     ButtonModule,
-    TabsModule,
+    SelectButtonModule,
     MessageModule,
     FloatLabelModule,
     AutoFocusModule,
@@ -33,6 +34,11 @@ export class Login implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+
+  protected methodOptions = [
+    { label: 'Email', value: 'email' },
+    { label: 'Téléphone', value: 'phone' },
+  ];
 
   protected activeTab = signal<string>('email');
   protected loading = signal(false);
@@ -55,9 +61,11 @@ export class Login implements OnInit {
     }
   }
 
-  protected onTabChange(tab: string | number | undefined): void {
-    this.activeTab.set(String(tab ?? 'email'));
-    this.errorMessage.set(null);
+  protected onTabChange(tab: string | null): void {
+    if (tab) {
+      this.activeTab.set(tab);
+      this.errorMessage.set(null);
+    }
   }
 
   protected onEmailLogin(): void {

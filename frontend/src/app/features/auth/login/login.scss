@@ -96,7 +96,21 @@
 .login-card {
   @apply w-full;
   max-width: 400px;
-  --p-tabs-tabpanel-padding: 0;
+}
+
+.method-selector {
+  @apply mb-5;
+
+  ::ng-deep .p-selectbutton {
+    .p-togglebutton {
+      flex: 1;
+      justify-content: center;
+      height: 40px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+    }
+  }
 }
 
 .back-home-link {
@@ -142,7 +156,7 @@
 }
 
 .login-form {
-  @apply flex flex-col gap-5 pt-4;
+  @apply flex flex-col gap-7 pt-3;
 }
 
 .social-divider {
