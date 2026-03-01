@@ -60,7 +60,6 @@
 
       @if (activeTab() === 'email') {
         <form [formGroup]="emailForm" (ngSubmit)="onEmailLogin()" class="login-form">
-          <p class="form-legend">* Champs obligatoires</p>
           <div class="field-wrap">
             <p-floatlabel>
               <input
@@ -110,7 +109,6 @@
         </form>
       } @else {
         <form [formGroup]="phoneForm" (ngSubmit)="onPhoneLogin()" class="login-form">
-          <p class="form-legend">* Champs obligatoires</p>
           <div class="field-wrap">
             <p-floatlabel>
               <input
