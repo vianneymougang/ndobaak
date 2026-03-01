@@ -141,13 +141,13 @@
 
 .role-card {
   @apply flex flex-col items-center gap-3 p-4 rounded-xl w-full cursor-pointer;
-  border: 2px solid var(--color-ndb-border);
+  border: 1.5px solid #D1D5DB;
   background: #fff;
-  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
   &:hover {
     border-color: var(--color-ndb-orange);
-    background: #FFF8F3;
+    background: #fff;
   }
 
   &:focus-visible {
@@ -156,9 +156,9 @@
   }
 
   &--active {
-    border-color: var(--color-ndb-orange);
-    background: #FFF5EE;
-    box-shadow: 0 0 0 3px rgba(232, 118, 43, 0.12);
+    border: 2px solid var(--color-ndb-orange);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(232, 118, 43, 0.15);
 
     .role-card__icon {
       background: var(--color-ndb-orange);
@@ -172,8 +172,8 @@
 
   &__icon {
     @apply flex items-center justify-center w-12 h-12 rounded-xl flex-shrink-0;
-    background: var(--color-ndb-page);
-    color: var(--color-ndb-navy);
+    background: #F3F4F6;
+    color: #6B7280;
     transition: background 0.15s ease, color 0.15s ease;
 
     i {
