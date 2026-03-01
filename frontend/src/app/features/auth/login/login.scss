@@ -98,18 +98,33 @@
   max-width: 400px;
 }
 
-.method-selector {
-  @apply mb-5;
+.method-tabs {
+  @apply flex mb-6;
+  border-bottom: 2px solid var(--color-ndb-border);
+}
 
-  ::ng-deep .p-selectbutton {
-    .p-togglebutton {
-      flex: 1;
-      justify-content: center;
-      height: 40px;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-    }
+.method-tab {
+  @apply flex-1 py-2.5 text-sm font-semibold text-center cursor-pointer;
+  font-family: 'Poppins', sans-serif;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  color: var(--color-ndb-muted);
+  transition: color 0.15s ease, border-color 0.15s ease;
+
+  &--active {
+    color: var(--color-ndb-orange);
+    border-bottom-color: var(--color-ndb-orange);
+  }
+
+  &:hover:not(&--active) {
+    color: var(--color-ndb-navy);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-ndb-orange);
+    outline-offset: -2px;
   }
 }
 
@@ -156,7 +171,7 @@
 }
 
 .login-form {
-  @apply flex flex-col gap-7 pt-3;
+  @apply flex flex-col gap-9 pt-3;
 }
 
 .social-divider {

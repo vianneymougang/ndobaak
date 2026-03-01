@@ -49,16 +49,21 @@
         </div>
       }
 
-      <div class="method-selector">
-        <p-selectbutton
-          [options]="methodOptions"
-          [ngModel]="activeTab()"
-          (ngModelChange)="onTabChange($event)"
-          optionLabel="label"
-          optionValue="value"
-          [allowEmpty]="false"
-          [fluid]="true"
-        />
+      <div class="method-tabs" role="group" aria-label="Méthode de connexion">
+        <button
+          type="button"
+          class="method-tab"
+          [class.method-tab--active]="activeTab() === 'email'"
+          (click)="onTabChange('email')"
+          [attr.aria-pressed]="activeTab() === 'email'"
+        >Email</button>
+        <button
+          type="button"
+          class="method-tab"
+          [class.method-tab--active]="activeTab() === 'phone'"
+          (click)="onTabChange('phone')"
+          [attr.aria-pressed]="activeTab() === 'phone'"
+        >Téléphone</button>
       </div>
 
       @if (activeTab() === 'email') {

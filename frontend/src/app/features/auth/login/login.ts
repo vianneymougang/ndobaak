@@ -6,7 +6,6 @@ import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { SelectButtonModule } from 'primeng/selectbutton';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth';
 
@@ -19,7 +18,6 @@ import { AuthService } from '../../../core/services/auth';
     InputTextModule,
     PasswordModule,
     ButtonModule,
-    SelectButtonModule,
     FloatLabelModule,
     AutoFocusModule,
   ],
@@ -32,11 +30,6 @@ export class Login implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-
-  protected methodOptions = [
-    { label: 'Email', value: 'email' },
-    { label: 'Téléphone', value: 'phone' },
-  ];
 
   protected activeTab = signal<string>('email');
   protected loading = signal(false);
