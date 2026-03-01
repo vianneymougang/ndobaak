@@ -86,11 +86,11 @@
           (click)="onRoleChange('STUDENT')"
           [attr.aria-pressed]="selectedRole() === 'STUDENT'"
         >
-          <div class="role-card__icon" [class.role-card__icon--active]="selectedRole() === 'STUDENT'">
+          <div class="role-card__icon">
             <i class="pi pi-book"></i>
           </div>
           <div class="role-card__body">
-            <span class="role-card__title" [class.role-card__title--active]="selectedRole() === 'STUDENT'">Étudiant</span>
+            <span class="role-card__title">Étudiant</span>
             <span class="role-card__desc">Je cherche un logement</span>
           </div>
         </button>
@@ -101,11 +101,11 @@
           (click)="onRoleChange('LANDLORD')"
           [attr.aria-pressed]="selectedRole() === 'LANDLORD'"
         >
-          <div class="role-card__icon" [class.role-card__icon--active]="selectedRole() === 'LANDLORD'">
+          <div class="role-card__icon">
             <i class="pi pi-home"></i>
           </div>
           <div class="role-card__body">
-            <span class="role-card__title" [class.role-card__title--active]="selectedRole() === 'LANDLORD'">Propriétaire</span>
+            <span class="role-card__title">Propriétaire</span>
             <span class="role-card__desc">Je propose un logement</span>
           </div>
         </button>

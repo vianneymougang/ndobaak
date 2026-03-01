@@ -145,9 +145,12 @@
   background: #fff;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
+  --icon-bg: #F3F4F6;
+  --icon-color: #6B7280;
+  --title-color: var(--color-ndb-navy);
+
   &:hover {
     border-color: var(--color-ndb-orange);
-    background: #fff;
   }
 
   &:focus-visible {
@@ -157,27 +160,22 @@
 
   &--active {
     border: 2px solid var(--color-ndb-orange);
-    background: #fff;
     box-shadow: 0 0 0 4px rgba(232, 118, 43, 0.15);
+
+    --icon-bg: var(--color-ndb-orange);
+    --icon-color: #fff;
+    --title-color: var(--color-ndb-orange);
   }
 
   &__icon {
     @apply flex items-center justify-center w-12 h-12 rounded-xl flex-shrink-0;
-    background: #F3F4F6;
+    background: var(--icon-bg);
     transition: background 0.15s ease;
 
     i {
       font-size: 1.25rem;
-      color: #6B7280;
+      color: var(--icon-color);
       transition: color 0.15s ease;
-    }
-
-    &--active {
-      background: var(--color-ndb-orange);
-
-      i {
-        color: #fff;
-      }
     }
   }
 
@@ -188,12 +186,8 @@
   &__title {
     font-family: 'Poppins', sans-serif;
     @apply text-sm font-semibold;
-    color: var(--color-ndb-navy);
+    color: var(--title-color);
     transition: color 0.15s ease;
-
-    &--active {
-      color: var(--color-ndb-orange);
-    }
   }
 
   &__desc {
