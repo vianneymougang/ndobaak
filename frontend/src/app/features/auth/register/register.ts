@@ -13,7 +13,6 @@ import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputTextModule } from 'primeng/inputtext';
-import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
 import { SelectModule } from 'primeng/select';
 import { environment } from '../../../../environments/environment';
@@ -63,7 +62,6 @@ export const COUNTRIES: Country[] = [
     SelectModule,
     PasswordModule,
     ButtonModule,
-    MessageModule,
     FloatLabelModule,
     AutoFocusModule,
   ],

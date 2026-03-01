@@ -5,7 +5,6 @@ import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
-import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { environment } from '../../../../environments/environment';
@@ -21,7 +20,6 @@ import { AuthService } from '../../../core/services/auth';
     PasswordModule,
     ButtonModule,
     SelectButtonModule,
-    MessageModule,
     FloatLabelModule,
     AutoFocusModule,
   ],

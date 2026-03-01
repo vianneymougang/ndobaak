@@ -43,7 +43,10 @@
       <p class="login-subtitle">Connectez-vous à votre compte Ndobaâk</p>
 
       @if (errorMessage()) {
-      <p-message severity="error" [text]="errorMessage()!" />
+        <div class="auth-error-banner">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ errorMessage() }}</span>
+        </div>
       }
 
       <div class="method-selector">
