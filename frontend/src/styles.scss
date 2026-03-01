@@ -324,3 +324,27 @@ html {
   --p-tag-background: rgba(27, 58, 92, 0.08);
   --p-tag-color:      #1B3A5C;
 }
+
+/* ════════════════════════════════════════════
+   FORM UTILITIES
+   ════════════════════════════════════════════ */
+.field-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: #DC3545;
+  padding-left: 2px;
+}
+
+.form-legend {
+  font-size: 0.75rem;
+  color: #6C757D;
+  margin: 0;
+}

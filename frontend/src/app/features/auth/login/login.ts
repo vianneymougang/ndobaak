@@ -71,6 +71,7 @@ export class Login implements OnInit {
   protected onEmailLogin(): void {
     if (this.emailForm.invalid) {
       this.emailForm.markAllAsTouched();
+      this.scrollToFirstError();
       return;
     }
 
@@ -87,6 +88,7 @@ export class Login implements OnInit {
   protected onPhoneLogin(): void {
     if (this.phoneForm.invalid) {
       this.phoneForm.markAllAsTouched();
+      this.scrollToFirstError();
       return;
     }
 
@@ -108,6 +110,12 @@ export class Login implements OnInit {
 
   protected onGoogleLogin(): void {
     window.location.href = `${environment.apiUrl}/oauth2/authorization/google?from=login`;
+  }
+
+  private scrollToFirstError(): void {
+    setTimeout(() => {
+      document.querySelector('.ng-invalid:not(form)')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
   }
 
   private onError(err: unknown): void {

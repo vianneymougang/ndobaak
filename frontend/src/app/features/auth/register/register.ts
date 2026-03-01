@@ -114,6 +114,7 @@ export class Register implements OnInit {
   protected onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.scrollToFirstError();
       return;
     }
 
@@ -133,6 +134,12 @@ export class Register implements OnInit {
         error: (err) => this.onError(err),
       });
     }
+  }
+
+  private scrollToFirstError(): void {
+    setTimeout(() => {
+      document.querySelector('.ng-invalid:not(form)')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
   }
 
   private onSuccess(): void {
