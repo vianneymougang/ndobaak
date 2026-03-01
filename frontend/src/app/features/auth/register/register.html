@@ -115,10 +115,50 @@
           <label for="email">Email</label>
         </p-floatlabel>
 
-        <p-floatlabel>
-          <input pInputText id="phone" formControlName="phone" class="w-full" />
-          <label for="phone">Téléphone</label>
-        </p-floatlabel>
+        <!-- Phone with country selector -->
+        <div class="phone-field-wrap">
+          <p-inputgroup>
+            <p-select
+              [options]="countries"
+              [ngModel]="selectedCountry()"
+              (ngModelChange)="onCountryChange($event)"
+              [ngModelOptions]="{ standalone: true }"
+              optionLabel="name"
+              styleClass="country-select"
+              [filter]="true"
+              filterBy="name,dialCode"
+              filterPlaceholder="Rechercher..."
+            >
+              <ng-template #selectedItem let-country>
+                <span class="country-option">
+                  <span class="country-flag">{{ country.flag }}</span>
+                  <span class="country-code">{{ country.dialCode }}</span>
+                </span>
+              </ng-template>
+              <ng-template #item let-country>
+                <span class="country-option">
+                  <span class="country-flag">{{ country.flag }}</span>
+                  <span class="country-name">{{ country.name }}</span>
+                  <span class="country-code country-code--muted">{{ country.dialCode }}</span>
+                </span>
+              </ng-template>
+            </p-select>
+            <p-floatlabel>
+              <input
+                pInputText
+                id="localPhone"
+                formControlName="localPhone"
+                type="tel"
+                inputmode="numeric"
+                class="w-full"
+              />
+              <label for="localPhone">Téléphone</label>
+            </p-floatlabel>
+          </p-inputgroup>
+          @if (form.get('localPhone')?.invalid && form.get('localPhone')?.touched) {
+            <p-message severity="error" text="Numéro invalide (chiffres uniquement, 7 à 12 chiffres)." />
+          }
+        </div>
 
         <p-floatlabel>
           <p-password id="password" formControlName="password" [toggleMask]="true" [fluid]="true" />
