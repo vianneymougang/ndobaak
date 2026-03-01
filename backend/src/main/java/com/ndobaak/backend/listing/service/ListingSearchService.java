@@ -1,6 +1,7 @@
 package com.ndobaak.backend.listing.service;
 
 import com.ndobaak.backend.common.enums.ListingStatus;
+import com.ndobaak.backend.common.enums.ReviewStatus;
 import com.ndobaak.backend.listing.dto.ListingSearchRequest;
 import com.ndobaak.backend.listing.dto.ListingSearchResponse;
 import com.ndobaak.backend.listing.dto.SearchPageResponse;
@@ -146,7 +147,7 @@ public class ListingSearchService {
         Map<Long, double[]> ratingsMap = new HashMap<>();
         if (listingIds.isEmpty()) return ratingsMap;
 
-        List<Object[]> ratings = reviewRepository.findAverageRatingsByListingIds(listingIds);
+        List<Object[]> ratings = reviewRepository.findAverageRatingsByListingIds(listingIds, ReviewStatus.APPROVED);
         for (Object[] row : ratings) {
             Long listingId = (Long) row[0];
             Double avgRating = (Double) row[1];

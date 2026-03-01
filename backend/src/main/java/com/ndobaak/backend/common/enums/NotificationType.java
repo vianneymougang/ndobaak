@@ -1,0 +1,8 @@
+package com.ndobaak.backend.common.enums;
+
+public enum NotificationType {
+    BOOKING_CREATED, BOOKING_CONFIRMED, BOOKING_CANCELLED,
+    PAYMENT_RECEIVED, PAYMENT_REMINDER,
+    REVIEW_POSTED,
+    LISTING_APPROVED, LISTING_REJECTED;
+}
