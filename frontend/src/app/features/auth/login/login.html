@@ -66,16 +66,19 @@
                 />
                 <label for="loginEmail">Email</label>
               </p-floatlabel>
-              <p-floatlabel>
-                <p-password
-                  id="loginPassword"
-                  formControlName="password"
-                  [toggleMask]="true"
-                  [feedback]="false"
-                  [fluid]="true"
-                />
-                <label for="loginPassword">Mot de passe</label>
-              </p-floatlabel>
+              <div class="password-field-wrap">
+                <p-floatlabel>
+                  <p-password
+                    id="loginPassword"
+                    formControlName="password"
+                    [toggleMask]="true"
+                    [feedback]="false"
+                    [fluid]="true"
+                  />
+                  <label for="loginPassword">Mot de passe</label>
+                </p-floatlabel>
+                <a routerLink="/auth/forgot-password" class="forgot-link">Mot de passe oublié ?</a>
+              </div>
               <p-button
                 type="submit"
                 label="Se connecter"
@@ -94,20 +97,26 @@
                   [pAutoFocus]="true"
                   id="loginPhone"
                   formControlName="phone"
+                  type="tel"
+                  inputmode="numeric"
+                  placeholder="Ex : 677 00 00 00"
                   class="w-full"
                 />
                 <label for="loginPhone">Téléphone</label>
               </p-floatlabel>
-              <p-floatlabel>
-                <p-password
-                  id="loginPhonePassword"
-                  formControlName="password"
-                  [toggleMask]="true"
-                  [feedback]="false"
-                  [fluid]="true"
-                />
-                <label for="loginPhonePassword">Mot de passe</label>
-              </p-floatlabel>
+              <div class="password-field-wrap">
+                <p-floatlabel>
+                  <p-password
+                    id="loginPhonePassword"
+                    formControlName="password"
+                    [toggleMask]="true"
+                    [feedback]="false"
+                    [fluid]="true"
+                  />
+                  <label for="loginPhonePassword">Mot de passe</label>
+                </p-floatlabel>
+                <a routerLink="/auth/forgot-password" class="forgot-link">Mot de passe oublié ?</a>
+              </div>
               <p-button
                 type="submit"
                 label="Se connecter"

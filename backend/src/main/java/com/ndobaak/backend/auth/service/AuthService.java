@@ -12,6 +12,7 @@ import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.common.exception.UnauthorizedException;
 import com.ndobaak.backend.common.security.JwtProperties;
 import com.ndobaak.backend.common.security.JwtTokenProvider;
+import com.ndobaak.backend.common.util.PhoneNormalizer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,7 +47,7 @@ public class AuthService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
-                .phone(request.getPhone())
+                .phone(PhoneNormalizer.normalize(request.getPhone()))
                 .password(passwordEncoder.encode(request.getPassword()))
                 .matricule(request.getMatricule())
                 .fieldOfStudy(request.getFieldOfStudy())
@@ -65,7 +66,7 @@ public class AuthService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
-                .phone(request.getPhone())
+                .phone(PhoneNormalizer.normalize(request.getPhone()))
                 .password(passwordEncoder.encode(request.getPassword()))
                 .idCardNumber(request.getIdCardNumber())
                 .taxId(request.getTaxId())
@@ -81,7 +82,7 @@ public class AuthService {
             user = userRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
         } else if (StringUtils.hasText(request.getPhone())) {
-            user = userRepository.findByPhone(request.getPhone())
+            user = userRepository.findByPhone(PhoneNormalizer.normalize(request.getPhone()))
                     .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
         } else {
             throw new BusinessException("Email or phone is required");

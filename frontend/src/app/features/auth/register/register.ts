@@ -11,9 +11,11 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { InputGroupModule } from 'primeng/inputgroup';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
+import { SelectModule } from 'primeng/select';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth';
@@ -27,6 +29,30 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
   return null;
 }
 
+export interface Country {
+  flag: string;
+  name: string;
+  dialCode: string;
+}
+
+export const COUNTRIES: Country[] = [
+  { flag: '🇨🇲', name: 'Cameroun', dialCode: '+237' },
+  { flag: '🇳🇬', name: 'Nigeria', dialCode: '+234' },
+  { flag: '🇨🇮', name: "Côte d'Ivoire", dialCode: '+225' },
+  { flag: '🇸🇳', name: 'Sénégal', dialCode: '+221' },
+  { flag: '🇬🇳', name: 'Guinée', dialCode: '+224' },
+  { flag: '🇬🇦', name: 'Gabon', dialCode: '+241' },
+  { flag: '🇨🇬', name: 'Congo', dialCode: '+242' },
+  { flag: '🇨🇩', name: 'RD Congo', dialCode: '+243' },
+  { flag: '🇹🇩', name: 'Tchad', dialCode: '+235' },
+  { flag: '🇬🇭', name: 'Ghana', dialCode: '+233' },
+  { flag: '🇫🇷', name: 'France', dialCode: '+33' },
+  { flag: '🇧🇪', name: 'Belgique', dialCode: '+32' },
+  { flag: '🇨🇦', name: 'Canada', dialCode: '+1' },
+  { flag: '🇺🇸', name: 'États-Unis', dialCode: '+1' },
+  { flag: '🇬🇧', name: 'Royaume-Uni', dialCode: '+44' },
+];
+
 @Component({
   selector: 'app-register',
   imports: [
@@ -34,6 +60,8 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
     ReactiveFormsModule,
     RouterLink,
     InputTextModule,
+    InputGroupModule,
+    SelectModule,
     PasswordModule,
     ButtonModule,
     SelectButtonModule,
@@ -56,6 +84,9 @@ export class Register implements OnInit {
     { label: 'Proprietaire', value: 'LANDLORD' },
   ];
 
+  protected countries = COUNTRIES;
+  protected selectedCountry = signal<Country>(COUNTRIES[0]);
+
   protected selectedRole = signal<string>('STUDENT');
   protected loading = signal(false);
   protected errorMessage = signal<string | null>(null);
@@ -65,7 +96,7 @@ export class Register implements OnInit {
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.minLength(9)]],
+      localPhone: ['', [Validators.required, Validators.pattern(/^\d{7,12}$/)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]],
     },
@@ -83,6 +114,10 @@ export class Register implements OnInit {
     this.selectedRole.set(role);
   }
 
+  protected onCountryChange(country: Country): void {
+    this.selectedCountry.set(country);
+  }
+
   protected onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -91,7 +126,8 @@ export class Register implements OnInit {
 
     this.loading.set(true);
     this.errorMessage.set(null);
-    const { firstName, lastName, email, phone, password } = this.form.getRawValue();
+    const { firstName, lastName, email, localPhone, password } = this.form.getRawValue();
+    const phone = this.selectedCountry().dialCode + localPhone;
 
     if (this.selectedRole() === 'STUDENT') {
       this.authService.registerStudent({ firstName, lastName, email, phone, password }).subscribe({
