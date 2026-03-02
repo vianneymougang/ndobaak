@@ -56,6 +56,7 @@ public class SecurityConfig {
                     "/v3/api-docs/**"
                 ).permitAll()
                 .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/error").permitAll()
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/listings/search").permitAll()

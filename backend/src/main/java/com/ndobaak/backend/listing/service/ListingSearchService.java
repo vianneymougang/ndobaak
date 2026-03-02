@@ -12,6 +12,7 @@ import com.ndobaak.backend.listing.repository.ReviewRepository;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -33,6 +34,7 @@ public class ListingSearchService {
         this.reviewRepository = reviewRepository;
     }
 
+    @Transactional(readOnly = true)
     public SearchPageResponse<ListingSearchResponse> search(ListingSearchRequest request) {
         Specification<Listing> spec = buildSpecification(request);
         List<Listing> dbResults = listingRepository.findAll(spec);
