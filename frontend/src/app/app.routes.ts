@@ -39,6 +39,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/search/search').then((m) => m.Search),
       },
       {
+        path: 'listings/create',
+        canActivate: [authGuard, roleGuard('LANDLORD')],
+        loadComponent: () => import('./features/listing/create/create').then((m) => m.Create),
+      },
+      {
         path: 'listings/:id',
         loadComponent: () => import('./features/listing/detail/detail').then((m) => m.Detail),
       },
@@ -47,11 +52,6 @@ export const routes: Routes = [
         canActivate: [authGuard, roleGuard('LANDLORD')],
         loadComponent: () =>
           import('./features/listing/my-listings/my-listings').then((m) => m.MyListings),
-      },
-      {
-        path: 'listings/create',
-        canActivate: [authGuard, roleGuard('LANDLORD')],
-        loadComponent: () => import('./features/listing/create/create').then((m) => m.Create),
       },
     ],
   },
