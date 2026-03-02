@@ -214,6 +214,7 @@ public class ListingService {
         return listingMapper.toResponse(listing, false);
     }
 
+    @Transactional(readOnly = true)
     public List<ListingResponse> getMyListings() {
         User landlord = authService.getAuthenticatedUser();
         return listingRepository.findByLandlordIdOrderByCreatedAtDesc(landlord.getId())
@@ -222,6 +223,7 @@ public class ListingService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public ListingResponse getListingById(Long id) {
         Listing listing = listingRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Listing", "id", id));
