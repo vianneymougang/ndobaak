@@ -8,7 +8,7 @@
 /* Visual panel */
 .register-visual {
   @apply hidden lg:flex flex-1 flex-col justify-between p-12;
-  background: linear-gradient(145deg, #1B3A5C 0%, #2D5F8A 50%, #1A7A5C 100%);
+  background: linear-gradient(150deg, #0D2B1C 0%, #1B4332 45%, #2D6A4F 100%);
   position: relative;
   overflow: hidden;
 
@@ -20,7 +20,7 @@
     width: 500px;
     height: 500px;
     border-radius: 50%;
-    background: rgba(232, 118, 43, 0.12);
+    background: rgba(212, 160, 23, 0.1);
   }
 }
 
@@ -38,8 +38,9 @@
   }
 
   .logo-name {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Urbanist', sans-serif;
     @apply text-2xl font-bold text-white;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -61,7 +62,7 @@
     .feature-text {
       h4 {
         @apply text-white font-semibold text-base mb-0.5;
-        font-family: 'Poppins', sans-serif;
+        font-family: 'Urbanist', sans-serif;
       }
 
       p {
@@ -120,14 +121,17 @@
   }
 
   .logo-name {
-    font-family: 'Poppins', sans-serif;
-    @apply text-xl font-bold text-ndb-navy;
+    font-family: 'Urbanist', sans-serif;
+    @apply text-xl font-bold;
+    color: #111827;
   }
 }
 
 .register-title {
-  @apply text-3xl font-bold text-ndb-navy mb-1;
-  font-family: 'Poppins', sans-serif;
+  @apply text-3xl font-bold mb-1;
+  font-family: 'Urbanist', sans-serif;
+  color: #111827;
+  letter-spacing: -0.01em;
 }
 
 .register-subtitle {
@@ -204,7 +208,7 @@
   }
 
   &__title {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Urbanist', sans-serif;
     @apply text-sm font-semibold;
     color: var(--title-color);
     transition: color 0.15s ease;

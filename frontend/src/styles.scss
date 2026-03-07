@@ -1,27 +1,27 @@
 /* ──────────────────────────────────────────────
    Ndobaâk — Global Styles & PrimeNG Token Overrides
+   Palette: Forest Green (#1B4332) × Gold (#D4A017)
    ────────────────────────────────────────────── */
 
 :root {
-
   /* ════════════════════════════════════════════
-     PRIMARY PALETTE — Ndobaâk orange (#E8762B)
+     PRIMARY PALETTE — Ndobaâk Gold (#D4A017)
      Overrides PrimeNG's default blue palette.
      Unlayered so it wins over @layer primeng.
      ════════════════════════════════════════════ */
-  --p-primary-50:             #fef6ee;
-  --p-primary-100:            #fce8d0;
-  --p-primary-200:            #f9cda1;
-  --p-primary-300:            #f5a96a;
-  --p-primary-400:            #f08035;
-  --p-primary-500:            #E8762B;
-  --p-primary-600:            #d35e1a;
-  --p-primary-700:            #af4916;
-  --p-primary-800:            #8c3c16;
-  --p-primary-900:            #723217;
-  --p-primary-950:            #3e180a;
-  --p-primary-color:          #E8762B;
-  --p-primary-contrast-color: #ffffff;
+  --p-primary-50:  #fffbeb;
+  --p-primary-100: #fef3c7;
+  --p-primary-200: #fde68a;
+  --p-primary-300: #fcd34d;
+  --p-primary-400: #fbbf24;
+  --p-primary-500: #D4A017;
+  --p-primary-600: #B8860B;
+  --p-primary-700: #92680C;
+  --p-primary-800: #78520D;
+  --p-primary-900: #62420D;
+  --p-primary-950: #3b260a;
+  --p-primary-color: #D4A017;
+  --p-primary-contrast-color: #1B4332;
 
   /* Force light mode — dark mode not yet implemented */
   color-scheme: light;
@@ -29,250 +29,249 @@
   /* ════════════════════════════════════════════
      SHAPE
      ════════════════════════════════════════════ */
-  --p-border-radius-sm:  4px;
-  --p-border-radius-md:  8px;
-  --p-border-radius-lg:  12px;
-  --p-border-radius-xl:  16px;
+  --p-border-radius-sm: 4px;
+  --p-border-radius-md: 8px;
+  --p-border-radius-lg: 12px;
+  --p-border-radius-xl: 16px;
 
   /* ════════════════════════════════════════════
      BUTTON
      ════════════════════════════════════════════ */
-  --p-button-border-radius:      8px;
-  --p-button-label-font-weight:  600;
-  --p-button-gap:                0.5rem;
-  --p-button-padding-x:          1.25rem;
-  --p-button-padding-y:          0.625rem;
+  --p-button-border-radius: 8px;
+  --p-button-label-font-weight: 600;
+  --p-button-gap: 0.5rem;
+  --p-button-padding-x: 1.25rem;
+  --p-button-padding-y: 0.625rem;
 
-  /* Secondary → navy */
-  --p-button-secondary-background:         #1B3A5C;
-  --p-button-secondary-hover-background:   #2D5F8A;
-  --p-button-secondary-active-background:  #14304e;
-  --p-button-secondary-border-color:       #1B3A5C;
-  --p-button-secondary-hover-border-color: #2D5F8A;
-  --p-button-secondary-active-border-color:#14304e;
-  --p-button-secondary-color:              #ffffff;
-  --p-button-secondary-hover-color:        #ffffff;
-  --p-button-secondary-active-color:       #ffffff;
+  /* Secondary → forest */
+  --p-button-secondary-background: #1B4332;
+  --p-button-secondary-hover-background: #2D6A4F;
+  --p-button-secondary-active-background: #143526;
+  --p-button-secondary-border-color: #1B4332;
+  --p-button-secondary-hover-border-color: #2D6A4F;
+  --p-button-secondary-active-border-color: #143526;
+  --p-button-secondary-color: #ffffff;
+  --p-button-secondary-hover-color: #ffffff;
+  --p-button-secondary-active-color: #ffffff;
 
-  /* Success → brand green */
-  --p-button-success-background:           #1A7A5C;
-  --p-button-success-hover-background:     #155e47;
-  --p-button-success-active-background:    #0f4433;
-  --p-button-success-border-color:         #1A7A5C;
-  --p-button-success-hover-border-color:   #155e47;
-  --p-button-success-active-border-color:  #0f4433;
-  --p-button-success-color:                #ffffff;
-  --p-button-success-hover-color:          #ffffff;
-  --p-button-success-active-color:         #ffffff;
+  /* Success → forest light */
+  --p-button-success-background: #40916C;
+  --p-button-success-hover-background: #2D6A4F;
+  --p-button-success-active-background: #1B4332;
+  --p-button-success-border-color: #40916C;
+  --p-button-success-hover-border-color: #2D6A4F;
+  --p-button-success-active-border-color: #1B4332;
+  --p-button-success-color: #ffffff;
+  --p-button-success-hover-color: #ffffff;
+  --p-button-success-active-color: #ffffff;
 
   /* Danger → error red */
-  --p-button-danger-background:            #DC3545;
-  --p-button-danger-hover-background:      #c82333;
-  --p-button-danger-active-background:     #bd2130;
-  --p-button-danger-border-color:          #DC3545;
-  --p-button-danger-hover-border-color:    #c82333;
-  --p-button-danger-active-border-color:   #bd2130;
-  --p-button-danger-color:                 #ffffff;
-  --p-button-danger-hover-color:           #ffffff;
-  --p-button-danger-active-color:          #ffffff;
+  --p-button-danger-background: #EF4444;
+  --p-button-danger-hover-background: #DC2626;
+  --p-button-danger-active-background: #B91C1C;
+  --p-button-danger-border-color: #EF4444;
+  --p-button-danger-hover-border-color: #DC2626;
+  --p-button-danger-active-border-color: #B91C1C;
+  --p-button-danger-color: #ffffff;
+  --p-button-danger-hover-color: #ffffff;
+  --p-button-danger-active-color: #ffffff;
 
-  /* Outlined primary */
-  --p-button-outlined-primary-border-color:       #E8762B;
-  --p-button-outlined-primary-color:              #E8762B;
-  --p-button-outlined-primary-hover-background:   rgba(232, 118, 43, 0.08);
-  --p-button-outlined-primary-active-background:  rgba(232, 118, 43, 0.16);
+  /* Outlined primary — gold */
+  --p-button-outlined-primary-border-color: #D4A017;
+  --p-button-outlined-primary-color: #D4A017;
+  --p-button-outlined-primary-hover-background: rgba(212, 160, 23, 0.08);
+  --p-button-outlined-primary-active-background: rgba(212, 160, 23, 0.16);
 
-  /* Outlined secondary (navy outline) */
-  --p-button-outlined-secondary-border-color:       #1B3A5C;
-  --p-button-outlined-secondary-color:              #1B3A5C;
-  --p-button-outlined-secondary-hover-background:   rgba(27, 58, 92, 0.06);
-  --p-button-outlined-secondary-active-background:  rgba(27, 58, 92, 0.12);
+  /* Outlined secondary — forest */
+  --p-button-outlined-secondary-border-color: #1B4332;
+  --p-button-outlined-secondary-color: #1B4332;
+  --p-button-outlined-secondary-hover-background: rgba(27, 67, 50, 0.06);
+  --p-button-outlined-secondary-active-background: rgba(27, 67, 50, 0.12);
 
-  /* Text variants — use brand palette */
-  --p-button-text-primary-color:              #E8762B;
-  --p-button-text-primary-hover-background:   rgba(232, 118, 43, 0.08);
-  --p-button-text-primary-active-background:  rgba(232, 118, 43, 0.16);
-  --p-button-text-secondary-color:            #1B3A5C;
-  --p-button-text-secondary-hover-background: rgba(27, 58, 92, 0.06);
-  --p-button-text-secondary-active-background:rgba(27, 58, 92, 0.12);
+  /* Text variants */
+  --p-button-text-primary-color: #D4A017;
+  --p-button-text-primary-hover-background: rgba(212, 160, 23, 0.08);
+  --p-button-text-primary-active-background: rgba(212, 160, 23, 0.16);
+  --p-button-text-secondary-color: #1B4332;
+  --p-button-text-secondary-hover-background: rgba(27, 67, 50, 0.06);
+  --p-button-text-secondary-active-background: rgba(27, 67, 50, 0.12);
 
   /* Link variant */
-  --p-button-link-color:        #E8762B;
-  --p-button-link-hover-color:  #C9611B;
-  --p-button-link-active-color: #C9611B;
+  --p-button-link-color: #D4A017;
+  --p-button-link-hover-color: #B8860B;
+  --p-button-link-active-color: #B8860B;
 
   /* ════════════════════════════════════════════
      INPUT TEXT
      ════════════════════════════════════════════ */
-  --p-inputtext-border-radius:       6px;
-  --p-inputtext-border-color:        #DEE2E6;
-  --p-inputtext-hover-border-color:  #adb5bd;
-  --p-inputtext-focus-border-color:  #2D5F8A;
-  --p-inputtext-invalid-border-color:#DC3545;
-  --p-inputtext-color:               #2C3E50;
-  --p-inputtext-placeholder-color:   #6C757D;
-  --p-inputtext-focus-ring-width:    3px;
-  --p-inputtext-focus-ring-style:    solid;
-  --p-inputtext-focus-ring-color:    rgba(45, 95, 138, 0.15);
-  --p-inputtext-focus-ring-offset:   0;
-  --p-inputtext-focus-ring-shadow:   0 0 0 3px rgba(45, 95, 138, 0.15);
+  --p-inputtext-border-radius: 6px;
+  --p-inputtext-border-color: #E5E0D8;
+  --p-inputtext-hover-border-color: #c5bdb0;
+  --p-inputtext-focus-border-color: #D4A017;
+  --p-inputtext-invalid-border-color: #EF4444;
+  --p-inputtext-color: #374151;
+  --p-inputtext-placeholder-color: #6B7280;
+  --p-inputtext-focus-ring-width: 3px;
+  --p-inputtext-focus-ring-style: solid;
+  --p-inputtext-focus-ring-color: rgba(212, 160, 23, 0.18);
+  --p-inputtext-focus-ring-offset: 0;
+  --p-inputtext-focus-ring-shadow: 0 0 0 3px rgba(212, 160, 23, 0.18);
 
   /* ════════════════════════════════════════════
      SELECT (DROPDOWN)
      ════════════════════════════════════════════ */
-  --p-select-border-radius:                 6px;
-  --p-select-border-color:                  #DEE2E6;
-  --p-select-hover-border-color:            #adb5bd;
-  --p-select-focus-border-color:            #2D5F8A;
-  --p-select-invalid-border-color:          #DC3545;
-  --p-select-color:                         #2C3E50;
-  --p-select-placeholder-color:             #6C757D;
-  --p-select-focus-ring-width:              3px;
-  --p-select-focus-ring-style:              solid;
-  --p-select-focus-ring-color:              rgba(45, 95, 138, 0.15);
-  --p-select-focus-ring-offset:             0;
-  --p-select-focus-ring-shadow:             0 0 0 3px rgba(45, 95, 138, 0.15);
-  --p-select-dropdown-color:                #6C757D;
+  --p-select-border-radius: 6px;
+  --p-select-border-color: #E5E0D8;
+  --p-select-hover-border-color: #c5bdb0;
+  --p-select-focus-border-color: #D4A017;
+  --p-select-invalid-border-color: #EF4444;
+  --p-select-color: #374151;
+  --p-select-placeholder-color: #6B7280;
+  --p-select-focus-ring-width: 3px;
+  --p-select-focus-ring-style: solid;
+  --p-select-focus-ring-color: rgba(212, 160, 23, 0.18);
+  --p-select-focus-ring-offset: 0;
+  --p-select-focus-ring-shadow: 0 0 0 3px rgba(212, 160, 23, 0.18);
+  --p-select-dropdown-color: #6B7280;
   /* Overlay panel */
-  --p-select-overlay-border-color:          #DEE2E6;
-  --p-select-overlay-border-radius:         10px;
-  --p-select-overlay-shadow:                0 8px 24px rgba(0, 0, 0, 0.12);
+  --p-select-overlay-border-color: #E5E0D8;
+  --p-select-overlay-border-radius: 10px;
+  --p-select-overlay-shadow: 0 8px 32px rgba(27, 67, 50, 0.12);
   /* Options */
-  --p-select-option-border-radius:          6px;
-  --p-select-option-focus-background:       rgba(27, 58, 92, 0.06);
-  --p-select-option-focus-color:            #1B3A5C;
-  --p-select-option-selected-background:    rgba(232, 118, 43, 0.10);
-  --p-select-option-selected-color:         #E8762B;
-  --p-select-option-selected-focus-background: rgba(232, 118, 43, 0.16);
-  --p-select-option-selected-focus-color:   #C9611B;
-  --p-select-checkmark-color:               #E8762B;
+  --p-select-option-border-radius: 6px;
+  --p-select-option-focus-background: rgba(27, 67, 50, 0.06);
+  --p-select-option-focus-color: #1B4332;
+  --p-select-option-selected-background: rgba(212, 160, 23, 0.1);
+  --p-select-option-selected-color: #B8860B;
+  --p-select-option-selected-focus-background: rgba(212, 160, 23, 0.16);
+  --p-select-option-selected-focus-color: #92680C;
+  --p-select-checkmark-color: #D4A017;
 
   /* ════════════════════════════════════════════
      CHIP
      ════════════════════════════════════════════ */
-  --p-chip-border-radius:  8px;
-  --p-chip-background:     rgba(27, 58, 92, 0.07);
-  --p-chip-color:          #1B3A5C;
-  --p-chip-padding-x:      0.75rem;
-  --p-chip-padding-y:      0.3rem;
-  --p-chip-icon-color:     #2D5F8A;
+  --p-chip-border-radius: 8px;
+  --p-chip-background: rgba(27, 67, 50, 0.07);
+  --p-chip-color: #1B4332;
+  --p-chip-padding-x: 0.75rem;
+  --p-chip-padding-y: 0.3rem;
+  --p-chip-icon-color: #2D6A4F;
 
   /* ════════════════════════════════════════════
      TAG / BADGE
      ════════════════════════════════════════════ */
-  --p-tag-border-radius:     6px;
-  --p-tag-font-size:         0.7rem;
-  --p-tag-font-weight:       600;
-  --p-tag-padding:           0.25rem 0.6rem;
-  /* Severity mapping */
-  --p-tag-primary-background:  rgba(232, 118, 43, 0.12);
-  --p-tag-primary-color:       #E8762B;
-  --p-tag-secondary-background:rgba(27, 58, 92, 0.08);
-  --p-tag-secondary-color:     #1B3A5C;
-  --p-tag-success-background:  #E8F5E9;
-  --p-tag-success-color:       #1A7A5C;
-  --p-tag-info-background:     rgba(45, 95, 138, 0.10);
-  --p-tag-info-color:          #2D5F8A;
-  --p-tag-warn-background:     #FFF3E0;
-  --p-tag-warn-color:          #E8762B;
-  --p-tag-danger-background:   #FFEBEE;
-  --p-tag-danger-color:        #DC3545;
-  --p-tag-contrast-background: #1B3A5C;
-  --p-tag-contrast-color:      #ffffff;
+  --p-tag-border-radius: 6px;
+  --p-tag-font-size: 0.7rem;
+  --p-tag-font-weight: 600;
+  --p-tag-padding: 0.25rem 0.6rem;
+  /* Severity */
+  --p-tag-primary-background: rgba(212, 160, 23, 0.12);
+  --p-tag-primary-color: #B8860B;
+  --p-tag-secondary-background: rgba(27, 67, 50, 0.08);
+  --p-tag-secondary-color: #1B4332;
+  --p-tag-success-background: #D8F3DC;
+  --p-tag-success-color: #1B4332;
+  --p-tag-info-background: rgba(59, 130, 246, 0.1);
+  --p-tag-info-color: #1D4ED8;
+  --p-tag-warn-background: #F9E5A0;
+  --p-tag-warn-color: #92680C;
+  --p-tag-danger-background: #FEE2E2;
+  --p-tag-danger-color: #DC2626;
+  --p-tag-contrast-background: #1B4332;
+  --p-tag-contrast-color: #ffffff;
 
   /* ════════════════════════════════════════════
      STEPPER
      ════════════════════════════════════════════ */
-  /* Inactive step */
-  --p-stepper-step-number-background:          #F5F7FA;
-  --p-stepper-step-number-border-color:        #DEE2E6;
-  --p-stepper-step-number-color:               #6C757D;
-  --p-stepper-step-number-font-weight:         600;
-  --p-stepper-step-title-color:                #6C757D;
-  /* Active step → orange */
-  --p-stepper-step-number-active-background:   #E8762B;
-  --p-stepper-step-number-active-border-color: #E8762B;
-  --p-stepper-step-number-active-color:        #ffffff;
-  --p-stepper-step-title-active-color:         #1B3A5C;
-  --p-stepper-step-title-font-weight:          500;
+  --p-stepper-step-number-background: #F2F0EB;
+  --p-stepper-step-number-border-color: #E5E0D8;
+  --p-stepper-step-number-color: #6B7280;
+  --p-stepper-step-number-font-weight: 700;
+  --p-stepper-step-title-color: #6B7280;
+  /* Active step → gold */
+  --p-stepper-step-number-active-background: #D4A017;
+  --p-stepper-step-number-active-border-color: #D4A017;
+  --p-stepper-step-number-active-color: #1B4332;
+  --p-stepper-step-title-active-color: #1B4332;
+  --p-stepper-step-title-font-weight: 600;
   /* Separator */
-  --p-stepper-separator-background:            #DEE2E6;
-  --p-stepper-separator-active-background:     #E8762B;
+  --p-stepper-separator-background: #E5E0D8;
+  --p-stepper-separator-active-background: #D4A017;
 
   /* ════════════════════════════════════════════
      TABS
      ════════════════════════════════════════════ */
-  --p-tabs-tablist-border-color:   #DEE2E6;
-  --p-tabs-tablist-border-width:   2px;
-  --p-tabs-tab-color:              #6C757D;
-  --p-tabs-tab-hover-color:        #1B3A5C;
-  --p-tabs-tab-active-color:       #1B3A5C;
-  --p-tabs-tab-border-color:       transparent;
-  --p-tabs-tab-hover-border-color: #DEE2E6;
-  --p-tabs-tab-active-border-color:#E8762B;
-  --p-tabs-tab-font-weight:        500;
-  --p-tabs-active-bar-background:  #E8762B;
-  --p-tabs-active-bar-height:      2px;
+  --p-tabs-tablist-border-color: #E5E0D8;
+  --p-tabs-tablist-border-width: 2px;
+  --p-tabs-tab-color: #6B7280;
+  --p-tabs-tab-hover-color: #1B4332;
+  --p-tabs-tab-active-color: #1B4332;
+  --p-tabs-tab-border-color: transparent;
+  --p-tabs-tab-hover-border-color: #E5E0D8;
+  --p-tabs-tab-active-border-color: #D4A017;
+  --p-tabs-tab-font-weight: 600;
+  --p-tabs-active-bar-background: #D4A017;
+  --p-tabs-active-bar-height: 2px;
 
   /* ════════════════════════════════════════════
      PAGINATOR
      ════════════════════════════════════════════ */
-  --p-paginator-background:                     transparent;
-  --p-paginator-border-radius:                  8px;
-  --p-paginator-nav-button-border-radius:        8px;
-  --p-paginator-nav-button-background:           transparent;
-  --p-paginator-nav-button-color:                #6C757D;
-  --p-paginator-nav-button-hover-background:     rgba(27, 58, 92, 0.06);
-  --p-paginator-nav-button-hover-color:          #1B3A5C;
-  --p-paginator-nav-button-selected-background:  #E8762B;
-  --p-paginator-nav-button-selected-color:       #ffffff;
-  --p-paginator-current-page-report-color:       #6C757D;
+  --p-paginator-background: transparent;
+  --p-paginator-border-radius: 8px;
+  --p-paginator-nav-button-border-radius: 8px;
+  --p-paginator-nav-button-background: transparent;
+  --p-paginator-nav-button-color: #6B7280;
+  --p-paginator-nav-button-hover-background: rgba(27, 67, 50, 0.06);
+  --p-paginator-nav-button-hover-color: #1B4332;
+  --p-paginator-nav-button-selected-background: #D4A017;
+  --p-paginator-nav-button-selected-color: #1B4332;
+  --p-paginator-current-page-report-color: #6B7280;
 
   /* ════════════════════════════════════════════
      AVATAR
      ════════════════════════════════════════════ */
-  --p-avatar-background:   #1B3A5C;
-  --p-avatar-color:        #ffffff;
-  --p-avatar-border-radius:50%;
+  --p-avatar-background: #1B4332;
+  --p-avatar-color: #ffffff;
+  --p-avatar-border-radius: 50%;
 
   /* ════════════════════════════════════════════
      FLOAT LABEL
      ════════════════════════════════════════════ */
-  --p-floatlabel-color:         #6C757D;
-  --p-floatlabel-focus-color:   #2D5F8A;
-  --p-floatlabel-active-color:  #2D5F8A;
-  --p-floatlabel-invalid-color: #DC3545;
+  --p-floatlabel-color: #6B7280;
+  --p-floatlabel-focus-color: #D4A017;
+  --p-floatlabel-active-color: #D4A017;
+  --p-floatlabel-invalid-color: #EF4444;
 
   /* ════════════════════════════════════════════
      CHECKBOX
      ════════════════════════════════════════════ */
-  --p-checkbox-border-radius:              4px;
-  --p-checkbox-border-color:               #DEE2E6;
-  --p-checkbox-hover-border-color:         #2D5F8A;
-  --p-checkbox-focus-border-color:         #2D5F8A;
-  --p-checkbox-checked-background:         #E8762B;
-  --p-checkbox-checked-hover-background:   #C9611B;
-  --p-checkbox-checked-border-color:       #E8762B;
-  --p-checkbox-checked-hover-border-color: #C9611B;
-  --p-checkbox-icon-checked-color:         #ffffff;
-  --p-checkbox-icon-checked-hover-color:   #ffffff;
-  --p-checkbox-focus-ring-color:           rgba(232, 118, 43, 0.2);
-  --p-checkbox-focus-ring-width:           3px;
-  --p-checkbox-focus-ring-shadow:          0 0 0 3px rgba(232, 118, 43, 0.2);
+  --p-checkbox-border-radius: 4px;
+  --p-checkbox-border-color: #E5E0D8;
+  --p-checkbox-hover-border-color: #D4A017;
+  --p-checkbox-focus-border-color: #D4A017;
+  --p-checkbox-checked-background: #D4A017;
+  --p-checkbox-checked-hover-background: #B8860B;
+  --p-checkbox-checked-border-color: #D4A017;
+  --p-checkbox-checked-hover-border-color: #B8860B;
+  --p-checkbox-icon-checked-color: #1B4332;
+  --p-checkbox-icon-checked-hover-color: #1B4332;
+  --p-checkbox-focus-ring-color: rgba(212, 160, 23, 0.22);
+  --p-checkbox-focus-ring-width: 3px;
+  --p-checkbox-focus-ring-shadow: 0 0 0 3px rgba(212, 160, 23, 0.22);
 }
 
 /* ════════════════════════════════════════════
-   BUTTON — Poppins font (no design token exists for this)
+   BUTTON — Urbanist font
    ════════════════════════════════════════════ */
 .p-button {
-  font-family: 'Poppins', sans-serif !important;
+  font-family: 'Urbanist', sans-serif !important;
   letter-spacing: 0.025em;
   transition: all 0.2s ease !important;
   min-height: 44px;
 }
 
 /* ════════════════════════════════════════════
-   INPUTS — fixed height (no design token for height)
+   INPUTS — fixed height
    ════════════════════════════════════════════ */
 .p-inputtext,
 .p-select,
@@ -291,38 +290,42 @@ html {
    SKELETON — pulse animation
    ════════════════════════════════════════════ */
 @keyframes skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .skeleton {
-  background: #E9ECEF;
+  background: #e5e0d8;
   border-radius: 6px;
   animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
 
 /* ════════════════════════════════════════════
    UTILITY BADGE CLASSES
-   Applied via styleClass on p-tag to override severity colors
    ════════════════════════════════════════════ */
 .badge-verified {
-  --p-tag-background: #E8F5E9;
-  --p-tag-color:      #1A7A5C;
+  --p-tag-background: #D8F3DC;
+  --p-tag-color: #1B4332;
 }
 
 .badge-pending {
-  --p-tag-background: #FFF3E0;
-  --p-tag-color:      #E8762B;
+  --p-tag-background: #F9E5A0;
+  --p-tag-color: #92680C;
 }
 
 .badge-rejected {
-  --p-tag-background: #FFEBEE;
-  --p-tag-color:      #DC3545;
+  --p-tag-background: #FEE2E2;
+  --p-tag-color: #DC2626;
 }
 
 .badge-draft {
-  --p-tag-background: rgba(27, 58, 92, 0.08);
-  --p-tag-color:      #1B3A5C;
+  --p-tag-background: rgba(27, 67, 50, 0.08);
+  --p-tag-color: #1B4332;
 }
 
 /* ════════════════════════════════════════════
@@ -339,13 +342,13 @@ html {
   align-items: center;
   gap: 4px;
   font-size: 0.75rem;
-  color: #DC3545;
+  color: #DC2626;
   padding-left: 2px;
 }
 
 .form-legend {
   font-size: 0.75rem;
-  color: #6C757D;
+  color: #6B7280;
   margin: 0;
 }
 
@@ -355,8 +358,8 @@ html {
   gap: 8px;
   padding: 10px 14px;
   border-radius: 6px;
-  background: rgba(220, 53, 69, 0.06);
-  border: 1px solid rgba(220, 53, 69, 0.25);
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.25);
   font-size: 0.8125rem;
   color: #B91C1C;
   line-height: 1.45;

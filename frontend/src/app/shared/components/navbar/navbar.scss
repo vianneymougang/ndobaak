@@ -1,44 +1,77 @@
 @reference "../../../../tailwind.css";
 
+/* ════════════════════════════════════
+   NAVBAR — Transparent → Forest Green
+   ════════════════════════════════════ */
 .navbar {
-  @apply bg-ndb-navy sticky top-0 z-50;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
+  @apply sticky top-0 z-50;
+  background: transparent;
+  transition: background 0.35s ease, box-shadow 0.35s ease, border-bottom-color 0.35s ease;
+  border-bottom: 1px solid transparent;
+
+  /* Default: visible on any non-hero page */
+  &:not(.navbar--transparent) {
+    background: #1B4332;
+    box-shadow: 0 2px 20px rgba(27, 67, 50, 0.3);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* Transparent variant: hero page at scroll 0 */
+  &.navbar--transparent {
+    background: transparent;
+    box-shadow: none;
+    border-bottom-color: transparent;
+  }
+
+  /* Scrolled: always forest solid */
+  &.navbar--scrolled {
+    background: #1B4332;
+    box-shadow: 0 2px 20px rgba(27, 67, 50, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
 }
 
 .navbar-container {
   @apply max-w-7xl mx-auto px-4 flex items-center justify-between;
-  height: 64px;
+  height: 68px;
 }
 
 /* ── Brand ── */
 .navbar-brand {
-  @apply flex items-center gap-2 no-underline;
+  @apply flex items-center gap-2.5 no-underline;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.88;
+  }
 }
 
-.brand-icon {
-  @apply flex items-center justify-center w-8 h-8 rounded-lg bg-ndb-orange text-white text-sm;
+.brand-icon-svg {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
 }
 
 .brand-text {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Urbanist', sans-serif;
   @apply text-xl font-bold text-white tracking-tight;
+  letter-spacing: -0.01em;
 }
 
 /* ── Desktop links ── */
 .navbar-links {
-  @apply hidden md:flex items-center gap-6;
+  @apply hidden md:flex items-center gap-7;
 
   a {
-    @apply text-white/80 no-underline text-sm font-medium flex items-center gap-1.5 transition-colors;
+    @apply text-white/75 no-underline text-sm font-semibold flex items-center gap-1.5 transition-colors;
+    font-family: 'Urbanist', sans-serif;
 
     i {
       @apply text-xs opacity-70;
     }
 
-    &:hover,
-    &.active {
+    &:hover {
       @apply text-white;
-      text-shadow: 0 0 20px rgba(232, 118, 43, 0.4);
 
       i {
         @apply opacity-100;
@@ -46,47 +79,49 @@
     }
 
     &.active {
-      @apply text-ndb-orange;
+      @apply text-white;
+      color: #D4A017;
+
+      i {
+        @apply opacity-100;
+      }
     }
   }
 }
 
 /* ── Auth actions ── */
 .navbar-auth {
-  @apply hidden md:flex items-center gap-4;
+  @apply hidden md:flex items-center gap-3;
 }
 
-.nav-link-auth {
-  @apply text-white/80 text-sm font-medium no-underline transition-colors;
+.btn-nav-outline {
+  @apply inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold no-underline transition-all;
+  color: rgba(255, 255, 255, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  font-family: 'Urbanist', sans-serif;
+  letter-spacing: 0.01em;
 
   &:hover {
-    @apply text-white;
+    border-color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.1);
   }
 }
 
-.btn-cta {
+.btn-nav-gold {
   @apply inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold no-underline transition-all;
-  background: #E8762B;
-  color: #ffffff;
-  font-family: 'Poppins', sans-serif;
+  background: #D4A017;
+  color: #1B4332;
+  font-family: 'Urbanist', sans-serif;
   letter-spacing: 0.02em;
 
   &:hover {
-    background: #C9611B;
+    background: #B8860B;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(232, 118, 43, 0.4);
+    box-shadow: 0 4px 14px rgba(212, 160, 23, 0.45);
   }
-}
 
-.btn-cta-outline {
-  @apply inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold no-underline transition-all;
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  font-family: 'Poppins', sans-serif;
-
-  &:hover {
-    border-color: rgba(255, 255, 255, 0.95);
-    background: rgba(255, 255, 255, 0.12);
+  &:active {
+    transform: translateY(0);
   }
 }
 
@@ -96,8 +131,10 @@
 }
 
 .user-avatar {
-  @apply w-9 h-9 rounded-full bg-ndb-orange text-white text-sm font-bold flex items-center justify-center flex-shrink-0;
-  font-family: 'Poppins', sans-serif;
+  @apply w-9 h-9 rounded-full text-white text-sm font-bold flex items-center justify-center flex-shrink-0;
+  background: #D4A017;
+  color: #1B4332;
+  font-family: 'Urbanist', sans-serif;
 }
 
 .user-info {
@@ -105,11 +142,11 @@
 
   .user-name {
     @apply text-white text-sm font-semibold leading-tight;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Urbanist', sans-serif;
   }
 
   .user-role {
-    @apply text-white/60 text-xs;
+    @apply text-white/55 text-xs;
   }
 }
 
@@ -118,13 +155,14 @@
   background: rgba(255, 255, 255, 0.08);
 
   &:hover {
-    @apply text-white bg-white/15;
+    @apply text-white;
+    background: rgba(255, 255, 255, 0.15);
   }
 }
 
 /* ── Mobile toggle ── */
 .menu-toggle {
-  @apply flex md:hidden items-center justify-center w-10 h-10 text-white text-xl cursor-pointer rounded-lg transition-colors border-0;
+  @apply flex md:hidden items-center justify-center w-10 h-10 text-white text-lg cursor-pointer rounded-lg transition-colors border-0;
   background: rgba(255, 255, 255, 0.1);
 
   &:hover {
@@ -135,19 +173,20 @@
 /* ── Mobile nav ── */
 .mobile-nav {
   @apply md:hidden border-t flex flex-col px-4 pb-4 gap-1;
-  border-color: rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #1B4332;
 
   a {
-    @apply text-white/85 no-underline py-3 text-sm font-medium flex items-center gap-2 transition-colors border-b;
-    border-color: rgba(255, 255, 255, 0.08);
+    @apply text-white/80 no-underline py-3 text-sm font-semibold flex items-center gap-2 transition-colors border-b;
+    border-color: rgba(255, 255, 255, 0.07);
+    font-family: 'Urbanist', sans-serif;
 
     &:last-of-type {
       @apply border-b-0;
     }
 
     &:hover {
-      @apply text-white;
+      color: #D4A017;
     }
   }
 }

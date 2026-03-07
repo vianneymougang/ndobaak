@@ -35,8 +35,8 @@ export class Home implements OnInit {
   protected budgetRanges = [
     { label: 'Tous les budgets', value: '' },
     { label: 'Moins de 30 000 FCFA', value: '0-30000' },
-    { label: '30 000 - 50 000 FCFA', value: '30000-50000' },
-    { label: '50 000 - 80 000 FCFA', value: '50000-80000' },
+    { label: '30 000 – 50 000 FCFA', value: '30000-50000' },
+    { label: '50 000 – 80 000 FCFA', value: '50000-80000' },
     { label: 'Plus de 80 000 FCFA', value: '80000-' },
   ];
 
@@ -47,18 +47,28 @@ export class Home implements OnInit {
     {
       icon: 'pi-search',
       title: 'Recherchez',
-      description: 'Trouvez le logement idéal près du campus avec nos filtres avancés : type, budget, distance.',
+      description:
+        "Filtrez par type, budget et distance du campus pour trouver le logement idéal près de l'IUSJC.",
     },
     {
       icon: 'pi-verified',
       title: 'Annonces vérifiées',
-      description: 'Toutes les annonces sont contrôlées par notre équipe avant publication. Aucune surprise.',
+      description:
+        "Chaque annonce est contrôlée par notre équipe avant publication. Zéro surprise à l'arrivée.",
     },
     {
       icon: 'pi-home',
       title: 'Emménagez',
-      description: 'Réservez en ligne et emménagez en toute sérénité avec le soutien de notre équipe.',
+      description:
+        "Réservez en ligne et payez par Mobile Money. Notre équipe vous accompagne jusqu'à l'emménagement.",
     },
+  ];
+
+  protected stats = [
+    { value: '150+', label: 'Logements disponibles', icon: 'pi-home' },
+    { value: '1 500', label: 'Étudiants logés', icon: 'pi-users' },
+    { value: '100%', label: 'Annonces vérifiées', icon: 'pi-verified' },
+    { value: '50+', label: 'Propriétaires actifs', icon: 'pi-star' },
   ];
 
   ngOnInit(): void {

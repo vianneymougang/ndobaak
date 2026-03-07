@@ -5,11 +5,10 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { ChipModule } from 'primeng/chip';
 import { ListingSearchResponse } from '../../../core/models/listing.models';
-import { StarRating } from '../star-rating/star-rating';
 
 @Component({
   selector: 'app-listing-card',
-  imports: [RouterLink, SlicePipe, ButtonModule, TagModule, ChipModule, StarRating],
+  imports: [RouterLink, SlicePipe, ButtonModule, TagModule, ChipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './listing-card.html',
   styleUrl: './listing-card.scss',

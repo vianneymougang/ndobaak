@@ -3,41 +3,41 @@
 /* ── Split-screen layout ── */
 .login-page {
   @apply min-h-screen flex;
-  background: var(--color-ndb-page);
+  background: var(--color-ndb-cream);
 }
 
 /* Visual panel — hidden on mobile */
 .login-visual {
   @apply hidden lg:flex flex-1 flex-col justify-between p-12;
-  background: linear-gradient(145deg, #1B3A5C 0%, #2D5F8A 60%, #1A7A5C 100%);
+  background: linear-gradient(150deg, #0D2B1C 0%, #1B4332 45%, #2D6A4F 100%);
   position: relative;
   overflow: hidden;
 
   &::before {
     content: '';
     position: absolute;
-    top: -40%;
-    right: -20%;
+    top: -30%;
+    right: -15%;
     width: 500px;
     height: 500px;
     border-radius: 50%;
-    background: rgba(232, 118, 43, 0.15);
+    background: rgba(212, 160, 23, 0.1);
   }
 
   &::after {
     content: '';
     position: absolute;
-    bottom: -30%;
+    bottom: -25%;
     left: -10%;
-    width: 400px;
-    height: 400px;
+    width: 380px;
+    height: 380px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.04);
   }
 }
 
 .visual-logo {
-  @apply flex items-center gap-2 relative z-10 no-underline;
+  @apply flex items-center gap-2.5 relative z-10 no-underline;
   transition: opacity 0.15s ease;
 
   &:hover {
@@ -45,13 +45,20 @@
   }
 
   .logo-icon {
-    @apply flex items-center justify-center w-10 h-10 rounded-xl text-white text-lg;
-    background: var(--color-ndb-orange);
+    @apply flex items-center justify-center w-10 h-10 rounded-xl;
+    background: rgba(212, 160, 23, 0.2);
+    border: 1px solid rgba(212, 160, 23, 0.35);
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
   }
 
   .logo-name {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Urbanist', sans-serif;
     @apply text-2xl font-bold text-white;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -60,24 +67,28 @@
 
   blockquote {
     @apply text-white/90 text-2xl font-light leading-relaxed mb-4;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Urbanist', sans-serif;
   }
 
   cite {
-    @apply text-white/60 text-sm;
+    @apply text-white/50 text-sm;
+    font-family: 'Lato', sans-serif;
   }
 }
 
 .visual-stats {
-  @apply flex gap-8 relative z-10;
+  @apply flex gap-10 relative z-10;
 
   .stat {
     .num {
-      @apply block text-3xl font-bold text-white;
-      font-family: 'Poppins', sans-serif;
+      @apply block text-3xl font-extrabold text-white;
+      font-family: 'Urbanist', sans-serif;
+      color: #D4A017;
     }
+
     .lbl {
-      @apply text-white/60 text-sm;
+      @apply text-white/55 text-sm;
+      font-family: 'Lato', sans-serif;
     }
   }
 }
@@ -105,7 +116,7 @@
 
 .method-tab {
   @apply flex-1 py-2.5 text-sm font-semibold text-center cursor-pointer;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Urbanist', sans-serif;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
@@ -114,16 +125,16 @@
   transition: color 0.15s ease, border-color 0.15s ease;
 
   &--active {
-    color: var(--color-ndb-orange);
-    border-bottom-color: var(--color-ndb-orange);
+    color: #D4A017;
+    border-bottom-color: #D4A017;
   }
 
   &:hover:not(&--active) {
-    color: var(--color-ndb-navy);
+    color: #1B4332;
   }
 
   &:focus-visible {
-    outline: 2px solid var(--color-ndb-orange);
+    outline: 2px solid #D4A017;
     outline-offset: -2px;
   }
 }
@@ -131,10 +142,11 @@
 .back-home-link {
   @apply flex items-center gap-1.5 text-sm font-medium no-underline mb-6;
   color: var(--color-ndb-muted);
+  font-family: 'Lato', sans-serif;
   transition: color 0.15s ease;
 
   &:hover {
-    color: var(--color-ndb-navy);
+    color: #1B4332;
   }
 
   i {
@@ -151,23 +163,28 @@
   }
 
   .logo-icon {
-    @apply flex items-center justify-center w-9 h-9 rounded-xl text-white;
-    background: var(--color-ndb-orange);
+    @apply flex items-center justify-center w-9 h-9 rounded-xl;
+    background: #1B4332;
   }
 
   .logo-name {
-    font-family: 'Poppins', sans-serif;
-    @apply text-xl font-bold text-ndb-navy;
+    font-family: 'Urbanist', sans-serif;
+    @apply text-xl font-bold;
+    color: #111827;
   }
 }
 
 .login-title {
-  @apply text-3xl font-bold text-ndb-navy mb-1;
-  font-family: 'Poppins', sans-serif;
+  @apply text-3xl font-bold mb-1;
+  font-family: 'Urbanist', sans-serif;
+  color: #111827;
+  letter-spacing: -0.01em;
 }
 
 .login-subtitle {
-  @apply text-ndb-muted text-sm mb-6;
+  @apply text-sm mb-6;
+  color: var(--color-ndb-muted);
+  font-family: 'Lato', sans-serif;
 }
 
 .login-form {
@@ -185,25 +202,28 @@
   }
 
   span {
-    @apply text-xs text-ndb-muted flex-shrink-0;
+    @apply text-xs flex-shrink-0;
+    color: var(--color-ndb-muted);
+    font-family: 'Lato', sans-serif;
   }
 }
 
 .btn-google {
   @apply w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg text-sm font-medium cursor-pointer;
-  border: 1.5px solid #DADCE0;
+  border: 1.5px solid #E5E0D8;
   background: #fff;
-  color: var(--color-ndb-navy);
+  color: #374151;
+  font-family: 'Lato', sans-serif;
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 
   &:hover {
-    background: #f8f9fa;
-    border-color: #BBBFC4;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    background: #FAFAF7;
+    border-color: #c5bdb0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--color-ndb-orange);
+    outline: 2px solid #D4A017;
     outline-offset: 2px;
   }
 
@@ -219,23 +239,27 @@
 .forgot-link {
   @apply text-xs font-medium no-underline self-end;
   color: var(--color-ndb-muted);
+  font-family: 'Lato', sans-serif;
   transition: color 0.15s ease;
 
   &:hover {
-    color: var(--color-ndb-orange);
+    color: #D4A017;
   }
 }
 
 .register-link {
-  @apply text-center text-sm text-ndb-muted mt-6 m-0;
+  @apply text-center text-sm mt-6 m-0;
+  color: var(--color-ndb-muted);
+  font-family: 'Lato', sans-serif;
 
   a {
     @apply font-semibold no-underline;
-    color: var(--color-ndb-orange);
+    color: #D4A017;
+    font-family: 'Urbanist', sans-serif;
 
     &:hover {
       text-decoration: underline;
+      color: #B8860B;
     }
   }
 }
-

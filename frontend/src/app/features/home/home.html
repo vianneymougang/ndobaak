@@ -1,19 +1,30 @@
-<!-- ── HERO ── -->
+<!-- ══════════════════════════════════════════════
+     HERO — Cinematic fullscreen
+     ══════════════════════════════════════════════ -->
 <section class="hero" [style.background-image]="heroImageUrl">
   <div class="hero-overlay"></div>
   <div class="hero-content">
     <div class="hero-text">
       <span class="hero-badge">
-        <i class="pi pi-check-circle"></i> 100% annonces vérifiées
+        <i class="pi pi-check-circle"></i>
+        100% annonces vérifiées
       </span>
-      <h1 class="hero-title">Trouvez votre logement étudiant à Eyang</h1>
+      <h1 class="hero-title">
+        Trouvez votre<br />
+        logement étudiant<br />
+        <em class="hero-title-accent">à Eyang</em>
+      </h1>
       <p class="hero-subtitle">
-        Annonces vérifiées, photos réelles, réservation en ligne — la référence pour les étudiants de l'IUSJC.
+        Annonces vérifiées, photos réelles, réservation et paiement Mobile Money — la référence pour les étudiants de l'IUSJC.
       </p>
     </div>
 
+    <!-- Glassmorphic search card -->
     <div class="hero-search-card">
-      <p class="search-card-label">Rechercher un logement</p>
+      <p class="search-card-label">
+        <i class="pi pi-search"></i>
+        Rechercher un logement
+      </p>
       <div class="search-inputs">
         <p-select
           [options]="roomTypes"
@@ -23,6 +34,7 @@
           placeholder="Type de chambre"
           class="search-select"
         />
+        <div class="search-divider"></div>
         <p-select
           [options]="budgetRanges"
           [(ngModel)]="selectedBudget"
@@ -37,35 +49,58 @@
         </button>
       </div>
     </div>
+
+    <!-- Trust strip -->
+    <div class="hero-trust">
+      <span class="trust-item"><i class="pi pi-shield"></i> Paiement sécurisé</span>
+      <span class="trust-sep">·</span>
+      <span class="trust-item"><i class="pi pi-map-marker"></i> Zone Eyang, Yaoundé</span>
+      <span class="trust-sep">·</span>
+      <span class="trust-item"><i class="pi pi-mobile"></i> Mobile Money</span>
+    </div>
   </div>
 </section>
 
-<!-- ── COMMENT ÇA MARCHE ── -->
+<!-- ══════════════════════════════════════════════
+     HOW IT WORKS — Journey with numbered steps
+     ══════════════════════════════════════════════ -->
 <section class="how-it-works">
   <div class="section-container">
+    <span class="section-eyebrow">Simple &amp; rapide</span>
     <h2 class="section-title">Comment ça marche</h2>
-    <p class="section-subtitle">Trouvez et réservez votre logement en 3 étapes simples</p>
+    <p class="section-subtitle">Trouvez et réservez votre logement en 3 étapes</p>
 
-    <div class="features-grid">
-      @for (feature of features; track feature.title) {
-        <div class="feature-card">
-          <div class="feature-icon-wrap">
+    <div class="journey-grid">
+      @for (feature of features; track feature.title; let i = $index) {
+        <div class="journey-step">
+          <div class="step-number">0{{ i + 1 }}</div>
+          <div class="step-icon-wrap">
             <i class="pi" [class]="feature.icon"></i>
           </div>
-          <h3>{{ feature.title }}</h3>
-          <p>{{ feature.description }}</p>
+          <h3 class="step-title">{{ feature.title }}</h3>
+          <p class="step-desc">{{ feature.description }}</p>
         </div>
+        @if (i < features.length - 1) {
+          <div class="journey-arrow" aria-hidden="true">
+            <i class="pi pi-arrow-right"></i>
+          </div>
+        }
       }
     </div>
   </div>
 </section>
 
-<!-- ── ANNONCES POPULAIRES ── -->
+<!-- ══════════════════════════════════════════════
+     POPULAR LISTINGS
+     ══════════════════════════════════════════════ -->
 @if (popularListings().length > 0) {
   <section class="popular-listings">
     <div class="section-container">
       <div class="section-header">
-        <h2 class="section-title left">Annonces populaires</h2>
+        <div>
+          <span class="section-eyebrow">Top rated</span>
+          <h2 class="section-title left">Annonces populaires</h2>
+        </div>
         <a routerLink="/search" class="see-all-link">
           Voir tout <i class="pi pi-arrow-right"></i>
         </a>
@@ -80,35 +115,44 @@
   </section>
 }
 
-<!-- ── STATS ── -->
+<!-- ══════════════════════════════════════════════
+     STATS — Bento 4 cards
+     ══════════════════════════════════════════════ -->
 <section class="stats-section">
   <div class="section-container">
-    <div class="stats-grid">
-      <div class="stat-item">
-        <span class="stat-number">150+</span>
-        <span class="stat-label">Logements disponibles</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-number">1 500</span>
-        <span class="stat-label">Étudiants logés</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-number">100%</span>
-        <span class="stat-label">Annonces vérifiées</span>
-      </div>
+    <div class="bento-grid">
+      @for (stat of stats; track stat.label) {
+        <div class="bento-card">
+          <div class="bento-icon-wrap">
+            <i class="pi" [class]="stat.icon"></i>
+          </div>
+          <span class="bento-num">{{ stat.value }}</span>
+          <span class="bento-label">{{ stat.label }}</span>
+        </div>
+      }
     </div>
   </div>
 </section>
 
-<!-- ── CTA PROPRIÉTAIRES ── -->
+<!-- ══════════════════════════════════════════════
+     CTA PROPRIÉTAIRES — Forest background
+     ══════════════════════════════════════════════ -->
 <section class="landlord-cta">
+  <!-- Decorative organic pattern -->
+  <div class="cta-pattern" aria-hidden="true">
+    <svg viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg" class="cta-pattern-svg">
+      <circle cx="350" cy="50" r="120" fill="rgba(212,160,23,0.06)"/>
+      <circle cx="20" cy="250" r="90" fill="rgba(255,255,255,0.04)"/>
+      <circle cx="200" cy="150" r="60" fill="rgba(212,160,23,0.04)"/>
+    </svg>
+  </div>
+
   <div class="section-container">
     <div class="cta-content">
       <div class="cta-text">
-        <h2>Vous avez un logement à louer ?</h2>
-        <p>Rejoignez plus de 50 propriétaires qui font confiance à Ndobaâk pour trouver des locataires fiables.</p>
+        <span class="cta-eyebrow">Vous êtes propriétaire ?</span>
+        <h2>Publiez votre logement,<br />trouvez des locataires fiables</h2>
+        <p>Rejoignez plus de 50 propriétaires qui font confiance à Ndobaâk pour trouver des étudiants sérieux de l'IUSJC.</p>
       </div>
       <div class="cta-actions">
         <a routerLink="/register" class="cta-btn-primary">

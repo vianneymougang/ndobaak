@@ -9,8 +9,10 @@
   @apply flex items-center justify-between mb-8;
 
   h1 {
-    @apply text-3xl font-bold text-ndb-navy m-0;
-    font-family: 'Poppins', sans-serif;
+    @apply text-3xl font-bold m-0;
+    font-family: 'Urbanist', sans-serif;
+    color: #111827;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -29,8 +31,9 @@
   }
 
   h3 {
-    @apply text-xl font-semibold text-ndb-navy mb-2;
-    font-family: 'Poppins', sans-serif;
+    @apply text-xl font-semibold mb-2;
+    font-family: 'Urbanist', sans-serif;
+    color: #111827;
   }
 
   p {
@@ -50,7 +53,7 @@
 
   &:hover {
     box-shadow: var(--shadow-card-hover);
-    border-color: rgba(27, 58, 92, 0.15);
+    border-color: rgba(27, 67, 50, 0.18);
   }
 
   @media (max-width: 640px) {
@@ -86,8 +89,9 @@
   @apply flex items-start gap-3 mb-1 flex-wrap;
 
   h3 {
-    @apply text-base font-semibold text-ndb-navy m-0 flex-1;
-    font-family: 'Poppins', sans-serif;
+    @apply text-base font-semibold m-0 flex-1;
+    font-family: 'Urbanist', sans-serif;
+    color: #111827;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -96,8 +100,8 @@
 
 .listing-price {
   @apply font-bold text-lg m-0 leading-tight;
-  font-family: 'Poppins', sans-serif;
-  color: var(--color-ndb-orange);
+  font-family: 'Urbanist', sans-serif;
+  color: #D4A017;
 }
 
 .listing-location {

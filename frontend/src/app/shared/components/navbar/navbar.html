@@ -1,7 +1,17 @@
-<nav class="navbar">
+<nav class="navbar" [class.navbar--transparent]="isTransparent()" [class.navbar--scrolled]="scrolled()">
   <div class="navbar-container">
+
+    <!-- Brand / Logo -->
     <a routerLink="/" class="navbar-brand">
-      <span class="brand-icon"><i class="pi pi-home"></i></span>
+      <svg class="brand-icon-svg" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect width="36" height="36" rx="8" fill="rgba(255,255,255,0.15)"/>
+        <!-- N letterform -->
+        <rect x="7.5" y="10.5" width="4" height="16" rx="0.5" fill="white"/>
+        <rect x="24.5" y="10.5" width="4" height="16" rx="0.5" fill="white"/>
+        <path d="M 11.5 10.5 L 24.5 26.5" stroke="white" stroke-width="4" stroke-linecap="round"/>
+        <!-- Gold roof -->
+        <path d="M 14 9 L 18 5 L 22 9" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
       <span class="brand-text">Ndobaâk</span>
     </a>
 
@@ -19,7 +29,7 @@
           <i class="pi pi-list"></i> Mes annonces
         </a>
         <a routerLink="/listings/create" routerLinkActive="active" (click)="menuOpen = false">
-          <i class="pi pi-plus"></i> Publier une annonce
+          <i class="pi pi-plus"></i> Publier
         </a>
       }
     </div>
@@ -37,13 +47,13 @@
           </button>
         </div>
       } @else {
-        <a routerLink="/login" class="btn-cta-outline">Se connecter</a>
-        <a routerLink="/register" class="btn-cta">S'inscrire</a>
+        <a routerLink="/login" class="btn-nav-outline">Se connecter</a>
+        <a routerLink="/register" class="btn-nav-gold">S'inscrire</a>
       }
     </div>
   </div>
 
-  <!-- Mobile menu overlay -->
+  <!-- Mobile nav -->
   @if (menuOpen) {
     <div class="mobile-nav">
       <a routerLink="/search" (click)="menuOpen = false">
@@ -59,12 +69,12 @@
       }
       <div class="mobile-auth">
         @if (isAuthenticated()) {
-          <button class="btn-cta-outline" (click)="logout(); menuOpen = false">
+          <button class="btn-nav-outline" (click)="logout(); menuOpen = false">
             <i class="pi pi-sign-out"></i> Déconnexion
           </button>
         } @else {
-          <a routerLink="/login" class="btn-cta-outline" (click)="menuOpen = false">Se connecter</a>
-          <a routerLink="/register" class="btn-cta" (click)="menuOpen = false">S'inscrire</a>
+          <a routerLink="/login" class="btn-nav-outline" (click)="menuOpen = false">Se connecter</a>
+          <a routerLink="/register" class="btn-nav-gold" (click)="menuOpen = false">S'inscrire</a>
         }
       </div>
     </div>
