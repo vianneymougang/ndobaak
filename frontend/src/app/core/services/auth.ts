@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, catchError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   AuthResponse,
@@ -49,9 +49,13 @@ export class AuthService {
   }
 
   loadCurrentUser(): Observable<UserProfile> {
-    return this.http
-      .get<UserProfile>(`${this.apiUrl}/auth/me`)
-      .pipe(tap((user) => this.currentUser.set(user)));
+    return this.http.get<UserProfile>(`${this.apiUrl}/auth/me`).pipe(
+      tap((user) => this.currentUser.set(user)),
+      catchError((err) => {
+        this.logout();
+        throw err;
+      }),
+    );
   }
 
   handleOAuthCallback(token: string, refreshToken: string): Observable<UserProfile> {
