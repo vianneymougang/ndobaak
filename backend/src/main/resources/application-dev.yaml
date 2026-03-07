@@ -1,4 +1,9 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 60MB
+
   datasource:
     url: jdbc:postgresql://localhost:5432/ndobaak_dev
     username: ndobaak
@@ -41,7 +46,7 @@ app:
     refresh-expiration-ms: 604800000 # 7 jours
 
   storage:
-    endpoint: http://localhost:9000
+    endpoint: ${APP_STORAGE_ENDPOINT:http://localhost:9000}
     access-key: ndobaak
     secret-key: ndobaak_minio_2026
     bucket: ndobaak-media

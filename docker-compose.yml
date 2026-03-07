@@ -87,11 +87,14 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-dev-placeholder}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-dev-placeholder}
       JWT_SECRET: ${JWT_SECRET:-ndobaak-dev-secret-key-change-in-production-2026}
+      APP_STORAGE_ENDPOINT: http://minio:9000
     depends_on:
       postgres:
         condition: service_healthy
       mailtrap:
         condition: service_healthy
+      minio:
+        condition: service_started
     networks:
       - default
 
