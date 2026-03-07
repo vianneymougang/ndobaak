@@ -5,10 +5,12 @@ import { roleGuard } from './core/guards/role-guard';
 export const routes: Routes = [
   {
     path: 'login',
+    title: 'Connexion',
     loadComponent: () => import('./features/auth/login/login').then((m) => m.Login),
   },
   {
     path: 'register',
+    title: 'Créer un compte',
     loadComponent: () => import('./features/auth/register/register').then((m) => m.Register),
   },
   {
@@ -18,11 +20,13 @@ export const routes: Routes = [
   },
   {
     path: 'auth/forgot-password',
+    title: 'Mot de passe oublié',
     loadComponent: () =>
       import('./features/auth/forgot-password/forgot-password').then((m) => m.ForgotPassword),
   },
   {
     path: 'auth/reset-password',
+    title: 'Réinitialiser le mot de passe',
     loadComponent: () =>
       import('./features/auth/reset-password/reset-password').then((m) => m.ResetPassword),
   },
@@ -36,10 +40,12 @@ export const routes: Routes = [
       },
       {
         path: 'search',
+        title: 'Rechercher',
         loadComponent: () => import('./features/search/search').then((m) => m.Search),
       },
       {
         path: 'listings/create',
+        title: 'Publier une annonce',
         canActivate: [authGuard, roleGuard('LANDLORD')],
         loadComponent: () => import('./features/listing/create/create').then((m) => m.Create),
       },
@@ -49,6 +55,7 @@ export const routes: Routes = [
       },
       {
         path: 'my-listings',
+        title: 'Mes annonces',
         canActivate: [authGuard, roleGuard('LANDLORD')],
         loadComponent: () =>
           import('./features/listing/my-listings/my-listings').then((m) => m.MyListings),
