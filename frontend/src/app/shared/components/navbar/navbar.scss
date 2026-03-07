@@ -3,8 +3,11 @@
 /* ════════════════════════════════════
    NAVBAR — Transparent → Forest Green
    ════════════════════════════════════ */
+:host {
+  @apply sticky top-0 z-50 block;
+}
+
 .navbar {
-  @apply sticky top-0 z-50;
   background: transparent;
   transition: background 0.35s ease, box-shadow 0.35s ease, border-bottom-color 0.35s ease;
   border-bottom: 1px solid transparent;
