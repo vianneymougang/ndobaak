@@ -3,7 +3,6 @@ package com.ndobaak.backend.listing.service;
 import com.ndobaak.backend.auth.entity.Landlord;
 import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.common.enums.ListingStatus;
-import com.ndobaak.backend.common.enums.RoomType;
 import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.ForbiddenException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
