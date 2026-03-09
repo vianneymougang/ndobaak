@@ -36,18 +36,12 @@ services:
     networks:
       - default
 
-  mailtrap:
-    image: dbck/mailtrap:latest
+  mailpit:
+    image: axllent/mailpit:latest
     container_name: ndobaak-mail
     ports:
-      - "1080:80" # Web UI - http://localhost:1080
-      - "1025:25" # SMTP
-      - "1587:587" # SMTP with StartTLS
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - "1080:8025"
+      - "1025:1025"
     networks:
       - default
     restart: unless-stopped
@@ -82,8 +76,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ndobaak_dev
       SPRING_DATASOURCE_USERNAME: ndobaak
       SPRING_DATASOURCE_PASSWORD: ndobaak_dev_2026
-      SPRING_MAIL_HOST: mailtrap
-      SPRING_MAIL_PORT: 25
+      SPRING_MAIL_HOST: mailpit
+      SPRING_MAIL_PORT: 1025
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-dev-placeholder}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-dev-placeholder}
       JWT_SECRET: ${JWT_SECRET:-ndobaak-dev-secret-key-change-in-production-2026}
@@ -91,8 +85,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      mailtrap:
-        condition: service_healthy
+      mailpit:
+        condition: service_started
       minio:
         condition: service_started
     networks:
