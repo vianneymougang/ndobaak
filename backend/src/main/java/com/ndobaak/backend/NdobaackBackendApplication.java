@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class NdobaackApplication {
+public class NdobaackBackendApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(NdobaackApplication.class, args);
+		SpringApplication.run(NdobaackBackendApplication.class, args);
 	}
 
 }
