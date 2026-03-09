@@ -60,13 +60,13 @@ public class ListingController {
     }
 
     @PostMapping
-    public ResponseEntity<ListingResponse> createListing(@RequestBody CreateListingRequest request) {
+    public ResponseEntity<ListingResponse> createListing(@Valid @RequestBody CreateListingRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(listingService.createListing(request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ListingResponse> updateListing(@PathVariable Long id,
-                                                         @RequestBody CreateListingRequest request) {
+                                                         @Valid @RequestBody CreateListingRequest request) {
         return ResponseEntity.ok(listingService.updateListing(id, request));
     }
 
