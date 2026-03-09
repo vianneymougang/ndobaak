@@ -18,14 +18,16 @@
 }
 
 .filter-inner {
-  @apply max-w-7xl mx-auto px-6 py-3 flex flex-row items-center gap-3 overflow-x-auto;
+  @apply max-w-7xl mx-auto px-4 py-3 flex flex-row items-center gap-3;
   flex-wrap: nowrap;
+  overflow-x: auto;
 }
 
+/* ── Search input ── */
 .filter-search {
-  @apply relative;
-  width: 220px;
-  flex-shrink: 0;
+  @apply relative flex-1;
+  min-width: 160px;
+  max-width: 280px;
 }
 
 .filter-search-icon {
@@ -41,43 +43,202 @@
 .filter-input-search {
   @apply w-full;
   padding-left: 34px !important;
-
-  ::ng-deep & {
-    height: 40px !important;
-  }
+  height: 40px !important;
 }
 
 .filter-separator {
-  @apply hidden md:block w-px h-8 flex-shrink-0;
+  @apply hidden lg:block w-px h-8 flex-shrink-0;
   background: var(--color-ndb-border);
 }
 
-.filter-select {
-  flex-shrink: 0;
-  width: 160px;
+/* ── Desktop chips ── */
+.filter-chips {
+  @apply hidden lg:flex items-center gap-2 flex-1 flex-wrap;
+}
 
-  ::ng-deep .p-select {
-    height: 40px;
-    width: 100%;
+.filter-chip {
+  @apply inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium cursor-pointer border transition-all whitespace-nowrap flex-shrink-0;
+  font-family: 'Urbanist', sans-serif;
+  background: white;
+  border-color: var(--color-ndb-border);
+  color: #374151;
+  height: 36px;
+
+  &:hover {
+    border-color: #1B4332;
+    color: #1B4332;
+  }
+
+  &.filter-chip--active {
+    background: rgba(27, 67, 50, 0.07);
+    border-color: #1B4332;
+    color: #1B4332;
+    font-weight: 600;
   }
 }
 
-.filter-price-range {
-  @apply flex items-center gap-2 flex-shrink-0;
+.filter-chip-chevron {
+  font-size: 10px;
+  opacity: 0.6;
+}
 
-  ::ng-deep .p-inputnumber input {
-    height: 40px !important;
-    width: 100px !important;
+.filter-chip-clear {
+  @apply flex items-center justify-center rounded-full text-xs;
+  width: 16px;
+  height: 16px;
+  background: #1B4332;
+  color: white;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #D4A017;
+    color: #1B4332;
+  }
+}
+
+/* ── Popover content ── */
+.filter-popover-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 220px;
+  padding: 4px 0;
+}
+
+.filter-popover-price {
+  min-width: 280px;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.filter-popover-title {
+  @apply text-xs font-bold uppercase tracking-wider px-2 pb-2;
+  font-family: 'Urbanist', sans-serif;
+  color: var(--color-ndb-muted);
+  border-bottom: 1px solid var(--color-ndb-border);
+  margin-bottom: 4px;
+}
+
+.filter-type-option {
+  @apply flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm cursor-pointer border-0 transition-all text-left w-full;
+  background: transparent;
+  color: #374151;
+  font-family: 'Lato', sans-serif;
+
+  &:hover {
+    background: rgba(27, 67, 50, 0.06);
+    color: #1B4332;
+  }
+
+  &.active {
+    background: rgba(27, 67, 50, 0.08);
+    color: #1B4332;
+    font-weight: 600;
+  }
+}
+
+.option-check {
+  font-size: 11px;
+  color: #1B4332;
+  font-weight: 700;
+  width: 14px;
+  flex-shrink: 0;
+  opacity: 0;
+
+  &.visible {
+    opacity: 1;
+  }
+}
+
+/* ── Price controls (shared between popover and drawer) ── */
+.price-range-labels {
+  @apply flex justify-between text-xs;
+  color: var(--color-ndb-muted);
+  font-family: 'Lato', sans-serif;
+  margin-top: 8px;
+}
+
+.price-inputs {
+  @apply flex items-end gap-3;
+}
+
+.price-input-wrap {
+  @apply flex flex-col gap-1 flex-1;
+}
+
+.price-input-label {
+  @apply text-xs font-medium;
+  font-family: 'Urbanist', sans-serif;
+  color: var(--color-ndb-muted);
+}
+
+.price-input {
+  @apply w-full px-3 py-2 rounded-lg border text-sm;
+  border-color: var(--color-ndb-border);
+  font-family: 'Lato', sans-serif;
+  color: #111827;
+  height: 40px;
+  appearance: textfield;
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #1B4332;
+    box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.08);
   }
 }
 
 .price-dash {
-  @apply text-sm;
+  @apply text-sm flex-shrink-0;
   color: var(--color-ndb-muted);
+  padding-bottom: 10px;
 }
 
+.price-reset-btn {
+  @apply text-xs font-semibold cursor-pointer border-0 self-start;
+  background: none;
+  color: #1B4332;
+  font-family: 'Urbanist', sans-serif;
+  text-decoration: underline;
+  padding: 0;
+
+  &:hover {
+    color: #D4A017;
+  }
+}
+
+/* ── Mobile filter button ── */
+.filter-mobile-btn {
+  @apply flex lg:hidden items-center gap-2 px-4 py-2 rounded-full border text-sm font-semibold cursor-pointer transition-all flex-shrink-0 relative;
+  font-family: 'Urbanist', sans-serif;
+  background: white;
+  border-color: var(--color-ndb-border);
+  color: #374151;
+  height: 40px;
+
+  &:hover {
+    border-color: #1B4332;
+    color: #1B4332;
+  }
+}
+
+.filter-badge {
+  @apply flex items-center justify-center text-xs font-bold rounded-full;
+  width: 18px;
+  height: 18px;
+  background: #1B4332;
+  color: white;
+  font-family: 'Urbanist', sans-serif;
+}
+
+/* ── Search button ── */
 .filter-btn-search {
-  @apply flex items-center gap-2 px-5 py-2.5 rounded-lg text-white text-sm font-bold cursor-pointer border-0 transition-all flex-shrink-0;
+  @apply flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold cursor-pointer border-0 transition-all flex-shrink-0;
   background: #D4A017;
   color: #1B4332;
   font-family: 'Urbanist', sans-serif;
@@ -88,6 +249,143 @@
     background: #B8860B;
     box-shadow: 0 4px 14px rgba(212, 160, 23, 0.35);
     transform: translateY(-1px);
+  }
+}
+
+.search-btn-label {
+  @apply hidden sm:inline;
+}
+
+/* ── Mobile Drawer ── */
+.drawer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.drawer-section {
+  padding: 20px 20px;
+  border-bottom: 1px solid var(--color-ndb-border);
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 8px;
+  }
+}
+
+.drawer-section-header {
+  @apply flex items-center justify-between mb-4;
+}
+
+.drawer-section-title {
+  @apply block text-sm font-bold mb-4;
+  font-family: 'Urbanist', sans-serif;
+  color: #111827;
+
+  .drawer-section-header & {
+    margin-bottom: 0;
+  }
+}
+
+.drawer-reset-link {
+  @apply text-xs font-semibold cursor-pointer border-0;
+  background: none;
+  color: #1B4332;
+  font-family: 'Urbanist', sans-serif;
+  text-decoration: underline;
+
+  &:hover {
+    color: #D4A017;
+  }
+}
+
+.drawer-type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.drawer-type-btn {
+  @apply flex items-center justify-center px-3 py-3 rounded-xl border text-sm font-medium cursor-pointer transition-all text-center;
+  font-family: 'Urbanist', sans-serif;
+  background: white;
+  border-color: var(--color-ndb-border);
+  color: #374151;
+  min-height: 48px;
+
+  &:hover {
+    border-color: #1B4332;
+    color: #1B4332;
+    background: rgba(27, 67, 50, 0.04);
+  }
+
+  &.active {
+    background: rgba(27, 67, 50, 0.08);
+    border-color: #1B4332;
+    color: #1B4332;
+    font-weight: 700;
+  }
+}
+
+.drawer-sort-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.drawer-sort-btn {
+  @apply flex items-center px-4 py-3 rounded-xl border text-sm font-medium cursor-pointer transition-all text-left;
+  font-family: 'Urbanist', sans-serif;
+  background: white;
+  border-color: var(--color-ndb-border);
+  color: #374151;
+  min-height: 48px;
+  width: 100%;
+
+  &:hover {
+    border-color: #1B4332;
+    color: #1B4332;
+    background: rgba(27, 67, 50, 0.04);
+  }
+
+  &.active {
+    background: rgba(27, 67, 50, 0.08);
+    border-color: #1B4332;
+    color: #1B4332;
+    font-weight: 700;
+  }
+}
+
+.drawer-actions {
+  @apply flex gap-3 p-4;
+  border-top: 1px solid var(--color-ndb-border);
+  background: white;
+}
+
+.drawer-clear-btn {
+  @apply flex items-center justify-center px-5 py-3 rounded-xl border text-sm font-semibold cursor-pointer transition-all flex-shrink-0;
+  font-family: 'Urbanist', sans-serif;
+  background: white;
+  border-color: var(--color-ndb-border);
+  color: #374151;
+  min-height: 48px;
+
+  &:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+  }
+}
+
+.drawer-apply-btn {
+  @apply flex-1 flex items-center justify-center px-5 py-3 rounded-xl text-sm font-bold cursor-pointer border-0 transition-all;
+  font-family: 'Urbanist', sans-serif;
+  background: #1B4332;
+  color: white;
+  min-height: 48px;
+  letter-spacing: 0.02em;
+
+  &:hover {
+    background: #2D6A4F;
   }
 }
 

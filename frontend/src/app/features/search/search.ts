@@ -11,11 +11,11 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
 import { PaginatorModule } from 'primeng/paginator';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { DrawerModule } from 'primeng/drawer';
+import { PopoverModule } from 'primeng/popover';
+import { SliderModule } from 'primeng/slider';
 import { ListingService } from '../../core/services/listing';
 import { ListingSearchResponse } from '../../core/models/listing.models';
 import { ListingCard } from '../../shared/components/listing-card/listing-card';
@@ -23,16 +23,18 @@ import { environment } from '../../../environments/environment';
 
 declare const L: typeof import('leaflet');
 
+const MAX_PRICE = 300_000;
+
 @Component({
   selector: 'app-search',
   imports: [
     FormsModule,
     InputTextModule,
-    SelectModule,
-    InputNumberModule,
     ButtonModule,
     PaginatorModule,
-    ProgressSpinnerModule,
+    DrawerModule,
+    PopoverModule,
+    SliderModule,
     ListingCard,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,6 +52,7 @@ export class Search implements OnInit, AfterViewInit {
   protected results = signal<ListingSearchResponse[]>([]);
   protected totalElements = signal(0);
   protected loading = signal(false);
+  protected drawerVisible = signal(false);
 
   protected keyword = '';
   protected roomType = '';
@@ -58,8 +61,11 @@ export class Search implements OnInit, AfterViewInit {
   protected sortBy = '';
   protected page = 0;
   protected size = 10;
+  protected priceRange: number[] = [0, MAX_PRICE];
 
-  protected roomTypeOptions = [
+  protected readonly maxPrice = MAX_PRICE;
+
+  protected readonly roomTypeOptions = [
     { label: 'Tous les types', value: '' },
     { label: 'Studio', value: 'STUDIO' },
     { label: 'Chambre simple', value: 'SINGLE_ROOM' },
@@ -67,13 +73,45 @@ export class Search implements OnInit, AfterViewInit {
     { label: 'Appartement', value: 'APARTMENT' },
   ];
 
-  protected sortOptions = [
+  protected readonly sortOptions = [
     { label: 'Pertinence', value: '' },
     { label: 'Prix croissant', value: 'PRICE_ASC' },
-    { label: 'Prix decroissant', value: 'PRICE_DESC' },
+    { label: 'Prix décroissant', value: 'PRICE_DESC' },
     { label: 'Distance', value: 'DISTANCE_ASC' },
     { label: 'Note', value: 'RATING_DESC' },
   ];
+
+  protected get activeRoomTypeLabel(): string {
+    return this.roomTypeOptions.find(o => o.value === this.roomType)?.label ?? 'Type';
+  }
+
+  protected get activeSortLabel(): string {
+    return this.sortOptions.find(o => o.value === this.sortBy)?.label ?? 'Tri';
+  }
+
+  protected get activePriceLabel(): string {
+    const hasMin = this.priceMin !== null && this.priceMin > 0;
+    const hasMax = this.priceMax !== null && this.priceMax < MAX_PRICE;
+    if (!hasMin && !hasMax) return 'Prix';
+    if (hasMin && hasMax) return `${this.formatK(this.priceMin!)} – ${this.formatK(this.priceMax!)}`;
+    if (hasMin) return `≥ ${this.formatK(this.priceMin!)}`;
+    return `≤ ${this.formatK(this.priceMax!)}`;
+  }
+
+  protected get activeFilterCount(): number {
+    let count = 0;
+    if (this.roomType) count++;
+    if (this.hasPriceFilter) count++;
+    if (this.sortBy) count++;
+    return count;
+  }
+
+  protected get hasPriceFilter(): boolean {
+    return (
+      (this.priceMin !== null && this.priceMin > 0) ||
+      (this.priceMax !== null && this.priceMax < MAX_PRICE)
+    );
+  }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
@@ -82,6 +120,7 @@ export class Search implements OnInit, AfterViewInit {
       this.priceMin = params['priceMin'] ? +params['priceMin'] : null;
       this.priceMax = params['priceMax'] ? +params['priceMax'] : null;
       this.sortBy = params['sortBy'] ?? '';
+      this.priceRange = [this.priceMin ?? 0, this.priceMax ?? MAX_PRICE];
       this.doSearch();
     });
   }
@@ -90,7 +129,50 @@ export class Search implements OnInit, AfterViewInit {
     this.initMap();
   }
 
+  protected selectRoomType(value: string): void {
+    this.roomType = value;
+  }
+
+  protected selectSort(value: string): void {
+    this.sortBy = value;
+  }
+
+  protected onSliderValueChange(values: number[]): void {
+    this.priceRange = values;
+    this.priceMin = values[0] === 0 ? null : values[0];
+    this.priceMax = values[1] === MAX_PRICE ? null : values[1];
+  }
+
+  protected onPriceInputChange(): void {
+    const min = typeof this.priceMin === 'number' && !isNaN(this.priceMin) ? this.priceMin : null;
+    const max = typeof this.priceMax === 'number' && !isNaN(this.priceMax) ? this.priceMax : null;
+    this.priceMin = min;
+    this.priceMax = max;
+    this.priceRange = [min ?? 0, max ?? MAX_PRICE];
+  }
+
+  protected clearPrice(): void {
+    this.priceMin = null;
+    this.priceMax = null;
+    this.priceRange = [0, MAX_PRICE];
+  }
+
+  protected clearRoomType(): void {
+    this.roomType = '';
+  }
+
+  protected clearSort(): void {
+    this.sortBy = '';
+  }
+
+  protected clearAllFilters(): void {
+    this.roomType = '';
+    this.sortBy = '';
+    this.clearPrice();
+  }
+
   protected doSearch(): void {
+    this.drawerVisible.set(false);
     this.loading.set(true);
     const filters: Record<string, unknown> = {
       keyword: this.keyword || null,
@@ -117,6 +199,10 @@ export class Search implements OnInit, AfterViewInit {
     this.page = event.page ?? 0;
     this.size = event.rows ?? 10;
     this.doSearch();
+  }
+
+  private formatK(value: number): string {
+    return value >= 1000 ? `${Math.round(value / 1000)}k FCFA` : `${value} FCFA`;
   }
 
   private initMap(): void {
