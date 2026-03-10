@@ -9,6 +9,7 @@ import com.ndobaak.backend.listing.entity.Listing;
 import com.ndobaak.backend.listing.entity.Photo;
 import com.ndobaak.backend.listing.repository.ListingRepository;
 import com.ndobaak.backend.listing.repository.ReviewRepository;
+import com.ndobaak.backend.media.service.StorageService;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -28,10 +29,14 @@ public class ListingSearchService {
 
     private final ListingRepository listingRepository;
     private final ReviewRepository reviewRepository;
+    private final StorageService storageService;
 
-    public ListingSearchService(ListingRepository listingRepository, ReviewRepository reviewRepository) {
+    public ListingSearchService(ListingRepository listingRepository,
+                                ReviewRepository reviewRepository,
+                                StorageService storageService) {
         this.listingRepository = listingRepository;
         this.reviewRepository = reviewRepository;
+        this.storageService = storageService;
     }
 
     @Transactional(readOnly = true)
@@ -163,7 +168,7 @@ public class ListingSearchService {
     }
 
     private ListingSearchResponse toSearchResponse(Listing listing, Map<Long, double[]> ratingsMap) {
-        String thumbnailUrl = listing.getPhotos().stream()
+        String thumbnailKey = listing.getPhotos().stream()
                 .filter(p -> p.getThumbnailUrl() != null)
                 .min(Comparator.comparing(Photo::getDisplayOrder, Comparator.nullsLast(Comparator.naturalOrder())))
                 .map(Photo::getThumbnailUrl)
@@ -197,7 +202,7 @@ public class ListingSearchService {
         return ListingSearchResponse.builder()
                 .id(listing.getId())
                 .title(listing.getTitle())
-                .thumbnailUrl(thumbnailUrl)
+                .thumbnailUrl(storageService.resolvePublicUrl(thumbnailKey))
                 .monthlyPrice(listing.getMonthlyPrice())
                 .roomType(listing.getRoomType())
                 .neighborhood(neighborhood)

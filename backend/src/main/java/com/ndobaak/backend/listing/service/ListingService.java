@@ -25,8 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 
@@ -36,6 +36,7 @@ public class ListingService {
     private static final double CAMPUS_LAT = 3.8480;
     private static final double CAMPUS_LNG = 11.5021;
     private static final double MAX_CAMPUS_DISTANCE_KM = 10.0;
+    private static final String WEBP_CONTENT_TYPE = "image/webp";
 
     private final ListingRepository listingRepository;
     private final AmenityRepository amenityRepository;
@@ -115,7 +116,7 @@ public class ListingService {
     }
 
     @Transactional
-    public ListingResponse uploadPhoto(Long listingId, MultipartFile file) throws IOException {
+    public synchronized ListingResponse uploadPhoto(Long listingId, MultipartFile file) throws IOException {
         Listing listing = getOwnedListing(listingId);
 
         int photoCount = photoRepository.countByListingId(listingId);
@@ -123,32 +124,38 @@ public class ListingService {
             throw new BusinessException("Maximum 10 photos per listing");
         }
 
-        ImageProcessingService.ResizedImages resized = imageProcessingService.resize(file.getInputStream());
+        ImageProcessingService.ProcessedImages processed = imageProcessingService.process(file.getInputStream());
 
-        String originalUrl = storageService.upload("listings/" + listingId + "/original",
-                file.getOriginalFilename(),
-                new ByteArrayInputStream(resized.original()),
-                resized.original().length,
-                file.getContentType());
+        String folder = "listings/" + listingId;
 
-        String mediumUrl = storageService.upload("listings/" + listingId + "/medium",
-                file.getOriginalFilename(),
-                new ByteArrayInputStream(resized.medium()),
-                resized.medium().length,
-                file.getContentType());
+        String originalKey = storageService.upload(folder + "/original",
+                "photo.webp",
+                new ByteArrayInputStream(processed.original()),
+                processed.original().length,
+                WEBP_CONTENT_TYPE);
 
-        String thumbnailUrl = storageService.upload("listings/" + listingId + "/thumbnail",
-                file.getOriginalFilename(),
-                new ByteArrayInputStream(resized.thumbnail()),
-                resized.thumbnail().length,
-                file.getContentType());
+        String mediumKey = storageService.upload(folder + "/medium",
+                "photo.webp",
+                new ByteArrayInputStream(processed.medium()),
+                processed.medium().length,
+                WEBP_CONTENT_TYPE);
+
+        String thumbnailKey = storageService.upload(folder + "/thumbnail",
+                "photo.webp",
+                new ByteArrayInputStream(processed.thumbnail()),
+                processed.thumbnail().length,
+                WEBP_CONTENT_TYPE);
+
+        int nextOrder = photoRepository.findMaxDisplayOrderByListingId(listingId)
+                .map(max -> max + 1)
+                .orElse(0);
 
         Photo photo = Photo.builder()
-                .url(originalUrl)
-                .mediumUrl(mediumUrl)
-                .thumbnailUrl(thumbnailUrl)
-                .fileSize(file.getSize())
-                .displayOrder(photoCount)
+                .url(originalKey)
+                .mediumUrl(mediumKey)
+                .thumbnailUrl(thumbnailKey)
+                .fileSize((long) processed.original().length)
+                .displayOrder(nextOrder)
                 .listing(listing)
                 .build();
 
