@@ -27,13 +27,13 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
   return null;
 }
 
-export interface Country {
+interface Country {
   flag: string;
   name: string;
   dialCode: string;
 }
 
-export const COUNTRIES: Country[] = [
+const COUNTRIES: Country[] = [
   { flag: '🇨🇲', name: 'Cameroun', dialCode: '+237' },
   { flag: '🇳🇬', name: 'Nigeria', dialCode: '+234' },
   { flag: '🇨🇮', name: "Côte d'Ivoire", dialCode: '+225' },

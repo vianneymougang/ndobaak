@@ -1,4 +1,4 @@
-export interface AmenityConfig {
+interface AmenityConfig {
   label: string;
   icon: string;
 }
