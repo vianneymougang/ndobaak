@@ -1,12 +1,12 @@
 <!-- ══════════════════════════════════════════════
-     HERO — Cinematic fullscreen
+     HERO — Cinematic, compact on mobile
      ══════════════════════════════════════════════ -->
 <section class="hero" [style.background-image]="heroImageUrl">
   <div class="hero-overlay"></div>
   <div class="hero-content">
     <div class="hero-text">
       <span class="hero-badge">
-        <i class="pi pi-check-circle"></i>
+        <i class="pi pi-check-circle" aria-hidden="true"></i>
         100% annonces vérifiées
       </span>
       <h1 class="hero-title">
@@ -22,7 +22,7 @@
     <!-- Glassmorphic search card -->
     <div class="hero-search-card">
       <p class="search-card-label">
-        <i class="pi pi-search"></i>
+        <i class="pi pi-search" aria-hidden="true"></i>
         Rechercher un logement
       </p>
       <div class="search-inputs">
@@ -44,7 +44,7 @@
           class="search-select"
         />
         <button class="search-btn" (click)="onSearch()">
-          <i class="pi pi-search"></i>
+          <i class="pi pi-search" aria-hidden="true"></i>
           RECHERCHER
         </button>
       </div>
@@ -52,14 +52,39 @@
 
     <!-- Trust strip -->
     <div class="hero-trust">
-      <span class="trust-item"><i class="pi pi-shield"></i> Paiement sécurisé</span>
-      <span class="trust-sep">·</span>
-      <span class="trust-item"><i class="pi pi-map-marker"></i> Zone Eyang, Yaoundé</span>
-      <span class="trust-sep">·</span>
-      <span class="trust-item"><i class="pi pi-mobile"></i> Mobile Money</span>
+      <span class="trust-item"><i class="pi pi-shield" aria-hidden="true"></i> Paiement sécurisé</span>
+      <span class="trust-sep" aria-hidden="true">·</span>
+      <span class="trust-item"><i class="pi pi-map-marker" aria-hidden="true"></i> Zone Eyang, Yaoundé</span>
+      <span class="trust-sep" aria-hidden="true">·</span>
+      <span class="trust-item"><i class="pi pi-mobile" aria-hidden="true"></i> Mobile Money</span>
     </div>
   </div>
 </section>
+
+<!-- ══════════════════════════════════════════════
+     POPULAR LISTINGS — Remontées avant "comment ça marche"
+     ══════════════════════════════════════════════ -->
+@if (popularListings().length > 0) {
+  <section class="popular-listings">
+    <div class="section-container">
+      <div class="section-header">
+        <div>
+          <span class="section-eyebrow">Disponibles maintenant</span>
+          <h2 class="section-title left">Annonces populaires</h2>
+        </div>
+        <a routerLink="/search" class="see-all-link">
+          Voir tout <i class="pi pi-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <div class="listings-grid">
+        @for (listing of popularListings(); track listing.id) {
+          <app-listing-card [listing]="listing" />
+        }
+      </div>
+    </div>
+  </section>
+}
 
 <!-- ══════════════════════════════════════════════
      HOW IT WORKS — Journey with numbered steps
@@ -75,7 +100,7 @@
         <div class="journey-step">
           <div class="step-number">0{{ i + 1 }}</div>
           <div class="step-icon-wrap">
-            <i class="pi" [class]="feature.icon"></i>
+            <i class="pi" [class]="feature.icon" aria-hidden="true"></i>
           </div>
           <h3 class="step-title">{{ feature.title }}</h3>
           <p class="step-desc">{{ feature.description }}</p>
@@ -91,31 +116,6 @@
 </section>
 
 <!-- ══════════════════════════════════════════════
-     POPULAR LISTINGS
-     ══════════════════════════════════════════════ -->
-@if (popularListings().length > 0) {
-  <section class="popular-listings">
-    <div class="section-container">
-      <div class="section-header">
-        <div>
-          <span class="section-eyebrow">Top rated</span>
-          <h2 class="section-title left">Annonces populaires</h2>
-        </div>
-        <a routerLink="/search" class="see-all-link">
-          Voir tout <i class="pi pi-arrow-right"></i>
-        </a>
-      </div>
-
-      <div class="listings-grid">
-        @for (listing of popularListings(); track listing.id) {
-          <app-listing-card [listing]="listing" />
-        }
-      </div>
-    </div>
-  </section>
-}
-
-<!-- ══════════════════════════════════════════════
      STATS — Bento 4 cards
      ══════════════════════════════════════════════ -->
 <section class="stats-section">
@@ -124,7 +124,7 @@
       @for (stat of stats; track stat.label) {
         <div class="bento-card">
           <div class="bento-icon-wrap">
-            <i class="pi" [class]="stat.icon"></i>
+            <i class="pi" [class]="stat.icon" aria-hidden="true"></i>
           </div>
           <span class="bento-num">{{ stat.value }}</span>
           <span class="bento-label">{{ stat.label }}</span>
@@ -135,10 +135,9 @@
 </section>
 
 <!-- ══════════════════════════════════════════════
-     CTA PROPRIÉTAIRES — Forest background
+     CTA PROPRIÉTAIRES — Discret, en bas
      ══════════════════════════════════════════════ -->
 <section class="landlord-cta">
-  <!-- Decorative organic pattern -->
   <div class="cta-pattern" aria-hidden="true">
     <svg viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg" class="cta-pattern-svg">
       <circle cx="350" cy="50" r="120" fill="rgba(212,160,23,0.06)"/>
@@ -152,13 +151,12 @@
       <div class="cta-text">
         <span class="cta-eyebrow">Vous êtes propriétaire ?</span>
         <h2>Publiez votre logement,<br />trouvez des locataires fiables</h2>
-        <p>Rejoignez plus de 50 propriétaires qui font confiance à Ndobaâk pour trouver des étudiants sérieux de l'IUSJC.</p>
+        <p>Rejoignez les propriétaires qui font confiance à Ndobaâk pour trouver des étudiants sérieux de l'IUSJC.</p>
       </div>
       <div class="cta-actions">
         <a routerLink="/register" class="cta-btn-primary">
-          <i class="pi pi-plus"></i> Publier une annonce
+          <i class="pi pi-plus" aria-hidden="true"></i> Déposer une annonce
         </a>
-        <a href="#" class="cta-btn-secondary">En savoir plus</a>
       </div>
     </div>
   </div>
