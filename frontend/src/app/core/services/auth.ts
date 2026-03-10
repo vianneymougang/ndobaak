@@ -78,7 +78,7 @@ export class AuthService {
     localStorage.removeItem('refresh_token');
     this.tokenSignal.set(null);
     this.currentUser.set(null);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
   private handleAuthResponse(response: AuthResponse): void {
