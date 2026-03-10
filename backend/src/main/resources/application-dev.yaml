@@ -47,6 +47,7 @@ app:
 
   storage:
     endpoint: ${APP_STORAGE_ENDPOINT:http://localhost:9000}
+    public-url: ${APP_STORAGE_PUBLIC_URL:http://localhost:9000/ndobaak-media}
     access-key: ndobaak
     secret-key: ndobaak_minio_2026
     bucket: ndobaak-media
