@@ -14,14 +14,14 @@
   --p-primary-200: #fde68a;
   --p-primary-300: #fcd34d;
   --p-primary-400: #fbbf24;
-  --p-primary-500: #D4A017;
-  --p-primary-600: #B8860B;
+  --p-primary-500: var(--color-ndb-gold);
+  --p-primary-600: var(--color-ndb-gold-dark);
   --p-primary-700: #92680C;
   --p-primary-800: #78520D;
   --p-primary-900: #62420D;
   --p-primary-950: #3b260a;
-  --p-primary-color: #D4A017;
-  --p-primary-contrast-color: #1B4332;
+  --p-primary-color: var(--color-ndb-gold);
+  --p-primary-contrast-color: var(--color-ndb-forest);
 
   /* Force light mode — dark mode not yet implemented */
   color-scheme: light;
@@ -44,118 +44,118 @@
   --p-button-padding-y: 0.625rem;
 
   /* Secondary → forest */
-  --p-button-secondary-background: #1B4332;
-  --p-button-secondary-hover-background: #2D6A4F;
-  --p-button-secondary-active-background: #143526;
-  --p-button-secondary-border-color: #1B4332;
-  --p-button-secondary-hover-border-color: #2D6A4F;
-  --p-button-secondary-active-border-color: #143526;
+  --p-button-secondary-background: var(--color-ndb-forest);
+  --p-button-secondary-hover-background: var(--color-ndb-forest-mid);
+  --p-button-secondary-active-background: var(--color-ndb-forest-darker);
+  --p-button-secondary-border-color: var(--color-ndb-forest);
+  --p-button-secondary-hover-border-color: var(--color-ndb-forest-mid);
+  --p-button-secondary-active-border-color: var(--color-ndb-forest-darker);
   --p-button-secondary-color: #ffffff;
   --p-button-secondary-hover-color: #ffffff;
   --p-button-secondary-active-color: #ffffff;
 
   /* Success → forest light */
-  --p-button-success-background: #40916C;
-  --p-button-success-hover-background: #2D6A4F;
-  --p-button-success-active-background: #1B4332;
-  --p-button-success-border-color: #40916C;
-  --p-button-success-hover-border-color: #2D6A4F;
-  --p-button-success-active-border-color: #1B4332;
+  --p-button-success-background: var(--color-ndb-forest-light);
+  --p-button-success-hover-background: var(--color-ndb-forest-mid);
+  --p-button-success-active-background: var(--color-ndb-forest);
+  --p-button-success-border-color: var(--color-ndb-forest-light);
+  --p-button-success-hover-border-color: var(--color-ndb-forest-mid);
+  --p-button-success-active-border-color: var(--color-ndb-forest);
   --p-button-success-color: #ffffff;
   --p-button-success-hover-color: #ffffff;
   --p-button-success-active-color: #ffffff;
 
   /* Danger → error red */
-  --p-button-danger-background: #EF4444;
-  --p-button-danger-hover-background: #DC2626;
-  --p-button-danger-active-background: #B91C1C;
-  --p-button-danger-border-color: #EF4444;
-  --p-button-danger-hover-border-color: #DC2626;
-  --p-button-danger-active-border-color: #B91C1C;
+  --p-button-danger-background: var(--color-ndb-error);
+  --p-button-danger-hover-background: var(--color-ndb-error-dark);
+  --p-button-danger-active-background: var(--color-ndb-error-darker);
+  --p-button-danger-border-color: var(--color-ndb-error);
+  --p-button-danger-hover-border-color: var(--color-ndb-error-dark);
+  --p-button-danger-active-border-color: var(--color-ndb-error-darker);
   --p-button-danger-color: #ffffff;
   --p-button-danger-hover-color: #ffffff;
   --p-button-danger-active-color: #ffffff;
 
   /* Outlined primary — gold */
-  --p-button-outlined-primary-border-color: #D4A017;
-  --p-button-outlined-primary-color: #D4A017;
-  --p-button-outlined-primary-hover-background: rgba(212, 160, 23, 0.08);
-  --p-button-outlined-primary-active-background: rgba(212, 160, 23, 0.16);
+  --p-button-outlined-primary-border-color: var(--color-ndb-gold);
+  --p-button-outlined-primary-color: var(--color-ndb-gold);
+  --p-button-outlined-primary-hover-background: color-mix(in srgb, var(--color-ndb-gold) 8%, transparent);
+  --p-button-outlined-primary-active-background: color-mix(in srgb, var(--color-ndb-gold) 16%, transparent);
 
   /* Outlined secondary — forest */
-  --p-button-outlined-secondary-border-color: #1B4332;
-  --p-button-outlined-secondary-color: #1B4332;
-  --p-button-outlined-secondary-hover-background: rgba(27, 67, 50, 0.06);
-  --p-button-outlined-secondary-active-background: rgba(27, 67, 50, 0.12);
+  --p-button-outlined-secondary-border-color: var(--color-ndb-forest);
+  --p-button-outlined-secondary-color: var(--color-ndb-forest);
+  --p-button-outlined-secondary-hover-background: color-mix(in srgb, var(--color-ndb-forest) 6%, transparent);
+  --p-button-outlined-secondary-active-background: color-mix(in srgb, var(--color-ndb-forest) 12%, transparent);
 
   /* Text variants */
-  --p-button-text-primary-color: #D4A017;
-  --p-button-text-primary-hover-background: rgba(212, 160, 23, 0.08);
-  --p-button-text-primary-active-background: rgba(212, 160, 23, 0.16);
-  --p-button-text-secondary-color: #1B4332;
-  --p-button-text-secondary-hover-background: rgba(27, 67, 50, 0.06);
-  --p-button-text-secondary-active-background: rgba(27, 67, 50, 0.12);
+  --p-button-text-primary-color: var(--color-ndb-gold);
+  --p-button-text-primary-hover-background: color-mix(in srgb, var(--color-ndb-gold) 8%, transparent);
+  --p-button-text-primary-active-background: color-mix(in srgb, var(--color-ndb-gold) 16%, transparent);
+  --p-button-text-secondary-color: var(--color-ndb-forest);
+  --p-button-text-secondary-hover-background: color-mix(in srgb, var(--color-ndb-forest) 6%, transparent);
+  --p-button-text-secondary-active-background: color-mix(in srgb, var(--color-ndb-forest) 12%, transparent);
 
   /* Link variant */
-  --p-button-link-color: #D4A017;
-  --p-button-link-hover-color: #B8860B;
-  --p-button-link-active-color: #B8860B;
+  --p-button-link-color: var(--color-ndb-gold);
+  --p-button-link-hover-color: var(--color-ndb-gold-dark);
+  --p-button-link-active-color: var(--color-ndb-gold-dark);
 
   /* ════════════════════════════════════════════
      INPUT TEXT
      ════════════════════════════════════════════ */
   --p-inputtext-border-radius: 6px;
-  --p-inputtext-border-color: #E5E0D8;
+  --p-inputtext-border-color: var(--color-ndb-border);
   --p-inputtext-hover-border-color: #c5bdb0;
-  --p-inputtext-focus-border-color: #D4A017;
-  --p-inputtext-invalid-border-color: #EF4444;
-  --p-inputtext-color: #374151;
-  --p-inputtext-placeholder-color: #6B7280;
+  --p-inputtext-focus-border-color: var(--color-ndb-gold);
+  --p-inputtext-invalid-border-color: var(--color-ndb-error);
+  --p-inputtext-color: var(--color-ndb-body);
+  --p-inputtext-placeholder-color: var(--color-ndb-muted);
   --p-inputtext-focus-ring-width: 3px;
   --p-inputtext-focus-ring-style: solid;
-  --p-inputtext-focus-ring-color: rgba(212, 160, 23, 0.18);
+  --p-inputtext-focus-ring-color: color-mix(in srgb, var(--color-ndb-gold) 18%, transparent);
   --p-inputtext-focus-ring-offset: 0;
-  --p-inputtext-focus-ring-shadow: 0 0 0 3px rgba(212, 160, 23, 0.18);
+  --p-inputtext-focus-ring-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ndb-gold) 18%, transparent);
 
   /* ════════════════════════════════════════════
      SELECT (DROPDOWN)
      ════════════════════════════════════════════ */
   --p-select-border-radius: 6px;
-  --p-select-border-color: #E5E0D8;
+  --p-select-border-color: var(--color-ndb-border);
   --p-select-hover-border-color: #c5bdb0;
-  --p-select-focus-border-color: #D4A017;
-  --p-select-invalid-border-color: #EF4444;
-  --p-select-color: #374151;
-  --p-select-placeholder-color: #6B7280;
+  --p-select-focus-border-color: var(--color-ndb-gold);
+  --p-select-invalid-border-color: var(--color-ndb-error);
+  --p-select-color: var(--color-ndb-body);
+  --p-select-placeholder-color: var(--color-ndb-muted);
   --p-select-focus-ring-width: 3px;
   --p-select-focus-ring-style: solid;
-  --p-select-focus-ring-color: rgba(212, 160, 23, 0.18);
+  --p-select-focus-ring-color: color-mix(in srgb, var(--color-ndb-gold) 18%, transparent);
   --p-select-focus-ring-offset: 0;
-  --p-select-focus-ring-shadow: 0 0 0 3px rgba(212, 160, 23, 0.18);
-  --p-select-dropdown-color: #6B7280;
+  --p-select-focus-ring-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ndb-gold) 18%, transparent);
+  --p-select-dropdown-color: var(--color-ndb-muted);
   /* Overlay panel */
-  --p-select-overlay-border-color: #E5E0D8;
+  --p-select-overlay-border-color: var(--color-ndb-border);
   --p-select-overlay-border-radius: 10px;
-  --p-select-overlay-shadow: 0 8px 32px rgba(27, 67, 50, 0.12);
+  --p-select-overlay-shadow: 0 8px 32px color-mix(in srgb, var(--color-ndb-forest) 12%, transparent);
   /* Options */
   --p-select-option-border-radius: 6px;
-  --p-select-option-focus-background: rgba(27, 67, 50, 0.06);
-  --p-select-option-focus-color: #1B4332;
-  --p-select-option-selected-background: rgba(212, 160, 23, 0.1);
-  --p-select-option-selected-color: #B8860B;
-  --p-select-option-selected-focus-background: rgba(212, 160, 23, 0.16);
+  --p-select-option-focus-background: color-mix(in srgb, var(--color-ndb-forest) 6%, transparent);
+  --p-select-option-focus-color: var(--color-ndb-forest);
+  --p-select-option-selected-background: color-mix(in srgb, var(--color-ndb-gold) 10%, transparent);
+  --p-select-option-selected-color: var(--color-ndb-gold-dark);
+  --p-select-option-selected-focus-background: color-mix(in srgb, var(--color-ndb-gold) 16%, transparent);
   --p-select-option-selected-focus-color: #92680C;
-  --p-select-checkmark-color: #D4A017;
+  --p-select-checkmark-color: var(--color-ndb-gold);
 
   /* ════════════════════════════════════════════
      CHIP
      ════════════════════════════════════════════ */
   --p-chip-border-radius: 8px;
-  --p-chip-background: rgba(27, 67, 50, 0.07);
-  --p-chip-color: #1B4332;
+  --p-chip-background: color-mix(in srgb, var(--color-ndb-forest) 7%, transparent);
+  --p-chip-color: var(--color-ndb-forest);
   --p-chip-padding-x: 0.75rem;
   --p-chip-padding-y: 0.3rem;
-  --p-chip-icon-color: #2D6A4F;
+  --p-chip-icon-color: var(--color-ndb-forest-mid);
 
   /* ════════════════════════════════════════════
      TAG / BADGE
@@ -165,52 +165,52 @@
   --p-tag-font-weight: 600;
   --p-tag-padding: 0.25rem 0.6rem;
   /* Severity */
-  --p-tag-primary-background: rgba(212, 160, 23, 0.12);
-  --p-tag-primary-color: #B8860B;
-  --p-tag-secondary-background: rgba(27, 67, 50, 0.08);
-  --p-tag-secondary-color: #1B4332;
-  --p-tag-success-background: #D8F3DC;
-  --p-tag-success-color: #1B4332;
+  --p-tag-primary-background: color-mix(in srgb, var(--color-ndb-gold) 12%, transparent);
+  --p-tag-primary-color: var(--color-ndb-gold-dark);
+  --p-tag-secondary-background: color-mix(in srgb, var(--color-ndb-forest) 8%, transparent);
+  --p-tag-secondary-color: var(--color-ndb-forest);
+  --p-tag-success-background: var(--color-ndb-forest-pale);
+  --p-tag-success-color: var(--color-ndb-forest);
   --p-tag-info-background: rgba(59, 130, 246, 0.1);
   --p-tag-info-color: #1D4ED8;
-  --p-tag-warn-background: #F9E5A0;
+  --p-tag-warn-background: var(--color-ndb-gold-pale);
   --p-tag-warn-color: #92680C;
-  --p-tag-danger-background: #FEE2E2;
-  --p-tag-danger-color: #DC2626;
-  --p-tag-contrast-background: #1B4332;
+  --p-tag-danger-background: var(--color-ndb-error-bg);
+  --p-tag-danger-color: var(--color-ndb-error-dark);
+  --p-tag-contrast-background: var(--color-ndb-forest);
   --p-tag-contrast-color: #ffffff;
 
   /* ════════════════════════════════════════════
      STEPPER
      ════════════════════════════════════════════ */
-  --p-stepper-step-number-background: #F2F0EB;
-  --p-stepper-step-number-border-color: #E5E0D8;
-  --p-stepper-step-number-color: #6B7280;
+  --p-stepper-step-number-background: var(--color-ndb-cream-dark);
+  --p-stepper-step-number-border-color: var(--color-ndb-border);
+  --p-stepper-step-number-color: var(--color-ndb-muted);
   --p-stepper-step-number-font-weight: 700;
-  --p-stepper-step-title-color: #6B7280;
+  --p-stepper-step-title-color: var(--color-ndb-muted);
   /* Active step → gold */
-  --p-stepper-step-number-active-background: #D4A017;
-  --p-stepper-step-number-active-border-color: #D4A017;
-  --p-stepper-step-number-active-color: #1B4332;
-  --p-stepper-step-title-active-color: #1B4332;
+  --p-stepper-step-number-active-background: var(--color-ndb-gold);
+  --p-stepper-step-number-active-border-color: var(--color-ndb-gold);
+  --p-stepper-step-number-active-color: var(--color-ndb-forest);
+  --p-stepper-step-title-active-color: var(--color-ndb-forest);
   --p-stepper-step-title-font-weight: 600;
   /* Separator */
-  --p-stepper-separator-background: #E5E0D8;
-  --p-stepper-separator-active-background: #D4A017;
+  --p-stepper-separator-background: var(--color-ndb-border);
+  --p-stepper-separator-active-background: var(--color-ndb-gold);
 
   /* ════════════════════════════════════════════
      TABS
      ════════════════════════════════════════════ */
-  --p-tabs-tablist-border-color: #E5E0D8;
+  --p-tabs-tablist-border-color: var(--color-ndb-border);
   --p-tabs-tablist-border-width: 2px;
-  --p-tabs-tab-color: #6B7280;
-  --p-tabs-tab-hover-color: #1B4332;
-  --p-tabs-tab-active-color: #1B4332;
+  --p-tabs-tab-color: var(--color-ndb-muted);
+  --p-tabs-tab-hover-color: var(--color-ndb-forest);
+  --p-tabs-tab-active-color: var(--color-ndb-forest);
   --p-tabs-tab-border-color: transparent;
-  --p-tabs-tab-hover-border-color: #E5E0D8;
-  --p-tabs-tab-active-border-color: #D4A017;
+  --p-tabs-tab-hover-border-color: var(--color-ndb-border);
+  --p-tabs-tab-active-border-color: var(--color-ndb-gold);
   --p-tabs-tab-font-weight: 600;
-  --p-tabs-active-bar-background: #D4A017;
+  --p-tabs-active-bar-background: var(--color-ndb-gold);
   --p-tabs-active-bar-height: 2px;
 
   /* ════════════════════════════════════════════
@@ -220,51 +220,51 @@
   --p-paginator-border-radius: 8px;
   --p-paginator-nav-button-border-radius: 8px;
   --p-paginator-nav-button-background: transparent;
-  --p-paginator-nav-button-color: #6B7280;
-  --p-paginator-nav-button-hover-background: rgba(27, 67, 50, 0.06);
-  --p-paginator-nav-button-hover-color: #1B4332;
-  --p-paginator-nav-button-selected-background: #D4A017;
-  --p-paginator-nav-button-selected-color: #1B4332;
-  --p-paginator-current-page-report-color: #6B7280;
+  --p-paginator-nav-button-color: var(--color-ndb-muted);
+  --p-paginator-nav-button-hover-background: color-mix(in srgb, var(--color-ndb-forest) 6%, transparent);
+  --p-paginator-nav-button-hover-color: var(--color-ndb-forest);
+  --p-paginator-nav-button-selected-background: var(--color-ndb-gold);
+  --p-paginator-nav-button-selected-color: var(--color-ndb-forest);
+  --p-paginator-current-page-report-color: var(--color-ndb-muted);
 
   /* ════════════════════════════════════════════
      AVATAR
      ════════════════════════════════════════════ */
-  --p-avatar-background: #1B4332;
+  --p-avatar-background: var(--color-ndb-forest);
   --p-avatar-color: #ffffff;
   --p-avatar-border-radius: 50%;
 
   /* ════════════════════════════════════════════
      FLOAT LABEL
      ════════════════════════════════════════════ */
-  --p-floatlabel-color: #6B7280;
-  --p-floatlabel-focus-color: #D4A017;
-  --p-floatlabel-active-color: #D4A017;
-  --p-floatlabel-invalid-color: #EF4444;
+  --p-floatlabel-color: var(--color-ndb-muted);
+  --p-floatlabel-focus-color: var(--color-ndb-gold);
+  --p-floatlabel-active-color: var(--color-ndb-gold);
+  --p-floatlabel-invalid-color: var(--color-ndb-error);
 
   /* ════════════════════════════════════════════
      CHECKBOX
      ════════════════════════════════════════════ */
   --p-checkbox-border-radius: 4px;
-  --p-checkbox-border-color: #E5E0D8;
-  --p-checkbox-hover-border-color: #D4A017;
-  --p-checkbox-focus-border-color: #D4A017;
-  --p-checkbox-checked-background: #D4A017;
-  --p-checkbox-checked-hover-background: #B8860B;
-  --p-checkbox-checked-border-color: #D4A017;
-  --p-checkbox-checked-hover-border-color: #B8860B;
-  --p-checkbox-icon-checked-color: #1B4332;
-  --p-checkbox-icon-checked-hover-color: #1B4332;
-  --p-checkbox-focus-ring-color: rgba(212, 160, 23, 0.22);
+  --p-checkbox-border-color: var(--color-ndb-border);
+  --p-checkbox-hover-border-color: var(--color-ndb-gold);
+  --p-checkbox-focus-border-color: var(--color-ndb-gold);
+  --p-checkbox-checked-background: var(--color-ndb-gold);
+  --p-checkbox-checked-hover-background: var(--color-ndb-gold-dark);
+  --p-checkbox-checked-border-color: var(--color-ndb-gold);
+  --p-checkbox-checked-hover-border-color: var(--color-ndb-gold-dark);
+  --p-checkbox-icon-checked-color: var(--color-ndb-forest);
+  --p-checkbox-icon-checked-hover-color: var(--color-ndb-forest);
+  --p-checkbox-focus-ring-color: color-mix(in srgb, var(--color-ndb-gold) 22%, transparent);
   --p-checkbox-focus-ring-width: 3px;
-  --p-checkbox-focus-ring-shadow: 0 0 0 3px rgba(212, 160, 23, 0.22);
+  --p-checkbox-focus-ring-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ndb-gold) 22%, transparent);
 }
 
 /* ════════════════════════════════════════════
    BUTTON — Urbanist font
    ════════════════════════════════════════════ */
 .p-button {
-  font-family: 'Urbanist', sans-serif !important;
+  font-family: var(--font-urbanist) !important;
   letter-spacing: 0.025em;
   transition: all 0.2s ease !important;
   min-height: 44px;
@@ -300,7 +300,7 @@ html {
 }
 
 .skeleton {
-  background: #e5e0d8;
+  background: var(--color-ndb-border);
   border-radius: 6px;
   animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
@@ -309,23 +309,23 @@ html {
    UTILITY BADGE CLASSES
    ════════════════════════════════════════════ */
 .badge-verified {
-  --p-tag-background: #D8F3DC;
-  --p-tag-color: #1B4332;
+  --p-tag-background: var(--color-ndb-forest-pale);
+  --p-tag-color: var(--color-ndb-forest);
 }
 
 .badge-pending {
-  --p-tag-background: #F9E5A0;
+  --p-tag-background: var(--color-ndb-gold-pale);
   --p-tag-color: #92680C;
 }
 
 .badge-rejected {
-  --p-tag-background: #FEE2E2;
-  --p-tag-color: #DC2626;
+  --p-tag-background: var(--color-ndb-error-bg);
+  --p-tag-color: var(--color-ndb-error-dark);
 }
 
 .badge-draft {
-  --p-tag-background: rgba(27, 67, 50, 0.08);
-  --p-tag-color: #1B4332;
+  --p-tag-background: color-mix(in srgb, var(--color-ndb-forest) 8%, transparent);
+  --p-tag-color: var(--color-ndb-forest);
 }
 
 /* ════════════════════════════════════════════
@@ -342,13 +342,13 @@ html {
   align-items: center;
   gap: 4px;
   font-size: 0.75rem;
-  color: #DC2626;
+  color: var(--color-ndb-error-dark);
   padding-left: 2px;
 }
 
 .form-legend {
   font-size: 0.75rem;
-  color: #6B7280;
+  color: var(--color-ndb-muted);
   margin: 0;
 }
 
@@ -358,10 +358,10 @@ html {
   gap: 8px;
   padding: 10px 14px;
   border-radius: 6px;
-  background: rgba(239, 68, 68, 0.06);
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: color-mix(in srgb, var(--color-ndb-error) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ndb-error) 25%, transparent);
   font-size: 0.8125rem;
-  color: #B91C1C;
+  color: var(--color-ndb-error-darker);
   line-height: 1.45;
   margin-bottom: 16px;
 

@@ -2,7 +2,7 @@
 
 .oauth-callback-page {
   @apply min-h-screen flex items-center justify-center;
-  background: var(--color-ndb-page);
+  background: var(--color-ndb-cream);
 }
 
 .callback-content {
@@ -16,7 +16,7 @@
 .callback-error {
   h2 {
     @apply text-xl font-semibold text-ndb-navy m-0;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-urbanist);
   }
 
   .error-icon {

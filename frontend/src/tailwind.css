@@ -92,6 +92,20 @@
   --color-ndb-warn-bg:       #F9E5A0;
   --color-ndb-error-bg:      #FEE2E2;
 
+  /* Dark forest variants for overlays and gradients */
+  --color-ndb-forest-darkest: #0B1E14;
+  --color-ndb-forest-dark:    #0D2B1C;
+  --color-ndb-forest-darker:  #143526;
+
+  /* Error variants */
+  --color-ndb-error-dark:     #DC2626;
+  --color-ndb-error-darker:   #B91C1C;
+
+  /* Additional shadows */
+  --shadow-navbar:   0 2px 20px rgba(27, 67, 50, 0.3);
+  --shadow-gold:     0 4px 14px rgba(212, 160, 23, 0.4);
+  --shadow-gold-lg:  0 8px 24px rgba(212, 160, 23, 0.45);
+
   /* ── Backward-compat aliases (migrating gradually) ── */
   --color-ndb-navy:          #1B4332;
   --color-ndb-navy-light:    #2D6A4F;
@@ -117,16 +131,16 @@
 
 @layer base {
   body {
-    font-family: 'Lato', sans-serif;
-    background-color: #FAFAF7;
-    color: #374151;
+    font-family: var(--font-lato);
+    background-color: var(--color-ndb-cream);
+    color: var(--color-ndb-body);
     line-height: 1.6;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Urbanist', sans-serif;
+    font-family: var(--font-urbanist);
     line-height: 1.25;
-    color: #111827;
+    color: var(--color-ndb-ink);
   }
 
   a {

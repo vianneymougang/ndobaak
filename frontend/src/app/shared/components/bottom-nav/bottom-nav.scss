@@ -21,15 +21,15 @@
   pointer-events: auto;
   display: flex;
   align-items: center;
-  background: rgba(27, 67, 50, 0.92);
+  background: color-mix(in srgb, var(--color-ndb-forest) 92%, transparent);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-radius: 100px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid color-mix(in srgb, white 14%, transparent);
   box-shadow:
-    0 16px 48px rgba(27, 67, 50, 0.5),
-    0 4px 16px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 16px 48px color-mix(in srgb, var(--color-ndb-forest) 50%, transparent),
+    0 4px 16px color-mix(in srgb, black 20%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
   padding: 6px 8px;
 
   transform: translateY(120px) scale(0.88);
@@ -54,8 +54,8 @@
   padding: 10px 22px;
   border-radius: 100px;
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.6);
-  font-family: 'Urbanist', sans-serif;
+  color: color-mix(in srgb, white 60%, transparent);
+  font-family: var(--font-urbanist);
   font-size: 0.58rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -69,8 +69,8 @@
   }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.9);
+    background: color-mix(in srgb, white 10%, transparent);
+    color: color-mix(in srgb, white 90%, transparent);
 
     i {
       transform: translateY(-2px);
@@ -78,10 +78,10 @@
   }
 
   &.island-item--active {
-    color: #d4a017;
+    color: var(--color-ndb-gold);
 
     i {
-      color: #d4a017;
+      color: var(--color-ndb-gold);
     }
   }
 }
@@ -90,7 +90,7 @@
 .island-sep {
   width: 1px;
   height: 22px;
-  background: rgba(255, 255, 255, 0.15);
+  background: color-mix(in srgb, white 15%, transparent);
   flex-shrink: 0;
   margin: 0 2px;
 }
@@ -100,14 +100,14 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #d4a017;
-  color: #1b4332;
+  background: var(--color-ndb-gold);
+  color: var(--color-ndb-forest);
   font-size: 0.6rem;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--font-urbanist);
   line-height: 1;
   flex-shrink: 0;
 }

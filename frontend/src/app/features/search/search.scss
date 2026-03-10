@@ -14,7 +14,7 @@
   @apply sticky z-40 bg-white border-b;
   top: 68px;
   border-color: var(--color-ndb-border);
-  box-shadow: 0 2px 12px rgba(27, 67, 50, 0.06);
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--color-ndb-forest) 6%, transparent);
 }
 
 .filter-inner {
@@ -58,21 +58,21 @@
 
 .filter-chip {
   @apply inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium cursor-pointer border transition-all whitespace-nowrap flex-shrink-0;
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--font-urbanist);
   background: white;
   border-color: var(--color-ndb-border);
-  color: #374151;
+  color: var(--color-ndb-body);
   height: 36px;
 
   &:hover {
-    border-color: #1B4332;
-    color: #1B4332;
+    border-color: var(--color-ndb-forest);
+    color: var(--color-ndb-forest);
   }
 
   &.filter-chip--active {
-    background: rgba(27, 67, 50, 0.07);
-    border-color: #1B4332;
-    color: #1B4332;
+    background: color-mix(in srgb, var(--color-ndb-forest) 7%, transparent);
+    border-color: var(--color-ndb-forest);
+    color: var(--color-ndb-forest);
     font-weight: 600;
   }
 }
@@ -86,13 +86,13 @@
   @apply flex items-center justify-center rounded-full text-xs;
   width: 16px;
   height: 16px;
-  background: #1B4332;
+  background: var(--color-ndb-forest);
   color: white;
   flex-shrink: 0;
 
   &:hover {
-    background: #D4A017;
-    color: #1B4332;
+    background: var(--color-ndb-gold);
+    color: var(--color-ndb-forest);
   }
 }
 
@@ -113,7 +113,7 @@
 
 .filter-popover-title {
   @apply text-xs font-bold uppercase tracking-wider px-2 pb-2;
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--font-urbanist);
   color: var(--color-ndb-muted);
   border-bottom: 1px solid var(--color-ndb-border);
   margin-bottom: 4px;
@@ -122,24 +122,24 @@
 .filter-type-option {
   @apply flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm cursor-pointer border-0 transition-all text-left w-full;
   background: transparent;
-  color: #374151;
-  font-family: 'Lato', sans-serif;
+  color: var(--color-ndb-body);
+  font-family: var(--font-lato);
 
   &:hover {
-    background: rgba(27, 67, 50, 0.06);
-    color: #1B4332;
+    background: color-mix(in srgb, var(--color-ndb-forest) 6%, transparent);
+    color: var(--color-ndb-forest);
   }
 
   &.active {
-    background: rgba(27, 67, 50, 0.08);
-    color: #1B4332;
+    background: color-mix(in srgb, var(--color-ndb-forest) 8%, transparent);
+    color: var(--color-ndb-forest);
     font-weight: 600;
   }
 }
 
 .option-check {
   font-size: 11px;
-  color: #1B4332;
+  color: var(--color-ndb-forest);
   font-weight: 700;
   width: 14px;
   flex-shrink: 0;
@@ -154,7 +154,7 @@
 .price-range-labels {
   @apply flex justify-between text-xs;
   color: var(--color-ndb-muted);
-  font-family: 'Lato', sans-serif;
+  font-family: var(--font-lato);
   margin-top: 8px;
 }
 
@@ -168,15 +168,15 @@
 
 .price-input-label {
   @apply text-xs font-medium;
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--font-urbanist);
   color: var(--color-ndb-muted);
 }
 
 .price-input {
   @apply w-full px-3 py-2 rounded-lg border text-sm;
   border-color: var(--color-ndb-border);
-  font-family: 'Lato', sans-serif;
-  color: #111827;
+  font-family: var(--font-lato);
+  color: var(--color-ndb-ink);
   height: 40px;
   appearance: textfield;
 
@@ -188,8 +188,8 @@
 
   &:focus {
     outline: none;
-    border-color: #1B4332;
-    box-shadow: 0 0 0 3px rgba(27, 67, 50, 0.08);
+    border-color: var(--color-ndb-forest);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ndb-forest) 8%, transparent);
   }
 }
 
@@ -202,28 +202,28 @@
 .price-reset-btn {
   @apply text-xs font-semibold cursor-pointer border-0 self-start;
   background: none;
-  color: #1B4332;
-  font-family: 'Urbanist', sans-serif;
+  color: var(--color-ndb-forest);
+  font-family: var(--font-urbanist);
   text-decoration: underline;
   padding: 0;
 
   &:hover {
-    color: #D4A017;
+    color: var(--color-ndb-gold);
   }
 }
 
 /* ── Mobile filter button ── */
 .filter-mobile-btn {
   @apply flex lg:hidden items-center gap-2 px-4 py-2 rounded-full border text-sm font-semibold cursor-pointer transition-all flex-shrink-0 relative;
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--font-urbanist);
   background: white;
   border-color: var(--color-ndb-border);
-  color: #374151;
+  color: var(--color-ndb-body);
   height: 40px;
 
   &:hover {
-    border-color: #1B4332;
-    color: #1B4332;
+    border-color: var(--color-ndb-forest);
+    color: var(--color-ndb-forest);
   }
 }
 
@@ -231,23 +231,23 @@
   @apply flex items-center justify-center text-xs font-bold rounded-full;
   width: 18px;
   height: 18px;
-  background: #1B4332;
+  background: var(--color-ndb-forest);
   color: white;
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--font-urbanist);
 }
 
 /* ── Search button ── */
 .filter-btn-search {
   @apply flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold cursor-pointer border-0 transition-all flex-shrink-0;
-  background: #D4A017;
-  color: #1B4332;
-  font-family: 'Urbanist', sans-serif;
+  background: var(--color-ndb-gold);
+  color: var(--color-ndb-forest);
+  font-family: var(--font-urbanist);
   letter-spacing: 0.04em;
   min-height: 40px;
 
   &:hover {
-    background: #B8860B;
-    box-shadow: 0 4px 14px rgba(212, 160, 23, 0.35);
+    background: var(--color-ndb-gold-dark);
+    box-shadow: var(--shadow-gold);
     transform: translateY(-1px);
   }
 }
@@ -279,8 +279,8 @@
 
 .drawer-section-title {
   @apply block text-sm font-bold mb-4;
-  font-family: 'Urbanist', sans-serif;
-  color: #111827;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-ink);
 
   .drawer-section-header & {
     margin-bottom: 0;
@@ -290,12 +290,12 @@
 .drawer-reset-link {
   @apply text-xs font-semibold cursor-pointer border-0;
   background: none;
-  color: #1B4332;
-  font-family: 'Urbanist', sans-serif;
+  color: var(--color-ndb-forest);
+  font-family: var(--font-urbanist);
   text-decoration: underline;
 
   &:hover {
-    color: #D4A017;
+    color: var(--color-ndb-gold);
   }
 }
 
@@ -307,22 +307,22 @@
 
 .drawer-type-btn {
   @apply flex items-center justify-center px-3 py-3 rounded-xl border text-sm font-medium cursor-pointer transition-all text-center;
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--font-urbanist);
   background: white;
   border-color: var(--color-ndb-border);
-  color: #374151;
+  color: var(--color-ndb-body);
   min-height: 48px;
 
   &:hover {
-    border-color: #1B4332;
-    color: #1B4332;
-    background: rgba(27, 67, 50, 0.04);
+    border-color: var(--color-ndb-forest);
+    color: var(--color-ndb-forest);
+    background: color-mix(in srgb, var(--color-ndb-forest) 4%, transparent);
   }
 
   &.active {
-    background: rgba(27, 67, 50, 0.08);
-    border-color: #1B4332;
-    color: #1B4332;
+    background: color-mix(in srgb, var(--color-ndb-forest) 8%, transparent);
+    border-color: var(--color-ndb-forest);
+    color: var(--color-ndb-forest);
     font-weight: 700;
   }
 }
@@ -335,23 +335,23 @@
 
 .drawer-sort-btn {
   @apply flex items-center px-4 py-3 rounded-xl border text-sm font-medium cursor-pointer transition-all text-left;
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--font-urbanist);
   background: white;
   border-color: var(--color-ndb-border);
-  color: #374151;
+  color: var(--color-ndb-body);
   min-height: 48px;
   width: 100%;
 
   &:hover {
-    border-color: #1B4332;
-    color: #1B4332;
-    background: rgba(27, 67, 50, 0.04);
+    border-color: var(--color-ndb-forest);
+    color: var(--color-ndb-forest);
+    background: color-mix(in srgb, var(--color-ndb-forest) 4%, transparent);
   }
 
   &.active {
-    background: rgba(27, 67, 50, 0.08);
-    border-color: #1B4332;
-    color: #1B4332;
+    background: color-mix(in srgb, var(--color-ndb-forest) 8%, transparent);
+    border-color: var(--color-ndb-forest);
+    color: var(--color-ndb-forest);
     font-weight: 700;
   }
 }
@@ -364,28 +364,28 @@
 
 .drawer-clear-btn {
   @apply flex items-center justify-center px-5 py-3 rounded-xl border text-sm font-semibold cursor-pointer transition-all flex-shrink-0;
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--font-urbanist);
   background: white;
   border-color: var(--color-ndb-border);
-  color: #374151;
+  color: var(--color-ndb-body);
   min-height: 48px;
 
   &:hover {
-    border-color: #ef4444;
-    color: #ef4444;
+    border-color: var(--color-ndb-error);
+    color: var(--color-ndb-error);
   }
 }
 
 .drawer-apply-btn {
   @apply flex-1 flex items-center justify-center px-5 py-3 rounded-xl text-sm font-bold cursor-pointer border-0 transition-all;
-  font-family: 'Urbanist', sans-serif;
-  background: #1B4332;
+  font-family: var(--font-urbanist);
+  background: var(--color-ndb-forest);
   color: white;
   min-height: 48px;
   letter-spacing: 0.02em;
 
   &:hover {
-    background: #2D6A4F;
+    background: var(--color-ndb-forest-mid);
   }
 }
 
@@ -405,11 +405,11 @@
 .results-count {
   @apply text-sm;
   color: var(--color-ndb-muted);
-  font-family: 'Lato', sans-serif;
+  font-family: var(--font-lato);
 
   strong {
-    color: #111827;
-    font-family: 'Urbanist', sans-serif;
+    color: var(--color-ndb-ink);
+    font-family: var(--font-urbanist);
   }
 }
 
@@ -438,35 +438,35 @@
 
   .empty-icon {
     @apply flex items-center justify-center w-20 h-20 rounded-full mb-5;
-    background: rgba(27, 67, 50, 0.07);
+    background: color-mix(in srgb, var(--color-ndb-forest) 7%, transparent);
 
     i {
       @apply text-4xl;
-      color: #1B4332;
+      color: var(--color-ndb-forest);
     }
   }
 
   h3 {
     @apply text-xl font-bold mb-2;
-    font-family: 'Urbanist', sans-serif;
-    color: #111827;
+    font-family: var(--font-urbanist);
+    color: var(--color-ndb-ink);
   }
 
   p {
     @apply mb-6 max-w-sm;
     color: var(--color-ndb-muted);
-    font-family: 'Lato', sans-serif;
+    font-family: var(--font-lato);
   }
 }
 
 .empty-cta {
   @apply px-6 py-2.5 rounded-lg text-sm font-bold cursor-pointer border-0;
-  background: #1B4332;
+  background: var(--color-ndb-forest);
   color: #fff;
-  font-family: 'Urbanist', sans-serif;
+  font-family: var(--font-urbanist);
 
   &:hover {
-    background: #2D6A4F;
+    background: var(--color-ndb-forest-mid);
   }
 }
 
