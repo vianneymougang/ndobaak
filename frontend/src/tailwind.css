@@ -55,81 +55,94 @@
 @import "tailwindcss";
 @import "tailwindcss-primeui";
 
+/* ══════════════════════════════════════════════
+   @theme — minimal set for @apply utility classes
+   (Tailwind tree-shakes these — only keep tokens
+    that are consumed via @apply in component SCSS)
+   ══════════════════════════════════════════════ */
 @theme {
-  /* ══════════════════════════════════════════════
-     NDOBAÂK DESIGN SYSTEM — Forest Green × Gold
-     ══════════════════════════════════════════════ */
-
-  /* Primary — Forest Green */
-  --color-ndb-forest:        #1B4332;
-  --color-ndb-forest-mid:    #2D6A4F;
-  --color-ndb-forest-light:  #40916C;
-  --color-ndb-forest-pale:   #D8F3DC;
-
-  /* Accent — Gold */
-  --color-ndb-gold:          #D4A017;
-  --color-ndb-gold-dark:     #B8860B;
-  --color-ndb-gold-pale:     #F9E5A0;
-
-  /* Backgrounds — Warm Cream */
-  --color-ndb-cream:         #FAFAF7;
-  --color-ndb-cream-dark:    #F2F0EB;
-
-  /* Text */
-  --color-ndb-ink:           #111827;
-  --color-ndb-body:          #374151;
-  --color-ndb-muted:         #6B7280;
-  --color-ndb-border:        #E5E0D8;
-
-  /* Semantic */
-  --color-ndb-success:       #22C55E;
-  --color-ndb-error:         #EF4444;
-  --color-ndb-warning:       #F59E0B;
-  --color-ndb-info:          #3B82F6;
-
-  /* Status bg tints */
-  --color-ndb-green-bg:      #D8F3DC;
-  --color-ndb-warn-bg:       #F9E5A0;
-  --color-ndb-error-bg:      #FEE2E2;
-
-  /* Dark forest variants for overlays and gradients */
-  --color-ndb-forest-darkest: #0B1E14;
-  --color-ndb-forest-dark:    #0D2B1C;
-  --color-ndb-forest-darker:  #143526;
-
-  /* Error variants */
-  --color-ndb-error-dark:     #DC2626;
-  --color-ndb-error-darker:   #B91C1C;
-
-  /* Additional shadows */
-  --shadow-navbar:   0 2px 20px rgba(27, 67, 50, 0.3);
-  --shadow-gold:     0 4px 14px rgba(212, 160, 23, 0.4);
-  --shadow-gold-lg:  0 8px 24px rgba(212, 160, 23, 0.45);
-
-  /* ── Backward-compat aliases (migrating gradually) ── */
-  --color-ndb-navy:          #1B4332;
-  --color-ndb-navy-light:    #2D6A4F;
-  --color-ndb-green:         #40916C;
-  --color-ndb-orange:        #D4A017;
-  --color-ndb-orange-dark:   #B8860B;
-  --color-ndb-page:          #FAFAF7;
-  --color-ndb-stats:         #F2F0EB;
-  --color-ndb-star:          #D4A017;
-
-  /* ── Fonts ── */
-  --font-urbanist: 'Urbanist', sans-serif;
-  --font-lato:     'Lato', sans-serif;
-  /* Font aliases (backward compat) */
-  --font-poppins:  'Urbanist', sans-serif;
-  --font-inter:    'Lato', sans-serif;
-
-  /* ── Design tokens ── */
-  --shadow-card:       0 2px 16px rgba(27, 67, 50, 0.08);
-  --shadow-card-hover: 0 12px 40px rgba(27, 67, 50, 0.16);
-  --shadow-elevated:   0 24px 60px rgba(27, 67, 50, 0.22);
+  --color-ndb-navy:       #1B4332;
+  --color-ndb-navy-light: #2D6A4F;
+  --color-ndb-green:      #40916C;
+  --color-ndb-orange:     #D4A017;
+  --color-ndb-muted:      #6B7280;
+  --color-ndb-body:       #374151;
+  --color-ndb-page:       #FAFAF7;
+  --color-ndb-stats:      #F2F0EB;
+  --color-ndb-border:     #E5E0D8;
 }
 
+/* ══════════════════════════════════════════════
+   @layer base — design tokens guaranteed to emit
+   All var(--color-ndb-*) usages in component SCSS
+   rely on these being present in the output CSS.
+   ══════════════════════════════════════════════ */
 @layer base {
+  :root {
+    /* ── Primary — Forest Green ── */
+    --color-ndb-forest:        #1B4332;
+    --color-ndb-forest-mid:    #2D6A4F;
+    --color-ndb-forest-light:  #40916C;
+    --color-ndb-forest-pale:   #D8F3DC;
+    --color-ndb-forest-darkest: #0B1E14;
+    --color-ndb-forest-dark:    #0D2B1C;
+    --color-ndb-forest-darker:  #143526;
+
+    /* ── Accent — Gold ── */
+    --color-ndb-gold:          #D4A017;
+    --color-ndb-gold-dark:     #B8860B;
+    --color-ndb-gold-pale:     #F9E5A0;
+
+    /* ── Backgrounds — Warm Cream ── */
+    --color-ndb-cream:         #FAFAF7;
+    --color-ndb-cream-dark:    #F2F0EB;
+
+    /* ── Text ── */
+    --color-ndb-ink:           #111827;
+    --color-ndb-body:          #374151;
+    --color-ndb-muted:         #6B7280;
+    --color-ndb-border:        #E5E0D8;
+
+    /* ── Semantic ── */
+    --color-ndb-success:       #22C55E;
+    --color-ndb-error:         #EF4444;
+    --color-ndb-warning:       #F59E0B;
+    --color-ndb-info:          #3B82F6;
+
+    /* ── Status bg tints ── */
+    --color-ndb-green-bg:      #D8F3DC;
+    --color-ndb-warn-bg:       #F9E5A0;
+    --color-ndb-error-bg:      #FEE2E2;
+
+    /* ── Error variants ── */
+    --color-ndb-error-dark:    #DC2626;
+    --color-ndb-error-darker:  #B91C1C;
+
+    /* ── Backward-compat aliases ── */
+    --color-ndb-navy:          #1B4332;
+    --color-ndb-navy-light:    #2D6A4F;
+    --color-ndb-green:         #40916C;
+    --color-ndb-orange:        #D4A017;
+    --color-ndb-orange-dark:   #B8860B;
+    --color-ndb-page:          #FAFAF7;
+    --color-ndb-stats:         #F2F0EB;
+    --color-ndb-star:          #D4A017;
+
+    /* ── Fonts ── */
+    --font-urbanist: 'Urbanist', sans-serif;
+    --font-lato:     'Lato', sans-serif;
+    --font-poppins:  'Urbanist', sans-serif;
+    --font-inter:    'Lato', sans-serif;
+
+    /* ── Shadows ── */
+    --shadow-card:       0 2px 16px rgba(27, 67, 50, 0.08);
+    --shadow-card-hover: 0 12px 40px rgba(27, 67, 50, 0.16);
+    --shadow-elevated:   0 24px 60px rgba(27, 67, 50, 0.22);
+    --shadow-navbar:     0 2px 20px rgba(27, 67, 50, 0.3);
+    --shadow-gold:       0 4px 14px rgba(212, 160, 23, 0.4);
+    --shadow-gold-lg:    0 8px 24px rgba(212, 160, 23, 0.45);
+  }
+
   body {
     font-family: var(--font-lato);
     background-color: var(--color-ndb-cream);
