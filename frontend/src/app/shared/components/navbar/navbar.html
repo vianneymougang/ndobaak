@@ -1,49 +1,58 @@
-<nav class="navbar" [class.navbar--transparent]="isTransparent()" [class.navbar--scrolled]="scrolled()">
+<nav
+  class="navbar"
+  [class.navbar--transparent]="isTransparent()"
+  [class.navbar--scrolled]="scrolled()"
+>
   <div class="navbar-container">
+
+    <!-- Mobile: hamburger left -->
+    <button
+      class="menu-toggle"
+      (click)="drawerOpen.set(true)"
+      aria-label="Ouvrir le menu"
+      aria-expanded="false"
+    >
+      <i class="pi pi-bars" aria-hidden="true"></i>
+    </button>
 
     <!-- Brand / Logo -->
     <a routerLink="/" class="navbar-brand">
       <svg class="brand-icon-svg" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <rect width="36" height="36" rx="8" fill="rgba(255,255,255,0.15)"/>
-        <!-- N letterform -->
         <rect x="7.5" y="10.5" width="4" height="16" rx="0.5" fill="white"/>
         <rect x="24.5" y="10.5" width="4" height="16" rx="0.5" fill="white"/>
         <path d="M 11.5 10.5 L 24.5 26.5" stroke="white" stroke-width="4" stroke-linecap="round"/>
-        <!-- Gold roof -->
         <path d="M 14 9 L 18 5 L 22 9" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <span class="brand-text">Ndobaâk</span>
     </a>
 
-    <button class="menu-toggle" (click)="toggleMenu()" aria-label="Toggle menu">
-      <i class="pi" [class.pi-bars]="!menuOpen" [class.pi-times]="menuOpen"></i>
-    </button>
-
-    <div class="navbar-links" [class.open]="menuOpen">
-      <a routerLink="/search" routerLinkActive="active" (click)="menuOpen = false">
-        <i class="pi pi-search"></i> Rechercher
+    <!-- Desktop links -->
+    <div class="navbar-links">
+      <a routerLink="/search" routerLinkActive="active">
+        <i class="pi pi-search" aria-hidden="true"></i> Rechercher
       </a>
-
       @if (isLandlord()) {
-        <a routerLink="/my-listings" routerLinkActive="active" (click)="menuOpen = false">
-          <i class="pi pi-list"></i> Mes annonces
-        </a>
-        <a routerLink="/listings/create" routerLinkActive="active" (click)="menuOpen = false">
-          <i class="pi pi-plus"></i> Publier
+        <a routerLink="/my-listings" routerLinkActive="active">
+          <i class="pi pi-list" aria-hidden="true"></i> Mes annonces
         </a>
       }
     </div>
 
+    <!-- Desktop auth -->
     <div class="navbar-auth">
+      <a routerLink="/listings/create" class="btn-nav-post">
+        <i class="pi pi-plus" aria-hidden="true"></i> Déposer une annonce
+      </a>
       @if (isAuthenticated()) {
         <div class="user-menu">
-          <div class="user-avatar">{{ userInitials() }}</div>
+          <div class="user-avatar" aria-hidden="true">{{ userInitials() }}</div>
           <div class="user-info">
             <span class="user-name">{{ user()?.firstName }} {{ user()?.lastName }}</span>
             <span class="user-role">{{ user()?.role === 'STUDENT' ? 'Étudiant' : 'Propriétaire' }}</span>
           </div>
-          <button class="logout-btn" (click)="logout()" title="Déconnexion">
-            <i class="pi pi-sign-out"></i>
+          <button class="logout-btn" (click)="logout()" aria-label="Déconnexion">
+            <i class="pi pi-sign-out" aria-hidden="true"></i>
           </button>
         </div>
       } @else {
@@ -51,32 +60,93 @@
         <a routerLink="/register" class="btn-nav-gold">S'inscrire</a>
       }
     </div>
+
+    <!-- Mobile: right side -->
+    <div class="navbar-mobile-right">
+      @if (isAuthenticated()) {
+        <button
+          class="user-avatar-mobile"
+          (click)="drawerOpen.set(true)"
+          [attr.aria-label]="'Mon compte — ' + user()?.firstName"
+        >
+          {{ userInitials() }}
+        </button>
+      } @else {
+        <a routerLink="/login" class="btn-nav-outline-mobile">Se connecter</a>
+      }
+    </div>
+
+  </div>
+</nav>
+
+<!-- Mobile navigation drawer -->
+<p-drawer
+  [visible]="drawerOpen()"
+  (visibleChange)="drawerOpen.set($event)"
+  position="left"
+  [style]="{ width: '280px' }"
+  appendTo="body"
+>
+  <ng-template #header>
+    <div class="drawer-brand">
+      <svg class="drawer-brand-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect width="36" height="36" rx="8" fill="#1b4332"/>
+        <rect x="7.5" y="10.5" width="4" height="16" rx="0.5" fill="white"/>
+        <rect x="24.5" y="10.5" width="4" height="16" rx="0.5" fill="white"/>
+        <path d="M 11.5 10.5 L 24.5 26.5" stroke="white" stroke-width="4" stroke-linecap="round"/>
+        <path d="M 14 9 L 18 5 L 22 9" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="drawer-brand-text">Ndobaâk</span>
+    </div>
+  </ng-template>
+
+  <div class="drawer-nav">
+    @if (!isAuthenticated() || isLandlord()) {
+      <a routerLink="/listings/create" (click)="drawerOpen.set(false)" class="drawer-link drawer-link--cta">
+        <i class="pi pi-plus" aria-hidden="true"></i>
+        Déposer une annonce
+      </a>
+    }
+
+    @if (isLandlord()) {
+      <a routerLink="/my-listings" (click)="drawerOpen.set(false)" class="drawer-link">
+        <i class="pi pi-list" aria-hidden="true"></i>
+        Mes annonces
+      </a>
+    }
+
+    <div class="drawer-divider"></div>
+
+    <a routerLink="/search" (click)="drawerOpen.set(false)" class="drawer-link">
+      <i class="pi pi-search" aria-hidden="true"></i>
+      Rechercher un logement
+    </a>
   </div>
 
-  <!-- Mobile nav -->
-  @if (menuOpen) {
-    <div class="mobile-nav">
-      <a routerLink="/search" (click)="menuOpen = false">
-        <i class="pi pi-search"></i> Rechercher
-      </a>
-      @if (isLandlord()) {
-        <a routerLink="/my-listings" (click)="menuOpen = false">
-          <i class="pi pi-list"></i> Mes annonces
-        </a>
-        <a routerLink="/listings/create" (click)="menuOpen = false">
-          <i class="pi pi-plus"></i> Publier une annonce
-        </a>
-      }
-      <div class="mobile-auth">
-        @if (isAuthenticated()) {
-          <button class="btn-nav-outline" (click)="logout(); menuOpen = false">
-            <i class="pi pi-sign-out"></i> Déconnexion
-          </button>
-        } @else {
-          <a routerLink="/login" class="btn-nav-outline" (click)="menuOpen = false">Se connecter</a>
-          <a routerLink="/register" class="btn-nav-gold" (click)="menuOpen = false">S'inscrire</a>
-        }
+  <ng-template #footer>
+    @if (isAuthenticated()) {
+      <div class="drawer-footer">
+        <div class="drawer-user">
+          <div class="drawer-user-avatar" aria-hidden="true">{{ userInitials() }}</div>
+          <div class="drawer-user-info">
+            <span class="drawer-user-name">{{ user()?.firstName }} {{ user()?.lastName }}</span>
+            <span class="drawer-user-role">{{ user()?.role === 'STUDENT' ? 'Étudiant' : 'Propriétaire' }}</span>
+          </div>
+        </div>
+        <button class="drawer-logout-btn" (click)="logout()">
+          <i class="pi pi-sign-out" aria-hidden="true"></i>
+          Déconnexion
+        </button>
       </div>
-    </div>
-  }
-</nav>
+    } @else {
+      <div class="drawer-footer-auth">
+        <a routerLink="/register" (click)="drawerOpen.set(false)" class="btn-nav-gold drawer-auth-btn">
+          S'inscrire
+        </a>
+        <a routerLink="/login" (click)="drawerOpen.set(false)" class="btn-nav-outline drawer-auth-btn">
+          Se connecter
+        </a>
+      </div>
+    }
+  </ng-template>
+</p-drawer>

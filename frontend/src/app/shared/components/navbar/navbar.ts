@@ -1,11 +1,4 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  inject,
-  computed,
-  signal,
-  HostListener,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
 import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
@@ -13,20 +6,25 @@ import { filter, map, startWith } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
-import { MenuModule } from 'primeng/menu';
+import { DrawerModule } from 'primeng/drawer';
 import { AuthService } from '../../../core/services/auth';
+import { NavState } from '../../services/nav-state';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, RouterLinkActive, ButtonModule, AvatarModule, MenuModule],
+  imports: [RouterLink, RouterLinkActive, ButtonModule, AvatarModule, DrawerModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
+  host: {
+    '(window:scroll)': 'onWindowScroll()',
+  },
 })
 export class Navbar {
   private authService = inject(AuthService);
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
+  protected navState = inject(NavState);
 
   protected isAuthenticated = this.authService.isAuthenticated;
   protected user = this.authService.user;
@@ -36,7 +34,8 @@ export class Navbar {
     return (u.firstName?.charAt(0) ?? '') + (u.lastName?.charAt(0) ?? '');
   });
   protected isLandlord = computed(() => this.authService.userRole() === 'LANDLORD');
-  protected menuOpen = false;
+
+  protected get drawerOpen() { return this.navState.drawerOpen; }
   protected scrolled = signal(false);
 
   private currentUrl = toSignal(
@@ -47,12 +46,10 @@ export class Navbar {
     ),
   );
 
-  /** Transparent only on the homepage before scrolling */
   protected isTransparent = computed(
-    () => this.currentUrl() === '/' && !this.scrolled(),
+    () => this.currentUrl() === '/' && !this.scrolled() && !this.navState.drawerOpen(),
   );
 
-  @HostListener('window:scroll', [])
   onWindowScroll(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.scrolled.set(window.scrollY > 40);
@@ -61,9 +58,6 @@ export class Navbar {
 
   protected logout(): void {
     this.authService.logout();
-  }
-
-  protected toggleMenu(): void {
-    this.menuOpen = !this.menuOpen;
+    this.drawerOpen.set(false);
   }
 }

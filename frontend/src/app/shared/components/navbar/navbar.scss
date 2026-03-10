@@ -1,8 +1,5 @@
 @reference "../../../../tailwind.css";
 
-/* ════════════════════════════════════
-   NAVBAR — Transparent → Forest Green
-   ════════════════════════════════════ */
 :host {
   @apply sticky top-0 z-50 block;
 }
@@ -12,31 +9,37 @@
   transition: background 0.35s ease, box-shadow 0.35s ease, border-bottom-color 0.35s ease;
   border-bottom: 1px solid transparent;
 
-  /* Default: visible on any non-hero page */
   &:not(.navbar--transparent) {
-    background: #1B4332;
+    background: #1b4332;
     box-shadow: 0 2px 20px rgba(27, 67, 50, 0.3);
     border-bottom-color: rgba(255, 255, 255, 0.08);
   }
 
-  /* Transparent variant: hero page at scroll 0 */
   &.navbar--transparent {
     background: transparent;
     box-shadow: none;
     border-bottom-color: transparent;
   }
 
-  /* Scrolled: always forest solid */
   &.navbar--scrolled {
-    background: #1B4332;
+    background: #1b4332;
     box-shadow: 0 2px 20px rgba(27, 67, 50, 0.3);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 }
 
+/* ── Container ── */
 .navbar-container {
+  height: 64px;
   @apply max-w-7xl mx-auto px-4 flex items-center justify-between;
-  height: 68px;
+
+  @media (max-width: 767px) {
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    align-items: center;
+    gap: 0;
+    padding-inline: 12px;
+  }
 }
 
 /* ── Brand ── */
@@ -44,14 +47,18 @@
   @apply flex items-center gap-2.5 no-underline;
   transition: opacity 0.15s ease;
 
+  @media (max-width: 767px) {
+    justify-content: center;
+  }
+
   &:hover {
     opacity: 0.88;
   }
 }
 
 .brand-icon-svg {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   flex-shrink: 0;
 }
 
@@ -82,8 +89,7 @@
     }
 
     &.active {
-      @apply text-white;
-      color: #D4A017;
+      color: #d4a017;
 
       i {
         @apply opacity-100;
@@ -92,9 +98,22 @@
   }
 }
 
-/* ── Auth actions ── */
+/* ── Desktop auth ── */
 .navbar-auth {
   @apply hidden md:flex items-center gap-3;
+}
+
+/* ── Buttons ── */
+.btn-nav-post {
+  @apply inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold no-underline transition-all;
+  color: rgba(255, 255, 255, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  font-family: 'Urbanist', sans-serif;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.08);
+  }
 }
 
 .btn-nav-outline {
@@ -102,7 +121,6 @@
   color: rgba(255, 255, 255, 0.9);
   border: 1.5px solid rgba(255, 255, 255, 0.4);
   font-family: 'Urbanist', sans-serif;
-  letter-spacing: 0.01em;
 
   &:hover {
     border-color: rgba(255, 255, 255, 0.8);
@@ -112,13 +130,13 @@
 
 .btn-nav-gold {
   @apply inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold no-underline transition-all;
-  background: #D4A017;
-  color: #1B4332;
+  background: #d4a017;
+  color: #1b4332;
   font-family: 'Urbanist', sans-serif;
   letter-spacing: 0.02em;
 
   &:hover {
-    background: #B8860B;
+    background: #b8860b;
     transform: translateY(-1px);
     box-shadow: 0 4px 14px rgba(212, 160, 23, 0.45);
   }
@@ -128,20 +146,20 @@
   }
 }
 
-/* ── User menu ── */
+/* ── User menu (desktop) ── */
 .user-menu {
   @apply flex items-center gap-3;
 }
 
 .user-avatar {
-  @apply w-9 h-9 rounded-full text-white text-sm font-bold flex items-center justify-center flex-shrink-0;
-  background: #D4A017;
-  color: #1B4332;
+  @apply w-9 h-9 rounded-full text-sm font-bold flex items-center justify-center flex-shrink-0;
+  background: #d4a017;
+  color: #1b4332;
   font-family: 'Urbanist', sans-serif;
 }
 
 .user-info {
-  @apply hidden md:flex flex-col;
+  @apply flex flex-col;
 
   .user-name {
     @apply text-white text-sm font-semibold leading-tight;
@@ -163,7 +181,7 @@
   }
 }
 
-/* ── Mobile toggle ── */
+/* ── Mobile hamburger (left) ── */
 .menu-toggle {
   @apply flex md:hidden items-center justify-center w-10 h-10 text-white text-lg cursor-pointer rounded-lg transition-colors border-0;
   background: rgba(255, 255, 255, 0.1);
@@ -173,27 +191,152 @@
   }
 }
 
-/* ── Mobile nav ── */
-.mobile-nav {
-  @apply md:hidden border-t flex flex-col px-4 pb-4 gap-1;
-  border-color: rgba(255, 255, 255, 0.1);
-  background: #1B4332;
+/* ── Mobile right side ── */
+.navbar-mobile-right {
+  @apply flex md:hidden items-center justify-end;
+}
 
-  a {
-    @apply text-white/80 no-underline py-3 text-sm font-semibold flex items-center gap-2 transition-colors border-b;
-    border-color: rgba(255, 255, 255, 0.07);
-    font-family: 'Urbanist', sans-serif;
+.user-avatar-mobile {
+  @apply w-9 h-9 rounded-full text-sm font-bold flex items-center justify-center cursor-pointer border-0 transition-opacity;
+  background: #d4a017;
+  color: #1b4332;
+  font-family: 'Urbanist', sans-serif;
 
-    &:last-of-type {
-      @apply border-b-0;
+  &:hover {
+    opacity: 0.88;
+  }
+}
+
+.btn-nav-outline-mobile {
+  @apply inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold no-underline transition-all;
+  color: rgba(255, 255, 255, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  font-family: 'Urbanist', sans-serif;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* ════════════════════════════════
+   DRAWER STYLES
+   ════════════════════════════════ */
+.drawer-brand {
+  @apply flex items-center gap-2.5;
+}
+
+.drawer-brand-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.drawer-brand-text {
+  font-family: 'Urbanist', sans-serif;
+  @apply text-lg font-bold;
+  color: #111827;
+  letter-spacing: -0.01em;
+}
+
+.drawer-nav {
+  @apply flex flex-col gap-1 pt-2;
+}
+
+.drawer-link {
+  @apply flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold no-underline transition-all;
+  color: #374151;
+  font-family: 'Urbanist', sans-serif;
+
+  i {
+    @apply text-base;
+    color: #6b7280;
+    transition: color 0.15s ease;
+    width: 20px;
+    text-align: center;
+  }
+
+  &:hover {
+    background: rgba(27, 67, 50, 0.06);
+    color: #1b4332;
+
+    i {
+      color: #1b4332;
+    }
+  }
+
+  &--cta {
+    background: rgba(212, 160, 23, 0.1);
+    color: #92600a;
+    margin-bottom: 4px;
+
+    i {
+      color: #d4a017;
     }
 
     &:hover {
-      color: #D4A017;
+      background: rgba(212, 160, 23, 0.18);
+      color: #78500a;
     }
   }
 }
 
-.mobile-auth {
-  @apply flex gap-3 pt-3;
+.drawer-divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.07);
+  margin: 8px 0;
+}
+
+/* ── Drawer footer ── */
+.drawer-footer {
+  @apply flex flex-col gap-3;
+}
+
+.drawer-user {
+  @apply flex items-center gap-3 px-1;
+}
+
+.drawer-user-avatar {
+  @apply w-10 h-10 rounded-full text-sm font-bold flex items-center justify-center flex-shrink-0;
+  background: #d4a017;
+  color: #1b4332;
+  font-family: 'Urbanist', sans-serif;
+}
+
+.drawer-user-info {
+  @apply flex flex-col;
+}
+
+.drawer-user-name {
+  @apply text-sm font-semibold;
+  font-family: 'Urbanist', sans-serif;
+  color: #111827;
+}
+
+.drawer-user-role {
+  @apply text-xs;
+  color: #6b7280;
+}
+
+.drawer-logout-btn {
+  @apply flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm font-semibold cursor-pointer border-0 transition-all;
+  background: rgba(239, 68, 68, 0.07);
+  color: #dc2626;
+  font-family: 'Urbanist', sans-serif;
+
+  i {
+    @apply text-sm;
+  }
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.13);
+  }
+}
+
+.drawer-footer-auth {
+  @apply flex flex-col gap-2;
+}
+
+.drawer-auth-btn {
+  @apply justify-center w-full;
 }
