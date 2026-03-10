@@ -71,7 +71,7 @@
             <h2>Équipements</h2>
             <div class="amenities-list">
               @for (amenity of l.amenities; track amenity.id) {
-                <p-chip [label]="amenity.name" [icon]="amenity.icon" />
+                <p-chip [label]="amenityLabel(amenity.name)" [icon]="amenityIcon(amenity.name)" />
               }
             </div>
           </section>

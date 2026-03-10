@@ -18,6 +18,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ListingService } from '../../../core/services/listing';
 import { ListingResponse } from '../../../core/models/listing.models';
+import { amenityLabel, amenityIcon } from '../../../core/models/amenity.config';
 import { environment } from '../../../../environments/environment';
 
 declare const L: typeof import('leaflet');
@@ -76,6 +77,9 @@ export class Detail implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.initDetailMap();
   }
+
+  protected readonly amenityLabel = amenityLabel;
+  protected readonly amenityIcon = amenityIcon;
 
   private initDetailMap(): void {
     if (typeof L === 'undefined') return;

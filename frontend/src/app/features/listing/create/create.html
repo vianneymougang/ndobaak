@@ -103,10 +103,10 @@
                       tabindex="0"
                       role="checkbox"
                       [attr.aria-checked]="amenity.selected"
-                      [attr.aria-label]="amenity.name"
+                      [attr.aria-label]="amenity.label"
                     >
                       <i [class]="amenity.icon"></i>
-                      <span>{{ amenity.name }}</span>
+                      <span>{{ amenity.label }}</span>
                     </div>
                   }
                 </div>
@@ -342,10 +342,10 @@
                 <div class="summary-group">
                   <h4>Equipements</h4>
                   <div class="amenity-tags">
-                    @for (name of selectedAmenityNames(); track name) {
-                      <p-tag [value]="name" severity="info" />
+                    @for (label of selectedAmenityLabels(); track label) {
+                      <p-tag [value]="label" severity="info" />
                     }
-                    @if (selectedAmenityNames().length === 0) {
+                    @if (selectedAmenityLabels().length === 0) {
                       <span class="no-data">Aucun equipement selectionne</span>
                     }
                   </div>

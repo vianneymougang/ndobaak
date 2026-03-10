@@ -16,6 +16,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageService } from 'primeng/api';
 import { ListingService } from '../../../core/services/listing';
 import { ListingResponse, RoomType, CreateListingRequest, PhotoResponse } from '../../../core/models/listing.models';
+import { AMENITY_CONFIG } from '../../../core/models/amenity.config';
 import * as L from 'leaflet';
 
 const CAMPUS_LAT = 3.8480;
@@ -23,6 +24,7 @@ const CAMPUS_LNG = 11.5021;
 
 interface AmenityOption {
   name: string;
+  label: string;
   icon: string;
   selected: boolean;
 }
@@ -70,17 +72,14 @@ export class Create implements OnInit, OnDestroy {
     { label: 'Appartement', value: 'APARTMENT' as RoomType },
   ];
 
-  protected amenities = signal<AmenityOption[]>([
-    { name: 'WiFi', icon: 'pi pi-wifi', selected: false },
-    { name: 'Running Water', icon: 'pi pi-compass', selected: false },
-    { name: 'Electricity', icon: 'pi pi-bolt', selected: false },
-    { name: 'Private Shower', icon: 'pi pi-home', selected: false },
-    { name: 'Kitchen', icon: 'pi pi-warehouse', selected: false },
-    { name: 'Security Guard', icon: 'pi pi-shield', selected: false },
-    { name: 'Parking', icon: 'pi pi-car', selected: false },
-    { name: 'Fan', icon: 'pi pi-sun', selected: false },
-    { name: 'Furnished', icon: 'pi pi-box', selected: false },
-  ]);
+  protected amenities = signal<AmenityOption[]>(
+    Object.entries(AMENITY_CONFIG).map(([name, config]) => ({
+      name,
+      label: config.label,
+      icon: config.icon,
+      selected: false,
+    }))
+  );
 
   protected infoForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(10)]],
@@ -113,6 +112,12 @@ export class Create implements OnInit, OnDestroy {
     this.amenities()
       .filter((a) => a.selected)
       .map((a) => a.name)
+  );
+
+  protected selectedAmenityLabels = computed(() =>
+    this.amenities()
+      .filter((a) => a.selected)
+      .map((a) => a.label)
   );
 
   protected photoCount = computed(() => this.photos().length);
