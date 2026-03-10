@@ -1,21 +1,21 @@
 FROM maven:3.9.9-eclipse-temurin-21-alpine AS builder
-
 WORKDIR /app
-
 COPY pom.xml .
-
 RUN mvn dependency:go-offline -B
-
 COPY src/ src/
+RUN mvn package -DskipTests && \
+    java -Djarmode=tools -jar target/*.jar extract --layers --launcher --destination extracted
 
-RUN mvn package -DskipTests
-
-FROM eclipse-temurin:21-jre AS runner
-
+FROM eclipse-temurin:21-jre-alpine AS runner
 WORKDIR /app
-
-COPY --from=builder /app/target/*.jar /app/app.jar
-
+RUN apk add --no-cache gcompat libstdc++ && \
+    addgroup -S spring && adduser -S spring -G spring
+COPY --from=builder /app/extracted/dependencies/ ./
+COPY --from=builder /app/extracted/spring-boot-loader/ ./
+COPY --from=builder /app/extracted/snapshot-dependencies/ ./
+COPY --from=builder /app/extracted/application/ ./
+USER spring
 EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 --start-period=40s \
+  CMD wget -qO- http://localhost:8080/api/v1/actuator/health || exit 1
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
