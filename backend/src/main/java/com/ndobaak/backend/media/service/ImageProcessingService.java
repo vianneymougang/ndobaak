@@ -1,44 +1,35 @@
 package com.ndobaak.backend.media.service;
 
-import net.coobird.thumbnailator.Thumbnails;
+import com.sksamuel.scrimage.ImmutableImage;
+import com.sksamuel.scrimage.webp.WebpWriter;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 @Service
 public class ImageProcessingService {
 
-    private static final int THUMBNAIL_WIDTH = 300;
-    private static final int MEDIUM_WIDTH = 800;
-    private static final int ORIGINAL_MAX_WIDTH = 1920;
+    private static final int THUMBNAIL_SIZE = 300;
+    private static final int MEDIUM_SIZE = 800;
+    private static final int ORIGINAL_MAX_SIZE = 1920;
+    private static final int WEBP_QUALITY = 85;
 
-    public record ResizedImages(
+    private static final WebpWriter WRITER = new WebpWriter().withQ(WEBP_QUALITY).withMultiThread();
+
+    public record ProcessedImages(
             byte[] original,
             byte[] medium,
             byte[] thumbnail
     ) {}
 
-    public ResizedImages resize(InputStream inputStream) throws IOException {
-        byte[] sourceBytes = inputStream.readAllBytes();
+    public ProcessedImages process(InputStream inputStream) throws IOException {
+        ImmutableImage source = ImmutableImage.loader().fromStream(inputStream);
 
-        byte[] original = resizeToMaxWidth(sourceBytes, ORIGINAL_MAX_WIDTH);
-        byte[] medium = resizeToMaxWidth(sourceBytes, MEDIUM_WIDTH);
-        byte[] thumbnail = resizeToMaxWidth(sourceBytes, THUMBNAIL_WIDTH);
+        byte[] original = source.bound(ORIGINAL_MAX_SIZE, ORIGINAL_MAX_SIZE).bytes(WRITER);
+        byte[] medium = source.bound(MEDIUM_SIZE, MEDIUM_SIZE).bytes(WRITER);
+        byte[] thumbnail = source.bound(THUMBNAIL_SIZE, THUMBNAIL_SIZE).bytes(WRITER);
 
-        return new ResizedImages(original, medium, thumbnail);
-    }
-
-    private byte[] resizeToMaxWidth(byte[] source, int maxWidth) throws IOException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        Thumbnails.of(new ByteArrayInputStream(source))
-                .width(maxWidth)
-                .keepAspectRatio(true)
-                .outputQuality(0.85)
-                .toOutputStream(output);
-        return output.toByteArray();
+        return new ProcessedImages(original, medium, thumbnail);
     }
 }
