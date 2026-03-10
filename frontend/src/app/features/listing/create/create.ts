@@ -13,7 +13,10 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { TagModule } from 'primeng/tag';
 import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ProgressBarModule } from 'primeng/progressbar';
 import { MessageService } from 'primeng/api';
+import { concat, EMPTY } from 'rxjs';
+import { finalize, tap } from 'rxjs/operators';
 import { ListingService } from '../../../core/services/listing';
 import { ListingResponse, RoomType, CreateListingRequest, PhotoResponse } from '../../../core/models/listing.models';
 import { AMENITY_CONFIG } from '../../../core/models/amenity.config';
@@ -27,6 +30,12 @@ interface AmenityOption {
   label: string;
   icon: string;
   selected: boolean;
+}
+
+interface PendingPhoto {
+  localUrl: string;
+  file: File;
+  uploading: boolean;
 }
 
 @Component({
@@ -45,6 +54,7 @@ interface AmenityOption {
     TagModule,
     MessageModule,
     ProgressSpinnerModule,
+    ProgressBarModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './create.html',
@@ -60,8 +70,11 @@ export class Create implements OnInit, OnDestroy {
   protected saving = signal(false);
   protected submitting = signal(false);
   protected listing = signal<ListingResponse | null>(null);
-  protected uploadingPhoto = signal(false);
+  protected uploadingPhotos = signal(false);
+  protected uploadProgress = signal(0);
+  protected uploadTotal = signal(0);
   protected photos = signal<PhotoResponse[]>([]);
+  protected pendingPhotos = signal<PendingPhoto[]>([]);
   protected map: L.Map | null = null;
   private marker: L.Marker | null = null;
 
@@ -121,6 +134,7 @@ export class Create implements OnInit, OnDestroy {
   );
 
   protected photoCount = computed(() => this.photos().length);
+  protected totalPhotoCount = computed(() => this.photos().length + this.pendingPhotos().length);
   protected canSubmit = computed(() => this.photoCount() >= 3 && this.photoCount() <= 10);
 
   protected distanceToCampus = computed(() => {
@@ -139,6 +153,7 @@ export class Create implements OnInit, OnDestroy {
       this.map.remove();
       this.map = null;
     }
+    this.pendingPhotos().forEach((p) => URL.revokeObjectURL(p.localUrl));
   }
 
   protected initMap(): void {
@@ -202,27 +217,60 @@ export class Create implements OnInit, OnDestroy {
     }
 
     const files = Array.from(input.files);
-    const remaining = 10 - this.photoCount();
+    const remaining = 10 - this.totalPhotoCount();
     const filesToUpload = files.slice(0, remaining);
 
-    filesToUpload.forEach((file) => {
-      this.uploadingPhoto.set(true);
-      this.listingService.uploadPhoto(currentListing.id, file).subscribe({
-        next: (updated) => {
+    if (filesToUpload.length === 0) {
+      input.value = '';
+      return;
+    }
+
+    const newPending: PendingPhoto[] = filesToUpload.map((file) => ({
+      localUrl: URL.createObjectURL(file),
+      file,
+      uploading: false,
+    }));
+
+    this.pendingPhotos.update((list) => [...list, ...newPending]);
+    this.uploadingPhotos.set(true);
+    this.uploadProgress.set(0);
+    this.uploadTotal.set(filesToUpload.length);
+
+    const uploads = filesToUpload.map((file, index) =>
+      this.listingService.uploadPhoto(currentListing.id, file).pipe(
+        tap((updated) => {
           this.listing.set(updated);
           this.photos.set(updated.photos);
-          this.uploadingPhoto.set(false);
-        },
-        error: () => {
-          this.uploadingPhoto.set(false);
+          this.uploadProgress.set(index + 1);
+
+          const pendingUrl = newPending[index].localUrl;
+          URL.revokeObjectURL(pendingUrl);
+          this.pendingPhotos.update((list) => list.filter((p) => p.localUrl !== pendingUrl));
+        })
+      )
+    );
+
+    concat(...uploads)
+      .pipe(
+        finalize(() => {
+          this.uploadingPhotos.set(false);
+          this.uploadProgress.set(0);
+          this.uploadTotal.set(0);
+        })
+      )
+      .subscribe({
+        error: (err) => {
+          this.pendingPhotos.update((list) => {
+            list.forEach((p) => URL.revokeObjectURL(p.localUrl));
+            return [];
+          });
           this.messageService.add({
             severity: 'error',
             summary: 'Erreur',
-            detail: `Echec de l'upload de ${file.name}`,
+            detail: 'Echec de l\'upload d\'une ou plusieurs photos.',
           });
         },
       });
-    });
 
     input.value = '';
   }

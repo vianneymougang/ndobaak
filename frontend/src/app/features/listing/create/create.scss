@@ -133,7 +133,9 @@
 }
 
 .uploading-indicator {
-  @apply flex items-center gap-2 text-sm text-ndb-muted;
+  @apply flex flex-col gap-2 text-sm text-ndb-muted;
+
+  span { @apply text-xs; }
 }
 
 .photos-counter {
@@ -156,6 +158,15 @@
   img {
     @apply w-full h-full object-cover;
   }
+
+  &.photo-card-pending {
+    opacity: 0.7;
+  }
+}
+
+.pending-overlay {
+  @apply absolute inset-0 flex items-center justify-center;
+  background: color-mix(in srgb, white 40%, transparent);
 }
 
 .cover-badge {
