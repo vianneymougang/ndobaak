@@ -1,0 +1,113 @@
+@reference "../../../../tailwind.css";
+
+:host {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+/* ── Island ── */
+.island {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  background: rgba(27, 67, 50, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 16px 48px rgba(27, 67, 50, 0.5),
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  padding: 6px 8px;
+
+  transform: translateY(120px) scale(0.88);
+  opacity: 0;
+  transition:
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.3s ease;
+
+  &.island--visible {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ── Items ── */
+.island-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 10px 22px;
+  border-radius: 100px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Urbanist', sans-serif;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  min-width: 76px;
+  transition: background 0.2s ease, color 0.2s ease;
+
+  i {
+    font-size: 1.15rem;
+    transition: color 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+
+    i {
+      transform: translateY(-2px);
+    }
+  }
+
+  &.island-item--active {
+    color: #d4a017;
+
+    i {
+      color: #d4a017;
+    }
+  }
+}
+
+/* ── Separator ── */
+.island-sep {
+  width: 1px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+/* ── Avatar for authenticated users ── */
+.island-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #d4a017;
+  color: #1b4332;
+  font-size: 0.6rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Urbanist', sans-serif;
+  line-height: 1;
+  flex-shrink: 0;
+}

@@ -1,0 +1,42 @@
+<div
+  class="island"
+  [class.island--visible]="isVisible()"
+  role="navigation"
+  aria-label="Navigation rapide"
+>
+  <a routerLink="/search" routerLinkActive="island-item--active" class="island-item">
+    <i class="pi pi-search" aria-hidden="true"></i>
+    <span>Rechercher</span>
+  </a>
+
+  <div class="island-sep" aria-hidden="true"></div>
+
+  @if (isLandlord()) {
+    <a
+      routerLink="/my-listings"
+      routerLinkActive="island-item--active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="island-item"
+      aria-label="Mes annonces"
+    >
+      <span class="island-avatar" aria-hidden="true">{{ userInitials() }}</span>
+      <span>{{ accountLabel() }}</span>
+    </a>
+  } @else if (isAuthenticated()) {
+    <button class="island-item" (click)="openDrawer()" aria-label="Mon compte">
+      <span class="island-avatar" aria-hidden="true">{{ userInitials() }}</span>
+      <span>{{ accountLabel() }}</span>
+    </button>
+  } @else {
+    <a
+      routerLink="/login"
+      routerLinkActive="island-item--active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="island-item"
+      aria-label="Se connecter"
+    >
+      <i class="pi pi-user" aria-hidden="true"></i>
+      <span>{{ accountLabel() }}</span>
+    </a>
+  }
+</div>
