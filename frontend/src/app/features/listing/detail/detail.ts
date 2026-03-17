@@ -9,29 +9,42 @@ import {
   viewChild,
   computed,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { GalleriaModule } from 'primeng/galleria';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { ChipModule } from 'primeng/chip';
 import { AvatarModule } from 'primeng/avatar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { DrawerModule } from 'primeng/drawer';
 import { ListingService } from '../../../core/services/listing';
 import { ListingResponse } from '../../../core/models/listing.models';
+import { BookingResponse } from '../../../core/models/booking.models';
 import { amenityLabel, amenityIcon } from '../../../core/models/amenity.config';
 import { environment } from '../../../../environments/environment';
+import { BookingPanel } from '../booking-panel/booking-panel';
 
 declare const L: typeof import('leaflet');
 
 @Component({
   selector: 'app-detail',
-  imports: [GalleriaModule, ButtonModule, TagModule, ChipModule, AvatarModule, ProgressSpinnerModule],
+  imports: [
+    GalleriaModule,
+    ButtonModule,
+    TagModule,
+    ChipModule,
+    AvatarModule,
+    ProgressSpinnerModule,
+    DrawerModule,
+    BookingPanel,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './detail.html',
   styleUrl: './detail.scss',
 })
 export class Detail implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private listingService = inject(ListingService);
 
   protected detailMap = viewChild<ElementRef>('detailMap');
@@ -39,6 +52,7 @@ export class Detail implements OnInit, AfterViewInit {
 
   protected listing = signal<ListingResponse | null>(null);
   protected loading = signal(true);
+  protected mobileDrawerVisible = signal(false);
 
   protected roomTypeLabel = computed(() => {
     const labels: Record<string, string> = {
@@ -80,6 +94,10 @@ export class Detail implements OnInit, AfterViewInit {
 
   protected readonly amenityLabel = amenityLabel;
   protected readonly amenityIcon = amenityIcon;
+
+  protected onBookingCreated(_booking: BookingResponse): void {
+    this.router.navigate(['/my-bookings']);
+  }
 
   private initDetailMap(): void {
     if (typeof L === 'undefined') return;
