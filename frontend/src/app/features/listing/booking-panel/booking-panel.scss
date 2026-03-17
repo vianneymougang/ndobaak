@@ -1,0 +1,95 @@
+@reference "../../../../tailwind.css";
+
+.booking-panel-skeleton {
+  @apply flex flex-col gap-3;
+}
+
+.booking-panel {
+  @apply flex flex-col gap-5;
+}
+
+.panel-price {
+  @apply flex items-baseline gap-1;
+}
+
+.panel-price-amount {
+  @apply text-3xl font-bold;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-gold);
+}
+
+.panel-price-unit {
+  @apply text-sm;
+  color: var(--color-ndb-muted);
+  font-family: var(--font-urbanist);
+}
+
+.panel-section {
+  @apply flex flex-col gap-2;
+}
+
+.panel-label {
+  @apply flex items-center gap-1.5 text-sm font-semibold;
+  color: var(--color-ndb-navy);
+  font-family: var(--font-urbanist);
+
+  i {
+    color: var(--color-ndb-gold);
+    @apply text-xs;
+  }
+}
+
+.panel-summary {
+  @apply flex flex-col gap-2 rounded-xl p-4;
+  background: color-mix(in srgb, var(--color-ndb-page) 80%, transparent);
+  border: 1px solid var(--color-ndb-border);
+}
+
+.summary-row {
+  @apply flex items-center justify-between text-sm;
+
+  .summary-label {
+    color: var(--color-ndb-muted);
+  }
+
+  .summary-value {
+    @apply font-semibold;
+    color: var(--color-ndb-navy);
+    font-family: var(--font-urbanist);
+  }
+
+  &--total {
+    .summary-label {
+      @apply font-semibold text-base;
+      color: var(--color-ndb-navy);
+    }
+  }
+}
+
+.summary-value--total {
+  @apply text-lg font-bold;
+  color: var(--color-ndb-gold);
+  font-family: var(--font-urbanist);
+}
+
+.summary-divider {
+  height: 1px;
+  background: var(--color-ndb-border);
+  margin: 4px 0;
+}
+
+.panel-landlord-notice {
+  @apply flex items-start gap-3 p-4 rounded-xl text-sm;
+  background: color-mix(in srgb, var(--color-ndb-gold) 8%, transparent);
+  color: var(--color-ndb-muted);
+  border: 1px solid color-mix(in srgb, var(--color-ndb-gold) 20%, transparent);
+
+  i {
+    color: var(--color-ndb-gold);
+    @apply text-lg flex-shrink-0 mt-0.5;
+  }
+
+  p {
+    @apply m-0;
+  }
+}
