@@ -136,7 +136,7 @@ CREATE TABLE paiement (
     operateur operateur_mobile_money NOT NULL,
     numero_mobile_money VARCHAR(20) NOT NULL,
     reference_transaction VARCHAR(100) UNIQUE,  -- Ref interne Ndobaâk
-    reference_externe VARCHAR(100),              -- Ref CinetPay/NotchPay
+    reference_externe VARCHAR(100),              -- Ref NotchPay
     statut statut_paiement NOT NULL DEFAULT 'EN_ATTENTE',
 
     -- Clé étrangère
