@@ -1,0 +1,108 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  header="Confirmer votre réservation"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [style]="{ width: '500px', 'max-width': '90vw' }"
+>
+  <div class="confirm-body">
+    <div
+      ngmMotion
+      [initial]="{ opacity: 0, y: 10 }"
+      [animate]="{ opacity: 1, y: 0 }"
+      [transition]="{ duration: 0.3, delay: 0.05 }"
+    >
+      <div class="listing-card-preview">
+        @if (thumbnailUrl()) {
+          <img
+            [src]="thumbnailUrl()!"
+            [alt]="listing().title"
+            class="listing-thumbnail"
+          />
+        } @else {
+          <div class="listing-thumbnail listing-thumbnail--placeholder">
+            <i class="pi pi-image" aria-hidden="true"></i>
+          </div>
+        }
+        <div class="listing-preview-info">
+          <p class="listing-preview-title">{{ listing().title }}</p>
+          <p class="listing-preview-address">
+            <i class="pi pi-map-marker" aria-hidden="true"></i>
+            {{ listing().location?.address ?? '' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      ngmMotion
+      [initial]="{ opacity: 0, y: 10 }"
+      [animate]="{ opacity: 1, y: 0 }"
+      [transition]="{ duration: 0.3, delay: 0.1 }"
+      class="confirm-dates"
+    >
+      <div class="date-row">
+        <span class="date-label"><i class="pi pi-calendar" aria-hidden="true"></i> Emménagement</span>
+        <span class="date-value">{{ formattedStartDate() }}</span>
+      </div>
+      <div class="date-row">
+        <span class="date-label"><i class="pi pi-calendar-times" aria-hidden="true"></i> Fin de séjour</span>
+        <span class="date-value">{{ formattedEndDate() }}</span>
+      </div>
+      <div class="date-row">
+        <span class="date-label"><i class="pi pi-clock" aria-hidden="true"></i> Durée</span>
+        <span class="date-value">{{ duration() }} mois</span>
+      </div>
+    </div>
+
+    <div
+      ngmMotion
+      [initial]="{ opacity: 0, y: 10 }"
+      [animate]="{ opacity: 1, y: 0 }"
+      [transition]="{ duration: 0.3, delay: 0.15 }"
+      class="confirm-summary"
+    >
+      <div class="summary-row">
+        <span class="summary-label">Loyer mensuel</span>
+        <span class="summary-value">{{ formattedMonthlyRent() }} FCFA</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Durée</span>
+        <span class="summary-value">{{ duration() }} mois</span>
+      </div>
+      <div class="summary-divider" role="separator"></div>
+      <div class="summary-row summary-row--total">
+        <span class="summary-label">Total estimé</span>
+        <span class="summary-value summary-value--total">{{ formattedTotal() }} FCFA</span>
+      </div>
+    </div>
+
+    <div class="terms-section">
+      <p-checkbox
+        [ngModel]="termsAccepted()"
+        (ngModelChange)="termsAccepted.set($event)"
+        [binary]="true"
+        inputId="booking-terms"
+      />
+      <label for="booking-terms" class="terms-label">
+        J'accepte les conditions générales d'utilisation de Ndobaak
+      </label>
+    </div>
+
+    <p-button
+      label="Confirmer la réservation"
+      icon="pi pi-check"
+      [fluid]="true"
+      [disabled]="!termsAccepted() || submitting()"
+      [loading]="submitting()"
+      (onClick)="submitBooking()"
+    />
+
+    <p class="confirm-notice">
+      En confirmant, une demande sera envoyée au propriétaire. Vous serez notifié de sa réponse.
+    </p>
+  </div>
+</p-dialog>

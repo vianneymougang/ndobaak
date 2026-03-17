@@ -1,0 +1,127 @@
+@reference "../../../../tailwind.css";
+
+.confirm-body {
+  @apply flex flex-col gap-5 pt-2;
+}
+
+.listing-card-preview {
+  @apply flex items-center gap-3 p-3 rounded-xl;
+  border: 1px solid var(--color-ndb-border);
+  background: color-mix(in srgb, var(--color-ndb-page) 60%, transparent);
+}
+
+.listing-thumbnail {
+  @apply flex-shrink-0 rounded-lg object-cover;
+  width: 80px;
+  height: 60px;
+
+  &--placeholder {
+    @apply flex items-center justify-center;
+    background: var(--color-ndb-border);
+
+    i {
+      @apply text-2xl;
+      color: var(--color-ndb-muted);
+    }
+  }
+}
+
+.listing-preview-info {
+  @apply flex flex-col gap-1 min-w-0;
+}
+
+.listing-preview-title {
+  @apply text-sm font-semibold m-0 truncate;
+  color: var(--color-ndb-navy);
+  font-family: var(--font-urbanist);
+}
+
+.listing-preview-address {
+  @apply text-xs m-0 flex items-center gap-1 truncate;
+  color: var(--color-ndb-muted);
+
+  i {
+    color: var(--color-ndb-gold);
+    @apply flex-shrink-0;
+  }
+}
+
+.confirm-dates {
+  @apply flex flex-col gap-2 p-4 rounded-xl;
+  background: color-mix(in srgb, var(--color-ndb-forest) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ndb-forest) 10%, transparent);
+}
+
+.date-row {
+  @apply flex items-center justify-between text-sm;
+}
+
+.date-label {
+  @apply flex items-center gap-1.5;
+  color: var(--color-ndb-muted);
+
+  i {
+    color: var(--color-ndb-forest);
+    @apply text-xs;
+  }
+}
+
+.date-value {
+  @apply font-semibold;
+  color: var(--color-ndb-navy);
+  font-family: var(--font-urbanist);
+}
+
+.confirm-summary {
+  @apply flex flex-col gap-2 p-4 rounded-xl;
+  background: color-mix(in srgb, var(--color-ndb-page) 80%, transparent);
+  border: 1px solid var(--color-ndb-border);
+}
+
+.summary-row {
+  @apply flex items-center justify-between text-sm;
+
+  .summary-label {
+    color: var(--color-ndb-muted);
+  }
+
+  .summary-value {
+    @apply font-semibold;
+    color: var(--color-ndb-navy);
+    font-family: var(--font-urbanist);
+  }
+
+  &--total {
+    .summary-label {
+      @apply font-semibold text-base;
+      color: var(--color-ndb-navy);
+    }
+  }
+}
+
+.summary-value--total {
+  @apply text-base font-bold;
+  color: var(--color-ndb-gold);
+  font-family: var(--font-urbanist);
+}
+
+.summary-divider {
+  height: 1px;
+  background: var(--color-ndb-border);
+  margin: 4px 0;
+}
+
+.terms-section {
+  @apply flex items-start gap-3;
+}
+
+.terms-label {
+  @apply text-sm cursor-pointer leading-relaxed;
+  color: var(--color-ndb-body);
+}
+
+.confirm-notice {
+  @apply text-xs text-center m-0;
+  color: var(--color-ndb-muted);
+  font-style: italic;
+}
