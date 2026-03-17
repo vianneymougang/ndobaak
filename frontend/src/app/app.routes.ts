@@ -60,6 +60,22 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/listing/my-listings/my-listings').then((m) => m.MyListings),
       },
+      {
+        path: 'my-bookings',
+        title: 'Mes réservations',
+        canActivate: [authGuard, roleGuard('STUDENT')],
+        loadComponent: () =>
+          import('./features/booking/my-bookings/my-bookings').then((m) => m.MyBookings),
+      },
+      {
+        path: 'landlord/bookings',
+        title: 'Demandes de réservation',
+        canActivate: [authGuard, roleGuard('LANDLORD')],
+        loadComponent: () =>
+          import('./features/booking/landlord-bookings/landlord-bookings').then(
+            (m) => m.LandlordBookings,
+          ),
+      },
     ],
   },
 ];

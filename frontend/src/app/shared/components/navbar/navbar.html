@@ -36,6 +36,14 @@
         <a routerLink="/my-listings" routerLinkActive="active">
           <i class="pi pi-list" aria-hidden="true"></i> Mes annonces
         </a>
+        <a routerLink="/landlord/bookings" routerLinkActive="active">
+          <i class="pi pi-calendar" aria-hidden="true"></i> Réservations reçues
+        </a>
+      }
+      @if (isStudent()) {
+        <a routerLink="/my-bookings" routerLinkActive="active">
+          <i class="pi pi-calendar" aria-hidden="true"></i> Mes réservations
+        </a>
       }
     </div>
 
@@ -112,6 +120,17 @@
       <a routerLink="/my-listings" (click)="drawerOpen.set(false)" class="drawer-link">
         <i class="pi pi-list" aria-hidden="true"></i>
         Mes annonces
+      </a>
+      <a routerLink="/landlord/bookings" (click)="drawerOpen.set(false)" class="drawer-link">
+        <i class="pi pi-calendar" aria-hidden="true"></i>
+        Réservations reçues
+      </a>
+    }
+
+    @if (isStudent()) {
+      <a routerLink="/my-bookings" (click)="drawerOpen.set(false)" class="drawer-link">
+        <i class="pi pi-calendar" aria-hidden="true"></i>
+        Mes réservations
       </a>
     }
 

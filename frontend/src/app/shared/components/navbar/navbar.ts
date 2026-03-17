@@ -34,6 +34,7 @@ export class Navbar {
     return (u.firstName?.charAt(0) ?? '') + (u.lastName?.charAt(0) ?? '');
   });
   protected isLandlord = computed(() => this.authService.userRole() === 'LANDLORD');
+  protected isStudent = computed(() => this.authService.userRole() === 'STUDENT');
 
   protected get drawerOpen() { return this.navState.drawerOpen; }
   protected scrolled = signal(false);
