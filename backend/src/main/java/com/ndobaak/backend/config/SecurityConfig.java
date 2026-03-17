@@ -64,6 +64,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/listings/search").permitAll()
                 .requestMatchers(HttpMethod.GET, "/listings/{id}").permitAll()
                 .requestMatchers("/media/**").permitAll()
+                .requestMatchers("/payments/webhook/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
