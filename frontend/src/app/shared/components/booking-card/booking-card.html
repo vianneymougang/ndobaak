@@ -1,0 +1,102 @@
+<div
+  ngmMotion
+  [whileHover]="{ y: -3 }"
+  [transition]="{ type: 'spring', stiffness: 400, damping: 30 }"
+  class="booking-card"
+>
+  @if (booking().listing.thumbnailUrl) {
+    <img
+      [src]="booking().listing.thumbnailUrl!"
+      [alt]="booking().listing.title"
+      class="card-photo"
+    />
+  } @else {
+    <div class="card-photo card-photo--placeholder" aria-hidden="true">
+      <i class="pi pi-image"></i>
+    </div>
+  }
+
+  <div class="card-content">
+    <div class="card-header">
+      <div class="card-listing-info">
+        <p class="card-title">{{ booking().listing.title }}</p>
+        <p class="card-address">
+          <i class="pi pi-map-marker" aria-hidden="true"></i>
+          {{ booking().listing.address }}
+        </p>
+      </div>
+      <p-tag
+        [value]="statusLabel()"
+        [severity]="statusSeverity()"
+        [rounded]="true"
+      />
+    </div>
+
+    @if (viewMode() === 'landlord') {
+      <div class="card-student">
+        <p-avatar
+          [label]="studentInitials()"
+          shape="circle"
+          size="normal"
+        />
+        <div class="student-info">
+          <span class="student-name">{{ booking().student.firstName }} {{ booking().student.lastName }}</span>
+        </div>
+      </div>
+    }
+
+    <div class="card-dates">
+      <span class="card-date">
+        <i class="pi pi-sign-in" aria-hidden="true"></i>
+        {{ formattedStartDate() }}
+      </span>
+      <span class="card-date-arrow" aria-hidden="true">→</span>
+      <span class="card-date">
+        <i class="pi pi-sign-out" aria-hidden="true"></i>
+        {{ formattedEndDate() }}
+      </span>
+    </div>
+
+    <div class="card-pricing">
+      <span class="card-rent">{{ formattedMonthlyRent() }} FCFA / mois</span>
+      <span class="card-total">Total : {{ formattedTotal() }} FCFA</span>
+    </div>
+
+    @if (booking().cancellationReason) {
+      <p class="card-reason">
+        <i class="pi pi-info-circle" aria-hidden="true"></i>
+        {{ booking().cancellationReason }}
+      </p>
+    }
+
+    <div class="card-actions">
+      @if (canConfirmOrReject()) {
+        <p-button
+          label="Confirmer"
+          icon="pi pi-check"
+          severity="success"
+          size="small"
+          (onClick)="confirm.emit(booking().id)"
+        />
+        <p-button
+          label="Refuser"
+          icon="pi pi-times"
+          severity="danger"
+          [outlined]="true"
+          size="small"
+          (onClick)="reject.emit(booking().id)"
+        />
+      }
+      @if (canCancel() && !(viewMode() === 'landlord' && booking().status === 'PENDING')) {
+        <p-button
+          label="Annuler"
+          icon="pi pi-ban"
+          severity="danger"
+          [outlined]="true"
+          size="small"
+          (onClick)="cancel.emit(booking().id)"
+        />
+      }
+    </div>
+  </div>
+</div>
