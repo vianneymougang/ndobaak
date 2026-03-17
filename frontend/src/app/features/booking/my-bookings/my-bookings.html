@@ -14,10 +14,10 @@
     @if (loading()) {
       @for (item of skeletonItems; track $index) {
         <div class="booking-skeleton">
-          <p-skeleton width="120px" height="90px" styleClass="flex-shrink-0 rounded-xl" />
+          <p-skeleton width="120px" height="90px" class="shrink-0 rounded-xl" />
           <div class="skeleton-lines">
-            <p-skeleton height="20px" styleClass="mb-2" />
-            <p-skeleton height="16px" width="70%" styleClass="mb-2" />
+            <p-skeleton height="20px" class="mb-2" />
+            <p-skeleton height="16px" width="70%" class="mb-2" />
             <p-skeleton height="14px" width="50%" />
           </div>
         </div>
