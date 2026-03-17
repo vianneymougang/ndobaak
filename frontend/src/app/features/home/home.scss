@@ -5,7 +5,7 @@
 ═══════════════════════════════════════ */
 .hero {
   position: relative;
-  min-height: 100vh;
+  min-height: 101vh;
   display: flex;
   align-items: center;
   background-size: cover;
@@ -62,7 +62,7 @@
 }
 
 .hero-title {
-  @apply text-4xl md:text-7xl font-extrabold text-white m-0;
+  @apply text-4xl md:text-7xl font-extrabold text-white m-0 my-3;
   font-family: var(--font-urbanist);
   line-height: 1.1;
   letter-spacing: -0.02em;

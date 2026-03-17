@@ -11,7 +11,7 @@ import { Component, ChangeDetectionStrategy, input, computed } from '@angular/co
           class="pi"
           [class.pi-star-fill]="star.type === 'full'"
           [class.pi-star]="star.type === 'empty'"
-          [style.color]="star.type === 'full' ? '#D4A017' : '#E5E0D8'"
+          [style.color]="star.type === 'full' ? 'var(--color-ndb-gold)' : 'var(--color-ndb-border)'"
         ></i>
       }
       <span class="rating-value">{{ rating().toFixed(1) }}</span>
@@ -27,8 +27,8 @@ import { Component, ChangeDetectionStrategy, input, computed } from '@angular/co
       margin-left: 5px;
       font-size: 0.875rem;
       font-weight: 700;
-      font-family: 'Urbanist', sans-serif;
-      color: #374151;
+      font-family: var(--font-urbanist);
+      color: var(--color-ndb-body);
     }
   `,
 })

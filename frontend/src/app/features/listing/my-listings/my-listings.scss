@@ -10,7 +10,7 @@
 
   h1 {
     @apply text-3xl font-bold m-0;
-    font-family: var(--font-urbanist);
+    font-family: var(--font-urbanist), serif;
     color: var(--color-ndb-ink);
     letter-spacing: -0.01em;
   }
@@ -30,7 +30,7 @@
   border-radius: 10px;
   background: var(--color-ndb-gold);
   color: var(--color-ndb-forest);
-  font-family: var(--font-urbanist);
+  font-family: var(--font-urbanist), serif;
   font-size: 0.875rem;
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -81,7 +81,7 @@
 
   h3 {
     @apply text-xl font-semibold mb-2;
-    font-family: var(--font-urbanist);
+    font-family: var(--font-urbanist), serif;
     color: var(--color-ndb-ink);
   }
 
@@ -139,7 +139,7 @@
 
   h3 {
     @apply text-base font-semibold m-0 flex-1;
-    font-family: var(--font-urbanist);
+    font-family: var(--font-urbanist), serif;
     color: var(--color-ndb-ink);
     white-space: nowrap;
     overflow: hidden;
@@ -149,7 +149,7 @@
 
 .listing-price {
   @apply font-bold text-lg m-0 leading-tight;
-  font-family: var(--font-urbanist);
+  font-family: var(--font-urbanist), serif;
   color: var(--color-ndb-gold);
 }
 
