@@ -6,6 +6,7 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { of, catchError } from 'rxjs';
+import { provideMotionConfig, provideMotionFeatures, ngmAnimationFeatures } from '@scripttype/ng-motion';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth-interceptor';
@@ -45,5 +46,7 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
+    provideMotionConfig({ reducedMotion: 'user' }),
+    provideMotionFeatures(ngmAnimationFeatures),
   ],
 };
