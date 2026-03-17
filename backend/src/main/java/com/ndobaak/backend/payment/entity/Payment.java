@@ -73,4 +73,10 @@ public class Payment extends BaseEntity {
 
     @Column(name = "payment_date")
     private LocalDateTime paidAt;
+
+    @Column(name = "provider_name", length = 50)
+    private String providerName;
+
+    @Column(name = "external_reference", length = 100)
+    private String providerReference;
 }
