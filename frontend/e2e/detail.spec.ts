@@ -7,12 +7,12 @@ test.describe('Listing detail page', () => {
   test('should navigate from search card to detail page', async ({ page }) => {
     const searchPage = new SearchPage(page);
     await searchPage.goto();
+    await searchPage.expectResultsOrEmpty();
 
-    const hasResults = await searchPage.listingCards.first().isVisible().catch(() => false);
-    test.skip(!hasResults, 'No listings available to navigate to detail');
+    const count = await searchPage.getListingCardCount();
+    test.skip(count === 0, 'No listings available to navigate to detail');
 
-    const firstCardLink = searchPage.listingCards.first().locator('a').first();
-    await firstCardLink.click();
+    await searchPage.listingCards.first().click();
     await page.waitForURL(/\/listings\/\d+/, { timeout: 10_000 });
 
     const detailPage = new DetailPage(page);
@@ -24,12 +24,12 @@ test.describe('Listing detail page', () => {
   test('should display map with tiles on detail page', async ({ page }) => {
     const searchPage = new SearchPage(page);
     await searchPage.goto();
+    await searchPage.expectResultsOrEmpty();
 
-    const hasResults = await searchPage.listingCards.first().isVisible().catch(() => false);
-    test.skip(!hasResults, 'No listings available to navigate to detail');
+    const count = await searchPage.getListingCardCount();
+    test.skip(count === 0, 'No listings available to navigate to detail');
 
-    const firstCardLink = searchPage.listingCards.first().locator('a').first();
-    await firstCardLink.click();
+    await searchPage.listingCards.first().click();
     await page.waitForURL(/\/listings\/\d+/, { timeout: 10_000 });
 
     const detailPage = new DetailPage(page);
@@ -41,12 +41,12 @@ test.describe('Listing detail page', () => {
   test('should display reviews section on detail page', async ({ page }) => {
     const searchPage = new SearchPage(page);
     await searchPage.goto();
+    await searchPage.expectResultsOrEmpty();
 
-    const hasResults = await searchPage.listingCards.first().isVisible().catch(() => false);
-    test.skip(!hasResults, 'No listings available to navigate to detail');
+    const count = await searchPage.getListingCardCount();
+    test.skip(count === 0, 'No listings available to navigate to detail');
 
-    const firstCardLink = searchPage.listingCards.first().locator('a').first();
-    await firstCardLink.click();
+    await searchPage.listingCards.first().click();
     await page.waitForURL(/\/listings\/\d+/, { timeout: 10_000 });
 
     const detailPage = new DetailPage(page);

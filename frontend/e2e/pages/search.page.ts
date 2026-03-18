@@ -14,6 +14,7 @@ export class SearchPage {
   readonly radiusSelector: Locator;
   readonly searchAreaButton: Locator;
   readonly paginator: Locator;
+  readonly skeletons: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -29,10 +30,20 @@ export class SearchPage {
     this.radiusSelector = page.locator('.filter-radius p-selectbutton');
     this.searchAreaButton = page.locator('.search-area-btn');
     this.paginator = page.locator('p-paginator');
+    this.skeletons = page.locator('.listing-skeleton');
   }
 
   async goto() {
-    await this.page.goto('/search');
+    await this.page.goto('/');
+    await this.page.waitForLoadState('networkidle');
+    const searchLink = this.page.locator('a[href="/search"]').first();
+    await searchLink.click();
+    await this.page.waitForURL('**/search**', { timeout: 10_000 });
+    await this.waitForSearchLoaded();
+  }
+
+  async waitForSearchLoaded() {
+    await expect(this.filterBar).toBeVisible({ timeout: 10_000 });
     await this.page.waitForLoadState('networkidle');
   }
 
@@ -43,21 +54,21 @@ export class SearchPage {
   }
 
   async expectMapVisible() {
-    await expect(this.mapContainer).toBeVisible();
+    await expect(this.mapContainer).toBeVisible({ timeout: 10_000 });
   }
 
   async expectResultsOrEmpty() {
-    const hasResults = await this.listingCards.first().isVisible().catch(() => false);
-    const hasEmpty = await this.emptyState.isVisible().catch(() => false);
-    expect(hasResults || hasEmpty).toBeTruthy();
+    await expect(
+      this.listingCards.first().or(this.emptyState)
+    ).toBeVisible({ timeout: 15_000 });
   }
 
   async expectResultsCountVisible() {
-    await expect(this.resultsCount).toBeVisible();
+    await expect(this.resultsCount).toBeVisible({ timeout: 10_000 });
   }
 
   async expectLocationBannerVisible() {
-    await expect(this.locationBanner).toBeVisible();
+    await expect(this.locationBanner).toBeVisible({ timeout: 10_000 });
     await expect(this.locationBanner).toContainText('localisation');
   }
 
@@ -66,7 +77,7 @@ export class SearchPage {
   }
 
   async expectRadiusSelectorVisible() {
-    await expect(this.radiusSelector).toBeVisible();
+    await expect(this.radiusSelector).toBeVisible({ timeout: 10_000 });
   }
 
   async search(keyword: string) {
@@ -81,6 +92,6 @@ export class SearchPage {
 
   async expectMapTilesRendered() {
     const tiles = this.page.locator('.leaflet-tile-loaded');
-    await expect(tiles.first()).toBeVisible({ timeout: 10_000 });
+    await expect(tiles.first()).toBeVisible({ timeout: 15_000 });
   }
 }

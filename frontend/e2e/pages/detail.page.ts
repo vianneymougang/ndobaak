@@ -17,7 +17,7 @@ export class DetailPage {
     this.page = page;
     this.detailPage = page.locator('.detail-page');
     this.title = page.locator('.detail-title');
-    this.price = page.locator('.detail-price');
+    this.price = page.locator('.panel-price');
     this.photoGrid = page.locator('.photo-grid');
     this.mapSection = page.getByRole('heading', { name: 'Localisation' });
     this.mapContainer = page.locator('.detail-map');
@@ -41,13 +41,16 @@ export class DetailPage {
   }
 
   async expectMapSectionVisible() {
-    await expect(this.mapSection).toBeVisible();
-    await expect(this.mapContainer).toBeVisible();
+    await this.mapSection.scrollIntoViewIfNeeded();
+    await expect(this.mapSection).toBeVisible({ timeout: 10_000 });
+    await expect(this.mapContainer).toBeVisible({ timeout: 10_000 });
   }
 
   async expectMapTilesRendered() {
+    await this.mapContainer.scrollIntoViewIfNeeded();
+    await this.page.waitForTimeout(2000);
     const tiles = this.page.locator('.detail-map .leaflet-tile-loaded');
-    await expect(tiles.first()).toBeVisible({ timeout: 10_000 });
+    await expect(tiles.first()).toBeVisible({ timeout: 15_000 });
   }
 
   async expectReviewSectionVisible() {

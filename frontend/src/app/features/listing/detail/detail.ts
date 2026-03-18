@@ -4,10 +4,10 @@ import {
   inject,
   signal,
   OnInit,
-  AfterViewInit,
   ElementRef,
   viewChild,
   computed,
+  effect,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GalleriaModule } from 'primeng/galleria';
@@ -47,7 +47,7 @@ import * as L from 'leaflet';
   templateUrl: './detail.html',
   styleUrl: './detail.scss',
 })
-export class Detail implements OnInit, AfterViewInit {
+export class Detail implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private listingService = inject(ListingService);
@@ -55,6 +55,14 @@ export class Detail implements OnInit, AfterViewInit {
 
   protected detailMap = viewChild<ElementRef>('detailMap');
   private map: L.Map | null = null;
+
+  private mapEffect = effect(() => {
+    const el = this.detailMap();
+    const listing = this.listing();
+    if (el && listing?.location) {
+      this.initDetailMap();
+    }
+  });
 
   protected listing = signal<ListingResponse | null>(null);
   protected loading = signal(true);
@@ -90,14 +98,9 @@ export class Detail implements OnInit, AfterViewInit {
       next: (listing) => {
         this.listing.set(listing);
         this.loading.set(false);
-        this.initDetailMap();
       },
       error: () => this.loading.set(false),
     });
-  }
-
-  ngAfterViewInit(): void {
-    this.initDetailMap();
   }
 
   protected readonly amenityLabel = amenityLabel;

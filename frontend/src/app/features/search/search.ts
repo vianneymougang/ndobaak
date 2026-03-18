@@ -279,6 +279,9 @@ export class Search implements OnInit, AfterViewInit {
     if (!el) return;
 
     this.map = L.map(el).setView([3.848, 11.502], 14);
+    if (!environment.production) {
+      (window as any).__ndb_map = this.map;
+    }
     L.tileLayer(environment.mapTileUrl, {
       attribution: '&copy; OpenStreetMap contributors',
     }).addTo(this.map);
