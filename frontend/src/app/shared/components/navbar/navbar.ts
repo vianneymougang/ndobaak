@@ -9,10 +9,11 @@ import { AvatarModule } from 'primeng/avatar';
 import { DrawerModule } from 'primeng/drawer';
 import { AuthService } from '../../../core/services/auth';
 import { NavState } from '../../services/nav-state';
+import { NotificationBell } from '../notification-bell/notification-bell';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, RouterLinkActive, ButtonModule, AvatarModule, DrawerModule],
+  imports: [RouterLink, RouterLinkActive, ButtonModule, AvatarModule, DrawerModule, NotificationBell],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',

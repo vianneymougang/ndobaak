@@ -33,6 +33,9 @@
         <i class="pi pi-search" aria-hidden="true"></i> Rechercher
       </a>
       @if (isLandlord()) {
+        <a routerLink="/landlord/dashboard" routerLinkActive="active">
+          <i class="pi pi-objects-column" aria-hidden="true"></i> Tableau de bord
+        </a>
         <a routerLink="/my-listings" routerLinkActive="active">
           <i class="pi pi-list" aria-hidden="true"></i> Mes annonces
         </a>
@@ -58,6 +61,7 @@
         <i class="pi pi-plus" aria-hidden="true"></i> Déposer une annonce
       </a>
       @if (isAuthenticated()) {
+        <app-notification-bell />
         <div class="user-menu">
           <div class="user-avatar" aria-hidden="true">{{ userInitials() }}</div>
           <div class="user-info">
@@ -77,6 +81,7 @@
     <!-- Mobile: right side -->
     <div class="navbar-mobile-right">
       @if (isAuthenticated()) {
+        <app-notification-bell />
         <button
           class="user-avatar-mobile"
           (click)="drawerOpen.set(true)"
@@ -122,6 +127,10 @@
     }
 
     @if (isLandlord()) {
+      <a routerLink="/landlord/dashboard" (click)="drawerOpen.set(false)" class="drawer-link">
+        <i class="pi pi-objects-column" aria-hidden="true"></i>
+        Tableau de bord
+      </a>
       <a routerLink="/my-listings" (click)="drawerOpen.set(false)" class="drawer-link">
         <i class="pi pi-list" aria-hidden="true"></i>
         Mes annonces
@@ -143,6 +152,10 @@
       <a routerLink="/transactions" (click)="drawerOpen.set(false)" class="drawer-link">
         <i class="pi pi-wallet" aria-hidden="true"></i>
         Transactions
+      </a>
+      <a routerLink="/notifications" (click)="drawerOpen.set(false)" class="drawer-link">
+        <i class="pi pi-bell" aria-hidden="true"></i>
+        Notifications
       </a>
     }
 

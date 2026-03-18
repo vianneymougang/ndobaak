@@ -77,6 +77,24 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'landlord/dashboard',
+        title: 'Tableau de bord',
+        canActivate: [authGuard, roleGuard('LANDLORD')],
+        loadComponent: () =>
+          import('./features/dashboard/landlord-dashboard/landlord-dashboard').then(
+            (m) => m.LandlordDashboard,
+          ),
+      },
+      {
+        path: 'notifications',
+        title: 'Notifications',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/notification/notification-list/notification-list').then(
+            (m) => m.NotificationList,
+          ),
+      },
+      {
         path: 'bookings/:bookingId/pay',
         title: 'Paiement',
         canActivate: [authGuard, roleGuard('STUDENT')],
