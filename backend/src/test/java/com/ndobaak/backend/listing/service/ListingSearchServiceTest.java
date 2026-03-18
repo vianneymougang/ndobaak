@@ -11,6 +11,7 @@ import com.ndobaak.backend.listing.entity.Listing;
 import com.ndobaak.backend.listing.entity.Location;
 import com.ndobaak.backend.listing.repository.ListingRepository;
 import com.ndobaak.backend.listing.repository.ReviewRepository;
+import com.ndobaak.backend.media.service.StorageService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,6 +37,8 @@ class ListingSearchServiceTest {
     private ListingRepository listingRepository;
     @Mock
     private ReviewRepository reviewRepository;
+    @Mock
+    private StorageService storageService;
 
     @InjectMocks
     private ListingSearchService searchService;

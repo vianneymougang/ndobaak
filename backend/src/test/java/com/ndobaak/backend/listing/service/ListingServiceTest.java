@@ -3,6 +3,7 @@ package com.ndobaak.backend.listing.service;
 import com.ndobaak.backend.auth.entity.Landlord;
 import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.common.enums.ListingStatus;
+import com.ndobaak.backend.geo.GeoUtils;
 import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.ForbiddenException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
@@ -309,10 +310,10 @@ class ListingServiceTest {
 
     @Test
     void haversineDistanceShouldCalculateCorrectly() {
-        double distance = ListingService.haversineDistance(3.8480, 11.5021, 3.8480, 11.5021);
+        double distance = GeoUtils.haversineDistance(3.8480, 11.5021, 3.8480, 11.5021);
         assertThat(distance).isEqualTo(0.0);
 
-        double shortDistance = ListingService.haversineDistance(3.849, 11.503, 3.848, 11.502);
+        double shortDistance = GeoUtils.haversineDistance(3.849, 11.503, 3.848, 11.502);
         assertThat(shortDistance).isLessThan(1.0);
     }
 
