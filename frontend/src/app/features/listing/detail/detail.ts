@@ -18,11 +18,14 @@ import { AvatarModule } from 'primeng/avatar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DrawerModule } from 'primeng/drawer';
 import { ListingService } from '../../../core/services/listing';
+import { AuthService } from '../../../core/services/auth';
 import { ListingResponse } from '../../../core/models/listing.models';
 import { BookingResponse } from '../../../core/models/booking.models';
 import { amenityLabel, amenityIcon } from '../../../core/models/amenity.config';
 import { environment } from '../../../../environments/environment';
 import { BookingPanel } from '../booking-panel/booking-panel';
+import { ReviewList } from '../../../shared/components/review-list/review-list';
+import { ReviewForm } from '../../review/review-form/review-form';
 
 declare const L: typeof import('leaflet');
 
@@ -37,6 +40,8 @@ declare const L: typeof import('leaflet');
     ProgressSpinnerModule,
     DrawerModule,
     BookingPanel,
+    ReviewList,
+    ReviewForm,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './detail.html',
@@ -46,6 +51,7 @@ export class Detail implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private listingService = inject(ListingService);
+  protected authService = inject(AuthService);
 
   protected detailMap = viewChild<ElementRef>('detailMap');
   private map: L.Map | null = null;
@@ -53,6 +59,8 @@ export class Detail implements OnInit, AfterViewInit {
   protected listing = signal<ListingResponse | null>(null);
   protected loading = signal(true);
   protected mobileDrawerVisible = signal(false);
+  protected showReviewForm = signal(true);
+  protected reviewListRef = viewChild<ReviewList>('reviewList');
 
   protected roomTypeLabel = computed(() => {
     const labels: Record<string, string> = {
@@ -97,6 +105,15 @@ export class Detail implements OnInit, AfterViewInit {
 
   protected onBookingCreated(_booking: BookingResponse): void {
     this.router.navigate(['/my-bookings']);
+  }
+
+  protected canShowReviewForm = computed(() => {
+    return this.authService.userRole() === 'STUDENT' && this.showReviewForm();
+  });
+
+  protected onReviewCreated(): void {
+    this.showReviewForm.set(false);
+    this.reviewListRef()?.ngOnInit();
   }
 
   private initDetailMap(): void {
