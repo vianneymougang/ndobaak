@@ -4,10 +4,12 @@ import {
   inject,
   signal,
   OnInit,
-  AfterViewInit,
+  effect,
   ElementRef,
   viewChild,
+  PLATFORM_ID,
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -23,7 +25,7 @@ import { ListingSearchResponse, NearbyListingResponse } from '../../core/models/
 import { ListingCard } from '../../shared/components/listing-card/listing-card';
 import { environment } from '../../../environments/environment';
 
-import * as L from 'leaflet';
+import { L } from '../../core/utils/leaflet-fix';
 
 const MAX_PRICE = 300_000;
 
@@ -44,7 +46,7 @@ const MAX_PRICE = 300_000;
   templateUrl: './search.html',
   styleUrl: './search.scss',
 })
-export class Search implements OnInit, AfterViewInit {
+export class Search implements OnInit {
   private route = inject(ActivatedRoute);
   private listingService = inject(ListingService);
   private geolocationService = inject(GeolocationService);
@@ -143,9 +145,14 @@ export class Search implements OnInit, AfterViewInit {
     });
   }
 
-  ngAfterViewInit(): void {
-    this.initMap();
-  }
+  private platformId = inject(PLATFORM_ID);
+
+  private mapEffect = effect(() => {
+    const el = this.mapContainer();
+    if (el && isPlatformBrowser(this.platformId)) {
+      this.initMap();
+    }
+  });
 
   protected selectRoomType(value: string): void {
     this.roomType = value;

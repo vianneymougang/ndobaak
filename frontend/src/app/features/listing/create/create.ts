@@ -20,7 +20,7 @@ import { finalize, tap } from 'rxjs/operators';
 import { ListingService } from '../../../core/services/listing';
 import { ListingResponse, RoomType, CreateListingRequest, PhotoResponse } from '../../../core/models/listing.models';
 import { AMENITY_CONFIG } from '../../../core/models/amenity.config';
-import * as L from 'leaflet';
+import { L } from '../../../core/utils/leaflet-fix';
 
 const CAMPUS_LAT = 3.8480;
 const CAMPUS_LNG = 11.5021;

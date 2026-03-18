@@ -27,7 +27,7 @@ import { BookingPanel } from '../booking-panel/booking-panel';
 import { ReviewList } from '../../../shared/components/review-list/review-list';
 import { ReviewForm } from '../../review/review-form/review-form';
 
-import * as L from 'leaflet';
+import { L } from '../../../core/utils/leaflet-fix';
 
 @Component({
   selector: 'app-detail',

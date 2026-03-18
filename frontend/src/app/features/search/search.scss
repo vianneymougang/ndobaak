@@ -492,7 +492,7 @@
   width: 360px;
   top: calc(68px + 64px);
   height: calc(100vh - 148px);
-  position: relative;
+  isolation: isolate;
 }
 
 .map-container {
