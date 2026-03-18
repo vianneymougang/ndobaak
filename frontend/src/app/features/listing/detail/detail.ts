@@ -27,7 +27,7 @@ import { BookingPanel } from '../booking-panel/booking-panel';
 import { ReviewList } from '../../../shared/components/review-list/review-list';
 import { ReviewForm } from '../../review/review-form/review-form';
 
-declare const L: typeof import('leaflet');
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-detail',

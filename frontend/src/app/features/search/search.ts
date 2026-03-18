@@ -21,7 +21,7 @@ import { ListingSearchResponse } from '../../core/models/listing.models';
 import { ListingCard } from '../../shared/components/listing-card/listing-card';
 import { environment } from '../../../environments/environment';
 
-declare const L: typeof import('leaflet');
+import * as L from 'leaflet';
 
 const MAX_PRICE = 300_000;
 
