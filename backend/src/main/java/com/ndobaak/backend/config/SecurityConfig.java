@@ -63,6 +63,8 @@ public class SecurityConfig {
                 .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/listings/search").permitAll()
                 .requestMatchers(HttpMethod.GET, "/listings/{id}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/listings/{id}/reviews").permitAll()
+                .requestMatchers(HttpMethod.GET, "/listings/{id}/rating-stats").permitAll()
                 .requestMatchers("/media/**").permitAll()
                 .requestMatchers("/payments/webhook/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
