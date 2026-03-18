@@ -6,7 +6,7 @@
     <p-skeleton height="80px" styleClass="mb-3" />
     <p-skeleton height="52px" />
   </div>
-} @else if (!isLandlord()) {
+} @else if (!isOwner()) {
   <div
     ngmMotion
     [initial]="{ opacity: 0, y: 20 }"

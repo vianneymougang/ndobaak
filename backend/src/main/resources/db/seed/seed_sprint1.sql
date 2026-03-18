@@ -66,22 +66,22 @@ VALUES
      NOW() - INTERVAL '8 days',  'ACTIVE', 'IUSJC2024003', 'Droit', 1);
 
 -- -----------------------------------------------
--- 3. Locations (near IUSJC Yaoundé — 3.8612°N, 11.5167°E)
+-- 3. Locations (near IUSJC Yaoundé — 3.8845°N, 11.3912°E)
 -- -----------------------------------------------
 INSERT INTO location (address, latitude, longitude, distance_to_campus, neighborhood, city)
 VALUES
     -- L1 : Obili, very close
-    ('Rue Obili, face école primaire, Yaoundé', 3.8650, 11.5140, 0.45, 'Obili', 'Yaoundé'),
+    ('Rue Obili, face école primaire, Yaoundé', 3.8870, 11.3880, 0.44, 'Obili', 'Yaoundé'),
     -- L2 : Obili, slightly further
-    ('Carrefour Obili, 2ème rue à gauche, Yaoundé', 3.8670, 11.5120, 0.65, 'Obili', 'Yaoundé'),
+    ('Carrefour Obili, 2ème rue à gauche, Yaoundé', 3.8825, 11.3870, 0.52, 'Obili', 'Yaoundé'),
     -- L3 : Melen
-    ('Avenue Melen, derrière le marché, Yaoundé', 3.8580, 11.5220, 0.92, 'Melen', 'Yaoundé'),
+    ('Avenue Melen, derrière le marché, Yaoundé', 3.8780, 11.3960, 0.89, 'Melen', 'Yaoundé'),
     -- L4 : Melen, draft listing
-    ('Quartier Melen, rue des étudiants, Yaoundé', 3.8560, 11.5250, 1.05, 'Melen', 'Yaoundé'),
+    ('Quartier Melen, rue des étudiants, Yaoundé', 3.8760, 11.3980, 1.18, 'Melen', 'Yaoundé'),
     -- L5 : Tsinga
-    ('Résidence Tsinga, bloc C, Yaoundé', 3.8520, 11.5100, 1.35, 'Tsinga', 'Yaoundé'),
+    ('Résidence Tsinga, bloc C, Yaoundé', 3.8950, 11.3810, 1.54, 'Tsinga', 'Yaoundé'),
     -- L6 : Tsinga, rejected listing
-    ('Tsinga, derrière la station Total, Yaoundé', 3.8500, 11.5080, 1.55, 'Tsinga', 'Yaoundé');
+    ('Tsinga, derrière la station Total, Yaoundé', 3.8970, 11.3790, 1.91, 'Tsinga', 'Yaoundé');
 
 -- -----------------------------------------------
 -- 4. Listings

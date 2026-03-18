@@ -40,7 +40,7 @@ test.describe('Search page', () => {
 
   test('should show radius selector when geolocation granted', async ({ context, page }) => {
     await context.grantPermissions(['geolocation']);
-    await context.setGeolocation({ latitude: 3.848, longitude: 11.502 });
+    await context.setGeolocation({ latitude: 3.8845, longitude: 11.3912 });
 
     const searchPage = new SearchPage(page);
     await searchPage.goto();
@@ -51,7 +51,7 @@ test.describe('Search page', () => {
 
   test('should show "search this area" button after map drag', async ({ context, page }) => {
     await context.grantPermissions(['geolocation']);
-    await context.setGeolocation({ latitude: 3.848, longitude: 11.502 });
+    await context.setGeolocation({ latitude: 3.8845, longitude: 11.3912 });
 
     const searchPage = new SearchPage(page);
     await searchPage.goto();

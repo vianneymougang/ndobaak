@@ -22,8 +22,8 @@ import { ListingResponse, RoomType, CreateListingRequest, PhotoResponse } from '
 import { AMENITY_CONFIG } from '../../../core/models/amenity.config';
 import { L } from '../../../core/utils/leaflet-fix';
 
-const CAMPUS_LAT = 3.8480;
-const CAMPUS_LNG = 11.5021;
+const CAMPUS_LAT = 3.8844536562668015;
+const CAMPUS_LNG = 11.391160302004234;
 
 interface AmenityOption {
   name: string;

@@ -46,14 +46,14 @@ class GeoControllerTest {
         NearbyListingResponse response = new NearbyListingResponse(
                 1L, "Studio Eyang", "https://cdn.example.com/thumb.webp",
                 new BigDecimal("35000"), RoomType.STUDIO, "Eyang",
-                0.15, 0.12, 3.849, 11.503, 4.5, 10, true
+                0.15, 0.12, 3.8855, 11.3922, 4.5, 10, true
         );
-        when(geoService.findNearby(eq(3.848), eq(11.502), eq(2.0)))
+        when(geoService.findNearby(eq(3.8845), eq(11.3912), eq(2.0)))
                 .thenReturn(List.of(response));
 
         mockMvc.perform(get("/geo/nearby")
-                        .param("lat", "3.848")
-                        .param("lng", "11.502")
+                        .param("lat", "3.8845")
+                        .param("lng", "11.3912")
                         .param("radiusKm", "2.0"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
@@ -64,12 +64,12 @@ class GeoControllerTest {
 
     @Test
     void nearbyEndpointShouldUseDefaultRadius() throws Exception {
-        when(geoService.findNearby(eq(3.848), eq(11.502), eq(2.0)))
+        when(geoService.findNearby(eq(3.8845), eq(11.3912), eq(2.0)))
                 .thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/geo/nearby")
-                        .param("lat", "3.848")
-                        .param("lng", "11.502"))
+                        .param("lat", "3.8845")
+                        .param("lng", "11.3912"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
@@ -88,7 +88,7 @@ class GeoControllerTest {
 
         mockMvc.perform(get("/geo/nearby")
                         .param("lat", "91.0")
-                        .param("lng", "11.502")
+                        .param("lng", "11.3912")
                         .param("radiusKm", "2.0"))
                 .andExpect(status().isBadRequest());
     }
@@ -99,8 +99,8 @@ class GeoControllerTest {
                 .thenThrow(new BusinessException("Le rayon doit être compris entre 0.1 et 10 km."));
 
         mockMvc.perform(get("/geo/nearby")
-                        .param("lat", "3.848")
-                        .param("lng", "11.502")
+                        .param("lat", "3.8845")
+                        .param("lng", "11.3912")
                         .param("radiusKm", "15.0"))
                 .andExpect(status().isBadRequest());
     }

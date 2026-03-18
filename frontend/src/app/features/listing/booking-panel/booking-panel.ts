@@ -66,7 +66,10 @@ export class BookingPanel {
     new Intl.NumberFormat('fr-FR').format(this.totalAmount()),
   );
 
-  protected isLandlord = computed(() => this.authService.userRole() === 'LANDLORD');
+  protected isOwner = computed(() => {
+    const userId = this.authService.user()?.id;
+    return userId != null && userId === this.listing().landlord?.id;
+  });
   protected isAuthenticated = this.authService.isAuthenticated;
 
   readonly durationOptions = [

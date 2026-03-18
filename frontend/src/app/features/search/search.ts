@@ -29,6 +29,9 @@ import { L } from '../../core/utils/leaflet-fix';
 
 const MAX_PRICE = 300_000;
 
+const CAMPUS_LAT = 3.8844536562668015;
+const CAMPUS_LNG = 11.391160302004234;
+
 @Component({
   selector: 'app-search',
   imports: [
@@ -285,13 +288,23 @@ export class Search implements OnInit {
     const el = this.mapContainer()?.nativeElement;
     if (!el) return;
 
-    this.map = L.map(el).setView([3.848, 11.502], 14);
+    this.map = L.map(el).setView([CAMPUS_LAT, CAMPUS_LNG], 14);
     if (!environment.production) {
       (window as any).__ndb_map = this.map;
     }
     L.tileLayer(environment.mapTileUrl, {
       attribution: '&copy; OpenStreetMap contributors',
     }).addTo(this.map);
+
+    const campusIcon = L.divIcon({
+      className: 'campus-marker',
+      html: '<i class="pi pi-building" style="font-size:1.5rem;color:#6366f1"></i>',
+      iconSize: [30, 30],
+      iconAnchor: [15, 15],
+    });
+    L.marker([CAMPUS_LAT, CAMPUS_LNG], { icon: campusIcon, zIndexOffset: 1000 })
+      .addTo(this.map)
+      .bindPopup('IUSJC Campus');
 
     this.updateUserMarker();
     this.updateRadiusCircle();
@@ -354,10 +367,15 @@ export class Search implements OnInit {
 
     listings.forEach((listing) => {
       if (listing.latitude && listing.longitude) {
+        const price = new Intl.NumberFormat('fr-FR').format(listing.monthlyPrice);
+        const img = listing.thumbnailUrl
+          ? `<img src="${listing.thumbnailUrl}" alt="${listing.title}" style="width:100%;height:100px;object-fit:cover;border-radius:6px;margin-bottom:6px">`
+          : '';
         const marker = L.marker([listing.latitude, listing.longitude])
           .addTo(this.map!)
           .bindPopup(
-            `<strong>${listing.title}</strong><br>${new Intl.NumberFormat('fr-FR').format(listing.monthlyPrice)} FCFA/mois`
+            `<div style="min-width:180px;max-width:220px">${img}<strong style="font-size:13px;line-height:1.3;display:block">${listing.title}</strong><span style="color:var(--color-ndb-primary);font-weight:600">${price} FCFA/mois</span></div>`,
+            { maxWidth: 240 }
           );
         this.markers.push(marker);
       }

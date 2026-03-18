@@ -17,8 +17,8 @@ function buildListing(overrides: Partial<ListingSearchResponse> = {}): ListingSe
     reviewCount: 0,
     amenities: [],
     verified: false,
-    latitude: 3.848,
-    longitude: 11.502,
+    latitude: 3.8845,
+    longitude: 11.3912,
     availableRooms: 2,
     ...overrides,
   };

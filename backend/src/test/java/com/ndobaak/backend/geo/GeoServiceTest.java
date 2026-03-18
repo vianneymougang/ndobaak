@@ -37,15 +37,15 @@ class GeoServiceTest {
     @Test
     void findNearbyShouldReturnMappedResults() {
         Object[] row = buildRow(1L, "Studio Eyang", "photos/thumb.webp",
-                new BigDecimal("35000"), "STUDIO", "Eyang", 0.15, 3.849, 11.503, true);
-        when(listingRepository.findNearby(eq(3.848), eq(11.502), eq(2.0), eq(50)))
+                new BigDecimal("35000"), "STUDIO", "Eyang", 0.15, 3.8855, 11.3922, true);
+        when(listingRepository.findNearby(eq(3.8845), eq(11.3912), eq(2.0), eq(50)))
                 .thenReturn(List.<Object[]>of(row));
         when(reviewRepository.findAverageRatingsByListingIds(List.of(1L), ReviewStatus.APPROVED))
                 .thenReturn(Collections.emptyList());
         when(storageService.resolvePublicUrl("photos/thumb.webp"))
                 .thenReturn("https://cdn.example.com/photos/thumb.webp");
 
-        List<NearbyListingResponse> results = geoService.findNearby(3.848, 11.502, 2.0);
+        List<NearbyListingResponse> results = geoService.findNearby(3.8845, 11.3912, 2.0);
 
         assertThat(results).hasSize(1);
         NearbyListingResponse r = results.get(0);
@@ -61,14 +61,14 @@ class GeoServiceTest {
     @Test
     void findNearbyShouldEnrichWithRatings() {
         Object[] row = buildRow(1L, "Rated Place", null,
-                new BigDecimal("40000"), "APARTMENT", "Melen", 1.2, 3.860, 11.510, true);
+                new BigDecimal("40000"), "APARTMENT", "Melen", 1.2, 3.8780, 11.3960, true);
         when(listingRepository.findNearby(anyDouble(), anyDouble(), anyDouble(), anyInt()))
                 .thenReturn(List.<Object[]>of(row));
         List<Object[]> ratings = List.<Object[]>of(new Object[]{1L, 4.5, 12L});
         when(reviewRepository.findAverageRatingsByListingIds(List.of(1L), ReviewStatus.APPROVED))
                 .thenReturn(ratings);
 
-        List<NearbyListingResponse> results = geoService.findNearby(3.848, 11.502, 5.0);
+        List<NearbyListingResponse> results = geoService.findNearby(3.8845, 11.3912, 5.0);
 
         assertThat(results.get(0).avgRating()).isEqualTo(4.5);
         assertThat(results.get(0).reviewCount()).isEqualTo(12);
@@ -77,13 +77,13 @@ class GeoServiceTest {
     @Test
     void findNearbyShouldHandleNullThumbnail() {
         Object[] row = buildRow(1L, "No Photo", null,
-                new BigDecimal("25000"), "SINGLE_ROOM", "Eyang", 0.5, 3.849, 11.503, true);
+                new BigDecimal("25000"), "SINGLE_ROOM", "Eyang", 0.5, 3.8855, 11.3922, true);
         when(listingRepository.findNearby(anyDouble(), anyDouble(), anyDouble(), anyInt()))
                 .thenReturn(List.<Object[]>of(row));
         when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
-        List<NearbyListingResponse> results = geoService.findNearby(3.848, 11.502, 2.0);
+        List<NearbyListingResponse> results = geoService.findNearby(3.8845, 11.3912, 2.0);
 
         assertThat(results.get(0).thumbnailUrl()).isNull();
         verify(storageService, never()).resolvePublicUrl(any());
@@ -96,43 +96,43 @@ class GeoServiceTest {
         when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
-        List<NearbyListingResponse> results = geoService.findNearby(3.848, 11.502, 2.0);
+        List<NearbyListingResponse> results = geoService.findNearby(3.8845, 11.3912, 2.0);
 
         assertThat(results).isEmpty();
     }
 
     @Test
     void findNearbyShouldRejectInvalidLatitude() {
-        assertThatThrownBy(() -> geoService.findNearby(91.0, 11.502, 2.0))
+        assertThatThrownBy(() -> geoService.findNearby(91.0, 11.3912, 2.0))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("latitude");
 
-        assertThatThrownBy(() -> geoService.findNearby(-91.0, 11.502, 2.0))
+        assertThatThrownBy(() -> geoService.findNearby(-91.0, 11.3912, 2.0))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("latitude");
     }
 
     @Test
     void findNearbyShouldRejectInvalidLongitude() {
-        assertThatThrownBy(() -> geoService.findNearby(3.848, 181.0, 2.0))
+        assertThatThrownBy(() -> geoService.findNearby(3.8845, 181.0, 2.0))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("longitude");
 
-        assertThatThrownBy(() -> geoService.findNearby(3.848, -181.0, 2.0))
+        assertThatThrownBy(() -> geoService.findNearby(3.8845, -181.0, 2.0))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("longitude");
     }
 
     @Test
     void findNearbyShouldRejectRadiusTooSmall() {
-        assertThatThrownBy(() -> geoService.findNearby(3.848, 11.502, 0.05))
+        assertThatThrownBy(() -> geoService.findNearby(3.8845, 11.3912, 0.05))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("rayon");
     }
 
     @Test
     void findNearbyShouldRejectRadiusTooLarge() {
-        assertThatThrownBy(() -> geoService.findNearby(3.848, 11.502, 15.0))
+        assertThatThrownBy(() -> geoService.findNearby(3.8845, 11.3912, 15.0))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("rayon");
     }

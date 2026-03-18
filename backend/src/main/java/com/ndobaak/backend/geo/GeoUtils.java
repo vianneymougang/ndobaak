@@ -2,8 +2,8 @@ package com.ndobaak.backend.geo;
 
 public final class GeoUtils {
 
-    public static final double CAMPUS_LAT = 3.8480;
-    public static final double CAMPUS_LNG = 11.5021;
+    public static final double CAMPUS_LAT = 3.8844536562668015;
+    public static final double CAMPUS_LNG = 11.391160302004234;
     public static final double EARTH_RADIUS_KM = 6371.0;
 
     private GeoUtils() {}

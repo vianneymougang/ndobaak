@@ -101,8 +101,8 @@ class ListingServiceTest {
         request.setTitle("Near Campus Listing");
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setAddress("Eyang");
-        locationRequest.setLatitude(3.849);
-        locationRequest.setLongitude(11.503);
+        locationRequest.setLatitude(3.8855);
+        locationRequest.setLongitude(11.3922);
         request.setLocation(locationRequest);
 
         when(listingRepository.save(any(Listing.class))).thenAnswer(inv -> {
@@ -193,7 +193,7 @@ class ListingServiceTest {
     void submitForReviewShouldValidateAndChangeStatus() {
         Landlord landlord = buildLandlord(2L);
         Location location = Location.builder()
-                .address("Eyang").latitude(3.849).longitude(11.503).build();
+                .address("Eyang").latitude(3.8855).longitude(11.3922).build();
 
         Listing listing = Listing.builder()
                 .title("Valid Listing Title")
@@ -310,10 +310,10 @@ class ListingServiceTest {
 
     @Test
     void haversineDistanceShouldCalculateCorrectly() {
-        double distance = GeoUtils.haversineDistance(3.8480, 11.5021, 3.8480, 11.5021);
+        double distance = GeoUtils.haversineDistance(3.8845, 11.3912, 3.8845, 11.3912);
         assertThat(distance).isEqualTo(0.0);
 
-        double shortDistance = GeoUtils.haversineDistance(3.849, 11.503, 3.848, 11.502);
+        double shortDistance = GeoUtils.haversineDistance(3.8855, 11.3922, 3.8845, 11.3912);
         assertThat(shortDistance).isLessThan(1.0);
     }
 
