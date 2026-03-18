@@ -39,11 +39,11 @@
 - [x] 2.6 — Webhook security (signature verification, idempotent processing, provider-specific endpoints)
 
 ### Frontend
-- [ ] 2.7 — Payment Flow page (payment type selector, operator selector, phone input, price breakdown)
-- [ ] 2.8 — Payment Success/Failure pages
-- [ ] 2.9 — Digital Receipt page (receipt details, download PDF, share)
-- [ ] 2.10 — Transaction History page (paginated list, status filters)
-- [ ] 2.11 — Installment Payment Tracking (progress bar, schedule table, pay buttons)
+- [x] 2.7 — Payment Flow page (payment type selector, operator selector, phone input, price breakdown)
+- [x] 2.8 — Payment Success/Failure pages
+- [x] 2.9 — Digital Receipt page (receipt details, download PDF, share)
+- [x] 2.10 — Transaction History page (paginated list, status filters)
+- [x] 2.11 — Installment Payment Tracking (progress bar, schedule table, pay buttons)
 
 ## Phase 3 — E7: Reviews & Ratings
 
@@ -60,13 +60,13 @@
 ## Phase 4 — E4: Enhanced Geolocation
 
 ### Backend
-- [ ] 4.1 — Distance calculation endpoint (Haversine formula, nearby listings query)
-- [ ] 4.2 — Distance field in search results DTO
+- [x] 4.1 — Distance calculation endpoint (Haversine formula, nearby listings query)
+- [x] 4.2 — Distance field in search results DTO
 
 ### Frontend
-- [ ] 4.3 — GeolocationService (browser geolocation, caching, fallback to IUSJC)
-- [ ] 4.4 — Distance display in search results ("X km from you" on listing cards)
-- [ ] 4.5 — Radius search on map (radius selector, circle overlay, "search this area")
+- [x] 4.3 — GeolocationService (browser geolocation, caching, fallback to IUSJC)
+- [x] 4.4 — Distance display in search results ("X km from you" on listing cards)
+- [x] 4.5 — Radius search on map (radius selector, circle overlay, "search this area")
 
 ## Phase 5 — Notification System & Dashboard
 
@@ -91,15 +91,23 @@
 - [ ] 6.6 — PaymentController WebMvc tests
 - [ ] 6.7 — ReviewController WebMvc tests
 - [ ] 6.8 — NotificationController WebMvc tests
+- [x] 6.9 — GeoService unit tests (8 tests: mapping, ratings, null thumbnail, validation)
+- [x] 6.10 — GeoController WebMvc tests (5 tests: happy path, defaults, missing/invalid params)
+- [x] 6.11 — ListingSearchService distanceFromUser tests (3 tests: with/without coords, maxDistance filter)
 
 ### Frontend Tests
-- [ ] 6.9 — BookingConfirmDialog + MyBookings component tests
-- [ ] 6.10 — PaymentFlow + Receipt component tests
-- [ ] 6.11 — ReviewForm + ReviewList component tests
-- [ ] 6.12 — NotificationBell component tests
+- [ ] 6.12 — BookingConfirmDialog + MyBookings component tests
+- [ ] 6.13 — PaymentFlow + Receipt component tests
+- [ ] 6.14 — ReviewForm + ReviewList component tests
+- [ ] 6.15 — NotificationBell component tests
 
 ### End-to-End
-- [ ] 6.13 — Full E2E validation (register → book → confirm → pay → review → notifications)
+- [x] 6.16 — Search page E2E (8 tests: filter bar, map, results, keyword, geolocation, radius, search area, distance)
+- [x] 6.17 — Listing detail page E2E (3 tests: navigation, map tiles, reviews section)
+- [ ] 6.18 — Auth E2E (login/logout flows)
+- [ ] 6.19 — Bookings E2E (student + landlord flows)
+- [ ] 6.20 — Payment E2E (payment form, processing, success/failure)
+- [ ] 6.21 — Transactions E2E (history page)
 
 ---
 
@@ -109,14 +117,17 @@ _(tracked during implementation)_
 ---
 
 ## Progress Summary
-- **Total tasks**: 48
-- **Completed**: 22
-- **Remaining**: 26
+- **Total tasks**: 53
+- **Completed**: 37
+- **Remaining**: 16
 
 ### Test Summary
 | Suite | Tests | Status |
 |---|---|---|
-| Backend Unit Tests | — | Pending |
-| Backend Controller Tests | — | Pending |
-| Frontend Component Tests | — | Pending |
-| **Total** | **—** | **Pending** |
+| Backend Unit (GeoService) | 8 | Passing |
+| Backend Controller (GeoController) | 5 | Passing |
+| Backend Unit (ListingSearchService complement) | 3 | Passing |
+| Frontend E2E (Search) | 8 | Passing |
+| Frontend E2E (Detail) | 3 | Passing |
+| Backend Total | 83 | Passing |
+| **Frontend E2E Total** | **11** | **Passing** |
