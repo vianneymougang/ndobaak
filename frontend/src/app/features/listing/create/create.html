@@ -145,7 +145,7 @@
               </div>
 
               @if (!listing()) {
-                <p-message severity="warn" text="Sauvegardez d'abord le brouillon (etape 1) avant d'ajouter des photos." />
+                  <p-message severity="warn">Sauvegardez d'abord le brouillon (etape 1) avant d'ajouter des photos.</p-message>
               } @else {
                 <div class="upload-zone">
                   <label for="photo-upload" class="upload-area" (dragover)="$event.preventDefault()" (drop)="$event.preventDefault()">
@@ -331,7 +331,7 @@
                     }
                   </div>
                   @if (photoCount() < 3) {
-                    <p-message severity="warn" text="Minimum 3 photos requises pour soumettre." />
+                    <p-message severity="warn">Minimum 3 photos requises pour soumettre.</p-message>
                   }
                 </div>
 
