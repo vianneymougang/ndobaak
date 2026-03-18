@@ -46,7 +46,7 @@ public class ListingSearchService {
         Map<Long, double[]> ratingsMap = loadRatings(listingIds);
 
         List<ListingSearchResponse> results = dbResults.stream()
-                .map(listing -> toSearchResponse(listing, ratingsMap))
+                .map(listing -> toSearchResponse(listing, ratingsMap, request))
                 .toList();
 
         results = applyPostFilters(results, request);
@@ -110,8 +110,12 @@ public class ListingSearchService {
         List<ListingSearchResponse> filtered = new ArrayList<>(results);
 
         if (request.getMaxDistance() != null) {
+            boolean hasUserCoords = request.getUserLat() != null && request.getUserLng() != null;
             filtered = filtered.stream()
-                    .filter(r -> r.getDistanceToCampus() != null && r.getDistanceToCampus() <= request.getMaxDistance())
+                    .filter(r -> {
+                        Double distance = hasUserCoords ? r.getDistanceFromUser() : r.getDistanceToCampus();
+                        return distance != null && distance <= request.getMaxDistance();
+                    })
                     .toList();
         }
 
@@ -139,7 +143,8 @@ public class ListingSearchService {
             case "PRICE_ASC" -> sorted.sort(Comparator.comparing(ListingSearchResponse::getMonthlyPrice));
             case "PRICE_DESC" -> sorted.sort(Comparator.comparing(ListingSearchResponse::getMonthlyPrice).reversed());
             case "DISTANCE_ASC" -> sorted.sort(Comparator.comparing(
-                    ListingSearchResponse::getDistanceToCampus, Comparator.nullsLast(Comparator.naturalOrder())));
+                    r -> r.getDistanceFromUser() != null ? r.getDistanceFromUser() : r.getDistanceToCampus(),
+                    Comparator.nullsLast(Comparator.naturalOrder())));
             case "RATING_DESC" -> sorted.sort(Comparator.comparing(
                     ListingSearchResponse::getAvgRating, Comparator.nullsLast(Comparator.reverseOrder())));
             default -> {}
@@ -165,7 +170,8 @@ public class ListingSearchService {
         return ratingsMap;
     }
 
-    private ListingSearchResponse toSearchResponse(Listing listing, Map<Long, double[]> ratingsMap) {
+    private ListingSearchResponse toSearchResponse(Listing listing, Map<Long, double[]> ratingsMap,
+                                                      ListingSearchRequest request) {
         String thumbnailKey = listing.getPhotos().stream()
                 .filter(p -> p.getThumbnailUrl() != null)
                 .min(Comparator.comparing(Photo::getDisplayOrder, Comparator.nullsLast(Comparator.naturalOrder())))
@@ -189,6 +195,13 @@ public class ListingSearchService {
             }
         }
 
+        Double distanceFromUser = null;
+        if (request.getUserLat() != null && request.getUserLng() != null
+                && latitude != null && longitude != null) {
+            distanceFromUser = GeoUtils.roundDistance(
+                    GeoUtils.haversineDistance(request.getUserLat(), request.getUserLng(), latitude, longitude));
+        }
+
         double[] ratingData = ratingsMap.getOrDefault(listing.getId(), null);
         Double avgRating = ratingData != null ? ratingData[0] : null;
         Integer reviewCount = ratingData != null ? (int) ratingData[1] : 0;
@@ -205,6 +218,7 @@ public class ListingSearchService {
                 .roomType(listing.getRoomType())
                 .neighborhood(neighborhood)
                 .distanceToCampus(distanceToCampus)
+                .distanceFromUser(distanceFromUser)
                 .avgRating(avgRating)
                 .reviewCount(reviewCount)
                 .amenities(amenityNames)

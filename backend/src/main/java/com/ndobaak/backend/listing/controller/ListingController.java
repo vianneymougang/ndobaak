@@ -40,6 +40,8 @@ public class ListingController {
             @RequestParam(required = false) Double minRating,
             @RequestParam(required = false) LocalDate availableBefore,
             @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) Double userLat,
+            @RequestParam(required = false) Double userLng,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
@@ -53,6 +55,8 @@ public class ListingController {
         request.setMinRating(minRating);
         request.setAvailableBefore(availableBefore);
         request.setSortBy(sortBy);
+        request.setUserLat(userLat);
+        request.setUserLng(userLng);
         request.setPage(page);
         request.setSize(size);
 
