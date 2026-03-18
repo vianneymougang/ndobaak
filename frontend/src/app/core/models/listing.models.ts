@@ -77,6 +77,7 @@ export interface ListingSearchResponse {
   roomType: RoomType;
   neighborhood?: string;
   distanceToCampus?: number;
+  distanceFromUser?: number;
   avgRating?: number;
   reviewCount: number;
   amenities: string[];

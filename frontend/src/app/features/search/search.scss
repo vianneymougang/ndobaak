@@ -398,6 +398,18 @@
   @apply flex flex-col flex-1 min-w-0;
 }
 
+.location-banner {
+  @apply flex items-center gap-2 px-4 py-3 rounded-xl mb-4 text-sm;
+  background: color-mix(in srgb, var(--color-ndb-gold) 12%, transparent);
+  color: var(--color-ndb-ink);
+  font-family: var(--font-lato);
+
+  .pi {
+    color: var(--color-ndb-gold);
+    font-size: 1.1rem;
+  }
+}
+
 .results-header {
   @apply flex items-center justify-between mb-4;
 }

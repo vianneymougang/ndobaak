@@ -280,6 +280,13 @@
   <div class="search-body">
     <div class="search-results">
 
+      @if (locationDenied()) {
+        <div class="location-banner">
+          <i class="pi pi-map-marker"></i>
+          <span>Activez la localisation pour voir les distances depuis votre position.</span>
+        </div>
+      }
+
       @if (loading()) {
         <div class="results-header">
           <div class="skeleton skeleton-text" style="width: 180px; height: 20px;"></div>

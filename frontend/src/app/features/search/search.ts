@@ -17,6 +17,7 @@ import { DrawerModule } from 'primeng/drawer';
 import { PopoverModule } from 'primeng/popover';
 import { SliderModule } from 'primeng/slider';
 import { ListingService } from '../../core/services/listing';
+import { GeolocationService } from '../../core/services/geolocation';
 import { ListingSearchResponse } from '../../core/models/listing.models';
 import { ListingCard } from '../../shared/components/listing-card/listing-card';
 import { environment } from '../../../environments/environment';
@@ -44,6 +45,7 @@ const MAX_PRICE = 300_000;
 export class Search implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
   private listingService = inject(ListingService);
+  private geolocationService = inject(GeolocationService);
 
   protected mapContainer = viewChild<ElementRef>('mapContainer');
   private map: L.Map | null = null;
@@ -53,6 +55,7 @@ export class Search implements OnInit, AfterViewInit {
   protected totalElements = signal(0);
   protected loading = signal(false);
   protected drawerVisible = signal(false);
+  protected locationDenied = this.geolocationService.denied;
 
   protected keyword = '';
   protected roomType = '';
@@ -114,14 +117,16 @@ export class Search implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe((params) => {
-      this.keyword = params['keyword'] ?? '';
-      this.roomType = params['roomType'] ?? '';
-      this.priceMin = params['priceMin'] ? +params['priceMin'] : null;
-      this.priceMax = params['priceMax'] ? +params['priceMax'] : null;
-      this.sortBy = params['sortBy'] ?? '';
-      this.priceRange = [this.priceMin ?? 0, this.priceMax ?? MAX_PRICE];
-      this.doSearch();
+    this.geolocationService.requestPosition().subscribe(() => {
+      this.route.queryParams.subscribe((params) => {
+        this.keyword = params['keyword'] ?? '';
+        this.roomType = params['roomType'] ?? '';
+        this.priceMin = params['priceMin'] ? +params['priceMin'] : null;
+        this.priceMax = params['priceMax'] ? +params['priceMax'] : null;
+        this.sortBy = params['sortBy'] ?? '';
+        this.priceRange = [this.priceMin ?? 0, this.priceMax ?? MAX_PRICE];
+        this.doSearch();
+      });
     });
   }
 
@@ -174,12 +179,15 @@ export class Search implements OnInit, AfterViewInit {
   protected doSearch(): void {
     this.drawerVisible.set(false);
     this.loading.set(true);
+    const pos = this.geolocationService.position();
     const filters: Record<string, unknown> = {
       keyword: this.keyword || null,
       roomType: this.roomType || null,
       priceMin: this.priceMin,
       priceMax: this.priceMax,
       sortBy: this.sortBy || null,
+      userLat: pos?.latitude ?? null,
+      userLng: pos?.longitude ?? null,
       page: this.page,
       size: this.size,
     };
