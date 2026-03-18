@@ -1,11 +1,15 @@
 package com.ndobaak.backend.payment.repository;
 
+import com.ndobaak.backend.common.enums.PaymentStatus;
 import com.ndobaak.backend.payment.entity.Payment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,4 +23,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Page<Payment> findByBookingStudentId(Long studentId, Pageable pageable);
 
     Page<Payment> findByBookingListingLandlordId(Long landlordId, Pageable pageable);
+
+    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.booking.listing.landlord.id = :landlordId AND p.status = :status")
+    BigDecimal sumAmountByLandlordIdAndStatus(@Param("landlordId") Long landlordId, @Param("status") PaymentStatus status);
 }

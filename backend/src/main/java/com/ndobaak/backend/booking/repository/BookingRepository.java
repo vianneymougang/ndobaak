@@ -25,4 +25,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Page<Booking> findByListingLandlordId(Long landlordId, Pageable pageable);
 
     Page<Booking> findByListingLandlordIdAndStatus(Long landlordId, BookingStatus status, Pageable pageable);
+
+    long countByListingLandlordIdAndStatus(Long landlordId, BookingStatus status);
+
+    long countByListingLandlordIdAndStatusIn(Long landlordId, java.util.List<BookingStatus> statuses);
 }

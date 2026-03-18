@@ -16,6 +16,8 @@ public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpec
 
     List<Listing> findByLandlordIdOrderByCreatedAtDesc(Long landlordId);
 
+    long countByLandlordId(Long landlordId);
+
     List<Listing> findByStatusOrderByCreatedAtDesc(ListingStatus status);
 
     @Query("SELECT l FROM Listing l LEFT JOIN FETCH l.location LEFT JOIN FETCH l.amenities LEFT JOIN FETCH l.landlord WHERE l.id = :id")
