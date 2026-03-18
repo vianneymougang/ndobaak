@@ -1,6 +1,7 @@
 package com.ndobaak.backend.listing.service;
 
 import com.ndobaak.backend.common.enums.ListingStatus;
+import com.ndobaak.backend.geo.GeoUtils;
 import com.ndobaak.backend.common.enums.ReviewStatus;
 import com.ndobaak.backend.listing.dto.ListingSearchRequest;
 import com.ndobaak.backend.listing.dto.ListingSearchResponse;
@@ -23,9 +24,6 @@ import java.util.Map;
 
 @Service
 public class ListingSearchService {
-
-    private static final double CAMPUS_LAT = 3.8480;
-    private static final double CAMPUS_LNG = 11.5021;
 
     private final ListingRepository listingRepository;
     private final ReviewRepository reviewRepository;
@@ -186,8 +184,8 @@ public class ListingSearchService {
             longitude = listing.getLocation().getLongitude();
 
             if (distanceToCampus == null && latitude != null && longitude != null) {
-                distanceToCampus = ListingService.haversineDistance(latitude, longitude, CAMPUS_LAT, CAMPUS_LNG);
-                distanceToCampus = Math.round(distanceToCampus * 100.0) / 100.0;
+                distanceToCampus = GeoUtils.roundDistance(
+                        GeoUtils.haversineDistance(latitude, longitude, GeoUtils.CAMPUS_LAT, GeoUtils.CAMPUS_LNG));
             }
         }
 

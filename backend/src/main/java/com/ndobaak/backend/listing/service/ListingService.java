@@ -3,6 +3,7 @@ package com.ndobaak.backend.listing.service;
 import com.ndobaak.backend.auth.entity.User;
 import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.common.enums.ListingStatus;
+import com.ndobaak.backend.geo.GeoUtils;
 import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.ForbiddenException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
@@ -33,8 +34,6 @@ import java.util.List;
 @Service
 public class ListingService {
 
-    private static final double CAMPUS_LAT = 3.8480;
-    private static final double CAMPUS_LNG = 11.5021;
     private static final double MAX_CAMPUS_DISTANCE_KM = 10.0;
     private static final String WEBP_CONTENT_TYPE = "image/webp";
 
@@ -206,14 +205,14 @@ public class ListingService {
         }
 
         if (listing.getLocation() != null) {
-            double distance = haversineDistance(
+            double distance = GeoUtils.haversineDistance(
                     listing.getLocation().getLatitude(),
                     listing.getLocation().getLongitude(),
-                    CAMPUS_LAT, CAMPUS_LNG);
+                    GeoUtils.CAMPUS_LAT, GeoUtils.CAMPUS_LNG);
             if (distance > MAX_CAMPUS_DISTANCE_KM) {
                 throw new BusinessException("Listing must be within 10km of campus");
             }
-            listing.getLocation().setDistanceToCampus(Math.round(distance * 100.0) / 100.0);
+            listing.getLocation().setDistanceToCampus(GeoUtils.roundDistance(distance));
         }
 
         listing.setStatus(ListingStatus.PENDING_REVIEW);
@@ -273,10 +272,10 @@ public class ListingService {
                 .build();
 
         if (request.getLatitude() != null && request.getLongitude() != null) {
-            double distance = haversineDistance(
+            double distance = GeoUtils.haversineDistance(
                     request.getLatitude(), request.getLongitude(),
-                    CAMPUS_LAT, CAMPUS_LNG);
-            location.setDistanceToCampus(Math.round(distance * 100.0) / 100.0);
+                    GeoUtils.CAMPUS_LAT, GeoUtils.CAMPUS_LNG);
+            location.setDistanceToCampus(GeoUtils.roundDistance(distance));
         }
         return location;
     }
@@ -289,21 +288,10 @@ public class ListingService {
         if (request.getCity() != null) location.setCity(request.getCity());
 
         if (location.getLatitude() != null && location.getLongitude() != null) {
-            double distance = haversineDistance(
+            double distance = GeoUtils.haversineDistance(
                     location.getLatitude(), location.getLongitude(),
-                    CAMPUS_LAT, CAMPUS_LNG);
-            location.setDistanceToCampus(Math.round(distance * 100.0) / 100.0);
+                    GeoUtils.CAMPUS_LAT, GeoUtils.CAMPUS_LNG);
+            location.setDistanceToCampus(GeoUtils.roundDistance(distance));
         }
-    }
-
-    static double haversineDistance(double lat1, double lon1, double lat2, double lon2) {
-        double R = 6371.0;
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
     }
 }
