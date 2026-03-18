@@ -70,6 +70,14 @@
     }
 
     <div class="card-actions">
+      @if (canPay()) {
+        <p-button
+          label="Payer"
+          icon="pi pi-wallet"
+          size="small"
+          [routerLink]="['/bookings', booking().id, 'pay']"
+        />
+      }
       @if (canConfirmOrReject()) {
         <p-button
           label="Confirmer"

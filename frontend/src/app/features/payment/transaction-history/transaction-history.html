@@ -1,0 +1,81 @@
+<div class="history-page">
+  <h1 class="page-title">Mes transactions</h1>
+
+  @if (loading()) {
+    <div class="transaction-list">
+      @for (item of skeletonItems; track $index) {
+        <div class="transaction-skeleton">
+          <p-skeleton width="40%" height="1rem" />
+          <p-skeleton width="25%" height="1rem" />
+          <p-skeleton width="20%" height="1.5rem" />
+        </div>
+      }
+    </div>
+  } @else if (payments().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="pi pi-wallet" aria-hidden="true"></i>
+      </div>
+      <h2 class="empty-title">Aucune transaction</h2>
+      <p class="empty-desc">
+        Vos transactions apparaîtront ici après votre premier paiement.
+      </p>
+      <p-button
+        label="Voir mes réservations"
+        icon="pi pi-arrow-right"
+        routerLink="/my-bookings"
+        severity="secondary"
+        [outlined]="true"
+      />
+    </div>
+  } @else {
+    <div class="transaction-list">
+      @for (payment of payments(); track payment.id; let i = $index) {
+        <div
+          class="transaction-row"
+          ngmMotion
+          [initial]="{ opacity: 0, y: 10 }"
+          [animate]="{ opacity: 1, y: 0 }"
+          [transition]="{ duration: 0.25, delay: staggerDelay(i) }"
+        >
+          <div class="transaction-main">
+            <div class="transaction-info">
+              <span class="transaction-operator">{{ operatorLabel(payment.operator) }}</span>
+              <span class="transaction-date">{{ formatDate(payment.createdAt) }}</span>
+            </div>
+            <div class="transaction-right">
+              <span class="transaction-amount">{{ formatAmount(payment.totalCharged) }} FCFA</span>
+              <p-tag
+                [value]="statusLabels[payment.status]"
+                [severity]="statusSeverities[payment.status]"
+                [rounded]="true"
+              />
+            </div>
+          </div>
+
+          <div class="transaction-meta">
+            <span class="transaction-id">{{ payment.transactionId }}</span>
+            @if (payment.status === 'COMPLETED') {
+              <a
+                [routerLink]="['/payments', payment.id, 'receipt']"
+                class="receipt-link"
+              >
+                <i class="pi pi-file" aria-hidden="true"></i>
+                Reçu
+              </a>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (totalElements() > pageSize) {
+      <p-paginator
+        [rows]="pageSize"
+        [totalRecords]="totalElements()"
+        [first]="page() * pageSize"
+        (onPageChange)="onPageChange($event)"
+      />
+    }
+  }
+</div>

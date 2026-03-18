@@ -76,6 +76,67 @@ export const routes: Routes = [
             (m) => m.LandlordBookings,
           ),
       },
+      {
+        path: 'bookings/:bookingId/pay',
+        title: 'Paiement',
+        canActivate: [authGuard, roleGuard('STUDENT')],
+        loadComponent: () =>
+          import('./features/payment/payment-form/payment-form').then((m) => m.PaymentForm),
+      },
+      {
+        path: 'bookings/:bookingId/pay/processing',
+        title: 'Paiement en cours',
+        canActivate: [authGuard, roleGuard('STUDENT')],
+        loadComponent: () =>
+          import('./features/payment/payment-processing/payment-processing').then(
+            (m) => m.PaymentProcessing,
+          ),
+      },
+      {
+        path: 'payments/:paymentId/success',
+        title: 'Paiement confirmé',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/payment/payment-success/payment-success').then(
+            (m) => m.PaymentSuccess,
+          ),
+      },
+      {
+        path: 'payments/:paymentId/failure',
+        title: 'Paiement échoué',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/payment/payment-failure/payment-failure').then(
+            (m) => m.PaymentFailure,
+          ),
+      },
+      {
+        path: 'payments/:paymentId/receipt',
+        title: 'Reçu de paiement',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/payment/payment-receipt/payment-receipt').then(
+            (m) => m.PaymentReceipt,
+          ),
+      },
+      {
+        path: 'transactions',
+        title: 'Mes transactions',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/payment/transaction-history/transaction-history').then(
+            (m) => m.TransactionHistory,
+          ),
+      },
+      {
+        path: 'bookings/:bookingId/installments',
+        title: 'Échéancier de paiement',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/payment/installment-tracker/installment-tracker').then(
+            (m) => m.InstallmentTracker,
+          ),
+      },
     ],
   },
 ];

@@ -1,0 +1,71 @@
+<div class="processing-page">
+  <div
+    class="processing-card"
+    ngmMotion
+    [initial]="{ opacity: 0, scale: 0.95 }"
+    [animate]="{ opacity: 1, scale: 1 }"
+    [transition]="{ type: 'spring', stiffness: 300, damping: 30 }"
+  >
+    @if (!timedOut()) {
+      <div class="phone-animation">
+        <div
+          class="phone-icon"
+          ngmMotion
+          [animate]="{ rotate: [0, -5, 5, -5, 0] }"
+          [transition]="{ duration: 0.6, repeat: 9999, repeatDelay: 2 }"
+        >
+          <i class="pi pi-mobile" aria-hidden="true"></i>
+        </div>
+      </div>
+
+      <h1 class="processing-title">Confirmez sur votre téléphone</h1>
+      <p class="processing-desc">
+        Une demande de paiement a été envoyée sur votre téléphone.
+        Composez votre code PIN Mobile Money pour confirmer.
+      </p>
+
+      <p-progressSpinner
+        strokeWidth="3"
+        [style]="{ width: '48px', height: '48px' }"
+        ariaLabel="Vérification du paiement en cours"
+      />
+
+      <p class="elapsed">
+        En attente depuis {{ elapsedSeconds() }}s...
+      </p>
+
+      <p-button
+        label="Annuler"
+        severity="secondary"
+        [text]="true"
+        icon="pi pi-times"
+        (onClick)="cancel()"
+      />
+    } @else {
+      <div class="timeout-icon">
+        <i class="pi pi-clock" aria-hidden="true"></i>
+      </div>
+
+      <h1 class="processing-title">Le paiement prend plus de temps que prévu</h1>
+      <p class="processing-desc">
+        Si vous avez déjà confirmé sur votre téléphone, le paiement sera traité sous peu.
+        Sinon, vous pouvez réessayer.
+      </p>
+
+      <div class="timeout-actions">
+        <p-button
+          label="Réessayer la vérification"
+          icon="pi pi-refresh"
+          (onClick)="retry()"
+        />
+        <p-button
+          label="Retour aux réservations"
+          severity="secondary"
+          [outlined]="true"
+          icon="pi pi-arrow-left"
+          (onClick)="cancel()"
+        />
+      </div>
+    }
+  </div>
+</div>

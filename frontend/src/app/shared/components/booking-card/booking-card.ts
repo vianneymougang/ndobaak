@@ -5,6 +5,7 @@ import {
   input,
   output,
 } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
@@ -13,7 +14,7 @@ import { BookingResponse, BookingStatus } from '../../../core/models/booking.mod
 
 @Component({
   selector: 'app-booking-card',
-  imports: [TagModule, ButtonModule, AvatarModule, NgmMotionDirective],
+  imports: [RouterLink, TagModule, ButtonModule, AvatarModule, NgmMotionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './booking-card.html',
   styleUrl: './booking-card.scss',
@@ -76,5 +77,9 @@ export class BookingCard {
 
   protected canConfirmOrReject = computed(
     () => this.viewMode() === 'landlord' && this.booking().status === 'PENDING',
+  );
+
+  protected canPay = computed(
+    () => this.viewMode() === 'student' && this.booking().status === 'CONFIRMED',
   );
 }

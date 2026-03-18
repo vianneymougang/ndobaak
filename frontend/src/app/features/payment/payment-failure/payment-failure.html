@@ -1,0 +1,55 @@
+<div class="failure-page">
+  <div
+    class="failure-card"
+    ngmMotion
+    [initial]="{ opacity: 0, scale: 0.95 }"
+    [animate]="{ opacity: 1, scale: 1 }"
+    [transition]="{ type: 'spring', stiffness: 300, damping: 25 }"
+  >
+    <div
+      class="failure-icon"
+      ngmMotion
+      [initial]="{ scale: 0 }"
+      [animate]="{ scale: 1 }"
+      [transition]="{ type: 'spring', stiffness: 400, damping: 15, delay: 0.2 }"
+    >
+      <i class="pi pi-times" aria-hidden="true"></i>
+    </div>
+
+    <h1 class="failure-title">Paiement échoué</h1>
+    <p class="failure-desc">
+      Le paiement n'a pas pu être traité. Cela peut être dû à un solde insuffisant,
+      un code PIN incorrect ou un problème temporaire de l'opérateur.
+    </p>
+
+    <div class="failure-tips">
+      <h3 class="tips-title">Que faire ?</h3>
+      <ul class="tips-list">
+        <li>Vérifiez votre solde Mobile Money</li>
+        <li>Assurez-vous d'avoir entré le bon code PIN</li>
+        <li>Attendez quelques minutes si le réseau est instable</li>
+      </ul>
+    </div>
+
+    <div
+      class="failure-actions"
+      ngmMotion
+      [initial]="{ opacity: 0, y: 10 }"
+      [animate]="{ opacity: 1, y: 0 }"
+      [transition]="{ delay: 0.4, duration: 0.3 }"
+    >
+      <p-button
+        label="Réessayer le paiement"
+        icon="pi pi-refresh"
+        [routerLink]="bookingPayLink"
+      />
+      <p-button
+        label="Mes réservations"
+        icon="pi pi-arrow-left"
+        severity="secondary"
+        [outlined]="true"
+        routerLink="/my-bookings"
+      />
+    </div>
+  </div>
+</div>

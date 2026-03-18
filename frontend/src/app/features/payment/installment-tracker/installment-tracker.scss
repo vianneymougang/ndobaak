@@ -1,0 +1,171 @@
+@reference "../../../../tailwind.css";
+
+.tracker-page {
+  @apply max-w-3xl mx-auto px-4 py-6;
+
+  @media (min-width: 1024px) {
+    @apply px-8 py-10;
+  }
+}
+
+.back-link {
+  @apply inline-flex items-center gap-2 text-sm mb-4;
+  color: var(--color-ndb-muted);
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--color-ndb-forest);
+  }
+}
+
+.page-title {
+  @apply text-2xl font-bold mb-6;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.tracker-skeleton {
+  @apply flex flex-col gap-4;
+}
+
+.progress-card {
+  @apply flex flex-col gap-4 p-5 rounded-2xl mb-8;
+  background: white;
+  border: 1px solid var(--color-ndb-border);
+  box-shadow: var(--shadow-card);
+}
+
+.progress-header {
+  @apply flex items-center justify-between;
+}
+
+.progress-info {
+  @apply flex flex-col gap-0.5;
+}
+
+.progress-label {
+  @apply text-sm font-semibold;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.progress-fraction {
+  @apply text-xs;
+  color: var(--color-ndb-muted);
+}
+
+.progress-percent {
+  @apply text-2xl font-bold;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-forest);
+}
+
+.progress-amounts {
+  @apply flex gap-4 flex-wrap;
+}
+
+.amount-block {
+  @apply flex flex-col gap-0.5 flex-1 min-w-[100px];
+}
+
+.amount-label {
+  @apply text-xs;
+  color: var(--color-ndb-muted);
+}
+
+.amount-value {
+  @apply text-sm font-semibold;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+
+  &--success {
+    color: var(--color-ndb-forest);
+  }
+
+  &--total {
+    color: var(--color-ndb-gold-dark);
+  }
+}
+
+.frequency-badge {
+  @apply inline-flex items-center gap-2 text-xs m-0 px-3 py-1.5 rounded-lg self-start;
+  background: color-mix(in srgb, var(--color-ndb-forest) 6%, transparent);
+  color: var(--color-ndb-forest);
+}
+
+.schedule-title {
+  @apply text-lg font-semibold mb-4;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.installment-list {
+  @apply flex flex-col gap-3;
+}
+
+.installment-row {
+  @apply flex items-center gap-4 p-4 rounded-xl;
+  background: white;
+  border: 1px solid var(--color-ndb-border);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-card);
+  }
+
+  &--overdue {
+    border-color: color-mix(in srgb, var(--color-ndb-error) 30%, transparent);
+    background: color-mix(in srgb, var(--color-ndb-error) 2%, white);
+  }
+
+  @media (max-width: 640px) {
+    @apply flex-wrap;
+  }
+}
+
+.installment-number {
+  @apply flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold flex-shrink-0;
+  background: color-mix(in srgb, var(--color-ndb-forest) 8%, transparent);
+  color: var(--color-ndb-forest);
+  font-family: var(--font-urbanist);
+}
+
+.installment-details {
+  @apply flex flex-col gap-0.5 flex-1 min-w-0;
+}
+
+.installment-main {
+  @apply flex items-baseline gap-2;
+}
+
+.installment-amount {
+  @apply text-sm font-semibold;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.installment-commission {
+  @apply text-xs;
+  color: var(--color-ndb-muted);
+}
+
+.installment-due {
+  @apply flex items-center gap-1 text-xs;
+  color: var(--color-ndb-muted);
+
+  i {
+    @apply text-xs;
+  }
+}
+
+.installment-actions {
+  @apply flex items-center gap-2 flex-shrink-0;
+
+  @media (max-width: 640px) {
+    @apply w-full justify-end;
+  }
+}
+
+.pay-dialog-form {
+  @apply flex flex-col gap-7 pt-3;
+}

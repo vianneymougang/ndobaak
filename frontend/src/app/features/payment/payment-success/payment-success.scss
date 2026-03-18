@@ -1,0 +1,71 @@
+@reference "../../../../tailwind.css";
+
+.success-page {
+  @apply flex items-center justify-center min-h-[70vh] px-4 py-8;
+}
+
+.success-card {
+  @apply flex flex-col items-center text-center gap-4 p-8 rounded-2xl max-w-md w-full;
+  background: white;
+  border: 1px solid var(--color-ndb-border);
+  box-shadow: var(--shadow-card);
+}
+
+.success-icon {
+  @apply flex items-center justify-center w-20 h-20 rounded-full;
+  background: var(--color-ndb-forest-pale);
+
+  i {
+    @apply text-4xl;
+    color: var(--color-ndb-forest);
+  }
+}
+
+.success-title {
+  @apply text-2xl font-bold m-0;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-forest);
+}
+
+.success-amount {
+  @apply text-3xl font-bold m-0;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.success-date {
+  @apply text-sm m-0;
+  color: var(--color-ndb-muted);
+}
+
+.success-details {
+  @apply flex flex-col gap-3 w-full;
+}
+
+.detail-row {
+  @apply flex justify-between items-center text-sm;
+}
+
+.detail-label {
+  color: var(--color-ndb-muted);
+}
+
+.detail-value {
+  @apply font-semibold text-right;
+  color: var(--color-ndb-navy);
+  max-width: 60%;
+  word-break: break-word;
+
+  &--mono {
+    font-family: monospace;
+    @apply text-xs;
+  }
+}
+
+.success-actions {
+  @apply flex flex-col gap-3 w-full mt-2;
+
+  @media (min-width: 640px) {
+    @apply flex-row;
+  }
+}
