@@ -94,3 +94,19 @@ export interface SearchPageResponse<T> {
   page: number;
   size: number;
 }
+
+export interface NearbyListingResponse {
+  id: number;
+  title: string;
+  thumbnailUrl?: string;
+  monthlyPrice: number;
+  roomType: RoomType;
+  neighborhood?: string;
+  distanceToCampus?: number;
+  distanceFromUser?: number;
+  latitude?: number;
+  longitude?: number;
+  avgRating?: number;
+  reviewCount: number;
+  verified: boolean;
+}

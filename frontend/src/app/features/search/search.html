@@ -367,6 +367,12 @@
     <!-- ── Map panel ── -->
     <div class="search-map-panel">
       <div #mapContainer class="map-container"></div>
+      @if (searchThisAreaVisible()) {
+        <button class="search-area-btn" (click)="searchInCurrentMapArea()" type="button">
+          <i class="pi pi-search"></i>
+          Rechercher dans cette zone
+        </button>
+      }
     </div>
   </div>
 </div>

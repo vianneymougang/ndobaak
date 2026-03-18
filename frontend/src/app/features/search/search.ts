@@ -19,7 +19,7 @@ import { SliderModule } from 'primeng/slider';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { ListingService } from '../../core/services/listing';
 import { GeolocationService } from '../../core/services/geolocation';
-import { ListingSearchResponse } from '../../core/models/listing.models';
+import { ListingSearchResponse, NearbyListingResponse } from '../../core/models/listing.models';
 import { ListingCard } from '../../shared/components/listing-card/listing-card';
 import { environment } from '../../../environments/environment';
 
@@ -62,6 +62,7 @@ export class Search implements OnInit, AfterViewInit {
   protected locationDenied = this.geolocationService.denied;
   protected userPosition = this.geolocationService.position;
   protected activeRadius = signal<number>(2);
+  protected searchThisAreaVisible = signal(false);
   protected readonly radiusOptions = [
     { label: '0.5 km', value: 0.5 },
     { label: '1 km', value: 1 },
@@ -222,6 +223,46 @@ export class Search implements OnInit, AfterViewInit {
     this.doSearch();
   }
 
+  protected searchInCurrentMapArea(): void {
+    if (!this.map) return;
+    this.searchThisAreaVisible.set(false);
+    this.loading.set(true);
+
+    const center = this.map.getCenter();
+    const radius = this.activeRadius();
+
+    this.listingService.findNearby(center.lat, center.lng, radius).subscribe({
+      next: (nearby) => {
+        const mapped = this.mapNearbyToSearch(nearby);
+        this.results.set(mapped);
+        this.totalElements.set(mapped.length);
+        this.loading.set(false);
+        this.updateMapMarkers(mapped);
+      },
+      error: () => this.loading.set(false),
+    });
+  }
+
+  private mapNearbyToSearch(items: NearbyListingResponse[]): ListingSearchResponse[] {
+    return items.map(n => ({
+      id: n.id,
+      title: n.title,
+      thumbnailUrl: n.thumbnailUrl,
+      monthlyPrice: n.monthlyPrice,
+      roomType: n.roomType,
+      neighborhood: n.neighborhood,
+      distanceToCampus: n.distanceToCampus,
+      distanceFromUser: n.distanceFromUser,
+      avgRating: n.avgRating,
+      reviewCount: n.reviewCount,
+      amenities: [],
+      verified: n.verified,
+      latitude: n.latitude,
+      longitude: n.longitude,
+      availableRooms: 0,
+    }));
+  }
+
   protected onPageChange(event: { page?: number; rows?: number }): void {
     this.page = event.page ?? 0;
     this.size = event.rows ?? 10;
@@ -244,6 +285,15 @@ export class Search implements OnInit, AfterViewInit {
 
     this.updateUserMarker();
     this.updateRadiusCircle();
+
+    let ignoreFirstMove = true;
+    this.map.on('moveend', () => {
+      if (ignoreFirstMove) {
+        ignoreFirstMove = false;
+        return;
+      }
+      this.searchThisAreaVisible.set(true);
+    });
   }
 
   private updateUserMarker(): void {
