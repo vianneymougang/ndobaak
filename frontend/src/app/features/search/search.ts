@@ -16,6 +16,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { DrawerModule } from 'primeng/drawer';
 import { PopoverModule } from 'primeng/popover';
 import { SliderModule } from 'primeng/slider';
+import { SelectButtonModule } from 'primeng/selectbutton';
 import { ListingService } from '../../core/services/listing';
 import { GeolocationService } from '../../core/services/geolocation';
 import { ListingSearchResponse } from '../../core/models/listing.models';
@@ -36,6 +37,7 @@ const MAX_PRICE = 300_000;
     DrawerModule,
     PopoverModule,
     SliderModule,
+    SelectButtonModule,
     ListingCard,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,12 +52,22 @@ export class Search implements OnInit, AfterViewInit {
   protected mapContainer = viewChild<ElementRef>('mapContainer');
   private map: L.Map | null = null;
   private markers: L.Marker[] = [];
+  private userMarker: L.CircleMarker | null = null;
+  private radiusCircle: L.Circle | null = null;
 
   protected results = signal<ListingSearchResponse[]>([]);
   protected totalElements = signal(0);
   protected loading = signal(false);
   protected drawerVisible = signal(false);
   protected locationDenied = this.geolocationService.denied;
+  protected userPosition = this.geolocationService.position;
+  protected activeRadius = signal<number>(2);
+  protected readonly radiusOptions = [
+    { label: '0.5 km', value: 0.5 },
+    { label: '1 km', value: 1 },
+    { label: '2 km', value: 2 },
+    { label: '5 km', value: 5 },
+  ];
 
   protected keyword = '';
   protected roomType = '';
@@ -188,6 +200,7 @@ export class Search implements OnInit, AfterViewInit {
       sortBy: this.sortBy || null,
       userLat: pos?.latitude ?? null,
       userLng: pos?.longitude ?? null,
+      maxDistance: pos ? this.activeRadius() : null,
       page: this.page,
       size: this.size,
     };
@@ -201,6 +214,12 @@ export class Search implements OnInit, AfterViewInit {
       },
       error: () => this.loading.set(false),
     });
+  }
+
+  protected onRadiusChange(radius: number): void {
+    this.activeRadius.set(radius);
+    this.updateRadiusCircle();
+    this.doSearch();
   }
 
   protected onPageChange(event: { page?: number; rows?: number }): void {
@@ -221,6 +240,49 @@ export class Search implements OnInit, AfterViewInit {
     this.map = L.map(el).setView([3.848, 11.502], 14);
     L.tileLayer(environment.mapTileUrl, {
       attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(this.map);
+
+    this.updateUserMarker();
+    this.updateRadiusCircle();
+  }
+
+  private updateUserMarker(): void {
+    if (!this.map) return;
+    if (this.userMarker) {
+      this.userMarker.remove();
+      this.userMarker = null;
+    }
+
+    const pos = this.geolocationService.position();
+    if (!pos) return;
+
+    this.userMarker = L.circleMarker([pos.latitude, pos.longitude], {
+      radius: 8,
+      fillColor: '#4A90D9',
+      fillOpacity: 1,
+      color: '#ffffff',
+      weight: 3,
+    }).addTo(this.map)
+      .bindPopup('Votre position');
+  }
+
+  private updateRadiusCircle(): void {
+    if (!this.map) return;
+    if (this.radiusCircle) {
+      this.radiusCircle.remove();
+      this.radiusCircle = null;
+    }
+
+    const pos = this.geolocationService.position();
+    if (!pos) return;
+
+    this.radiusCircle = L.circle([pos.latitude, pos.longitude], {
+      radius: this.activeRadius() * 1000,
+      fillColor: '#4A90D9',
+      fillOpacity: 0.08,
+      color: '#4A90D9',
+      weight: 1.5,
+      dashArray: '6 4',
     }).addTo(this.map);
   }
 

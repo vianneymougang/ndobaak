@@ -144,6 +144,20 @@
           </div>
         </p-popover>
 
+        <!-- Radius selector (visible when geolocation active) -->
+        @if (!locationDenied() && userPosition()) {
+          <div class="filter-radius">
+            <p-selectbutton
+              [options]="radiusOptions"
+              [ngModel]="activeRadius()"
+              (ngModelChange)="onRadiusChange($event)"
+              optionLabel="label"
+              optionValue="value"
+              size="small"
+            />
+          </div>
+        }
+
       </div>
 
       <!-- Mobile filter button (< lg) -->
@@ -258,6 +272,20 @@
           }
         </div>
       </div>
+
+      <!-- Radius (visible when geolocation active) -->
+      @if (!locationDenied() && userPosition()) {
+        <div class="drawer-section">
+          <div class="drawer-section-title">Rayon de recherche</div>
+          <p-selectbutton
+            [options]="radiusOptions"
+            [ngModel]="activeRadius()"
+            (ngModelChange)="onRadiusChange($event)"
+            optionLabel="label"
+            optionValue="value"
+          />
+        </div>
+      }
 
     </div>
 
