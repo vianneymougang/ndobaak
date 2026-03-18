@@ -61,6 +61,7 @@ public class SecurityConfig {
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/geo/nearby").permitAll()
                 .requestMatchers(HttpMethod.GET, "/listings/search").permitAll()
                 .requestMatchers(HttpMethod.GET, "/listings/{id}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/listings/{id}/reviews").permitAll()
