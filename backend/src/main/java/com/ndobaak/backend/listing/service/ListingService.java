@@ -44,11 +44,13 @@ public class ListingService {
     private final ImageProcessingService imageProcessingService;
     private final AuthService authService;
     private final ListingMapper listingMapper;
+    private final com.ndobaak.backend.subscription.service.SubscriptionService subscriptionService;
 
     public ListingService(ListingRepository listingRepository, AmenityRepository amenityRepository,
                           PhotoRepository photoRepository, StorageService storageService,
                           ImageProcessingService imageProcessingService, AuthService authService,
-                          ListingMapper listingMapper) {
+                          ListingMapper listingMapper,
+                          com.ndobaak.backend.subscription.service.SubscriptionService subscriptionService) {
         this.listingRepository = listingRepository;
         this.amenityRepository = amenityRepository;
         this.photoRepository = photoRepository;
@@ -56,11 +58,25 @@ public class ListingService {
         this.imageProcessingService = imageProcessingService;
         this.authService = authService;
         this.listingMapper = listingMapper;
+        this.subscriptionService = subscriptionService;
     }
 
     @Transactional
     public ListingResponse createListing(CreateListingRequest request) {
         User landlord = authService.getAuthenticatedUser();
+
+        if (!subscriptionService.hasActiveSubscription(landlord.getId())) {
+            throw new com.ndobaak.backend.common.exception.BusinessException(
+                    "Vous devez souscrire à un abonnement pour publier des annonces.");
+        }
+
+        long currentListingCount = listingRepository.countByLandlordId(landlord.getId());
+        int maxListings = subscriptionService.getMaxListings(landlord.getId());
+        if (currentListingCount >= maxListings) {
+            throw new com.ndobaak.backend.common.exception.BusinessException(
+                    "Vous avez atteint la limite de " + maxListings
+                            + " annonces autorisées par votre abonnement.");
+        }
 
         Listing listing = Listing.builder()
                 .title(request.getTitle())

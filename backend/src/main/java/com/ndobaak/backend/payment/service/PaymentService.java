@@ -17,6 +17,7 @@ import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.ForbiddenException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.notification.service.NotificationService;
+import com.ndobaak.backend.subscription.service.SubscriptionService;
 import com.ndobaak.backend.payment.dto.InitiatePaymentRequest;
 import com.ndobaak.backend.payment.dto.PayInstallmentRequest;
 import com.ndobaak.backend.payment.dto.PaymentResponse;
@@ -64,6 +65,7 @@ public class PaymentService {
     private final PaymentGatewayRouter gatewayRouter;
     private final PaymentMapper paymentMapper;
     private final PaymentProperties paymentProperties;
+    private final SubscriptionService subscriptionService;
 
     public PaymentService(PaymentRepository paymentRepository,
                           PaymentScheduleRepository scheduleRepository,
@@ -73,7 +75,8 @@ public class PaymentService {
                           NotificationService notificationService,
                           PaymentGatewayRouter gatewayRouter,
                           PaymentMapper paymentMapper,
-                          PaymentProperties paymentProperties) {
+                          PaymentProperties paymentProperties,
+                          SubscriptionService subscriptionService) {
         this.paymentRepository = paymentRepository;
         this.scheduleRepository = scheduleRepository;
         this.installmentRepository = installmentRepository;
@@ -83,6 +86,7 @@ public class PaymentService {
         this.gatewayRouter = gatewayRouter;
         this.paymentMapper = paymentMapper;
         this.paymentProperties = paymentProperties;
+        this.subscriptionService = subscriptionService;
     }
 
     @Transactional
@@ -319,6 +323,12 @@ public class PaymentService {
         payment.setPaidAt(LocalDateTime.now());
         paymentRepository.save(payment);
 
+        if (payment.getPaymentType() == PaymentType.SUBSCRIPTION || payment.getBooking() == null) {
+            subscriptionService.activateSubscription(payment.getId());
+            log.info("Subscription payment completed: reference={}", payment.getTransactionId());
+            return;
+        }
+
         updateInstallmentStatus(payment);
 
         Booking booking = payment.getBooking();
@@ -350,6 +360,12 @@ public class PaymentService {
         payment.setStatus(PaymentStatus.FAILED);
         paymentRepository.save(payment);
 
+        if (payment.getPaymentType() == PaymentType.SUBSCRIPTION || payment.getBooking() == null) {
+            subscriptionService.onSubscriptionPaymentFailed(payment.getId());
+            log.warn("Subscription payment failed: reference={}", payment.getTransactionId());
+            return;
+        }
+
         Booking booking = payment.getBooking();
 
         notificationService.createNotification(
@@ -366,6 +382,9 @@ public class PaymentService {
     }
 
     private void updateInstallmentStatus(Payment payment) {
+        if (payment.getBooking() == null) {
+            return;
+        }
         installmentRepository.findByPaymentScheduleId(
                 scheduleRepository.findByBookingId(payment.getBooking().getId())
                         .map(PaymentSchedule::getId)
