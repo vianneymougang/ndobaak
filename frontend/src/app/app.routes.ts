@@ -31,6 +31,67 @@ export const routes: Routes = [
       import('./features/auth/reset-password/reset-password').then((m) => m.ResetPassword),
   },
   {
+    path: 'admin',
+    canActivate: [authGuard, roleGuard('ADMIN')],
+    loadComponent: () =>
+      import('./features/admin/admin-layout/admin-layout').then((m) => m.AdminLayout),
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        title: 'Dashboard Admin',
+        loadComponent: () =>
+          import('./features/admin/admin-dashboard/admin-dashboard').then((m) => m.AdminDashboard),
+      },
+      {
+        path: 'listings',
+        title: 'Annonces — Admin',
+        loadComponent: () =>
+          import('./features/admin/admin-listings/admin-listings').then((m) => m.AdminListings),
+      },
+      {
+        path: 'listings/:id',
+        title: 'Annonce — Admin',
+        loadComponent: () =>
+          import('./features/admin/admin-listing-detail/admin-listing-detail').then(
+            (m) => m.AdminListingDetail,
+          ),
+      },
+      {
+        path: 'users',
+        title: 'Utilisateurs — Admin',
+        loadComponent: () =>
+          import('./features/admin/admin-users/admin-users').then((m) => m.AdminUsers),
+      },
+      {
+        path: 'users/:id',
+        title: 'Profil utilisateur — Admin',
+        loadComponent: () =>
+          import('./features/admin/admin-user-detail/admin-user-detail').then(
+            (m) => m.AdminUserDetail,
+          ),
+      },
+      {
+        path: 'reviews',
+        title: 'Avis — Admin',
+        loadComponent: () =>
+          import('./features/admin/admin-reviews/admin-reviews').then((m) => m.AdminReviews),
+      },
+      {
+        path: 'transactions',
+        title: 'Transactions — Admin',
+        loadComponent: () =>
+          import('./features/admin/admin-transactions/admin-transactions').then(
+            (m) => m.AdminTransactions,
+          ),
+      },
+    ],
+  },
+  {
     path: '',
     loadComponent: () => import('./shared/components/layout/layout').then((m) => m.Layout),
     children: [

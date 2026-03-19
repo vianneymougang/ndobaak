@@ -36,6 +36,7 @@ export class Navbar {
   });
   protected isLandlord = computed(() => this.authService.userRole() === 'LANDLORD');
   protected isStudent = computed(() => this.authService.userRole() === 'STUDENT');
+  protected isAdmin = computed(() => this.authService.userRole() === 'ADMIN');
 
   protected get drawerOpen() { return this.navState.drawerOpen; }
   protected scrolled = signal(false);

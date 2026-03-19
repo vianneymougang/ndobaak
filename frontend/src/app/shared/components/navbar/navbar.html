@@ -53,6 +53,11 @@
           <i class="pi pi-wallet" aria-hidden="true"></i> Transactions
         </a>
       }
+      @if (isAdmin()) {
+        <a routerLink="/admin" routerLinkActive="active">
+          <i class="pi pi-shield" aria-hidden="true"></i> Administration
+        </a>
+      }
     </div>
 
     <!-- Desktop auth -->
