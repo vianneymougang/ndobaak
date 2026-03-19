@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   inject,
   signal,
+  computed,
   OnInit,
   DestroyRef,
 } from '@angular/core';
@@ -19,6 +20,8 @@ import {
   LandlordDashboardResponse,
 } from '../../../core/services/dashboard';
 import { BookingService } from '../../../core/services/booking';
+import { SubscriptionService } from '../../../core/services/subscription';
+import { Subscription } from '../../../core/models/subscription.models';
 
 @Component({
   selector: 'app-landlord-dashboard',
@@ -30,14 +33,40 @@ import { BookingService } from '../../../core/services/booking';
 export class LandlordDashboard implements OnInit {
   private dashboardService = inject(DashboardService);
   private bookingService = inject(BookingService);
+  private subscriptionService = inject(SubscriptionService);
   private messageService = inject(MessageService);
   private destroyRef = inject(DestroyRef);
 
   protected dashboard = signal<LandlordDashboardResponse | null>(null);
+  protected subscription = signal<Subscription | null | undefined>(undefined);
   protected loading = signal(true);
+  protected subscriptionLoading = signal(true);
+
+  protected subscriptionExpiringSoon = computed(() => {
+    const sub = this.subscription();
+    return sub?.status === 'ACTIVE' && (sub.daysRemaining ?? 0) <= 30;
+  });
 
   ngOnInit(): void {
     this.loadDashboard();
+    this.loadSubscription();
+  }
+
+  private loadSubscription(): void {
+    this.subscriptionLoading.set(true);
+    this.subscriptionService
+      .getMySubscription()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (sub) => {
+          this.subscription.set(sub);
+          this.subscriptionLoading.set(false);
+        },
+        error: () => {
+          this.subscription.set(null);
+          this.subscriptionLoading.set(false);
+        },
+      });
   }
 
   private loadDashboard(): void {

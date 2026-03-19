@@ -21,6 +21,7 @@ import { ListingService } from '../../../core/services/listing';
 import { ListingResponse, RoomType, CreateListingRequest, PhotoResponse } from '../../../core/models/listing.models';
 import { AMENITY_CONFIG } from '../../../core/models/amenity.config';
 import { L } from '../../../core/utils/leaflet-fix';
+import { SubscriptionService } from '../../../core/services/subscription';
 
 const CAMPUS_LAT = 3.8844536562668015;
 const CAMPUS_LNG = 11.391160302004234;
@@ -63,6 +64,7 @@ interface PendingPhoto {
 export class Create implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private listingService = inject(ListingService);
+  private subscriptionService = inject(SubscriptionService);
   private messageService = inject(MessageService);
   private router = inject(Router);
 
@@ -144,8 +146,27 @@ export class Create implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
+    this.checkSubscription();
     this.infoForm.get('description')?.valueChanges.subscribe(() => {});
     this.infoForm.get('title')?.valueChanges.subscribe(() => {});
+  }
+
+  private checkSubscription(): void {
+    this.subscriptionService.getMySubscription().subscribe({
+      next: (sub) => {
+        if (!sub || sub.status !== 'ACTIVE') {
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Abonnement requis',
+            detail: 'Un abonnement actif est requis pour publier une annonce.',
+          });
+          this.router.navigate(['/subscription']);
+        }
+      },
+      error: () => {
+        this.router.navigate(['/subscription']);
+      },
+    });
   }
 
   ngOnDestroy(): void {
@@ -313,8 +334,17 @@ export class Create implements OnInit, OnDestroy {
           detail: 'Brouillon sauvegarde avec succes.',
         });
       },
-      error: () => {
+      error: (err) => {
         this.saving.set(false);
+        if (err?.error?.code === 'SUBSCRIPTION_REQUIRED') {
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Abonnement requis',
+            detail: 'Un abonnement actif est requis pour publier une annonce.',
+          });
+          this.router.navigate(['/subscription']);
+          return;
+        }
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur',
@@ -343,8 +373,17 @@ export class Create implements OnInit, OnDestroy {
             });
             this.router.navigate(['/my-listings']);
           },
-          error: () => {
+          error: (err) => {
             this.submitting.set(false);
+            if (err?.error?.code === 'SUBSCRIPTION_REQUIRED') {
+              this.messageService.add({
+                severity: 'info',
+                summary: 'Abonnement requis',
+                detail: 'Un abonnement actif est requis pour publier une annonce.',
+              });
+              this.router.navigate(['/subscription']);
+              return;
+            }
             this.messageService.add({
               severity: 'error',
               summary: 'Erreur',
@@ -353,8 +392,17 @@ export class Create implements OnInit, OnDestroy {
           },
         });
       },
-      error: () => {
+      error: (err) => {
         this.submitting.set(false);
+        if (err?.error?.code === 'SUBSCRIPTION_REQUIRED') {
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Abonnement requis',
+            detail: 'Un abonnement actif est requis pour publier une annonce.',
+          });
+          this.router.navigate(['/subscription']);
+          return;
+        }
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur',

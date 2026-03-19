@@ -146,4 +146,45 @@
       Transactions
     </a>
   </div>
+
+  <!-- Subscription Widget -->
+  <div class="subscription-widget">
+    <div class="section-header">
+      <h2 class="section-title">Abonnement</h2>
+      <a routerLink="/subscription" class="section-link">Gérer</a>
+    </div>
+
+    @if (subscriptionLoading()) {
+      <div class="sub-widget-body">
+        <p-skeleton width="50%" height="1rem" />
+        <p-skeleton width="70%" height="0.875rem" styleClass="mt-2" />
+      </div>
+    } @else if (subscription(); as sub) {
+      <div class="sub-widget-body">
+        <div class="sub-widget-row">
+          <div class="sub-widget-info">
+            <p-tag
+              [value]="sub.status === 'ACTIVE' ? 'ACTIF' : sub.status === 'EXPIRED' ? 'EXPIRÉ' : 'ANNULÉ'"
+              [severity]="sub.status === 'ACTIVE' ? 'success' : 'danger'"
+            />
+            @if (subscriptionExpiringSoon()) {
+              <p-tag value="Expire bientôt" severity="warn" />
+            }
+          </div>
+          <span class="sub-widget-days">
+            @if (sub.status === 'ACTIVE') {
+              {{ sub.daysRemaining }} jours restants
+            } @else {
+              Expiré le {{ sub.endDate | date: 'dd/MM/yyyy' }}
+            }
+          </span>
+        </div>
+      </div>
+    } @else {
+      <div class="sub-widget-body sub-widget-empty">
+        <span>Aucun abonnement actif</span>
+        <a routerLink="/subscription" class="section-link">S'abonner →</a>
+      </div>
+    }
+  </div>
 </div>

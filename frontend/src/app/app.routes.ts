@@ -155,6 +155,15 @@ export const routes: Routes = [
             (m) => m.InstallmentTracker,
           ),
       },
+      {
+        path: 'subscription',
+        title: 'Mon abonnement',
+        canActivate: [authGuard, roleGuard('LANDLORD')],
+        loadComponent: () =>
+          import('./features/subscription/subscription-page/subscription-page').then(
+            (m) => m.SubscriptionPage,
+          ),
+      },
     ],
   },
 ];
