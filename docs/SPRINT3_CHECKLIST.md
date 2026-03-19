@@ -84,21 +84,21 @@
 ## Phase 6 — Testing & Quality Assurance
 
 ### Backend Unit Tests
-- [ ] 6.1 — SubscriptionServiceTest (~15 tests)
-- [ ] 6.2 — AdminUserServiceTest (~10 tests)
-- [ ] 6.3 — AdminReviewServiceTest (~10 tests)
-- [ ] 6.4 — AdminStatisticsServiceTest (~8 tests)
-- [ ] 6.5 — AdminTransactionServiceTest (~8 tests)
-- [ ] 6.6 — NotificationDispatcherTest (~12 tests)
-- [ ] 6.7 — NotificationPreferenceServiceTest (~8 tests)
-- [ ] 6.8 — EmailNotificationServiceTest (~5 tests)
-- [ ] 6.9 — SmsNotificationServiceTest (~5 tests)
-- [ ] 6.10 — ListingViewServiceTest (~5 tests)
+- [x] 6.1 — SubscriptionServiceTest (17 tests) (commit: test(sprint3): add 109 unit tests for Sprint 3 backend services)
+- [x] 6.2 — AdminUserServiceTest (12 tests) (commit: test(sprint3): add 109 unit tests for Sprint 3 backend services)
+- [x] 6.3 — AdminReviewServiceTest (12 tests) (commit: test(sprint3): add 109 unit tests for Sprint 3 backend services)
+- [x] 6.4 — AdminStatisticsServiceTest (8 tests) (commit: test(sprint3): add 109 unit tests for Sprint 3 backend services)
+- [x] 6.5 — AdminTransactionServiceTest (8 tests) (commit: test(sprint3): add 109 unit tests for Sprint 3 backend services)
+- [x] 6.6 — NotificationDispatcherTest (13 tests) (commit: test(sprint3): add 109 unit tests for Sprint 3 backend services)
+- [x] 6.7 — NotificationPreferenceServiceTest (9 tests) (commit: test(sprint3): add 109 unit tests for Sprint 3 backend services)
+- [x] 6.8 — EmailNotificationServiceTest (5 tests) (commit: test(sprint3): add 109 unit tests for Sprint 3 backend services)
+- [x] 6.9 — SmsNotificationServiceTest (5 tests) (commit: test(sprint3): add 109 unit tests for Sprint 3 backend services)
+- [x] 6.10 — ListingViewServiceTest (7 tests) (commit: test(sprint3): add 109 unit tests for Sprint 3 backend services)
 
 ### Backend Controller Tests
-- [ ] 6.11 — SubscriptionControllerTest (~8 tests)
+- [x] 6.11 — SubscriptionControllerTest (8 tests) (commit: test(sprint3): add 109 unit tests for Sprint 3 backend services)
 - [x] 6.12 — AdminController extended tests — existing tests fixed for Sprint 3 APIs (commit: fix(tests): update existing tests to use Sprint 3 refactored service APIs)
-- [ ] 6.13 — NotificationPreferenceControllerTest (~5 tests)
+- [x] 6.13 — NotificationPreferenceControllerTest (5 tests) (commit: test(sprint3): add 109 unit tests for Sprint 3 backend services)
 
 ### Frontend Component Tests
 - [x] 6.14 — Admin Dashboard component test (commit: feat(admin): implement admin panel frontend)
@@ -144,6 +144,6 @@
 | 3 — Admin Backend | 8 | 8 | 100% |
 | 4 — Admin Frontend | 11 | 11 | 100% |
 | 5 — Notifications | 8 | 8 | 100% |
-| 6 — Testing | 27 | 8 | 30% |
+| 6 — Testing | 27 | 21 | 78% |
 | 7 — Sprint 2 Backlog | 8 | 0 | 0% |
-| **Total** | **86** | **59** | **69%** |
+| **Total** | **86** | **72** | **84%** |
