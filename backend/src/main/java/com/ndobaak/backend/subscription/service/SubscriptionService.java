@@ -10,7 +10,7 @@ import com.ndobaak.backend.common.enums.PaymentType;
 import com.ndobaak.backend.common.enums.SubscriptionStatus;
 import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
-import com.ndobaak.backend.notification.service.NotificationService;
+import com.ndobaak.backend.notification.service.NotificationDispatcher;
 import com.ndobaak.backend.payment.entity.Payment;
 import com.ndobaak.backend.payment.gateway.PaymentGateway;
 import com.ndobaak.backend.payment.gateway.PaymentGatewayRequest;
@@ -31,7 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -39,13 +41,15 @@ public class SubscriptionService {
 
     private static final Logger log = LoggerFactory.getLogger(SubscriptionService.class);
     private static final BigDecimal SUBSCRIPTION_AMOUNT = BigDecimal.valueOf(100_000);
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final String RENEW_URL = "https://ndobaak.com/subscription";
 
     private final SubscriptionRepository subscriptionRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentGatewayRouter gatewayRouter;
     private final PaymentProperties paymentProperties;
     private final AuthService authService;
-    private final NotificationService notificationService;
+    private final NotificationDispatcher notificationDispatcher;
     private final SubscriptionMapper subscriptionMapper;
 
     public SubscriptionService(SubscriptionRepository subscriptionRepository,
@@ -53,14 +57,14 @@ public class SubscriptionService {
                                 PaymentGatewayRouter gatewayRouter,
                                 PaymentProperties paymentProperties,
                                 AuthService authService,
-                                NotificationService notificationService,
+                                NotificationDispatcher notificationDispatcher,
                                 SubscriptionMapper subscriptionMapper) {
         this.subscriptionRepository = subscriptionRepository;
         this.paymentRepository = paymentRepository;
         this.gatewayRouter = gatewayRouter;
         this.paymentProperties = paymentProperties;
         this.authService = authService;
-        this.notificationService = notificationService;
+        this.notificationDispatcher = notificationDispatcher;
         this.subscriptionMapper = subscriptionMapper;
     }
 
@@ -183,15 +187,24 @@ public class SubscriptionService {
                         subscription.setEndDate(start.plusYears(1));
                         subscriptionRepository.save(subscription);
 
-                        notificationService.createNotification(
+                        String landlordName = subscription.getLandlord().getFirstName();
+                        String endDateFormatted = subscription.getEndDate().format(DATE_FMT);
+
+                        notificationDispatcher.dispatch(
                                 subscription.getLandlord().getId(),
                                 NotificationType.SUBSCRIPTION_ACTIVATED,
                                 "Abonnement activé",
                                 "Votre abonnement Ndobaak est actif jusqu'au "
-                                        + subscription.getEndDate() + ". Vous pouvez publier jusqu'à "
+                                        + endDateFormatted + ". Vous pouvez publier jusqu'à "
                                         + subscription.getMaxListings() + " annonces.",
                                 subscription.getId(),
-                                "SUBSCRIPTION"
+                                "SUBSCRIPTION",
+                                Map.of(
+                                        "landlordName", landlordName,
+                                        "endDate", endDateFormatted,
+                                        "renewUrl", RENEW_URL
+                                ),
+                                Map.of()
                         );
 
                         log.info("Subscription activated for landlord={}, until={}",
@@ -210,13 +223,15 @@ public class SubscriptionService {
                         subscription.setStatus(SubscriptionStatus.PENDING_PAYMENT);
                         subscriptionRepository.save(subscription);
 
-                        notificationService.createNotification(
+                        notificationDispatcher.dispatch(
                                 subscription.getLandlord().getId(),
                                 NotificationType.PAYMENT_FAILED,
                                 "Échec du paiement d'abonnement",
                                 "Le paiement de votre abonnement a échoué. Veuillez réessayer.",
                                 subscription.getId(),
-                                "SUBSCRIPTION"
+                                "SUBSCRIPTION",
+                                Map.of("landlordName", subscription.getLandlord().getFirstName()),
+                                Map.of()
                         );
                     });
         });
@@ -232,13 +247,21 @@ public class SubscriptionService {
             subscription.setStatus(SubscriptionStatus.EXPIRED);
             subscriptionRepository.save(subscription);
 
-            notificationService.createNotification(
+            String endDateFormatted = subscription.getEndDate().format(DATE_FMT);
+
+            notificationDispatcher.dispatch(
                     subscription.getLandlord().getId(),
                     NotificationType.SUBSCRIPTION_EXPIRED,
                     "Abonnement expiré",
                     "Votre abonnement Ndobaak a expiré. Renouvelez-le pour continuer à publier des annonces.",
                     subscription.getId(),
-                    "SUBSCRIPTION"
+                    "SUBSCRIPTION",
+                    Map.of(
+                            "landlordName", subscription.getLandlord().getFirstName(),
+                            "endDate", endDateFormatted,
+                            "renewUrl", RENEW_URL
+                    ),
+                    Map.of()
             );
 
             log.info("Subscription expired for landlord={}", subscription.getLandlord().getId());
@@ -264,14 +287,23 @@ public class SubscriptionService {
                 );
 
         for (Subscription subscription : expiringSoon) {
-            notificationService.createNotification(
+            String endDateFormatted = subscription.getEndDate().format(DATE_FMT);
+            String daysStr = String.valueOf(daysRemaining);
+
+            notificationDispatcher.dispatch(
                     subscription.getLandlord().getId(),
                     NotificationType.SUBSCRIPTION_EXPIRING_SOON,
                     "Abonnement bientôt expiré",
-                    "Votre abonnement Ndobaak expire dans " + daysRemaining
-                            + " jours. Renouvelez-le pour continuer à publier.",
+                    "Votre abonnement Ndobaak expire dans " + daysRemaining + " jours. Renouvelez-le pour continuer à publier.",
                     subscription.getId(),
-                    "SUBSCRIPTION"
+                    "SUBSCRIPTION",
+                    Map.of(
+                            "landlordName", subscription.getLandlord().getFirstName(),
+                            "endDate", endDateFormatted,
+                            "daysRemaining", daysStr,
+                            "renewUrl", RENEW_URL
+                    ),
+                    Map.of("daysRemaining", daysStr)
             );
         }
     }

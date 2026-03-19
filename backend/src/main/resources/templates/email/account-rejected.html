@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Compte refusé — Ndobaâk</title>
+</head>
+<body style="margin:0;padding:0;background-color:#F0EDEA;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F0EDEA;padding:48px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
+        <tr><td style="height:3px;background:#DC2626;border-radius:3px 3px 0 0;"></td></tr>
+        <tr><td style="background:#ffffff;border-radius:0 0 12px 12px;box-shadow:0 4px 24px rgba(27,67,50,0.08);padding:40px 48px;">
+          <p style="margin:0 0 32px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:20px;font-weight:700;color:#1B4332;">Ndoba&#226;k</p>
+          <h1 style="margin:0 0 20px;font-size:24px;font-weight:700;color:#1B4332;line-height:1.3;">Votre compte a &#233;t&#233; refus&#233;</h1>
+          <p style="margin:0 0 8px;font-size:15px;color:#374151;">Bonjour <strong th:text="${firstName}">Prénom</strong>,</p>
+          <p style="margin:0 0 16px;font-size:15px;color:#374151;line-height:1.7;">Votre demande de v&#233;rification de compte n'a pas pu &#234;tre valid&#233;e.</p>
+          <th:block th:if="${reason != null and !reason.isEmpty()}">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FEF2F2;border-left:3px solid #DC2626;border-radius:4px;padding:16px;margin-bottom:24px;">
+              <tr><td style="font-size:14px;color:#374151;line-height:1.7;"><strong>Motif :</strong> <span th:text="${reason}">motif</span></td></tr>
+            </table>
+          </th:block>
+          <p style="margin:0 0 32px;font-size:15px;color:#374151;line-height:1.7;">Vous pouvez soumettre &#224; nouveau vos documents corrig&#233;s depuis votre espace.</p>
+          <th:block th:if="${resubmitUrl != null and !resubmitUrl.isEmpty()}">
+            <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+              <tr><td style="border-radius:6px;background-color:#1B4332;">
+                <a th:href="${resubmitUrl}" style="display:inline-block;padding:14px 30px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;">Resoumettre mes documents</a>
+              </td></tr>
+            </table>
+          </th:block>
+          <hr style="border:none;border-top:1px solid #E5E0D8;margin:32px 0 20px;">
+          <p style="margin:0;font-size:11px;color:#9CA3AF;text-align:center;">&#169; 2026 Ndoba&#226;k &mdash; Activit&#233;s encadr&#233;es par TANK'IMMO SAS</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

@@ -13,6 +13,7 @@ import com.ndobaak.backend.common.exception.UnauthorizedException;
 import com.ndobaak.backend.common.security.JwtProperties;
 import com.ndobaak.backend.common.security.JwtTokenProvider;
 import com.ndobaak.backend.common.util.PhoneNormalizer;
+import com.ndobaak.backend.notification.service.NotificationPreferenceService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,15 +29,17 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtProperties jwtProperties;
     private final UserMapper userMapper;
+    private final NotificationPreferenceService notificationPreferenceService;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
                        JwtTokenProvider jwtTokenProvider, JwtProperties jwtProperties,
-                       UserMapper userMapper) {
+                       UserMapper userMapper, NotificationPreferenceService notificationPreferenceService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.jwtProperties = jwtProperties;
         this.userMapper = userMapper;
+        this.notificationPreferenceService = notificationPreferenceService;
     }
 
     @Transactional
@@ -55,6 +58,7 @@ public class AuthService {
                 .build();
 
         student = (Student) userRepository.save(student);
+        notificationPreferenceService.createDefaultPreferences(student.getId());
         return generateTokens(student);
     }
 
@@ -73,6 +77,7 @@ public class AuthService {
                 .build();
 
         landlord = (Landlord) userRepository.save(landlord);
+        notificationPreferenceService.createDefaultPreferences(landlord.getId());
         return generateTokens(landlord);
     }
 

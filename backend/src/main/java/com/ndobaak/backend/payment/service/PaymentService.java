@@ -16,7 +16,7 @@ import com.ndobaak.backend.common.enums.ScheduleFrequency;
 import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.ForbiddenException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
-import com.ndobaak.backend.notification.service.NotificationService;
+import com.ndobaak.backend.notification.service.NotificationDispatcher;
 import com.ndobaak.backend.subscription.service.SubscriptionService;
 import com.ndobaak.backend.payment.dto.InitiatePaymentRequest;
 import com.ndobaak.backend.payment.dto.PayInstallmentRequest;
@@ -49,6 +49,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -61,7 +62,7 @@ public class PaymentService {
     private final InstallmentRepository installmentRepository;
     private final BookingRepository bookingRepository;
     private final AuthService authService;
-    private final NotificationService notificationService;
+    private final NotificationDispatcher notificationDispatcher;
     private final PaymentGatewayRouter gatewayRouter;
     private final PaymentMapper paymentMapper;
     private final PaymentProperties paymentProperties;
@@ -72,7 +73,7 @@ public class PaymentService {
                           InstallmentRepository installmentRepository,
                           BookingRepository bookingRepository,
                           AuthService authService,
-                          NotificationService notificationService,
+                          NotificationDispatcher notificationDispatcher,
                           PaymentGatewayRouter gatewayRouter,
                           PaymentMapper paymentMapper,
                           PaymentProperties paymentProperties,
@@ -82,7 +83,7 @@ public class PaymentService {
         this.installmentRepository = installmentRepository;
         this.bookingRepository = bookingRepository;
         this.authService = authService;
-        this.notificationService = notificationService;
+        this.notificationDispatcher = notificationDispatcher;
         this.gatewayRouter = gatewayRouter;
         this.paymentMapper = paymentMapper;
         this.paymentProperties = paymentProperties;
@@ -332,25 +333,46 @@ public class PaymentService {
         updateInstallmentStatus(payment);
 
         Booking booking = payment.getBooking();
+        String amountFormatted = formatAmount(payment.getAmount());
 
-        notificationService.createNotification(
+        notificationDispatcher.dispatch(
                 booking.getStudent().getId(),
                 NotificationType.PAYMENT_RECEIVED,
                 "Paiement reçu",
-                "Votre paiement de " + formatAmount(payment.getAmount()) + " FCFA pour \""
+                "Votre paiement de " + amountFormatted + " FCFA pour \""
                         + booking.getListing().getTitle() + "\" a été confirmé.",
                 payment.getId(),
-                "PAYMENT"
+                "PAYMENT",
+                Map.of(
+                        "payerName", payment.getPayerName(),
+                        "amount", amountFormatted + " FCFA",
+                        "listingTitle", booking.getListing().getTitle(),
+                        "receiptUrl", ""
+                ),
+                Map.of(
+                        "amount", amountFormatted,
+                        "reference", payment.getTransactionId()
+                )
         );
 
-        notificationService.createNotification(
+        notificationDispatcher.dispatch(
                 booking.getListing().getLandlord().getId(),
                 NotificationType.PAYMENT_RECEIVED,
                 "Paiement reçu",
-                "Un paiement de " + formatAmount(payment.getAmount()) + " FCFA a été reçu pour \""
+                "Un paiement de " + amountFormatted + " FCFA a été reçu pour \""
                         + booking.getListing().getTitle() + "\".",
                 payment.getId(),
-                "PAYMENT"
+                "PAYMENT",
+                Map.of(
+                        "payerName", payment.getPayerName(),
+                        "amount", amountFormatted + " FCFA",
+                        "listingTitle", booking.getListing().getTitle(),
+                        "receiptUrl", ""
+                ),
+                Map.of(
+                        "amount", amountFormatted,
+                        "reference", payment.getTransactionId()
+                )
         );
 
         log.info("Payment completed: reference={}, amount={}", payment.getTransactionId(), payment.getAmount());
@@ -368,14 +390,16 @@ public class PaymentService {
 
         Booking booking = payment.getBooking();
 
-        notificationService.createNotification(
+        notificationDispatcher.dispatch(
                 booking.getStudent().getId(),
                 NotificationType.PAYMENT_FAILED,
                 "Échec du paiement",
                 "Votre paiement pour \"" + booking.getListing().getTitle()
                         + "\" a échoué. Veuillez réessayer.",
                 payment.getId(),
-                "PAYMENT"
+                "PAYMENT",
+                Map.of("listingTitle", booking.getListing().getTitle()),
+                Map.of()
         );
 
         log.warn("Payment failed: reference={}", payment.getTransactionId());

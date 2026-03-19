@@ -164,6 +164,15 @@ export const routes: Routes = [
             (m) => m.SubscriptionPage,
           ),
       },
+      {
+        path: 'profile/notifications',
+        title: 'Préférences de notification',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/profile/notification-preferences/notification-preferences').then(
+            (m) => m.NotificationPreferences,
+          ),
+      },
     ],
   },
 ];
