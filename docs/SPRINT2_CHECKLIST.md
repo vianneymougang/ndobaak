@@ -94,20 +94,25 @@
 - [x] 6.9 — GeoService unit tests (8 tests: mapping, ratings, null thumbnail, validation)
 - [x] 6.10 — GeoController WebMvc tests (5 tests: happy path, defaults, missing/invalid params)
 - [x] 6.11 — ListingSearchService distanceFromUser tests (3 tests: with/without coords, maxDistance filter)
+- [x] 6.12b — DashboardService unit tests (7 tests: KPIs, null revenue, mapping, empty lists, status filtering)
+- [x] 6.12c — DashboardController WebMvc tests (3 tests: HTTP 200, JSON structure, NON_NULL serialization)
 
 ### Frontend Tests
-- [ ] 6.12 — BookingConfirmDialog + MyBookings component tests
-- [ ] 6.13 — PaymentFlow + Receipt component tests
-- [ ] 6.14 — ReviewForm + ReviewList component tests
-- [ ] 6.15 — NotificationBell component tests
+- [x] 6.12 — BookingConfirmDialog + MyBookings component tests (9+9 tests: submit, dialog, cancel, tabs, pagination)
+- [x] 6.13 — PaymentForm + PaymentReceipt component tests (10+7 tests: form validation, submit, load, formatting)
+- [x] 6.14 — ReviewForm + ReviewList component tests (12+9 tests: rating, photos, submit, distribution, pagination)
+- [x] 6.15 — NotificationBell component tests (8 tests: polling, popover, markRead, icons, routes)
+- [x] 6.15b — BookingCard component tests (10 tests: initials, status, visibility, viewMode)
+- [x] 6.15c — BookingPanel component tests (8 tests: total, endDate, owner, auth redirect, dialog)
+- [x] 6.15d — LandlordBookings component tests (12 tests: load, confirm, reject, cancel, tabs)
 
 ### End-to-End
 - [x] 6.16 — Search page E2E (8 tests: filter bar, map, results, keyword, geolocation, radius, search area, distance)
 - [x] 6.17 — Listing detail page E2E (3 tests: navigation, map tiles, reviews section)
-- [ ] 6.18 — Auth E2E (login/logout flows)
-- [ ] 6.19 — Bookings E2E (student + landlord flows)
-- [ ] 6.20 — Payment E2E (payment form, processing, success/failure)
-- [ ] 6.21 — Transactions E2E (history page)
+- [x] 6.18 — Auth E2E (4 tests: student login, landlord login, invalid credentials, required fields)
+- [x] 6.19 — Bookings E2E (5 tests: page load, booking cards, pay button, payment navigation, landlord view)
+- [x] 6.20 — Payment E2E (5 tests: form load, default type, installment toggle, validation, submit flow)
+- [x] 6.21 — Transactions E2E (3 tests: navigation, page title, empty/list display)
 
 ---
 
