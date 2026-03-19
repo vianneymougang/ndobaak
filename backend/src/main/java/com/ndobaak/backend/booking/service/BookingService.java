@@ -15,7 +15,7 @@ import com.ndobaak.backend.common.exception.ForbiddenException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.listing.entity.Listing;
 import com.ndobaak.backend.listing.repository.ListingRepository;
-import com.ndobaak.backend.notification.service.NotificationService;
+import com.ndobaak.backend.notification.service.NotificationDispatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,25 +23,29 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BookingService {
 
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     private final BookingRepository bookingRepository;
     private final ListingRepository listingRepository;
     private final AuthService authService;
-    private final NotificationService notificationService;
+    private final NotificationDispatcher notificationDispatcher;
     private final BookingMapper bookingMapper;
 
     public BookingService(BookingRepository bookingRepository, ListingRepository listingRepository,
-                          AuthService authService, NotificationService notificationService,
+                          AuthService authService, NotificationDispatcher notificationDispatcher,
                           BookingMapper bookingMapper) {
         this.bookingRepository = bookingRepository;
         this.listingRepository = listingRepository;
         this.authService = authService;
-        this.notificationService = notificationService;
+        this.notificationDispatcher = notificationDispatcher;
         this.bookingMapper = bookingMapper;
     }
 
@@ -84,13 +88,21 @@ public class BookingService {
 
         booking = bookingRepository.save(booking);
 
-        notificationService.createNotification(
+        String studentFullName = student.getFirstName() + " " + student.getLastName();
+        notificationDispatcher.dispatch(
                 listing.getLandlord().getId(),
                 NotificationType.BOOKING_CREATED,
                 "Nouvelle demande de réservation",
-                student.getFirstName() + " " + student.getLastName() + " souhaite réserver : " + listing.getTitle(),
+                studentFullName + " souhaite réserver : " + listing.getTitle(),
                 booking.getId(),
-                "BOOKING"
+                "BOOKING",
+                Map.of(
+                        "landlordName", listing.getLandlord().getFirstName(),
+                        "studentName", studentFullName,
+                        "listingTitle", listing.getTitle(),
+                        "startDate", request.getStartDate().format(DATE_FMT)
+                ),
+                Map.of()
         );
 
         return bookingMapper.toResponse(booking);
@@ -137,13 +149,26 @@ public class BookingService {
         booking.setLandlordResponseDate(LocalDateTime.now());
         booking = bookingRepository.save(booking);
 
-        notificationService.createNotification(
+        String studentFullName = booking.getStudent().getFirstName() + " " + booking.getStudent().getLastName();
+        notificationDispatcher.dispatch(
                 booking.getStudent().getId(),
                 NotificationType.BOOKING_CONFIRMED,
                 "Réservation confirmée",
                 "Votre réservation pour \"" + booking.getListing().getTitle() + "\" a été confirmée.",
                 booking.getId(),
-                "BOOKING"
+                "BOOKING",
+                Map.of(
+                        "studentName", studentFullName,
+                        "listingTitle", booking.getListing().getTitle(),
+                        "startDate", booking.getStartDate().format(DATE_FMT),
+                        "endDate", booking.getEndDate().format(DATE_FMT),
+                        "totalAmount", String.format("%,.0f FCFA", booking.getTotalAmount())
+                ),
+                Map.of(
+                        "listingTitle", booking.getListing().getTitle(),
+                        "startDate", booking.getStartDate().format(DATE_FMT),
+                        "endDate", booking.getEndDate().format(DATE_FMT)
+                )
         );
 
         return bookingMapper.toResponse(booking);
@@ -171,13 +196,15 @@ public class BookingService {
             notificationMessage += " Motif : " + reason;
         }
 
-        notificationService.createNotification(
+        notificationDispatcher.dispatch(
                 booking.getStudent().getId(),
                 NotificationType.BOOKING_CANCELLED,
                 "Réservation refusée",
                 notificationMessage,
                 booking.getId(),
-                "BOOKING"
+                "BOOKING",
+                Map.of("listingTitle", booking.getListing().getTitle()),
+                Map.of()
         );
 
         return bookingMapper.toResponse(booking);
@@ -201,13 +228,15 @@ public class BookingService {
         booking.setCancellationReason("Annulé par l'utilisateur");
         booking = bookingRepository.save(booking);
 
-        notificationService.createNotification(
+        notificationDispatcher.dispatch(
                 otherUserId,
                 NotificationType.BOOKING_CANCELLED,
                 "Réservation annulée",
                 "La réservation pour \"" + booking.getListing().getTitle() + "\" a été annulée.",
                 booking.getId(),
-                "BOOKING"
+                "BOOKING",
+                Map.of("listingTitle", booking.getListing().getTitle()),
+                Map.of()
         );
 
         return bookingMapper.toResponse(booking);

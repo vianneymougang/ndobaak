@@ -2,7 +2,11 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { NotificationResponse } from '../models/notification-models';
+import {
+  NotificationResponse,
+  NotificationTypePreferenceResponse,
+  UpdatePreferenceRequest,
+} from '../models/notification-models';
 import { PaginatedResponse } from '../models/booking.models';
 
 @Injectable({
@@ -30,5 +34,21 @@ export class NotificationService {
 
   markAllAsRead(): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/notifications/read-all`, {});
+  }
+
+  getPreferences(): Observable<NotificationTypePreferenceResponse[]> {
+    return this.http.get<NotificationTypePreferenceResponse[]>(
+      `${this.apiUrl}/notifications/preferences`,
+    );
+  }
+
+  updatePreference(
+    type: string,
+    request: UpdatePreferenceRequest,
+  ): Observable<NotificationTypePreferenceResponse> {
+    return this.http.put<NotificationTypePreferenceResponse>(
+      `${this.apiUrl}/notifications/preferences/${type}`,
+      request,
+    );
   }
 }

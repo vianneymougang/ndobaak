@@ -37,6 +37,12 @@ springdoc:
     path: /swagger-ui.html
     enabled: true
 
+twilio:
+  account-sid: ${TWILIO_ACCOUNT_SID:}
+  auth-token: ${TWILIO_AUTH_TOKEN:}
+  from-number: ${TWILIO_FROM_NUMBER:}
+  enabled: ${TWILIO_ENABLED:false}
+
 app:
   payment:
     commission-rate: 0.05

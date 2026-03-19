@@ -1,0 +1,83 @@
+<p-toast />
+
+<div class="pref-page">
+  <header class="pref-header">
+    <h1 class="pref-title">Préférences de notification</h1>
+    <p class="pref-subtitle">Choisissez comment vous souhaitez être notifié pour chaque événement.</p>
+  </header>
+
+  @if (loading()) {
+    <div class="pref-skeleton">
+      @for (_ of [1, 2, 3]; track $index) {
+        <div class="pref-group-skeleton">
+          <p-skeleton height="1.5rem" width="12rem" styleClass="mb-4" />
+          @for (__ of [1, 2, 3]; track $index) {
+            <div class="pref-row-skeleton">
+              <p-skeleton height="1rem" width="14rem" />
+              <p-skeleton height="2rem" width="3rem" />
+              <p-skeleton height="2rem" width="3rem" />
+              <p-skeleton height="2rem" width="3rem" />
+            </div>
+          }
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="pref-groups">
+      @for (group of groups(); track group.label) {
+        @if (group.preferences.length > 0) {
+          <section class="pref-group">
+            <h2 class="pref-group-title">
+              <i [class]="'pi ' + group.icon"></i>
+              {{ group.label }}
+            </h2>
+            <div class="pref-table">
+              <div class="pref-table-header">
+                <span class="pref-col-label">Notification</span>
+                <span class="pref-col-channel">Email</span>
+                <span class="pref-col-channel">SMS</span>
+                <span class="pref-col-channel">In-app</span>
+              </div>
+              @for (pref of group.preferences; track pref.notificationType) {
+                <div class="pref-row" [class.pref-row--critical]="pref.critical">
+                  <span class="pref-row-label">
+                    {{ NOTIFICATION_LABELS[pref.notificationType] ?? pref.notificationType }}
+                    @if (pref.critical) {
+                      <span class="pref-critical-badge">Critique</span>
+                    }
+                  </span>
+                  <span class="pref-col-channel">
+                    <p-toggleswitch
+                      [ngModel]="pref.emailEnabled"
+                      [disabled]="pref.critical"
+                      (onChange)="onEmailChange(pref, $event.checked)"
+                      [pTooltip]="pref.critical ? 'Notification critique — ne peut pas être désactivée' : ''"
+                      tooltipPosition="top"
+                    />
+                  </span>
+                  <span class="pref-col-channel">
+                    <p-toggleswitch
+                      [ngModel]="pref.smsEnabled"
+                      [disabled]="pref.critical"
+                      (onChange)="onSmsChange(pref, $event.checked)"
+                      [pTooltip]="pref.critical ? 'Notification critique — ne peut pas être désactivée' : ''"
+                      tooltipPosition="top"
+                    />
+                  </span>
+                  <span class="pref-col-channel">
+                    <p-toggleswitch
+                      [ngModel]="true"
+                      [disabled]="true"
+                      pTooltip="Ne peut pas être désactivé"
+                      tooltipPosition="top"
+                    />
+                  </span>
+                </div>
+              }
+            </div>
+          </section>
+        }
+      }
+    </div>
+  }
+</div>

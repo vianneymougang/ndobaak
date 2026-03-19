@@ -11,13 +11,14 @@ import com.ndobaak.backend.listing.entity.Listing;
 import com.ndobaak.backend.listing.mapper.ListingMapper;
 import com.ndobaak.backend.listing.repository.ListingRepository;
 import com.ndobaak.backend.listing.repository.PhotoRepository;
-import com.ndobaak.backend.notification.service.NotificationService;
+import com.ndobaak.backend.notification.service.NotificationDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AdminListingService {
@@ -27,14 +28,14 @@ public class AdminListingService {
     private final ListingRepository listingRepository;
     private final PhotoRepository photoRepository;
     private final ListingMapper listingMapper;
-    private final NotificationService notificationService;
+    private final NotificationDispatcher notificationDispatcher;
 
     public AdminListingService(ListingRepository listingRepository, PhotoRepository photoRepository,
-                               ListingMapper listingMapper, NotificationService notificationService) {
+                               ListingMapper listingMapper, NotificationDispatcher notificationDispatcher) {
         this.listingRepository = listingRepository;
         this.photoRepository = photoRepository;
         this.listingMapper = listingMapper;
-        this.notificationService = notificationService;
+        this.notificationDispatcher = notificationDispatcher;
     }
 
     public List<ListingResponse> getPendingListings() {
@@ -61,13 +62,18 @@ public class AdminListingService {
         listing.setStatus(ListingStatus.PUBLISHED);
         listing = listingRepository.save(listing);
 
-        notificationService.createNotification(
+        notificationDispatcher.dispatch(
                 listing.getLandlord().getId(),
                 NotificationType.LISTING_APPROVED,
                 "Annonce approuvée",
-                "Votre annonce \"" + listing.getTitle() + "\" a été approuvée et est maintenant visible.",
+                "Votre annonce \"" + listing.getTitle() + "\" a été approuvée et publiée.",
                 listing.getId(),
-                "LISTING"
+                "LISTING",
+                Map.of(
+                        "landlordName", listing.getLandlord().getFirstName(),
+                        "listingTitle", listing.getTitle()
+                ),
+                Map.of()
         );
 
         log.info("Listing {} validated and published by admin", listingId);
@@ -90,16 +96,22 @@ public class AdminListingService {
         listing.setRejectionReason(reason);
         listing = listingRepository.save(listing);
 
-        notificationService.createNotification(
+        notificationDispatcher.dispatch(
                 listing.getLandlord().getId(),
                 NotificationType.LISTING_REJECTED,
                 "Annonce refusée",
                 "Votre annonce \"" + listing.getTitle() + "\" a été refusée. Motif : " + reason,
                 listing.getId(),
-                "LISTING"
+                "LISTING",
+                Map.of(
+                        "landlordName", listing.getLandlord().getFirstName(),
+                        "listingTitle", listing.getTitle(),
+                        "reason", reason
+                ),
+                Map.of()
         );
 
-        log.info("Listing {} rejected by admin. Motif: {}", listingId, request.getMotif());
+        log.info("Listing {} rejected by admin. Reason: {}", listingId, reason);
 
         return listingMapper.toResponse(listing, false);
     }
