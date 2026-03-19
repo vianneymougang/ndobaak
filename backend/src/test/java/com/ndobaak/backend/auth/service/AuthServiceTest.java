@@ -11,6 +11,7 @@ import com.ndobaak.backend.common.exception.DuplicateResourceException;
 import com.ndobaak.backend.common.exception.UnauthorizedException;
 import com.ndobaak.backend.common.security.JwtProperties;
 import com.ndobaak.backend.common.security.JwtTokenProvider;
+import com.ndobaak.backend.notification.service.NotificationPreferenceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,6 +43,8 @@ class AuthServiceTest {
     private JwtProperties jwtProperties;
     @Mock
     private UserMapper userMapper;
+    @Mock
+    private NotificationPreferenceService notificationPreferenceService;
 
     @InjectMocks
     private AuthService authService;

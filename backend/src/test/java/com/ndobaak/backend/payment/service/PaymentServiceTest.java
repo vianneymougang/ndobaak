@@ -17,7 +17,7 @@ import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.ForbiddenException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.listing.entity.Listing;
-import com.ndobaak.backend.notification.service.NotificationService;
+import com.ndobaak.backend.notification.service.NotificationDispatcher;
 import com.ndobaak.backend.payment.dto.InitiatePaymentRequest;
 import com.ndobaak.backend.payment.dto.PayInstallmentRequest;
 import com.ndobaak.backend.payment.dto.PaymentResponse;
@@ -27,6 +27,7 @@ import com.ndobaak.backend.payment.entity.Installment;
 import com.ndobaak.backend.payment.entity.Payment;
 import com.ndobaak.backend.payment.entity.PaymentSchedule;
 import com.ndobaak.backend.payment.gateway.PaymentGateway;
+import com.ndobaak.backend.subscription.service.SubscriptionService;
 import com.ndobaak.backend.payment.gateway.PaymentGatewayRouter;
 import com.ndobaak.backend.payment.gateway.PaymentInitiationResult;
 import com.ndobaak.backend.payment.gateway.PaymentProperties;
@@ -57,6 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -78,7 +80,7 @@ class PaymentServiceTest {
     @Mock
     private AuthService authService;
     @Mock
-    private NotificationService notificationService;
+    private NotificationDispatcher notificationDispatcher;
     @Mock
     private PaymentGatewayRouter gatewayRouter;
     @Mock
@@ -87,6 +89,8 @@ class PaymentServiceTest {
     private PaymentProperties paymentProperties;
     @Mock
     private PaymentGateway gateway;
+    @Mock
+    private SubscriptionService subscriptionService;
 
     @InjectMocks
     private PaymentService paymentService;
@@ -379,6 +383,7 @@ class PaymentServiceTest {
                 .amount(new BigDecimal("300000"))
                 .transactionId("ref-123")
                 .status(PaymentStatus.PROCESSING)
+                .payerName("John Doe")
                 .build();
         payment.setId(1L);
 
@@ -397,8 +402,8 @@ class PaymentServiceTest {
         assertThat(payment.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
         assertThat(payment.getPaidAt()).isNotNull();
         verify(paymentRepository).save(payment);
-        verify(notificationService, times(2)).createNotification(
-                anyLong(), any(), anyString(), anyString(), anyLong(), eq("PAYMENT"));
+        verify(notificationDispatcher, times(2)).dispatch(
+                anyLong(), any(), anyString(), anyString(), anyLong(), eq("PAYMENT"), anyMap(), anyMap());
     }
 
     @Test
@@ -422,8 +427,8 @@ class PaymentServiceTest {
         paymentService.handleWebhook("mock", "payload", "sig");
 
         assertThat(payment.getStatus()).isEqualTo(PaymentStatus.FAILED);
-        verify(notificationService).createNotification(
-                eq(1L), any(), anyString(), anyString(), anyLong(), eq("PAYMENT"));
+        verify(notificationDispatcher).dispatch(
+                eq(1L), any(), anyString(), anyString(), anyLong(), eq("PAYMENT"), anyMap(), anyMap());
     }
 
     @Test
@@ -457,8 +462,8 @@ class PaymentServiceTest {
         paymentService.handleWebhook("mock", "payload", "sig");
 
         verify(paymentRepository, never()).save(any());
-        verify(notificationService, never()).createNotification(
-                anyLong(), any(), anyString(), anyString(), anyLong(), anyString());
+        verify(notificationDispatcher, never()).dispatch(
+                anyLong(), any(), anyString(), anyString(), anyLong(), anyString(), anyMap(), anyMap());
     }
 
     @Test

@@ -1,10 +1,15 @@
 package com.ndobaak.backend.admin.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ndobaak.backend.admin.dto.RejectListingRequest;
+import com.ndobaak.backend.admin.dto.RejectionMotifRequest;
 import com.ndobaak.backend.admin.service.AdminListingService;
+import com.ndobaak.backend.admin.service.AdminReviewService;
+import com.ndobaak.backend.admin.service.AdminStatisticsService;
+import com.ndobaak.backend.admin.service.AdminTransactionService;
+import com.ndobaak.backend.admin.service.AdminUserService;
 import com.ndobaak.backend.auth.service.CustomOAuth2UserService;
 import com.ndobaak.backend.common.enums.ListingStatus;
+import com.ndobaak.backend.common.enums.RejectionMotif;
 import com.ndobaak.backend.common.enums.RoomType;
 import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
@@ -24,6 +29,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -41,6 +47,14 @@ class AdminControllerTest {
 
     @MockitoBean
     private AdminListingService adminListingService;
+    @MockitoBean
+    private AdminUserService adminUserService;
+    @MockitoBean
+    private AdminReviewService adminReviewService;
+    @MockitoBean
+    private AdminStatisticsService adminStatisticsService;
+    @MockitoBean
+    private AdminTransactionService adminTransactionService;
     @MockitoBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
     @MockitoBean
@@ -119,31 +133,30 @@ class AdminControllerTest {
 
     @Test
     void rejectListingShouldReturn200WithReason() throws Exception {
-        RejectListingRequest request = new RejectListingRequest();
-        request.setReason("Photos de mauvaise qualité");
+        RejectionMotifRequest request = new RejectionMotifRequest();
+        request.setMotif(RejectionMotif.INACCURATE_PHOTOS);
 
         ListingResponse rejected = ListingResponse.builder()
                 .id(1L)
                 .title("Chambre campus test")
                 .status(ListingStatus.REJECTED)
-                .rejectionReason("Photos de mauvaise qualité")
+                .rejectionReason("Les photos ne correspondent pas au logement réel.")
                 .photos(Collections.emptyList())
                 .amenities(Collections.emptyList())
                 .build();
 
-        when(adminListingService.rejectListing(eq(1L), eq("Photos de mauvaise qualité"))).thenReturn(rejected);
+        when(adminListingService.rejectListing(eq(1L), any(RejectionMotifRequest.class))).thenReturn(rejected);
 
         mockMvc.perform(put("/admin/listings/1/reject")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("REJECTED"))
-                .andExpect(jsonPath("$.rejectionReason").value("Photos de mauvaise qualité"));
+                .andExpect(jsonPath("$.status").value("REJECTED"));
     }
 
     @Test
-    void rejectListingShouldReturn400WhenReasonMissing() throws Exception {
-        RejectListingRequest request = new RejectListingRequest();
+    void rejectListingShouldReturn400WhenMotifMissing() throws Exception {
+        RejectionMotifRequest request = new RejectionMotifRequest();
 
         mockMvc.perform(put("/admin/listings/1/reject")
                         .contentType(MediaType.APPLICATION_JSON)

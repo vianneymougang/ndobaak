@@ -16,7 +16,7 @@ import com.ndobaak.backend.common.exception.ForbiddenException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.listing.entity.Listing;
 import com.ndobaak.backend.listing.repository.ListingRepository;
-import com.ndobaak.backend.notification.service.NotificationService;
+import com.ndobaak.backend.notification.service.NotificationDispatcher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -36,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -52,7 +53,7 @@ class BookingServiceTest {
     @Mock
     private AuthService authService;
     @Mock
-    private NotificationService notificationService;
+    private NotificationDispatcher notificationDispatcher;
     @Mock
     private BookingMapper bookingMapper;
 
@@ -142,7 +143,7 @@ class BookingServiceTest {
         assertThat(saved.getMonthlyRent()).isEqualByComparingTo(new BigDecimal("35000"));
         assertThat(saved.getTotalAmount()).isEqualByComparingTo(new BigDecimal("105000"));
 
-        verify(notificationService).createNotification(eq(10L), any(), anyString(), anyString(), anyLong(), eq("BOOKING"));
+        verify(notificationDispatcher).dispatch(eq(10L), any(), anyString(), anyString(), anyLong(), eq("BOOKING"), anyMap(), anyMap());
     }
 
     @Test
@@ -342,7 +343,7 @@ class BookingServiceTest {
 
         assertThat(booking.getStatus()).isEqualTo(BookingStatus.CONFIRMED);
         assertThat(booking.getLandlordResponseDate()).isNotNull();
-        verify(notificationService).createNotification(eq(1L), any(), anyString(), anyString(), anyLong(), eq("BOOKING"));
+        verify(notificationDispatcher).dispatch(eq(1L), any(), anyString(), anyString(), anyLong(), eq("BOOKING"), anyMap(), anyMap());
     }
 
     @Test
@@ -392,7 +393,7 @@ class BookingServiceTest {
         assertThat(booking.getStatus()).isEqualTo(BookingStatus.CANCELLED);
         assertThat(booking.getCancellationReason()).isEqualTo("Logement indisponible");
         assertThat(booking.getLandlordResponseDate()).isNotNull();
-        verify(notificationService).createNotification(eq(1L), any(), anyString(), anyString(), anyLong(), eq("BOOKING"));
+        verify(notificationDispatcher).dispatch(eq(1L), any(), anyString(), anyString(), anyLong(), eq("BOOKING"), anyMap(), anyMap());
     }
 
     @Test
@@ -439,7 +440,7 @@ class BookingServiceTest {
         bookingService.cancelBooking(1L);
 
         assertThat(booking.getStatus()).isEqualTo(BookingStatus.CANCELLED);
-        verify(notificationService).createNotification(eq(10L), any(), anyString(), anyString(), anyLong(), eq("BOOKING"));
+        verify(notificationDispatcher).dispatch(eq(10L), any(), anyString(), anyString(), anyLong(), eq("BOOKING"), anyMap(), anyMap());
     }
 
     @Test
@@ -457,7 +458,7 @@ class BookingServiceTest {
         bookingService.cancelBooking(1L);
 
         assertThat(booking.getStatus()).isEqualTo(BookingStatus.CANCELLED);
-        verify(notificationService).createNotification(eq(1L), any(), anyString(), anyString(), anyLong(), eq("BOOKING"));
+        verify(notificationDispatcher).dispatch(eq(1L), any(), anyString(), anyString(), anyLong(), eq("BOOKING"), anyMap(), anyMap());
     }
 
     @Test
