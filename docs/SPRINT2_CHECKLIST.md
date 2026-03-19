@@ -83,14 +83,14 @@
 ## Phase 6 — Testing & Integration
 
 ### Backend Tests
-- [ ] 6.1 — BookingService unit tests
-- [ ] 6.2 — PaymentService unit tests
-- [ ] 6.3 — ReviewService unit tests
-- [ ] 6.4 — NotificationService unit tests
-- [ ] 6.5 — BookingController WebMvc tests
-- [ ] 6.6 — PaymentController WebMvc tests
-- [ ] 6.7 — ReviewController WebMvc tests
-- [ ] 6.8 — NotificationController WebMvc tests
+- [x] 6.1 — BookingService unit tests (23 tests: create, confirm, reject, cancel, list, access control)
+- [x] 6.2 — PaymentService unit tests (23 tests: initiate integral/installment, webhook, receipt, history, schedule)
+- [x] 6.3 — ReviewService unit tests (17 tests: create, photos, booking check, delete, rating stats)
+- [x] 6.4 — NotificationService unit tests (8 tests: create, list, mark read, unread count, access control)
+- [x] 6.5 — BookingController WebMvc tests (14 tests: all 7 endpoints, validation, auth, error cases)
+- [x] 6.6 — PaymentController WebMvc tests (13 tests: all 7 endpoints, webhook, validation, error cases)
+- [x] 6.7 — ReviewController WebMvc tests (11 tests: all 5 endpoints, multipart, validation, error cases)
+- [x] 6.8 — NotificationController WebMvc tests (6 tests: list, pagination, unread count, mark read)
 - [x] 6.9 — GeoService unit tests (8 tests: mapping, ratings, null thumbnail, validation)
 - [x] 6.10 — GeoController WebMvc tests (5 tests: happy path, defaults, missing/invalid params)
 - [x] 6.11 — ListingSearchService distanceFromUser tests (3 tests: with/without coords, maxDistance filter)
@@ -118,16 +118,24 @@ _(tracked during implementation)_
 
 ## Progress Summary
 - **Total tasks**: 53
-- **Completed**: 37
-- **Remaining**: 16
+- **Completed**: 43
+- **Remaining**: 10
 
 ### Test Summary
 | Suite | Tests | Status |
 |---|---|---|
+| Backend Unit (BookingService) | 23 | Passing |
+| Backend Unit (PaymentService) | 23 | Passing |
+| Backend Unit (ReviewService) | 17 | Passing |
+| Backend Unit (NotificationService) | 8 | Passing |
+| Backend Controller (BookingController) | 14 | Passing |
+| Backend Controller (PaymentController) | 13 | Passing |
+| Backend Controller (ReviewController) | 11 | Passing |
+| Backend Controller (NotificationController) | 6 | Passing |
 | Backend Unit (GeoService) | 8 | Passing |
 | Backend Controller (GeoController) | 5 | Passing |
 | Backend Unit (ListingSearchService complement) | 3 | Passing |
 | Frontend E2E (Search) | 8 | Passing |
 | Frontend E2E (Detail) | 3 | Passing |
-| Backend Total | 83 | Passing |
+| **Backend Total** | **198** | **Passing** |
 | **Frontend E2E Total** | **11** | **Passing** |
