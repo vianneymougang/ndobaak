@@ -153,11 +153,19 @@
         <h2>Publiez votre logement,<br />trouvez des locataires fiables</h2>
         <p>Rejoignez les propriétaires qui font confiance à Ndobaâk pour trouver des étudiants sérieux de l'IUSJC.</p>
       </div>
-      <div class="cta-actions">
-        <a routerLink="/register" class="cta-btn-primary">
-          <i class="pi pi-plus" aria-hidden="true"></i> Déposer une annonce
-        </a>
-      </div>
+      @if (!isStudent()) {
+        <div class="cta-actions">
+          @if (isLandlord()) {
+            <a routerLink="/listings/create" class="cta-btn-primary">
+              <i class="pi pi-plus" aria-hidden="true"></i> Déposer une annonce
+            </a>
+          } @else {
+            <a routerLink="/register" class="cta-btn-primary">
+              <i class="pi pi-plus" aria-hidden="true"></i> Déposer une annonce
+            </a>
+          }
+        </div>
+      }
     </div>
   </div>
 </section>

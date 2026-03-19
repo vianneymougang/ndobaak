@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { EMPTY, catchError } from 'rxjs';
 import { Router, RouterLink } from '@angular/router';
@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { ListingService } from '../../core/services/listing';
+import { AuthService } from '../../core/services/auth';
 import { ListingSearchResponse } from '../../core/models/listing.models';
 import { ListingCard } from '../../shared/components/listing-card/listing-card';
 
@@ -19,6 +20,10 @@ import { ListingCard } from '../../shared/components/listing-card/listing-card';
 export class Home implements OnInit {
   private router = inject(Router);
   private listingService = inject(ListingService);
+  private authService = inject(AuthService);
+
+  protected isLandlord = computed(() => this.authService.userRole() === 'LANDLORD');
+  protected isStudent = computed(() => this.authService.userRole() === 'STUDENT');
 
   protected readonly heroImageUrl = `url('${environment.mediaBaseUrl}/static/hero.jpg')`;
 
