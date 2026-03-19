@@ -69,6 +69,12 @@ public abstract class User {
     @Column(name = "oauth_provider_id")
     private String oauthProviderId;
 
+    @Column(name = "deactivated", nullable = false)
+    private boolean deactivated = false;
+
+    @Column(name = "deactivation_reason", length = 500)
+    private String deactivationReason;
+
     @PrePersist
     protected void onCreate() {
         if (registrationDate == null) {

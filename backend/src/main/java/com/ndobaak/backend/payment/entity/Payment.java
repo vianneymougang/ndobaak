@@ -35,7 +35,7 @@ import java.time.LocalDateTime;
 public class Payment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booking_id", nullable = false)
+    @JoinColumn(name = "booking_id")
     private Booking booking;
 
     @Column(nullable = false, precision = 12, scale = 0)
