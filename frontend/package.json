@@ -35,6 +35,7 @@
     "@angular/ssr": "^21.0.1",
     "@primeuix/themes": "^2.0.3",
     "@scripttype/ng-motion": "^0.5.0",
+    "chart.js": "^4.4.0",
     "express": "^5.1.0",
     "leaflet": "^1.9.4",
     "motion-dom": "^12.38.0",

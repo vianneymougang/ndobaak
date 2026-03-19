@@ -1,48 +1,122 @@
 <div class="dashboard">
-  <h1 class="dashboard-title">Tableau de bord</h1>
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">Tableau de bord</h1>
+    <p-selectButton
+      [options]="periodOptions"
+      [(ngModel)]="selectedPeriod"
+      optionLabel="label"
+      optionValue="value"
+      (onChange)="onPeriodChange()"
+    />
+  </div>
 
-  <!-- KPI Cards -->
   <div class="kpi-grid">
-    @if (loading()) {
+    @if (kpiLoading()) {
       @for (_ of [1, 2, 3, 4]; track $index) {
-        <div class="kpi-card">
-          <p-skeleton width="40%" height="0.875rem" />
-          <p-skeleton width="60%" height="2rem" styleClass="mt-2" />
+        <div class="kpi-card kpi-card--skeleton">
+          <p-skeleton width="40%" height="0.8rem" />
+          <p-skeleton width="55%" height="2rem" styleClass="mt-2" />
+          <p-skeleton width="30%" height="0.75rem" styleClass="mt-1" />
         </div>
       }
     } @else if (dashboard(); as d) {
-      <div class="kpi-card">
-        <span class="kpi-label">Annonces</span>
-        <span class="kpi-value">{{ d.totalListings }}</span>
-        <i class="pi pi-list kpi-icon" aria-hidden="true"></i>
+      <div
+        class="kpi-card"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 16 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ duration: 0.35, delay: staggerDelay(0), ease: 'easeOut' }"
+      >
+        <i class="pi pi-eye kpi-icon" aria-hidden="true"></i>
+        <span class="kpi-label">Vues totales</span>
+        <span class="kpi-value">{{ d.totalViews }}</span>
       </div>
-      <div class="kpi-card">
-        <span class="kpi-label">Réservations actives</span>
-        <span class="kpi-value">{{ d.activeBookings }}</span>
-        <i class="pi pi-calendar kpi-icon" aria-hidden="true"></i>
+
+      <div
+        class="kpi-card"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 16 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ duration: 0.35, delay: staggerDelay(1), ease: 'easeOut' }"
+      >
+        <i class="pi pi-check-circle kpi-icon" aria-hidden="true"></i>
+        <span class="kpi-label">Réservations confirmées</span>
+        <span class="kpi-value">{{ d.confirmedBookings }}</span>
       </div>
-      <div class="kpi-card kpi-card--accent">
-        <span class="kpi-label">Demandes en attente</span>
-        <span class="kpi-value">{{ d.pendingRequests }}</span>
-        <i class="pi pi-clock kpi-icon" aria-hidden="true"></i>
+
+      <div
+        class="kpi-card"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 16 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ duration: 0.35, delay: staggerDelay(2), ease: 'easeOut' }"
+      >
+        <i class="pi pi-percentage kpi-icon" aria-hidden="true"></i>
+        <span class="kpi-label">Taux d'occupation</span>
+        <span class="kpi-value">{{ d.occupancyRate | number: '1.0-0' }}%</span>
       </div>
-      <div class="kpi-card">
-        <span class="kpi-label">Revenus totaux</span>
-        <span class="kpi-value">{{ d.totalRevenue | currency: 'XAF' : 'symbol-narrow' : '1.0-0' }}</span>
+
+      <div
+        class="kpi-card kpi-card--accent"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 16 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ duration: 0.35, delay: staggerDelay(3), ease: 'easeOut' }"
+      >
         <i class="pi pi-wallet kpi-icon" aria-hidden="true"></i>
+        <span class="kpi-label">Revenus totaux</span>
+        <span class="kpi-value">{{ formatRevenue(d.totalRevenue) }}</span>
+        @if (d.revenueChangePercent !== 0) {
+          <span
+            class="kpi-trend"
+            [class.kpi-trend--up]="d.revenueChangePercent > 0"
+            [class.kpi-trend--down]="d.revenueChangePercent < 0"
+          >
+            <i
+              class="pi"
+              [class.pi-arrow-up]="d.revenueChangePercent > 0"
+              [class.pi-arrow-down]="d.revenueChangePercent < 0"
+              aria-hidden="true"
+            ></i>
+            {{ d.revenueChangePercent > 0 ? '+' : '' }}{{ d.revenueChangePercent | number: '1.0-1' }}%
+          </span>
+        }
       </div>
     }
   </div>
 
-  <div class="dashboard-grid">
-    <!-- Pending Booking Requests -->
+  <div class="charts-grid">
+    <div class="chart-section">
+      <h2 class="section-title">Revenus mensuels</h2>
+      @if (chartsLoading()) {
+        <p-skeleton height="220px" borderRadius="8px" />
+      } @else if (revenueChartData()) {
+        <div class="chart-wrapper">
+          <p-chart type="bar" [data]="revenueChartData()" [options]="revenueChartOptions()" />
+        </div>
+      }
+    </div>
+
+    <div class="chart-section">
+      <h2 class="section-title">Vues quotidiennes</h2>
+      @if (chartsLoading()) {
+        <p-skeleton height="220px" borderRadius="8px" />
+      } @else if (viewsChartData()) {
+        <div class="chart-wrapper">
+          <p-chart type="line" [data]="viewsChartData()" [options]="viewsChartOptions()" />
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="bottom-grid">
     <div class="dashboard-section">
       <div class="section-header">
         <h2 class="section-title">Demandes en attente</h2>
         <a routerLink="/landlord/bookings" class="section-link">Voir tout</a>
       </div>
 
-      @if (loading()) {
+      @if (kpiLoading()) {
         @for (_ of [1, 2]; track $index) {
           <div class="pending-skeleton">
             <p-skeleton width="50%" height="1rem" />
@@ -51,14 +125,20 @@
           </div>
         }
       } @else if (dashboard(); as d) {
-        @if (d.pendingBookings.length === 0) {
+        @if (d.recentPendingBookings.length === 0) {
           <div class="section-empty">
             <i class="pi pi-check-circle" aria-hidden="true"></i>
             <span>Aucune demande en attente</span>
           </div>
         } @else {
-          @for (booking of d.pendingBookings; track booking.bookingId) {
-            <div class="pending-card">
+          @for (booking of d.recentPendingBookings; track booking.bookingId; let i = $index) {
+            <div
+              class="pending-card"
+              ngmMotion
+              [initial]="{ opacity: 0, x: -12 }"
+              [animate]="{ opacity: 1, x: 0 }"
+              [transition]="{ duration: 0.3, delay: staggerDelay(i), ease: 'easeOut' }"
+            >
               <div class="pending-info">
                 <span class="pending-student">{{ booking.studentName }}</span>
                 <span class="pending-listing">{{ booking.listingTitle }}</span>
@@ -90,48 +170,56 @@
       }
     </div>
 
-    <!-- Recent Activity -->
-    <div class="dashboard-section">
-      <div class="section-header">
-        <h2 class="section-title">Activité récente</h2>
-        <a routerLink="/notifications" class="section-link">Voir tout</a>
-      </div>
-
-      @if (loading()) {
-        @for (_ of [1, 2, 3]; track $index) {
-          <div class="activity-skeleton">
-            <p-skeleton shape="circle" size="2rem" />
-            <div class="activity-skeleton-text">
-              <p-skeleton width="60%" height="0.875rem" />
-              <p-skeleton width="90%" height="0.75rem" />
-            </div>
-          </div>
-        }
-      } @else if (dashboard(); as d) {
-        @if (d.recentActivity.length === 0) {
-          <div class="section-empty">
-            <i class="pi pi-inbox" aria-hidden="true"></i>
-            <span>Aucune activité récente</span>
-          </div>
-        } @else {
-          @for (item of d.recentActivity; track $index) {
-            <div class="activity-item">
-              <div class="activity-icon">
-                <i class="pi" [class]="getActivityIcon(item.type)" aria-hidden="true"></i>
-              </div>
-              <div class="activity-content">
-                <span class="activity-title">{{ item.title }}</span>
-                <span class="activity-message">{{ item.message }}</span>
-                <span class="activity-time">{{ item.createdAt | date: 'dd MMM yyyy à HH:mm' }}</span>
-              </div>
-            </div>
-          }
-        }
+    <div class="chart-section">
+      <h2 class="section-title">Réservations par statut</h2>
+      @if (chartsLoading()) {
+        <p-skeleton height="240px" borderRadius="8px" />
+      } @else if (doughnutChartData()) {
+        <div class="chart-wrapper chart-wrapper--doughnut">
+          <p-chart
+            type="doughnut"
+            [data]="doughnutChartData()"
+            [options]="doughnutChartOptions()"
+          />
+        </div>
       }
     </div>
   </div>
 
-  <!-- Quick Links -->
+  @if (dashboard()?.subscription; as sub) {
+    <div
+      class="subscription-widget"
+      [class.subscription-widget--warning]="sub.daysRemaining <= 30 && sub.status === 'ACTIVE'"
+      ngmMotion
+      [initial]="{ opacity: 0, y: 8 }"
+      [animate]="{ opacity: 1, y: 0 }"
+      [transition]="{ duration: 0.4, ease: 'easeOut' }"
+    >
+      <div class="subscription-icon">
+        <i class="pi pi-crown" aria-hidden="true"></i>
+      </div>
+      <div class="subscription-info">
+        <span class="subscription-label">Abonnement bailleur</span>
+        <span
+          class="subscription-status"
+          [class.subscription-status--active]="sub.status === 'ACTIVE'"
+          [class.subscription-status--expired]="sub.status === 'EXPIRED'"
+        >
+          {{ sub.status === 'ACTIVE' ? 'Actif' : sub.status === 'EXPIRED' ? 'Expiré' : 'Inactif' }}
+        </span>
+        @if (sub.status === 'ACTIVE') {
+          <span class="subscription-expiry">
+            Expire le {{ sub.endDate | date: 'dd MMM yyyy' }} — {{ sub.daysRemaining }} jours restants
+          </span>
+        }
+      </div>
+      <a routerLink="/landlord/subscription" class="subscription-cta">
+        {{ sub.status === 'ACTIVE' ? 'Gérer' : 'Renouveler' }}
+        <i class="pi pi-arrow-right" aria-hidden="true"></i>
+      </a>
+    </div>
+  }
+
   <div class="quick-links">
     <a routerLink="/listings/create" class="quick-link">
       <i class="pi pi-plus" aria-hidden="true"></i>
