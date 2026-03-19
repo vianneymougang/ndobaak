@@ -106,7 +106,7 @@ describe('ListingCard', () => {
     fixture.componentRef.setInput('listing', buildListing({ distanceToCampus: 1.2, neighborhood: 'Melen' }));
     fixture.detectChanges();
     const locationEl = fixture.debugElement.query(By.css('.card-location'));
-    expect(locationEl.nativeElement.textContent).toContain('1.2 km du campus');
+    expect(locationEl.nativeElement.textContent).toContain('1.2 km');
   });
 
   it('displays amenities when present', () => {

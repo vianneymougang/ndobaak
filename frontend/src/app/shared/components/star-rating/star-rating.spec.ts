@@ -61,7 +61,7 @@ describe('StarRating', () => {
   it('has accessible aria-label with rating value', async () => {
     await createComponent(3);
     const host = fixture.debugElement.query(By.css('.star-rating'));
-    expect(host.nativeElement.getAttribute('aria-label')).toBe('3 out of 5 stars');
+    expect(host.nativeElement.getAttribute('aria-label')).toBe('3 étoiles sur 5');
   });
 
   it('rounds rating for filled star count', async () => {
