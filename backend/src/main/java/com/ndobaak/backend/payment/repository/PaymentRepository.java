@@ -26,4 +26,16 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.booking.listing.landlord.id = :landlordId AND p.status = :status")
     BigDecimal sumAmountByLandlordIdAndStatus(@Param("landlordId") Long landlordId, @Param("status") PaymentStatus status);
+
+    @Query("SELECT p FROM Payment p WHERE " +
+           "(:status IS NULL OR p.status = :status) AND " +
+           "(:type IS NULL OR p.paymentType = :type) " +
+           "ORDER BY p.createdAt DESC")
+    Page<Payment> findAllFiltered(@Param("status") PaymentStatus status, @Param("type") com.ndobaak.backend.common.enums.PaymentType type, Pageable pageable);
+
+    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.status = :status")
+    BigDecimal sumAmountByStatus(@Param("status") PaymentStatus status);
+
+    @Query("SELECT FUNCTION('TO_CHAR', p.createdAt, 'YYYY-MM'), COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.status = :status AND p.createdAt >= :since GROUP BY FUNCTION('TO_CHAR', p.createdAt, 'YYYY-MM') ORDER BY 1")
+    List<Object[]> sumMonthlyRevenueByStatus(@Param("status") PaymentStatus status, @Param("since") java.time.LocalDateTime since);
 }

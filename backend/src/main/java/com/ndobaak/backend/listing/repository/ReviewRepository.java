@@ -38,4 +38,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
                                         @Param("status") ReviewStatus status);
 
     long countByListingIdAndStatus(Long listingId, ReviewStatus status);
+
+    Page<Review> findByStatus(ReviewStatus status, Pageable pageable);
+
+    long countByStudentId(Long studentId);
+
+    @Query("SELECT r FROM Review r WHERE SIZE(r.photoUrls) = 0 AND r.status = :status ORDER BY r.createdAt DESC")
+    Page<Review> findByStatusOrderByCreatedAtDesc(@Param("status") ReviewStatus status, Pageable pageable);
 }

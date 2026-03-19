@@ -16,6 +16,9 @@ import com.ndobaak.backend.listing.repository.ListingRepository;
 import com.ndobaak.backend.listing.repository.ReviewRepository;
 import com.ndobaak.backend.media.service.StorageService;
 import com.ndobaak.backend.notification.service.NotificationService;
+import com.ndobaak.backend.admin.dto.ReviewReportResponse;
+import com.ndobaak.backend.listing.entity.ReviewReport;
+import com.ndobaak.backend.listing.repository.ReviewReportRepository;
 import com.ndobaak.backend.review.dto.CreateReviewRequest;
 import com.ndobaak.backend.review.dto.RatingStatsResponse;
 import com.ndobaak.backend.review.dto.ReviewResponse;
@@ -41,6 +44,7 @@ public class ReviewService {
     private static final int MAX_PHOTOS = 3;
 
     private final ReviewRepository reviewRepository;
+    private final ReviewReportRepository reviewReportRepository;
     private final BookingRepository bookingRepository;
     private final ListingRepository listingRepository;
     private final AuthService authService;
@@ -49,6 +53,7 @@ public class ReviewService {
     private final ReviewMapper reviewMapper;
 
     public ReviewService(ReviewRepository reviewRepository,
+                         ReviewReportRepository reviewReportRepository,
                          BookingRepository bookingRepository,
                          ListingRepository listingRepository,
                          AuthService authService,
@@ -56,6 +61,7 @@ public class ReviewService {
                          StorageService storageService,
                          ReviewMapper reviewMapper) {
         this.reviewRepository = reviewRepository;
+        this.reviewReportRepository = reviewReportRepository;
         this.bookingRepository = bookingRepository;
         this.listingRepository = listingRepository;
         this.authService = authService;
@@ -173,6 +179,47 @@ public class ReviewService {
                 .averageRating(average != null ? Math.round(average * 10.0) / 10.0 : 0.0)
                 .totalReviews(total)
                 .distribution(distribution)
+                .build();
+    }
+
+    @Transactional
+    public ReviewReportResponse reportReview(Long reviewId, String reason) {
+        User reporter = authService.getAuthenticatedUser();
+
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException("Review", "id", reviewId));
+
+        if (reviewReportRepository.existsByReviewIdAndReporterId(reviewId, reporter.getId())) {
+            throw new BusinessException("Vous avez déjà signalé cet avis.");
+        }
+
+        ReviewReport report = ReviewReport.builder()
+                .review(review)
+                .reporter(reporter)
+                .reason(reason)
+                .build();
+
+        report = reviewReportRepository.save(report);
+
+        notificationService.createNotification(
+                review.getListing().getLandlord().getId(),
+                NotificationType.REVIEW_FLAGGED,
+                "Avis signalé",
+                "Un avis sur votre annonce \"" + review.getListing().getTitle() + "\" a été signalé.",
+                review.getId(),
+                "REVIEW"
+        );
+
+        log.info("Review {} reported by user {}. Reason: {}", reviewId, reporter.getId(), reason);
+
+        return ReviewReportResponse.builder()
+                .id(report.getId())
+                .reviewId(reviewId)
+                .reporterName(reporter.getFirstName() + " " + reporter.getLastName())
+                .reporterId(reporter.getId())
+                .reason(reason)
+                .processed(false)
+                .createdAt(report.getCreatedAt())
                 .build();
     }
 

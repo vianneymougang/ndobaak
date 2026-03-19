@@ -29,4 +29,16 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     long countByListingLandlordIdAndStatus(Long landlordId, BookingStatus status);
 
     long countByListingLandlordIdAndStatusIn(Long landlordId, java.util.List<BookingStatus> statuses);
+
+    long countByStudentId(Long studentId);
+
+    long countByStudentIdAndStatus(Long studentId, BookingStatus status);
+
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(b) FROM Booking b WHERE b.createdAt >= :since")
+    long countByCreatedAtAfter(@org.springframework.data.repository.query.Param("since") java.time.LocalDateTime since);
+
+    @org.springframework.data.jpa.repository.Query("SELECT FUNCTION('TO_CHAR', b.createdAt, 'YYYY-MM'), COUNT(b) FROM Booking b WHERE b.createdAt >= :since GROUP BY FUNCTION('TO_CHAR', b.createdAt, 'YYYY-MM') ORDER BY 1")
+    java.util.List<Object[]> countMonthlyBookings(@org.springframework.data.repository.query.Param("since") java.time.LocalDateTime since);
+
+    long countByStatus(BookingStatus status);
 }
