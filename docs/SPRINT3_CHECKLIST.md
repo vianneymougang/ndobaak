@@ -107,30 +107,30 @@
 - [x] 6.17 — Admin Reviews page component test (commit: feat(admin): implement admin panel frontend)
 - [x] 6.18 — Admin Transactions page component test (commit: feat(admin): implement admin panel frontend)
 - [x] 6.19 — Subscription page component test (commit: feat(subscription): add frontend service and models)
-- [ ] 6.20 — Notification Preferences page component test
-- [ ] 6.21 — Landlord Dashboard enhanced component test
+- [x] 6.20 — Notification Preferences page component test (commit: test(frontend): add notification-preferences and landlord-dashboard specs)
+- [x] 6.21 — Landlord Dashboard enhanced component test (commit: test(frontend): add notification-preferences and landlord-dashboard specs)
 
 ### E2E Tests (Playwright)
-- [ ] 6.22 — Admin listing validation E2E
-- [ ] 6.23 — Admin listing rejection E2E
-- [ ] 6.24 — Admin user management E2E
-- [ ] 6.25 — Admin review moderation E2E
-- [ ] 6.26 — Subscription flow E2E
-- [ ] 6.27 — Notification preferences E2E
+- [x] 6.22 — Admin listing validation E2E (commit: test(e2e): add Sprint 3 admin, subscription and notification-preferences E2E specs)
+- [x] 6.23 — Admin listing rejection E2E (commit: test(e2e): add Sprint 3 admin, subscription and notification-preferences E2E specs)
+- [x] 6.24 — Admin user management E2E (commit: test(e2e): add Sprint 3 admin, subscription and notification-preferences E2E specs)
+- [x] 6.25 — Admin review moderation E2E (commit: test(e2e): add Sprint 3 admin, subscription and notification-preferences E2E specs)
+- [x] 6.26 — Subscription flow E2E (commit: test(e2e): add Sprint 3 admin, subscription and notification-preferences E2E specs)
+- [x] 6.27 — Notification preferences E2E (commit: test(e2e): add Sprint 3 admin, subscription and notification-preferences E2E specs)
 
 ## Phase 7 — Sprint 2 Remaining Tests (Backlog)
 
 ### Frontend Component Tests
-- [ ] 7.1 — BookingConfirmDialog + MyBookings component tests
-- [ ] 7.2 — PaymentFlow + Receipt component tests
-- [ ] 7.3 — ReviewForm + ReviewList component tests
-- [ ] 7.4 — NotificationBell component tests
+- [x] 7.1 — BookingConfirmDialog + MyBookings component tests (existing specs pass)
+- [x] 7.2 — PaymentFlow + Receipt component tests (existing specs pass)
+- [x] 7.3 — ReviewForm + ReviewList component tests (existing specs pass)
+- [x] 7.4 — NotificationBell component tests (existing spec passes)
 
 ### E2E Tests
-- [ ] 7.5 — Auth E2E (login/logout flows)
-- [ ] 7.6 — Bookings E2E (student + landlord flows)
-- [ ] 7.7 — Payment E2E (payment form, processing, success/failure)
-- [ ] 7.8 — Transactions E2E (history page)
+- [x] 7.5 — Auth E2E (login/logout flows) (commit: test(e2e): add auth, bookings, payment and transactions E2E specs)
+- [x] 7.6 — Bookings E2E (student + landlord flows) (commit: test(e2e): add auth, bookings, payment and transactions E2E specs)
+- [x] 7.7 — Payment E2E (payment form, processing, success/failure) (commit: test(e2e): add auth, bookings, payment and transactions E2E specs)
+- [x] 7.8 — Transactions E2E (history page) (commit: test(e2e): add auth, bookings, payment and transactions E2E specs)
 
 ---
 
@@ -144,6 +144,6 @@
 | 3 — Admin Backend | 8 | 8 | 100% |
 | 4 — Admin Frontend | 11 | 11 | 100% |
 | 5 — Notifications | 8 | 8 | 100% |
-| 6 — Testing | 27 | 21 | 78% |
-| 7 — Sprint 2 Backlog | 8 | 0 | 0% |
-| **Total** | **86** | **72** | **84%** |
+| 6 — Testing | 27 | 27 | 100% |
+| 7 — Sprint 2 Backlog | 8 | 8 | 100% |
+| **Total** | **86** | **86** | **100%** |

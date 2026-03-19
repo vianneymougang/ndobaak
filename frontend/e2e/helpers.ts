@@ -12,6 +12,12 @@ export const TEST_LANDLORD = {
   firstName: 'Jean-Baptiste',
 };
 
+export const TEST_ADMIN = {
+  email: 'admin@test.ndobaak.com',
+  password: 'ndobaak123',
+  firstName: 'Admin',
+};
+
 const API_URL = 'http://localhost:8080/api/v1';
 
 async function getAuthToken(email: string, password: string): Promise<{ accessToken: string; refreshToken: string }> {
@@ -34,6 +40,11 @@ export async function loginAsStudent(page: Page) {
 
 export async function loginAsLandlord(page: Page) {
   const tokens = await getAuthToken(TEST_LANDLORD.email, TEST_LANDLORD.password);
+  await injectAuth(page, tokens);
+}
+
+export async function loginAsAdmin(page: Page) {
+  const tokens = await getAuthToken(TEST_ADMIN.email, TEST_ADMIN.password);
   await injectAuth(page, tokens);
 }
 
