@@ -62,16 +62,18 @@
 
     <!-- Desktop auth -->
     <div class="navbar-auth">
-      <a routerLink="/listings/create" class="btn-nav-post">
-        <i class="pi pi-plus" aria-hidden="true"></i> Déposer une annonce
-      </a>
+      @if (!isAuthenticated()) {
+        <a routerLink="/listings/create" class="btn-nav-post">
+          <i class="pi pi-plus" aria-hidden="true"></i> Déposer une annonce
+        </a>
+      }
       @if (isAuthenticated()) {
         <app-notification-bell />
         <div class="user-menu">
           <div class="user-avatar" aria-hidden="true">{{ userInitials() }}</div>
           <div class="user-info">
             <span class="user-name">{{ user()?.firstName }} {{ user()?.lastName }}</span>
-            <span class="user-role">{{ user()?.role === 'STUDENT' ? 'Étudiant' : 'Propriétaire' }}</span>
+            <span class="user-role">{{ user()?.role === 'STUDENT' ? 'Étudiant' : user()?.role === 'ADMIN' ? 'Admin' : 'Propriétaire' }}</span>
           </div>
           <button class="logout-btn" (click)="logout()" aria-label="Déconnexion">
             <i class="pi pi-sign-out" aria-hidden="true"></i>
@@ -183,7 +185,7 @@
           <div class="drawer-user-avatar" aria-hidden="true">{{ userInitials() }}</div>
           <div class="drawer-user-info">
             <span class="drawer-user-name">{{ user()?.firstName }} {{ user()?.lastName }}</span>
-            <span class="drawer-user-role">{{ user()?.role === 'STUDENT' ? 'Étudiant' : 'Propriétaire' }}</span>
+            <span class="drawer-user-role">{{ user()?.role === 'STUDENT' ? 'Étudiant' : user()?.role === 'ADMIN' ? 'Admin' : 'Propriétaire' }}</span>
           </div>
         </div>
         <button class="drawer-logout-btn" (click)="logout()">
