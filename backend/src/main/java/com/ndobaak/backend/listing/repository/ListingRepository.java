@@ -27,6 +27,12 @@ public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpec
            "WHERE l.status = 'PUBLISHED' AND l.availableRooms > 0")
     List<Listing> findPublishedWithAvailableRooms();
 
+    @Query("SELECT l.id FROM Listing l WHERE l.landlord.id = :landlordId")
+    List<Long> findIdsByLandlordId(@Param("landlordId") Long landlordId);
+
+    @Query("SELECT COALESCE(SUM(l.availableRooms), 0) FROM Listing l WHERE l.landlord.id = :landlordId AND l.status = :status")
+    long sumAvailableRoomsByLandlordIdAndStatus(@Param("landlordId") Long landlordId, @Param("status") ListingStatus status);
+
     @Query(value = "SELECT l.id, l.title, p.thumbnail_url, l.monthly_price, " +
             "l.room_type, loc.neighborhood, loc.distance_to_campus, " +
             "loc.latitude, loc.longitude, " +

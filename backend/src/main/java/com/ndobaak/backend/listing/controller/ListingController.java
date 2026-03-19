@@ -1,9 +1,12 @@
 package com.ndobaak.backend.listing.controller;
 
+import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.common.enums.RoomType;
 import com.ndobaak.backend.listing.dto.*;
 import com.ndobaak.backend.listing.service.ListingSearchService;
 import com.ndobaak.backend.listing.service.ListingService;
+import com.ndobaak.backend.listing.service.ListingViewService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,10 +26,17 @@ public class ListingController {
 
     private final ListingService listingService;
     private final ListingSearchService listingSearchService;
+    private final ListingViewService listingViewService;
+    private final AuthService authService;
 
-    public ListingController(ListingService listingService, ListingSearchService listingSearchService) {
+    public ListingController(ListingService listingService,
+                             ListingSearchService listingSearchService,
+                             ListingViewService listingViewService,
+                             AuthService authService) {
         this.listingService = listingService;
         this.listingSearchService = listingSearchService;
+        this.listingViewService = listingViewService;
+        this.authService = authService;
     }
 
     @GetMapping("/search")
@@ -97,7 +107,26 @@ public class ListingController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ListingResponse> getListingById(@PathVariable Long id) {
+    public ResponseEntity<ListingResponse> getListingById(@PathVariable Long id, HttpServletRequest request) {
+        Long userId = resolveUserId();
+        String clientIp = resolveClientIp(request);
+        listingViewService.recordView(id, userId, clientIp);
         return ResponseEntity.ok(listingService.getListingById(id));
+    }
+
+    private Long resolveUserId() {
+        try {
+            return authService.getAuthenticatedUser().getId();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String resolveClientIp(HttpServletRequest request) {
+        String forwarded = request.getHeader("X-Forwarded-For");
+        if (forwarded != null && !forwarded.isEmpty()) {
+            return forwarded.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,4 +27,26 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.booking.listing.landlord.id = :landlordId AND p.status = :status")
     BigDecimal sumAmountByLandlordIdAndStatus(@Param("landlordId") Long landlordId, @Param("status") PaymentStatus status);
+
+    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.booking.listing.landlord.id = :landlordId AND p.status = :status AND p.createdAt BETWEEN :from AND :to")
+    BigDecimal sumAmountByLandlordIdAndStatusAndPeriod(@Param("landlordId") Long landlordId,
+                                                       @Param("status") PaymentStatus status,
+                                                       @Param("from") LocalDateTime from,
+                                                       @Param("to") LocalDateTime to);
+
+    @Query(value = """
+            SELECT TO_CHAR(p.created_at, 'YYYY-MM') AS month,
+                   COALESCE(SUM(p.amount), 0)        AS revenue,
+                   COUNT(p.id)                        AS booking_count
+            FROM payment p
+            JOIN booking b ON p.booking_id = b.id
+            JOIN listing l ON b.listing_id = l.id
+            WHERE l.landlord_id = :landlordId
+              AND p.status = 'COMPLETED'
+              AND p.created_at >= :from
+            GROUP BY TO_CHAR(p.created_at, 'YYYY-MM')
+            ORDER BY month ASC
+            """, nativeQuery = true)
+    List<Object[]> findMonthlyRevenue(@Param("landlordId") Long landlordId,
+                                      @Param("from") LocalDateTime from);
 }

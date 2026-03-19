@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -72,7 +73,7 @@ class DashboardControllerTest {
     @Test
     @WithMockUser(roles = "LANDLORD")
     void getLandlordDashboardShouldReturn200() throws Exception {
-        when(dashboardService.getLandlordDashboard()).thenReturn(buildFullResponse());
+        when(dashboardService.getLandlordDashboard(any(), any())).thenReturn(buildFullResponse());
 
         mockMvc.perform(get("/dashboard/landlord"))
                 .andExpect(status().isOk())
@@ -87,7 +88,7 @@ class DashboardControllerTest {
     @Test
     @WithMockUser(roles = "LANDLORD")
     void getLandlordDashboardShouldReturnCorrectJsonStructure() throws Exception {
-        when(dashboardService.getLandlordDashboard()).thenReturn(buildFullResponse());
+        when(dashboardService.getLandlordDashboard(any(), any())).thenReturn(buildFullResponse());
 
         mockMvc.perform(get("/dashboard/landlord"))
                 .andExpect(status().isOk())
@@ -115,7 +116,7 @@ class DashboardControllerTest {
                 .recentActivity(List.of())
                 .build();
 
-        when(dashboardService.getLandlordDashboard()).thenReturn(response);
+        when(dashboardService.getLandlordDashboard(any(), any())).thenReturn(response);
 
         mockMvc.perform(get("/dashboard/landlord"))
                 .andExpect(status().isOk())

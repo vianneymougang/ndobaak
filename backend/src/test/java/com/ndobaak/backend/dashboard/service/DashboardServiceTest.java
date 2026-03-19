@@ -6,14 +6,18 @@ import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.booking.entity.Booking;
 import com.ndobaak.backend.booking.repository.BookingRepository;
 import com.ndobaak.backend.common.enums.BookingStatus;
+import com.ndobaak.backend.common.enums.ListingStatus;
 import com.ndobaak.backend.common.enums.NotificationType;
 import com.ndobaak.backend.common.enums.PaymentStatus;
 import com.ndobaak.backend.dashboard.dto.LandlordDashboardResponse;
 import com.ndobaak.backend.listing.entity.Listing;
 import com.ndobaak.backend.listing.repository.ListingRepository;
+import com.ndobaak.backend.listing.service.ListingViewService;
 import com.ndobaak.backend.notification.entity.Notification;
 import com.ndobaak.backend.notification.repository.NotificationRepository;
 import com.ndobaak.backend.payment.repository.PaymentRepository;
+import com.ndobaak.backend.subscription.dto.SubscriptionMapper;
+import com.ndobaak.backend.subscription.repository.SubscriptionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,6 +30,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,9 +52,18 @@ class DashboardServiceTest {
     private PaymentRepository paymentRepository;
     @Mock
     private NotificationRepository notificationRepository;
+    @Mock
+    private ListingViewService listingViewService;
+    @Mock
+    private SubscriptionRepository subscriptionRepository;
+    @Mock
+    private SubscriptionMapper subscriptionMapper;
 
     @InjectMocks
     private DashboardService dashboardService;
+
+    private static final LocalDate FROM = LocalDate.now().minusDays(29);
+    private static final LocalDate TO = LocalDate.now();
 
     private Landlord buildLandlord(Long id) {
         Landlord landlord = new Landlord();
@@ -108,10 +123,18 @@ class DashboardServiceTest {
 
     private void stubEmptyDashboard(Long landlordId) {
         when(listingRepository.countByLandlordId(landlordId)).thenReturn(0L);
-        when(bookingRepository.countByListingLandlordIdAndStatusIn(eq(landlordId), any())).thenReturn(0L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(landlordId, BookingStatus.CONFIRMED)).thenReturn(0L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(landlordId, BookingStatus.COMPLETED)).thenReturn(0L);
         when(bookingRepository.countByListingLandlordIdAndStatus(landlordId, BookingStatus.PENDING)).thenReturn(0L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(landlordId, BookingStatus.CANCELLED)).thenReturn(0L);
         when(paymentRepository.sumAmountByLandlordIdAndStatus(landlordId, PaymentStatus.COMPLETED))
                 .thenReturn(BigDecimal.ZERO);
+        when(paymentRepository.sumAmountByLandlordIdAndStatusAndPeriod(eq(landlordId), eq(PaymentStatus.COMPLETED), any(), any()))
+                .thenReturn(BigDecimal.ZERO);
+        when(paymentRepository.findMonthlyRevenue(eq(landlordId), any())).thenReturn(List.of());
+        when(listingRepository.sumAvailableRoomsByLandlordIdAndStatus(landlordId, ListingStatus.PUBLISHED)).thenReturn(0L);
+        when(listingViewService.getViewsForLandlordListings(eq(landlordId), any(), any())).thenReturn(Map.of());
+        when(listingViewService.getDailyViewsForLandlord(eq(landlordId), any(), any())).thenReturn(List.of());
         when(bookingRepository.findByListingLandlordIdAndStatus(eq(landlordId), eq(BookingStatus.PENDING), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
         when(notificationRepository.findByUserIdOrderByCreatedAtDesc(eq(landlordId), any(Pageable.class)))
@@ -131,17 +154,24 @@ class DashboardServiceTest {
 
         when(authService.getAuthenticatedUser()).thenReturn(landlord);
         when(listingRepository.countByLandlordId(10L)).thenReturn(5L);
-        when(bookingRepository.countByListingLandlordIdAndStatusIn(eq(10L),
-                eq(List.of(BookingStatus.CONFIRMED, BookingStatus.COMPLETED)))).thenReturn(3L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.CONFIRMED)).thenReturn(2L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.COMPLETED)).thenReturn(1L);
         when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.PENDING)).thenReturn(2L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.CANCELLED)).thenReturn(0L);
         when(paymentRepository.sumAmountByLandlordIdAndStatus(10L, PaymentStatus.COMPLETED))
                 .thenReturn(new BigDecimal("210000"));
+        when(paymentRepository.sumAmountByLandlordIdAndStatusAndPeriod(eq(10L), eq(PaymentStatus.COMPLETED), any(), any()))
+                .thenReturn(BigDecimal.ZERO);
+        when(paymentRepository.findMonthlyRevenue(eq(10L), any())).thenReturn(List.of());
+        when(listingRepository.sumAvailableRoomsByLandlordIdAndStatus(10L, ListingStatus.PUBLISHED)).thenReturn(0L);
+        when(listingViewService.getViewsForLandlordListings(eq(10L), any(), any())).thenReturn(Map.of());
+        when(listingViewService.getDailyViewsForLandlord(eq(10L), any(), any())).thenReturn(List.of());
         when(bookingRepository.findByListingLandlordIdAndStatus(eq(10L), eq(BookingStatus.PENDING), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(pendingBooking)));
         when(notificationRepository.findByUserIdOrderByCreatedAtDesc(eq(10L), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(notification)));
 
-        LandlordDashboardResponse response = dashboardService.getLandlordDashboard();
+        LandlordDashboardResponse response = dashboardService.getLandlordDashboard(FROM, TO);
 
         assertThat(response.getTotalListings()).isEqualTo(5L);
         assertThat(response.getActiveBookings()).isEqualTo(3L);
@@ -157,7 +187,7 @@ class DashboardServiceTest {
         when(authService.getAuthenticatedUser()).thenReturn(landlord);
         stubEmptyDashboard(10L);
 
-        LandlordDashboardResponse response = dashboardService.getLandlordDashboard();
+        LandlordDashboardResponse response = dashboardService.getLandlordDashboard(FROM, TO);
 
         assertThat(response.getTotalListings()).isZero();
         assertThat(response.getActiveBookings()).isZero();
@@ -172,16 +202,23 @@ class DashboardServiceTest {
         Landlord landlord = buildLandlord(10L);
         when(authService.getAuthenticatedUser()).thenReturn(landlord);
         when(listingRepository.countByLandlordId(10L)).thenReturn(0L);
-        when(bookingRepository.countByListingLandlordIdAndStatusIn(eq(10L), any())).thenReturn(0L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.CONFIRMED)).thenReturn(0L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.COMPLETED)).thenReturn(0L);
         when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.PENDING)).thenReturn(0L);
-        when(paymentRepository.sumAmountByLandlordIdAndStatus(10L, PaymentStatus.COMPLETED))
-                .thenReturn(null);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.CANCELLED)).thenReturn(0L);
+        when(paymentRepository.sumAmountByLandlordIdAndStatus(10L, PaymentStatus.COMPLETED)).thenReturn(null);
+        when(paymentRepository.sumAmountByLandlordIdAndStatusAndPeriod(eq(10L), eq(PaymentStatus.COMPLETED), any(), any()))
+                .thenReturn(BigDecimal.ZERO);
+        when(paymentRepository.findMonthlyRevenue(eq(10L), any())).thenReturn(List.of());
+        when(listingRepository.sumAvailableRoomsByLandlordIdAndStatus(10L, ListingStatus.PUBLISHED)).thenReturn(0L);
+        when(listingViewService.getViewsForLandlordListings(eq(10L), any(), any())).thenReturn(Map.of());
+        when(listingViewService.getDailyViewsForLandlord(eq(10L), any(), any())).thenReturn(List.of());
         when(bookingRepository.findByListingLandlordIdAndStatus(eq(10L), eq(BookingStatus.PENDING), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
         when(notificationRepository.findByUserIdOrderByCreatedAtDesc(eq(10L), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        LandlordDashboardResponse response = dashboardService.getLandlordDashboard();
+        LandlordDashboardResponse response = dashboardService.getLandlordDashboard(FROM, TO);
 
         assertThat(response.getTotalRevenue()).isNull();
     }
@@ -198,16 +235,24 @@ class DashboardServiceTest {
 
         when(authService.getAuthenticatedUser()).thenReturn(landlord);
         when(listingRepository.countByLandlordId(10L)).thenReturn(1L);
-        when(bookingRepository.countByListingLandlordIdAndStatusIn(eq(10L), any())).thenReturn(0L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.CONFIRMED)).thenReturn(0L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.COMPLETED)).thenReturn(0L);
         when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.PENDING)).thenReturn(1L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.CANCELLED)).thenReturn(0L);
         when(paymentRepository.sumAmountByLandlordIdAndStatus(10L, PaymentStatus.COMPLETED))
                 .thenReturn(BigDecimal.ZERO);
+        when(paymentRepository.sumAmountByLandlordIdAndStatusAndPeriod(eq(10L), eq(PaymentStatus.COMPLETED), any(), any()))
+                .thenReturn(BigDecimal.ZERO);
+        when(paymentRepository.findMonthlyRevenue(eq(10L), any())).thenReturn(List.of());
+        when(listingRepository.sumAvailableRoomsByLandlordIdAndStatus(10L, ListingStatus.PUBLISHED)).thenReturn(0L);
+        when(listingViewService.getViewsForLandlordListings(eq(10L), any(), any())).thenReturn(Map.of());
+        when(listingViewService.getDailyViewsForLandlord(eq(10L), any(), any())).thenReturn(List.of());
         when(bookingRepository.findByListingLandlordIdAndStatus(eq(10L), eq(BookingStatus.PENDING), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(booking)));
         when(notificationRepository.findByUserIdOrderByCreatedAtDesc(eq(10L), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        LandlordDashboardResponse response = dashboardService.getLandlordDashboard();
+        LandlordDashboardResponse response = dashboardService.getLandlordDashboard(FROM, TO);
 
         assertThat(response.getPendingBookings()).hasSize(1);
         LandlordDashboardResponse.PendingBookingSummary summary = response.getPendingBookings().getFirst();
@@ -227,16 +272,24 @@ class DashboardServiceTest {
 
         when(authService.getAuthenticatedUser()).thenReturn(landlord);
         when(listingRepository.countByLandlordId(10L)).thenReturn(0L);
-        when(bookingRepository.countByListingLandlordIdAndStatusIn(eq(10L), any())).thenReturn(0L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.CONFIRMED)).thenReturn(0L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.COMPLETED)).thenReturn(0L);
         when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.PENDING)).thenReturn(0L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.CANCELLED)).thenReturn(0L);
         when(paymentRepository.sumAmountByLandlordIdAndStatus(10L, PaymentStatus.COMPLETED))
                 .thenReturn(BigDecimal.ZERO);
+        when(paymentRepository.sumAmountByLandlordIdAndStatusAndPeriod(eq(10L), eq(PaymentStatus.COMPLETED), any(), any()))
+                .thenReturn(BigDecimal.ZERO);
+        when(paymentRepository.findMonthlyRevenue(eq(10L), any())).thenReturn(List.of());
+        when(listingRepository.sumAvailableRoomsByLandlordIdAndStatus(10L, ListingStatus.PUBLISHED)).thenReturn(0L);
+        when(listingViewService.getViewsForLandlordListings(eq(10L), any(), any())).thenReturn(Map.of());
+        when(listingViewService.getDailyViewsForLandlord(eq(10L), any(), any())).thenReturn(List.of());
         when(bookingRepository.findByListingLandlordIdAndStatus(eq(10L), eq(BookingStatus.PENDING), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
         when(notificationRepository.findByUserIdOrderByCreatedAtDesc(eq(10L), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(notification)));
 
-        LandlordDashboardResponse response = dashboardService.getLandlordDashboard();
+        LandlordDashboardResponse response = dashboardService.getLandlordDashboard(FROM, TO);
 
         assertThat(response.getRecentActivity()).hasSize(1);
         LandlordDashboardResponse.RecentActivityItem activity = response.getRecentActivity().getFirst();
@@ -252,16 +305,24 @@ class DashboardServiceTest {
         Landlord landlord = buildLandlord(10L);
         when(authService.getAuthenticatedUser()).thenReturn(landlord);
         when(listingRepository.countByLandlordId(10L)).thenReturn(3L);
-        when(bookingRepository.countByListingLandlordIdAndStatusIn(eq(10L), any())).thenReturn(2L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.CONFIRMED)).thenReturn(2L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.COMPLETED)).thenReturn(0L);
         when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.PENDING)).thenReturn(0L);
+        when(bookingRepository.countByListingLandlordIdAndStatus(10L, BookingStatus.CANCELLED)).thenReturn(0L);
         when(paymentRepository.sumAmountByLandlordIdAndStatus(10L, PaymentStatus.COMPLETED))
                 .thenReturn(new BigDecimal("70000"));
+        when(paymentRepository.sumAmountByLandlordIdAndStatusAndPeriod(eq(10L), eq(PaymentStatus.COMPLETED), any(), any()))
+                .thenReturn(BigDecimal.ZERO);
+        when(paymentRepository.findMonthlyRevenue(eq(10L), any())).thenReturn(List.of());
+        when(listingRepository.sumAvailableRoomsByLandlordIdAndStatus(10L, ListingStatus.PUBLISHED)).thenReturn(0L);
+        when(listingViewService.getViewsForLandlordListings(eq(10L), any(), any())).thenReturn(Map.of());
+        when(listingViewService.getDailyViewsForLandlord(eq(10L), any(), any())).thenReturn(List.of());
         when(bookingRepository.findByListingLandlordIdAndStatus(eq(10L), eq(BookingStatus.PENDING), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
         when(notificationRepository.findByUserIdOrderByCreatedAtDesc(eq(10L), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        LandlordDashboardResponse response = dashboardService.getLandlordDashboard();
+        LandlordDashboardResponse response = dashboardService.getLandlordDashboard(FROM, TO);
 
         assertThat(response.getTotalListings()).isEqualTo(3L);
         assertThat(response.getActiveBookings()).isEqualTo(2L);
@@ -272,14 +333,25 @@ class DashboardServiceTest {
     }
 
     @Test
-    void getLandlordDashboardShouldCountOnlyConfirmedAndCompletedAsActive() {
+    void getLandlordDashboardShouldCountConfirmedAndCompletedAsActive() {
         Landlord landlord = buildLandlord(10L);
         when(authService.getAuthenticatedUser()).thenReturn(landlord);
         stubEmptyDashboard(10L);
 
-        dashboardService.getLandlordDashboard();
+        dashboardService.getLandlordDashboard(FROM, TO);
 
-        verify(bookingRepository).countByListingLandlordIdAndStatusIn(10L,
-                List.of(BookingStatus.CONFIRMED, BookingStatus.COMPLETED));
+        verify(bookingRepository).countByListingLandlordIdAndStatus(10L, BookingStatus.CONFIRMED);
+        verify(bookingRepository).countByListingLandlordIdAndStatus(10L, BookingStatus.COMPLETED);
+    }
+
+    @Test
+    void getSubscriptionStatusShouldDelegateToRepository() {
+        when(subscriptionRepository.findByLandlordId(10L)).thenReturn(Optional.empty());
+
+        Optional<com.ndobaak.backend.subscription.dto.SubscriptionResponse> result =
+                dashboardService.getSubscriptionStatus(10L);
+
+        assertThat(result).isEmpty();
+        verify(subscriptionRepository).findByLandlordId(10L);
     }
 }

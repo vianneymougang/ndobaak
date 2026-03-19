@@ -11,8 +11,10 @@ import com.ndobaak.backend.common.security.JwtAuthenticationFilter;
 import com.ndobaak.backend.common.security.OAuth2AuthenticationFailureHandler;
 import com.ndobaak.backend.common.security.OAuth2AuthenticationSuccessHandler;
 import com.ndobaak.backend.listing.dto.*;
+import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.listing.service.ListingSearchService;
 import com.ndobaak.backend.listing.service.ListingService;
+import com.ndobaak.backend.listing.service.ListingViewService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -45,6 +47,10 @@ class ListingControllerTest {
     private ListingService listingService;
     @MockitoBean
     private ListingSearchService listingSearchService;
+    @MockitoBean
+    private ListingViewService listingViewService;
+    @MockitoBean
+    private AuthService authService;
     @MockitoBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
     @MockitoBean

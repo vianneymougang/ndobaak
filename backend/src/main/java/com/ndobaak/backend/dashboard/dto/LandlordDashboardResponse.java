@@ -18,8 +18,17 @@ public class LandlordDashboardResponse {
     private long activeBookings;
     private long pendingRequests;
     private BigDecimal totalRevenue;
+    private long totalViews;
+    private double occupancyRate;
+    private long confirmedBookings;
+    private long completedBookings;
+    private BigDecimal previousPeriodRevenue;
+    private double revenueChangePercent;
     private List<PendingBookingSummary> pendingBookings;
     private List<RecentActivityItem> recentActivity;
+    private List<MonthlyRevenueDTO> revenueChart;
+    private List<DailyViewsDTO> viewsChart;
+    private BookingsByStatusDTO bookingsByStatus;
 
     @Getter
     @Setter
