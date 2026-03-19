@@ -18,6 +18,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { ChartModule } from 'primeng/chart';
 import { TooltipModule } from 'primeng/tooltip';
+import { TagModule } from 'primeng/tag';
 import { MessageService } from 'primeng/api';
 import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { DashboardService } from '../../../core/services/dashboard';
@@ -50,6 +51,7 @@ interface PeriodOption {
     SelectButtonModule,
     ChartModule,
     TooltipModule,
+    TagModule,
     NgmMotionDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
