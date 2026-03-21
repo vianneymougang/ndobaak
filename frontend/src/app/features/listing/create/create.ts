@@ -371,7 +371,7 @@ export class Create implements OnInit, OnDestroy {
               summary: 'Soumise',
               detail: 'Votre annonce a ete soumise pour validation.',
             });
-            this.router.navigate(['/my-listings']);
+            this.router.navigate(['/landlord/listings']);
           },
           error: (err) => {
             this.submitting.set(false);
