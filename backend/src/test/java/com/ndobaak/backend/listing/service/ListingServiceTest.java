@@ -3,7 +3,7 @@ package com.ndobaak.backend.listing.service;
 import com.ndobaak.backend.auth.entity.Landlord;
 import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.common.enums.ListingStatus;
-import com.ndobaak.backend.common.enums.RoomType;
+import com.ndobaak.backend.geo.GeoUtils;
 import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.ForbiddenException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
@@ -53,6 +53,8 @@ class ListingServiceTest {
     private AuthService authService;
     @Mock
     private ListingMapper listingMapper;
+    @Mock
+    private com.ndobaak.backend.subscription.service.SubscriptionService subscriptionService;
 
     @InjectMocks
     private ListingService listingService;
@@ -66,6 +68,9 @@ class ListingServiceTest {
     void createListingShouldReturnDraft() {
         Landlord landlord = buildLandlord(2L);
         when(authService.getAuthenticatedUser()).thenReturn(landlord);
+        when(subscriptionService.hasActiveSubscription(2L)).thenReturn(true);
+        when(subscriptionService.getMaxListings(2L)).thenReturn(20);
+        when(listingRepository.countByLandlordId(2L)).thenReturn(0L);
 
         CreateListingRequest request = new CreateListingRequest();
         request.setTitle("Test Listing Title Here");
@@ -96,13 +101,16 @@ class ListingServiceTest {
     void createListingWithLocationShouldCalculateDistance() {
         Landlord landlord = buildLandlord(2L);
         when(authService.getAuthenticatedUser()).thenReturn(landlord);
+        when(subscriptionService.hasActiveSubscription(2L)).thenReturn(true);
+        when(subscriptionService.getMaxListings(2L)).thenReturn(20);
+        when(listingRepository.countByLandlordId(2L)).thenReturn(0L);
 
         CreateListingRequest request = new CreateListingRequest();
         request.setTitle("Near Campus Listing");
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setAddress("Eyang");
-        locationRequest.setLatitude(3.849);
-        locationRequest.setLongitude(11.503);
+        locationRequest.setLatitude(3.8855);
+        locationRequest.setLongitude(11.3922);
         request.setLocation(locationRequest);
 
         when(listingRepository.save(any(Listing.class))).thenAnswer(inv -> {
@@ -125,6 +133,9 @@ class ListingServiceTest {
     void createListingWithAmenitiesShouldLinkThem() {
         Landlord landlord = buildLandlord(2L);
         when(authService.getAuthenticatedUser()).thenReturn(landlord);
+        when(subscriptionService.hasActiveSubscription(2L)).thenReturn(true);
+        when(subscriptionService.getMaxListings(2L)).thenReturn(20);
+        when(listingRepository.countByLandlordId(2L)).thenReturn(0L);
 
         Amenity wifi = new Amenity();
         wifi.setId(1L);
@@ -193,7 +204,7 @@ class ListingServiceTest {
     void submitForReviewShouldValidateAndChangeStatus() {
         Landlord landlord = buildLandlord(2L);
         Location location = Location.builder()
-                .address("Eyang").latitude(3.849).longitude(11.503).build();
+                .address("Eyang").latitude(3.8855).longitude(11.3922).build();
 
         Listing listing = Listing.builder()
                 .title("Valid Listing Title")
@@ -310,10 +321,10 @@ class ListingServiceTest {
 
     @Test
     void haversineDistanceShouldCalculateCorrectly() {
-        double distance = ListingService.haversineDistance(3.8480, 11.5021, 3.8480, 11.5021);
+        double distance = GeoUtils.haversineDistance(3.8845, 11.3912, 3.8845, 11.3912);
         assertThat(distance).isEqualTo(0.0);
 
-        double shortDistance = ListingService.haversineDistance(3.849, 11.503, 3.848, 11.502);
+        double shortDistance = GeoUtils.haversineDistance(3.8855, 11.3922, 3.8845, 11.3912);
         assertThat(shortDistance).isLessThan(1.0);
     }
 

@@ -1,0 +1,90 @@
+<div class="page-container">
+  <h1 class="page-title">Mes réservations</h1>
+
+  <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" class="bookings-tabs">
+    <p-tablist>
+      <p-tab [value]="0">Toutes</p-tab>
+      <p-tab [value]="1">En attente</p-tab>
+      <p-tab [value]="2">Confirmées</p-tab>
+      <p-tab [value]="3">Annulées</p-tab>
+    </p-tablist>
+  </p-tabs>
+
+  <div class="bookings-content" role="region" aria-live="polite" aria-label="Liste des réservations">
+    @if (loading()) {
+      @for (item of skeletonItems; track $index) {
+        <div class="booking-skeleton">
+          <p-skeleton width="120px" height="90px" class="shrink-0 rounded-xl" />
+          <div class="skeleton-lines">
+            <p-skeleton height="20px" class="mb-2" />
+            <p-skeleton height="16px" width="70%" class="mb-2" />
+            <p-skeleton height="14px" width="50%" />
+          </div>
+        </div>
+      }
+    } @else if (bookings().length === 0) {
+      <div class="empty-state" role="status">
+        <i class="pi pi-calendar empty-icon" aria-hidden="true"></i>
+        <h2 class="empty-title">Aucune réservation</h2>
+        <p class="empty-subtitle">{{ emptyMessage() }}</p>
+        @if (showSearchCta()) {
+          <p-button
+            label="Rechercher un logement"
+            icon="pi pi-search"
+            routerLink="/search"
+          />
+        }
+      </div>
+    } @else {
+      <div class="bookings-list">
+        @for (booking of bookings(); track booking.id; let i = $index) {
+          <app-booking-card
+            ngmMotion
+            [initial]="{ opacity: 0, y: 20 }"
+            [animate]="{ opacity: 1, y: 0 }"
+            [transition]="{ duration: 0.35, delay: staggerDelay(i), ease: 'easeOut' }"
+            [booking]="booking"
+            viewMode="student"
+            (cancel)="openCancelDialog($event)"
+          />
+        }
+      </div>
+
+      @if (totalElements() > pageSize) {
+        <p-paginator
+          [rows]="pageSize"
+          [totalRecords]="totalElements()"
+          [first]="page() * pageSize"
+          (onPageChange)="onPageChange($event)"
+          class="bookings-paginator"
+        />
+      }
+    }
+  </div>
+</div>
+
+<p-dialog
+  [visible]="cancelDialogVisible()"
+  (visibleChange)="cancelDialogVisible.set($event)"
+  header="Annuler la réservation"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '420px', 'max-width': '90vw' }"
+>
+  <p class="dialog-text">Voulez-vous vraiment annuler cette réservation ?</p>
+  <ng-template #footer>
+    <p-button
+      label="Non, garder"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="cancelDialogVisible.set(false)"
+    />
+    <p-button
+      label="Oui, annuler"
+      severity="danger"
+      [loading]="cancelling()"
+      (onClick)="confirmCancel()"
+    />
+  </ng-template>
+</p-dialog>

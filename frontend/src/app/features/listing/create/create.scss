@@ -5,10 +5,9 @@
 
   > h1 {
     @apply text-3xl font-bold text-ndb-navy mb-8;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-urbanist);
   }
 }
-
 
 /* ── Step content ── */
 .step-content {
@@ -42,7 +41,7 @@
   @apply text-xs text-ndb-muted mt-1 block;
 
   &.error {
-    color: #DC3545;
+    color: var(--color-ndb-error-dark);
   }
 }
 
@@ -52,7 +51,7 @@
 
   h3 {
     @apply text-lg font-semibold text-ndb-navy mb-4;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-urbanist);
   }
 }
 
@@ -63,7 +62,7 @@
 .amenity-chip {
   @apply flex items-center gap-2 px-4 py-3 rounded-xl cursor-pointer transition-all select-none border;
   border-color: var(--color-ndb-border);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-lato);
   font-size: 13px;
   color: var(--color-ndb-muted);
   background: #fff;
@@ -74,19 +73,19 @@
   }
 
   &:hover {
-    border-color: var(--color-ndb-navy-light);
-    color: var(--color-ndb-navy);
+    border-color: var(--color-ndb-forest-mid);
+    color: var(--color-ndb-forest);
 
-    i { color: var(--color-ndb-navy-light); }
+    i { color: var(--color-ndb-forest-mid); }
   }
 
   &.selected {
-    background: rgba(27, 58, 92, 0.06);
-    border-color: var(--color-ndb-navy);
-    color: var(--color-ndb-navy);
+    background: color-mix(in srgb, var(--color-ndb-forest) 6%, transparent);
+    border-color: var(--color-ndb-forest);
+    color: var(--color-ndb-forest);
     font-weight: 500;
 
-    i { color: var(--color-ndb-navy); }
+    i { color: var(--color-ndb-forest); }
   }
 }
 
@@ -98,7 +97,7 @@
 .photos-header {
   h3 {
     @apply text-lg font-semibold text-ndb-navy mb-1;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-urbanist);
   }
 
   p {
@@ -112,11 +111,11 @@
   @apply flex flex-col items-center justify-center gap-2 w-full rounded-2xl cursor-pointer transition-all;
   height: 160px;
   border: 2px dashed var(--color-ndb-border);
-  background: var(--color-ndb-page);
+  background: var(--color-ndb-cream);
 
   i {
     @apply text-4xl;
-    color: var(--color-ndb-navy-light);
+    color: var(--color-ndb-forest-mid);
   }
 
   span {
@@ -128,13 +127,15 @@
   }
 
   &:hover {
-    border-color: var(--color-ndb-navy-light);
-    background: rgba(27, 58, 92, 0.04);
+    border-color: var(--color-ndb-forest-mid);
+    background: color-mix(in srgb, var(--color-ndb-forest) 4%, transparent);
   }
 }
 
 .uploading-indicator {
-  @apply flex items-center gap-2 text-sm text-ndb-muted;
+  @apply flex flex-col gap-2 text-sm text-ndb-muted;
+
+  span { @apply text-xs; }
 }
 
 .photos-counter {
@@ -143,7 +144,7 @@
 
 .photo-warning {
   @apply text-xs;
-  color: #DC3545;
+  color: var(--color-ndb-error-dark);
 }
 
 .photos-grid {
@@ -157,6 +158,15 @@
   img {
     @apply w-full h-full object-cover;
   }
+
+  &.photo-card-pending {
+    opacity: 0.7;
+  }
+}
+
+.pending-overlay {
+  @apply absolute inset-0 flex items-center justify-center;
+  background: color-mix(in srgb, white 40%, transparent);
 }
 
 .cover-badge {
@@ -170,10 +180,10 @@
   top: 6px;
   right: 6px;
   @apply flex items-center justify-center w-7 h-7 rounded-full text-white text-xs cursor-pointer border-0 transition-all;
-  background: rgba(0, 0, 0, 0.5);
+  background: color-mix(in srgb, black 50%, transparent);
 
   &:hover {
-    background: #DC3545;
+    background: var(--color-ndb-error-dark);
   }
 }
 
@@ -183,12 +193,12 @@
 
 .map-info {
   @apply flex items-center gap-3 p-3 rounded-xl text-sm;
-  background: rgba(27, 58, 92, 0.04);
+  background: color-mix(in srgb, var(--color-ndb-forest) 4%, transparent);
 
   p {
     @apply flex items-center gap-1 text-ndb-muted m-0 flex-1;
 
-    i { color: var(--color-ndb-navy-light); }
+    i { color: var(--color-ndb-forest-mid); }
   }
 }
 
@@ -201,12 +211,12 @@
 .map-placeholder {
   @apply flex flex-col items-center justify-center gap-2 cursor-pointer rounded-2xl transition-all;
   height: 350px;
-  background: var(--color-ndb-page);
+  background: var(--color-ndb-cream);
   border: 2px dashed var(--color-ndb-border);
 
   i {
     @apply text-4xl;
-    color: var(--color-ndb-navy-light);
+    color: var(--color-ndb-forest-mid);
   }
 
   span {
@@ -214,8 +224,8 @@
   }
 
   &:hover {
-    border-color: var(--color-ndb-navy-light);
-    background: rgba(27, 58, 92, 0.04);
+    border-color: var(--color-ndb-forest-mid);
+    background: color-mix(in srgb, var(--color-ndb-forest) 4%, transparent);
   }
 }
 
@@ -223,7 +233,7 @@
 .summary-section {
   h3 {
     @apply text-xl font-semibold text-ndb-navy mb-4;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-urbanist);
   }
 }
 
@@ -241,7 +251,7 @@
 
   h4 {
     @apply text-sm font-semibold text-ndb-muted uppercase tracking-wider mb-3;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-urbanist);
     letter-spacing: 0.06em;
   }
 }
@@ -253,11 +263,11 @@
 
   .value {
     @apply font-medium text-ndb-navy;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-urbanist);
 
     &.price {
       @apply font-bold;
-      color: var(--color-ndb-orange);
+      color: var(--color-ndb-gold);
     }
   }
 }

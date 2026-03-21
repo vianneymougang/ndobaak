@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Réservation confirmée — Ndobaâk</title>
+</head>
+<body style="margin:0;padding:0;background-color:#F0EDEA;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F0EDEA;padding:48px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
+        <tr><td style="height:3px;background:#1B4332;border-radius:3px 3px 0 0;"></td></tr>
+        <tr><td style="background:#ffffff;border-radius:0 0 12px 12px;box-shadow:0 4px 24px rgba(27,67,50,0.08);padding:40px 48px;">
+          <p style="margin:0 0 32px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:20px;font-weight:700;color:#1B4332;">Ndoba&#226;k</p>
+          <h1 style="margin:0 0 20px;font-size:24px;font-weight:700;color:#1B4332;line-height:1.3;">Votre r&#233;servation est confirm&#233;e ✓</h1>
+          <p style="margin:0 0 8px;font-size:15px;color:#374151;">Bonjour <strong th:text="${studentName}">Étudiant</strong>,</p>
+          <p style="margin:0 0 24px;font-size:15px;color:#374151;line-height:1.7;">Bonne nouvelle ! Votre r&#233;servation a &#233;t&#233; confirm&#233;e par le propri&#233;taire.</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F9F7F4;border-radius:8px;padding:20px;margin-bottom:28px;">
+            <tr><td style="padding:6px 0;font-size:14px;color:#6B7280;">Logement</td><td style="padding:6px 0;font-size:14px;font-weight:600;color:#1B4332;" th:text="${listingTitle}">Titre annonce</td></tr>
+            <tr><td style="padding:6px 0;font-size:14px;color:#6B7280;">Date d'entr&#233;e</td><td style="padding:6px 0;font-size:14px;color:#374151;" th:text="${startDate}">01/01/2026</td></tr>
+            <tr><td style="padding:6px 0;font-size:14px;color:#6B7280;">Date de sortie</td><td style="padding:6px 0;font-size:14px;color:#374151;" th:text="${endDate}">01/07/2026</td></tr>
+            <tr><td style="padding:6px 0;font-size:14px;color:#6B7280;">Montant total</td><td style="padding:6px 0;font-size:14px;font-weight:700;color:#D4A017;" th:text="${totalAmount}">300 000 FCFA</td></tr>
+          </table>
+          <p style="margin:0 0 32px;font-size:14px;color:#6B7280;line-height:1.7;">Vous pouvez d&#233;sormais proc&#233;der au paiement depuis votre espace personnel.</p>
+          <hr style="border:none;border-top:1px solid #E5E0D8;margin:32px 0 20px;">
+          <p style="margin:0;font-size:11px;color:#9CA3AF;text-align:center;">&#169; 2026 Ndoba&#226;k &mdash; Activit&#233;s encadr&#233;es par TANK'IMMO SAS</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

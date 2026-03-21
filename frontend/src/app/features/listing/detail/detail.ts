@@ -4,40 +4,71 @@ import {
   inject,
   signal,
   OnInit,
-  AfterViewInit,
   ElementRef,
   viewChild,
   computed,
+  effect,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { GalleriaModule } from 'primeng/galleria';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { ChipModule } from 'primeng/chip';
 import { AvatarModule } from 'primeng/avatar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { DrawerModule } from 'primeng/drawer';
 import { ListingService } from '../../../core/services/listing';
+import { AuthService } from '../../../core/services/auth';
 import { ListingResponse } from '../../../core/models/listing.models';
+import { BookingResponse } from '../../../core/models/booking.models';
+import { amenityLabel, amenityIcon } from '../../../core/models/amenity.config';
 import { environment } from '../../../../environments/environment';
+import { BookingPanel } from '../booking-panel/booking-panel';
+import { ReviewList } from '../../../shared/components/review-list/review-list';
+import { ReviewForm } from '../../review/review-form/review-form';
 
-declare const L: typeof import('leaflet');
+import { L } from '../../../core/utils/leaflet-fix';
 
 @Component({
   selector: 'app-detail',
-  imports: [GalleriaModule, ButtonModule, TagModule, ChipModule, AvatarModule, ProgressSpinnerModule],
+  imports: [
+    GalleriaModule,
+    ButtonModule,
+    TagModule,
+    ChipModule,
+    AvatarModule,
+    ProgressSpinnerModule,
+    DrawerModule,
+    BookingPanel,
+    ReviewList,
+    ReviewForm,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './detail.html',
   styleUrl: './detail.scss',
 })
-export class Detail implements OnInit, AfterViewInit {
+export class Detail implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private listingService = inject(ListingService);
+  protected authService = inject(AuthService);
 
   protected detailMap = viewChild<ElementRef>('detailMap');
   private map: L.Map | null = null;
 
+  private mapEffect = effect(() => {
+    const el = this.detailMap();
+    const listing = this.listing();
+    if (el && listing?.location) {
+      this.initDetailMap();
+    }
+  });
+
   protected listing = signal<ListingResponse | null>(null);
   protected loading = signal(true);
+  protected mobileDrawerVisible = signal(false);
+  protected showReviewForm = signal(true);
+  protected reviewListRef = viewChild<ReviewList>('reviewList');
 
   protected roomTypeLabel = computed(() => {
     const labels: Record<string, string> = {
@@ -67,14 +98,25 @@ export class Detail implements OnInit, AfterViewInit {
       next: (listing) => {
         this.listing.set(listing);
         this.loading.set(false);
-        this.initDetailMap();
       },
       error: () => this.loading.set(false),
     });
   }
 
-  ngAfterViewInit(): void {
-    this.initDetailMap();
+  protected readonly amenityLabel = amenityLabel;
+  protected readonly amenityIcon = amenityIcon;
+
+  protected onBookingCreated(_booking: BookingResponse): void {
+    this.router.navigate(['/my-bookings']);
+  }
+
+  protected canShowReviewForm = computed(() => {
+    return this.authService.userRole() === 'STUDENT' && this.showReviewForm();
+  });
+
+  protected onReviewCreated(): void {
+    this.showReviewForm.set(false);
+    this.reviewListRef()?.ngOnInit();
   }
 
   private initDetailMap(): void {

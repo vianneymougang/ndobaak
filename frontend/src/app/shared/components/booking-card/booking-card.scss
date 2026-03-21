@@ -1,0 +1,124 @@
+@reference "../../../../tailwind.css";
+
+.booking-card {
+  @apply flex gap-4 bg-white p-4 rounded-2xl cursor-default;
+  border: 1px solid var(--color-ndb-border);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  @media (max-width: 768px) {
+    @apply flex-col;
+  }
+}
+
+.card-photo {
+  @apply flex-shrink-0 rounded-xl object-cover;
+  width: 120px;
+  height: 90px;
+
+  @media (max-width: 768px) {
+    @apply w-full;
+    height: 180px;
+  }
+
+  &--placeholder {
+    @apply flex items-center justify-center;
+    background: color-mix(in srgb, var(--color-ndb-border) 60%, transparent);
+
+    i {
+      @apply text-3xl;
+      color: var(--color-ndb-muted);
+    }
+  }
+}
+
+.card-content {
+  @apply flex flex-col gap-2 flex-1 min-w-0;
+}
+
+.card-header {
+  @apply flex items-start justify-between gap-2;
+}
+
+.card-listing-info {
+  @apply flex flex-col gap-0.5 min-w-0;
+}
+
+.card-title {
+  @apply text-base font-semibold m-0 truncate;
+  color: var(--color-ndb-navy);
+  font-family: var(--font-urbanist);
+}
+
+.card-address {
+  @apply text-xs m-0 flex items-center gap-1 truncate;
+  color: var(--color-ndb-muted);
+
+  i {
+    color: var(--color-ndb-gold);
+    @apply flex-shrink-0;
+  }
+}
+
+.card-student {
+  @apply flex items-center gap-2 py-1;
+}
+
+.student-info {
+  @apply flex flex-col;
+}
+
+.student-name {
+  @apply text-sm font-semibold;
+  color: var(--color-ndb-navy);
+  font-family: var(--font-urbanist);
+}
+
+.card-dates {
+  @apply flex items-center gap-2 text-sm;
+  color: var(--color-ndb-body);
+}
+
+.card-date {
+  @apply flex items-center gap-1;
+
+  i {
+    @apply text-xs;
+    color: var(--color-ndb-forest);
+  }
+}
+
+.card-date-arrow {
+  color: var(--color-ndb-muted);
+}
+
+.card-pricing {
+  @apply flex items-center gap-3 text-sm;
+}
+
+.card-rent {
+  @apply font-semibold;
+  color: var(--color-ndb-navy);
+  font-family: var(--font-urbanist);
+}
+
+.card-total {
+  color: var(--color-ndb-muted);
+}
+
+.card-reason {
+  @apply text-xs m-0 flex items-center gap-1 italic;
+  color: var(--color-ndb-muted);
+
+  i {
+    @apply flex-shrink-0;
+  }
+}
+
+.card-actions {
+  @apply flex items-center gap-2 flex-wrap mt-1;
+}

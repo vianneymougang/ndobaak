@@ -3,41 +3,41 @@
 /* ── Split-screen layout ── */
 .login-page {
   @apply min-h-screen flex;
-  background: var(--color-ndb-page);
+  background: var(--color-ndb-cream);
 }
 
 /* Visual panel — hidden on mobile */
 .login-visual {
   @apply hidden lg:flex flex-1 flex-col justify-between p-12;
-  background: linear-gradient(145deg, #1B3A5C 0%, #2D5F8A 60%, #1A7A5C 100%);
+  background: linear-gradient(150deg, var(--color-ndb-forest-dark) 0%, var(--color-ndb-forest) 45%, var(--color-ndb-forest-mid) 100%);
   position: relative;
   overflow: hidden;
 
   &::before {
     content: '';
     position: absolute;
-    top: -40%;
-    right: -20%;
+    top: -30%;
+    right: -15%;
     width: 500px;
     height: 500px;
     border-radius: 50%;
-    background: rgba(232, 118, 43, 0.15);
+    background: color-mix(in srgb, var(--color-ndb-gold) 10%, transparent);
   }
 
   &::after {
     content: '';
     position: absolute;
-    bottom: -30%;
+    bottom: -25%;
     left: -10%;
-    width: 400px;
-    height: 400px;
+    width: 380px;
+    height: 380px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
+    background: color-mix(in srgb, white 4%, transparent);
   }
 }
 
 .visual-logo {
-  @apply flex items-center gap-2 relative z-10 no-underline;
+  @apply flex items-center gap-2.5 relative z-10 no-underline;
   transition: opacity 0.15s ease;
 
   &:hover {
@@ -45,13 +45,20 @@
   }
 
   .logo-icon {
-    @apply flex items-center justify-center w-10 h-10 rounded-xl text-white text-lg;
-    background: var(--color-ndb-orange);
+    @apply flex items-center justify-center w-10 h-10 rounded-xl;
+    background: color-mix(in srgb, var(--color-ndb-gold) 20%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-ndb-gold) 35%, transparent);
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
   }
 
   .logo-name {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-urbanist);
     @apply text-2xl font-bold text-white;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -60,24 +67,28 @@
 
   blockquote {
     @apply text-white/90 text-2xl font-light leading-relaxed mb-4;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-urbanist);
   }
 
   cite {
-    @apply text-white/60 text-sm;
+    @apply text-white/50 text-sm;
+    font-family: var(--font-lato);
   }
 }
 
 .visual-stats {
-  @apply flex gap-8 relative z-10;
+  @apply flex gap-10 relative z-10;
 
   .stat {
     .num {
-      @apply block text-3xl font-bold text-white;
-      font-family: 'Poppins', sans-serif;
+      @apply block text-3xl font-extrabold text-white;
+      font-family: var(--font-urbanist);
+      color: var(--color-ndb-gold);
     }
+
     .lbl {
-      @apply text-white/60 text-sm;
+      @apply text-white/55 text-sm;
+      font-family: var(--font-lato);
     }
   }
 }
@@ -96,16 +107,46 @@
 .login-card {
   @apply w-full;
   max-width: 400px;
-  --p-tabs-tabpanel-padding: 0;
+}
+
+.method-tabs {
+  @apply flex mb-6;
+  border-bottom: 2px solid var(--color-ndb-border);
+}
+
+.method-tab {
+  @apply flex-1 py-2.5 text-sm font-semibold text-center cursor-pointer;
+  font-family: var(--font-urbanist);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  color: var(--color-ndb-muted);
+  transition: color 0.15s ease, border-color 0.15s ease;
+
+  &--active {
+    color: var(--color-ndb-gold);
+    border-bottom-color: var(--color-ndb-gold);
+  }
+
+  &:hover:not(&--active) {
+    color: var(--color-ndb-forest);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-ndb-gold);
+    outline-offset: -2px;
+  }
 }
 
 .back-home-link {
   @apply flex items-center gap-1.5 text-sm font-medium no-underline mb-6;
   color: var(--color-ndb-muted);
+  font-family: var(--font-lato);
   transition: color 0.15s ease;
 
   &:hover {
-    color: var(--color-ndb-navy);
+    color: var(--color-ndb-forest);
   }
 
   i {
@@ -122,27 +163,32 @@
   }
 
   .logo-icon {
-    @apply flex items-center justify-center w-9 h-9 rounded-xl text-white;
-    background: var(--color-ndb-orange);
+    @apply flex items-center justify-center w-9 h-9 rounded-xl;
+    background: var(--color-ndb-forest);
   }
 
   .logo-name {
-    font-family: 'Poppins', sans-serif;
-    @apply text-xl font-bold text-ndb-navy;
+    font-family: var(--font-urbanist);
+    @apply text-xl font-bold;
+    color: var(--color-ndb-ink);
   }
 }
 
 .login-title {
-  @apply text-3xl font-bold text-ndb-navy mb-1;
-  font-family: 'Poppins', sans-serif;
+  @apply text-3xl font-bold mb-1;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-ink);
+  letter-spacing: -0.01em;
 }
 
 .login-subtitle {
-  @apply text-ndb-muted text-sm mb-6;
+  @apply text-sm mb-6;
+  color: var(--color-ndb-muted);
+  font-family: var(--font-lato);
 }
 
 .login-form {
-  @apply flex flex-col gap-5 pt-4;
+  @apply flex flex-col gap-9 pt-3;
 }
 
 .social-divider {
@@ -156,25 +202,28 @@
   }
 
   span {
-    @apply text-xs text-ndb-muted flex-shrink-0;
+    @apply text-xs flex-shrink-0;
+    color: var(--color-ndb-muted);
+    font-family: var(--font-lato);
   }
 }
 
 .btn-google {
   @apply w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg text-sm font-medium cursor-pointer;
-  border: 1.5px solid #DADCE0;
+  border: 1.5px solid var(--color-ndb-border);
   background: #fff;
-  color: var(--color-ndb-navy);
+  color: var(--color-ndb-body);
+  font-family: var(--font-lato);
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 
   &:hover {
-    background: #f8f9fa;
-    border-color: #BBBFC4;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    background: var(--color-ndb-cream);
+    border-color: #c5bdb0;
+    box-shadow: 0 1px 3px color-mix(in srgb, black 6%, transparent);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--color-ndb-orange);
+    outline: 2px solid var(--color-ndb-gold);
     outline-offset: 2px;
   }
 
@@ -190,23 +239,27 @@
 .forgot-link {
   @apply text-xs font-medium no-underline self-end;
   color: var(--color-ndb-muted);
+  font-family: var(--font-lato);
   transition: color 0.15s ease;
 
   &:hover {
-    color: var(--color-ndb-orange);
+    color: var(--color-ndb-gold);
   }
 }
 
 .register-link {
-  @apply text-center text-sm text-ndb-muted mt-6 m-0;
+  @apply text-center text-sm mt-6 m-0;
+  color: var(--color-ndb-muted);
+  font-family: var(--font-lato);
 
   a {
     @apply font-semibold no-underline;
-    color: var(--color-ndb-orange);
+    color: var(--color-ndb-gold);
+    font-family: var(--font-urbanist);
 
     &:hover {
       text-decoration: underline;
+      color: var(--color-ndb-gold-dark);
     }
   }
 }
-

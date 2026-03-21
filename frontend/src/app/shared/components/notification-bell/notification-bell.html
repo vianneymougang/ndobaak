@@ -1,0 +1,72 @@
+<button
+  class="bell-trigger"
+  (click)="op.toggle($event)"
+  aria-label="Notifications"
+>
+  @if (unreadCount() > 0) {
+    <p-overlaybadge [value]="unreadCount() > 99 ? '99+' : unreadCount()" severity="danger">
+      <i class="pi pi-bell bell-icon" aria-hidden="true"></i>
+    </p-overlaybadge>
+  } @else {
+    <i class="pi pi-bell bell-icon" aria-hidden="true"></i>
+  }
+</button>
+
+<p-popover #op (onShow)="onPopoverShow()" ariaLabel="Centre de notifications">
+  <div class="notification-panel">
+    <div class="notification-header">
+      <span class="notification-title">Notifications</span>
+      @if (unreadCount() > 0) {
+        <button class="mark-all-btn" (click)="markAllAsRead()">
+          Tout marquer comme lu
+        </button>
+      }
+    </div>
+
+    <div class="notification-body">
+      @if (loading()) {
+        @for (_ of [1, 2, 3]; track $index) {
+          <div class="notification-skeleton">
+            <p-skeleton shape="circle" size="2rem" />
+            <div class="notification-skeleton-text">
+              <p-skeleton width="60%" height="0.8rem" />
+              <p-skeleton width="90%" height="0.7rem" />
+            </div>
+          </div>
+        }
+      } @else if (notifications().length === 0) {
+        <div class="notification-empty">
+          <i class="pi pi-inbox" aria-hidden="true"></i>
+          <span>Aucune notification</span>
+        </div>
+      } @else {
+        @for (n of notifications(); track n.id) {
+          <a
+            class="notification-item"
+            [class.notification-item--unread]="!n.read"
+            [routerLink]="getRoute(n)"
+            (click)="markAsRead(n, $event)"
+          >
+            <div class="notification-icon">
+              <i class="pi" [class]="getIcon(n.type)" aria-hidden="true"></i>
+            </div>
+            <div class="notification-content">
+              <span class="notification-item-title">{{ n.title }}</span>
+              <span class="notification-item-message">{{ n.message }}</span>
+              <span class="notification-item-time">{{ n.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            @if (!n.read) {
+              <span class="notification-dot" aria-label="Non lu"></span>
+            }
+          </a>
+        }
+      }
+    </div>
+
+    <div class="notification-footer">
+      <a routerLink="/notifications" class="view-all-link" (click)="op.hide()">
+        Voir toutes les notifications
+      </a>
+    </div>
+  </div>
+</p-popover>

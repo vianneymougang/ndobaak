@@ -1,0 +1,252 @@
+@use '../../../../styles' as *;
+
+.review-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rating-summary {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.rating-overview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rating-big {
+  font-family: var(--font-urbanist);
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--color-ndb-navy);
+  line-height: 1;
+}
+
+.rating-overview-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rating-count {
+  font-family: var(--font-lato);
+  font-size: 0.875rem;
+  color: var(--color-ndb-muted);
+}
+
+.rating-distribution {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+  flex: 1;
+  max-width: 320px;
+}
+
+.distribution-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.distribution-star {
+  font-family: var(--font-urbanist);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-ndb-body);
+  width: 12px;
+  text-align: right;
+}
+
+.distribution-star-icon {
+  font-size: 0.75rem;
+  color: var(--color-ndb-gold);
+}
+
+.distribution-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--color-ndb-surface);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.distribution-bar-fill {
+  height: 100%;
+  background: var(--color-ndb-gold);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.distribution-count {
+  font-family: var(--font-lato);
+  font-size: 0.8rem;
+  color: var(--color-ndb-muted);
+  width: 24px;
+  text-align: right;
+}
+
+.review-controls {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.review-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.review-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 12px;
+  background: var(--color-ndb-surface);
+  border: 1px solid var(--color-ndb-border);
+}
+
+.review-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.review-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.review-author {
+  font-family: var(--font-urbanist);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-ndb-navy);
+}
+
+.review-date {
+  font-family: var(--font-lato);
+  font-size: 0.8rem;
+  color: var(--color-ndb-muted);
+}
+
+.review-comment {
+  font-family: var(--font-lato);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--color-ndb-body);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  &.expanded {
+    display: block;
+    -webkit-line-clamp: unset;
+  }
+}
+
+.review-read-more {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-urbanist);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--color-ndb-forest);
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:hover {
+    color: var(--color-ndb-navy);
+  }
+}
+
+.review-photos {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0;
+}
+
+.review-photo-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+}
+
+.review-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-ndb-muted);
+
+  i {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-family: var(--font-urbanist);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-ndb-navy);
+    margin: 0 0 4px;
+  }
+
+  .review-empty-sub {
+    font-family: var(--font-lato);
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--color-ndb-muted);
+  }
+}
+
+.galleria-image {
+  width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+@media (max-width: 640px) {
+  .rating-summary {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .rating-distribution {
+    max-width: 100%;
+  }
+
+  .review-card {
+    padding: 16px;
+  }
+
+  .review-photo-btn img {
+    width: 64px;
+    height: 64px;
+  }
+}

@@ -1,0 +1,108 @@
+@reference "../../../../tailwind.css";
+
+:host {
+  display: block;
+}
+
+.kpi-card {
+  @apply flex flex-col bg-white rounded-2xl;
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow-card);
+  border: 1px solid transparent;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+  min-width: 0;
+
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+    border-color: color-mix(in srgb, var(--color-ndb-forest) 12%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-ndb-gold);
+    outline-offset: 2px;
+  }
+
+  &--accent {
+    border-color: var(--color-ndb-gold);
+    background: linear-gradient(
+      135deg,
+      white 0%,
+      color-mix(in srgb, var(--color-ndb-gold-pale) 18%, white) 100%
+    );
+  }
+
+  &--skeleton {
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+.kpi-icon-wrap {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-ndb-forest) 8%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+
+  i {
+    font-size: 1.125rem;
+    color: var(--color-ndb-forest);
+  }
+
+  &--accent {
+    background: color-mix(in srgb, var(--color-ndb-gold) 12%, transparent);
+
+    i {
+      color: var(--color-ndb-gold-dark);
+    }
+  }
+}
+
+.kpi-label {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-ndb-muted);
+  margin-bottom: 0.25rem;
+}
+
+.kpi-value {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 1.625rem;
+  color: var(--color-ndb-ink);
+  line-height: 1.2;
+  margin-bottom: 0.25rem;
+}
+
+.kpi-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-lato);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  border-radius: 100px;
+  width: fit-content;
+
+  i {
+    font-size: 0.625rem;
+  }
+
+  &--up {
+    color: var(--color-ndb-forest-light);
+    background: var(--color-ndb-forest-pale);
+  }
+
+  &--down {
+    color: var(--color-ndb-error-dark);
+    background: var(--color-ndb-error-bg);
+  }
+}

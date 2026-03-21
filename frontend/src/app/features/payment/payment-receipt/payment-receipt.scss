@@ -1,0 +1,121 @@
+@reference "../../../../tailwind.css";
+
+.receipt-page {
+  @apply max-w-2xl mx-auto px-4 py-6;
+
+  @media (min-width: 1024px) {
+    @apply px-8 py-10;
+  }
+}
+
+.receipt-actions {
+  @apply flex items-center justify-between mb-6;
+}
+
+.back-link {
+  @apply inline-flex items-center gap-2 text-sm;
+  color: var(--color-ndb-muted);
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--color-ndb-forest);
+  }
+}
+
+.action-buttons {
+  @apply flex gap-2;
+}
+
+.receipt-card {
+  @apply flex flex-col gap-2 p-6 rounded-2xl;
+  background: white;
+  border: 1px solid var(--color-ndb-border);
+  box-shadow: var(--shadow-card);
+
+  @media (min-width: 640px) {
+    @apply p-8;
+  }
+}
+
+.receipt-header {
+  @apply flex flex-col items-center text-center gap-1;
+}
+
+.receipt-title {
+  @apply text-xl font-bold m-0;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.receipt-id {
+  @apply text-xs m-0;
+  color: var(--color-ndb-muted);
+  font-family: monospace;
+}
+
+.receipt-section {
+  @apply flex flex-col gap-3;
+}
+
+.receipt-section-title {
+  @apply text-sm font-semibold m-0;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.receipt-rows {
+  @apply flex flex-col gap-2;
+}
+
+.receipt-row {
+  @apply flex justify-between items-start text-sm;
+
+  &--total {
+    @apply font-bold text-base;
+    font-family: var(--font-urbanist);
+    color: var(--color-ndb-navy);
+  }
+}
+
+.receipt-label {
+  color: var(--color-ndb-muted);
+  @apply flex-shrink-0;
+}
+
+.receipt-value {
+  @apply text-right;
+  color: var(--color-ndb-body);
+  max-width: 65%;
+  word-break: break-word;
+}
+
+.receipt-footer {
+  @apply mt-4 pt-4 text-center;
+  border-top: 1px dashed var(--color-ndb-border);
+
+  p {
+    @apply text-xs m-0;
+    color: var(--color-ndb-muted);
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .receipt-page {
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .receipt-card {
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+  }
+
+  body {
+    background: white !important;
+  }
+}

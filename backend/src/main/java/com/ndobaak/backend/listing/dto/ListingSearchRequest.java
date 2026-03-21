@@ -21,6 +21,8 @@ public class ListingSearchRequest {
     private Double minRating;
     private LocalDate availableBefore;
     private String sortBy;
+    private Double userLat;
+    private Double userLng;
     private int page = 0;
     private int size = 10;
 }

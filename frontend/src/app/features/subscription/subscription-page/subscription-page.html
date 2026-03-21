@@ -1,0 +1,271 @@
+<div class="subscription-page">
+  <h1 class="page-title">Abonnement</h1>
+
+  @if (loading()) {
+    <div class="skeleton-wrap">
+      <p-skeleton height="2rem" width="40%" styleClass="mb-6" />
+      <p-skeleton height="14rem" borderRadius="16px" />
+    </div>
+  } @else {
+    @let sub = subscription();
+
+    @if (!sub) {
+      <div
+        class="cta-card"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 24 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ duration: 0.4 }"
+      >
+        <div class="cta-header">
+          <div class="cta-icon-wrap" aria-hidden="true">
+            <i class="pi pi-shield"></i>
+          </div>
+          <h2 class="cta-title">Abonnement Propriétaire</h2>
+          <p class="cta-subtitle">
+            Publiez vos logements et gérez vos réservations en toute sérénité
+          </p>
+        </div>
+
+        <div class="price-block">
+          <span class="price-amount">100 000</span>
+          <span class="price-details">FCFA <span class="price-period">/ an</span></span>
+        </div>
+
+        <ul class="features-list" aria-label="Fonctionnalités incluses">
+          <li><i class="pi pi-check-circle" aria-hidden="true"></i> Publiez jusqu'à 10 annonces</li>
+          <li><i class="pi pi-check-circle" aria-hidden="true"></i> Tableau de bord avancé</li>
+          <li><i class="pi pi-check-circle" aria-hidden="true"></i> Gestion des réservations</li>
+          <li><i class="pi pi-check-circle" aria-hidden="true"></i> Support prioritaire</li>
+          <li><i class="pi pi-check-circle" aria-hidden="true"></i> Visibilité optimisée</li>
+        </ul>
+
+        <p-button
+          label="S'abonner"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          styleClass="w-full"
+          size="large"
+          (onClick)="openSubscribeDialog()"
+        />
+      </div>
+
+    } @else if (sub.status === 'ACTIVE') {
+      <div
+        class="status-card"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 24 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ duration: 0.4 }"
+      >
+        <div class="status-header">
+          <div class="status-title-row">
+            <h2 class="status-title">Mon abonnement</h2>
+            <p-tag [value]="statusLabel()" [severity]="statusSeverity()" />
+          </div>
+          @if (isExpiringSoon()) {
+            <div class="expiry-warning" role="alert">
+              <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+              Expire dans {{ sub.daysRemaining }} jours — renouvelez dès maintenant
+            </div>
+          }
+        </div>
+
+        <p-divider />
+
+        <dl class="subscription-details">
+          <div class="detail-row">
+            <dt class="detail-label">Date de début</dt>
+            <dd class="detail-value">{{ sub.startDate | date: 'dd MMMM yyyy' : '' : 'fr' }}</dd>
+          </div>
+          <div class="detail-row">
+            <dt class="detail-label">Date d'expiration</dt>
+            <dd class="detail-value">{{ sub.endDate | date: 'dd MMMM yyyy' : '' : 'fr' }}</dd>
+          </div>
+          <div class="detail-row">
+            <dt class="detail-label">Jours restants</dt>
+            <dd class="detail-value" [class.text-expiry]="isExpiringSoon()">
+              {{ sub.daysRemaining }} jours
+            </dd>
+          </div>
+          <div class="detail-row">
+            <dt class="detail-label">Annonces autorisées</dt>
+            <dd class="detail-value">{{ sub.maxListings }}</dd>
+          </div>
+          <div class="detail-row">
+            <dt class="detail-label">Montant</dt>
+            <dd class="detail-value">{{ sub.amount | number: '1.0-0' }} FCFA</dd>
+          </div>
+        </dl>
+
+        <p-divider />
+
+        <div class="auto-renew-section">
+          @if (sub.autoRenew) {
+            <div class="auto-renew-row">
+              <div class="auto-renew-info">
+                <span class="auto-renew-label">Renouvellement automatique activé</span>
+                <span class="auto-renew-desc">
+                  Votre abonnement sera renouvelé automatiquement à expiration.
+                </span>
+              </div>
+              <p-button
+                label="Désactiver"
+                severity="secondary"
+                size="small"
+                [loading]="cancellingAutoRenew()"
+                [disabled]="cancellingAutoRenew()"
+                (onClick)="cancelAutoRenewAction()"
+              />
+            </div>
+          } @else {
+            <div class="auto-renew-row">
+              <div class="auto-renew-info">
+                <span class="auto-renew-label">Renouvellement automatique désactivé</span>
+                <span class="auto-renew-desc">
+                  Renouvelez manuellement avant expiration pour conserver l'accès.
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (isExpiringSoon()) {
+          <div class="status-actions">
+            <p-button
+              label="Renouveler mon abonnement"
+              icon="pi pi-refresh"
+              (onClick)="openRenewDialog()"
+            />
+          </div>
+        }
+      </div>
+
+    } @else if (sub.status === 'PENDING_PAYMENT') {
+      <div
+        class="pending-card"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 24 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ duration: 0.4 }"
+      >
+        <i class="pi pi-clock pending-icon" aria-hidden="true"></i>
+        <h2 class="pending-title">Paiement en cours</h2>
+        <p class="pending-desc">
+          Vérifiez votre téléphone pour confirmer le paiement Mobile Money.
+        </p>
+        <p-button
+          label="Actualiser"
+          icon="pi pi-refresh"
+          severity="secondary"
+          (onClick)="loadSubscription()"
+        />
+      </div>
+
+    } @else if (sub.status === 'EXPIRED' || sub.status === 'CANCELLED') {
+      <div class="expired-banner" role="alert">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        <div class="expired-content">
+          <strong>Votre abonnement a expiré</strong>
+          <span>Renouvelez votre abonnement pour publier et gérer vos annonces.</span>
+        </div>
+      </div>
+
+      <div
+        class="renew-cta"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 24 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ duration: 0.4 }"
+      >
+        <p class="renew-text">
+          Votre abonnement a expiré le {{ sub.endDate | date: 'dd MMMM yyyy' : '' : 'fr' }}.
+        </p>
+        <p-button
+          label="Renouveler mon abonnement"
+          icon="pi pi-refresh"
+          size="large"
+          (onClick)="openRenewDialog()"
+        />
+      </div>
+    }
+  }
+</div>
+
+<p-dialog
+  [header]="isRenewal() ? 'Renouveler mon abonnement' : 'S\'abonner'"
+  [visible]="dialogVisible"
+  (onHide)="closeDialog()"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+  [closable]="!submitting()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" class="dialog-form">
+    <div class="dialog-amount">
+      <span class="dialog-price">100 000 FCFA</span>
+      <span class="dialog-period">/ an</span>
+    </div>
+    <p class="dialog-desc">
+      Vous recevrez une demande de paiement sur votre téléphone.
+    </p>
+
+    <div class="form-fields">
+      <div class="field-wrap">
+        <p-floatlabel>
+          <p-select
+            formControlName="operator"
+            [options]="operatorOptions"
+            optionLabel="label"
+            optionValue="value"
+            inputId="operator"
+            [invalid]="form.controls.operator.invalid && form.controls.operator.touched"
+          />
+          <label for="operator">Opérateur</label>
+        </p-floatlabel>
+        @if (form.controls.operator.invalid && form.controls.operator.touched) {
+          <small class="field-error">
+            <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+            Veuillez sélectionner un opérateur
+          </small>
+        }
+      </div>
+
+      <div class="field-wrap">
+        <p-floatlabel>
+          <p-inputMask
+            formControlName="phoneNumber"
+            mask="+237 999 999 999"
+            placeholder="+237 6XX XXX XXX"
+            inputId="phone"
+            [invalid]="form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched"
+            [unmask]="true"
+          />
+          <label for="phone">Numéro de téléphone</label>
+        </p-floatlabel>
+        @if (form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched) {
+          <small class="field-error">
+            <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+            Numéro camerounais invalide (ex: 6XX XXX XXX)
+          </small>
+        }
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Annuler"
+      severity="secondary"
+      [text]="true"
+      [disabled]="submitting()"
+      (onClick)="closeDialog()"
+    />
+    <p-button
+      [label]="isRenewal() ? 'Renouveler' : 'S\'abonner'"
+      icon="pi pi-lock"
+      [loading]="submitting()"
+      [disabled]="submitting()"
+      (onClick)="submit()"
+    />
+  </ng-template>
+</p-dialog>

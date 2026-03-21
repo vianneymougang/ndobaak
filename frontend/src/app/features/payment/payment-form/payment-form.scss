@@ -1,0 +1,220 @@
+@reference "../../../../tailwind.css";
+
+.payment-page {
+  @apply max-w-6xl mx-auto px-4 py-6;
+
+  @media (min-width: 1024px) {
+    @apply px-8 py-10;
+  }
+}
+
+.back-link {
+  @apply inline-flex items-center gap-2 text-sm mb-4;
+  color: var(--color-ndb-muted);
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--color-ndb-forest);
+  }
+}
+
+.page-title {
+  @apply text-2xl font-bold mb-6;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+
+  @media (min-width: 1024px) {
+    @apply text-3xl mb-8;
+  }
+}
+
+.payment-layout {
+  @apply flex flex-col gap-6;
+
+  @media (min-width: 1024px) {
+    @apply flex-row gap-10;
+  }
+}
+
+.form-column {
+  @apply flex flex-col gap-4 flex-1 min-w-0;
+
+  @media (min-width: 1024px) {
+    @apply max-w-xl;
+  }
+}
+
+.summary-column {
+  @media (min-width: 1024px) {
+    @apply w-80 flex-shrink-0;
+    position: sticky;
+    top: 100px;
+    align-self: flex-start;
+  }
+
+  @media (max-width: 1023px) {
+    @apply hidden;
+  }
+}
+
+.payment-form {
+  @apply flex flex-col gap-6;
+}
+
+.form-section {
+  @apply flex flex-col gap-5;
+}
+
+.section-title {
+  @apply text-lg font-semibold m-0;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.section-subtitle {
+  @apply text-sm m-0 -mt-2;
+  color: var(--color-ndb-muted);
+}
+
+.payment-type-cards {
+  @apply flex flex-col gap-3;
+
+  @media (min-width: 640px) {
+    @apply flex-row;
+  }
+}
+
+.type-card {
+  @apply flex items-start gap-3 p-4 rounded-xl cursor-pointer flex-1;
+  border: 2px solid var(--color-ndb-border);
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--color-ndb-gold) 50%, transparent);
+  }
+
+  &--active {
+    border-color: var(--color-ndb-gold);
+    background: color-mix(in srgb, var(--color-ndb-gold) 4%, transparent);
+  }
+}
+
+.type-card-content {
+  @apply flex flex-col gap-0.5;
+}
+
+.type-card-label {
+  @apply text-sm font-semibold;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.type-card-desc {
+  @apply text-xs;
+  color: var(--color-ndb-muted);
+}
+
+.form-fields {
+  @apply flex flex-col gap-7 pt-3;
+}
+
+.submit-desktop {
+  @apply flex flex-col gap-3 mt-2;
+
+  @media (max-width: 1023px) {
+    @apply hidden;
+  }
+}
+
+.secure-notice {
+  @apply flex items-center justify-center gap-2 text-xs m-0;
+  color: var(--color-ndb-muted);
+
+  i {
+    color: var(--color-ndb-forest-light);
+  }
+}
+
+.summary-card {
+  @apply flex flex-col rounded-2xl p-5;
+  background: white;
+  border: 1px solid var(--color-ndb-border);
+  box-shadow: var(--shadow-card);
+}
+
+.summary-photo {
+  @apply w-full rounded-xl object-cover;
+  height: 160px;
+
+  &--placeholder {
+    @apply flex items-center justify-center;
+    background: color-mix(in srgb, var(--color-ndb-border) 60%, transparent);
+
+    i {
+      @apply text-3xl;
+      color: var(--color-ndb-muted);
+    }
+  }
+}
+
+.summary-details {
+  @apply flex flex-col gap-1 mt-4;
+}
+
+.summary-title {
+  @apply text-base font-semibold m-0;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.summary-address {
+  @apply text-xs m-0 flex items-center gap-1;
+  color: var(--color-ndb-muted);
+
+  i {
+    color: var(--color-ndb-gold);
+    @apply flex-shrink-0;
+  }
+}
+
+.summary-lines {
+  @apply flex flex-col gap-3;
+}
+
+.summary-line {
+  @apply flex justify-between items-center text-sm;
+  color: var(--color-ndb-body);
+
+  &--total {
+    @apply font-bold text-base;
+    font-family: var(--font-urbanist);
+    color: var(--color-ndb-navy);
+  }
+}
+
+.mobile-bottom-bar {
+  @apply fixed bottom-0 left-0 right-0 flex items-center justify-between gap-4 px-4 py-3;
+  background: white;
+  border-top: 1px solid var(--color-ndb-border);
+  box-shadow: 0 -4px 16px color-mix(in srgb, var(--color-ndb-forest) 8%, transparent);
+  z-index: 50;
+
+  @media (min-width: 1024px) {
+    @apply hidden;
+  }
+}
+
+.mobile-total {
+  @apply flex flex-col;
+}
+
+.mobile-total-label {
+  @apply text-xs;
+  color: var(--color-ndb-muted);
+}
+
+.mobile-total-amount {
+  @apply text-base font-bold;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}

@@ -1,0 +1,130 @@
+<div class="page">
+  <div class="page-header">
+    <a routerLink="/admin/users" class="back-link">
+      <i class="pi pi-arrow-left"></i> Retour
+    </a>
+  </div>
+
+  @if (loading()) {
+    <div class="detail-card">
+      <p-skeleton shape="circle" size="72px" styleClass="mb-3" />
+      <p-skeleton height="1.5rem" width="200px" styleClass="mb-2" />
+      <p-skeleton height="1rem" width="160px" styleClass="mb-4" />
+      <div class="info-grid">
+        @for (i of [1,2,3,4,5,6]; track i) {
+          <div><p-skeleton height="0.75rem" width="60px" styleClass="mb-1" /><p-skeleton height="1rem" /></div>
+        }
+      </div>
+    </div>
+  } @else if (user(); as u) {
+    <div class="detail-card">
+      <div class="user-header">
+        <div class="user-avatar">{{ u.firstName[0] }}{{ u.lastName[0] }}</div>
+        <div>
+          <h1 class="user-name">{{ u.firstName }} {{ u.lastName }}</h1>
+          <p class="user-email">{{ u.email }}</p>
+          <div class="user-tags">
+            <p-tag [value]="u.role" [severity]="roleSeverity(u.role)" />
+            <p-tag
+              [value]="u.deactivated ? 'Désactivé' : u.status"
+              [severity]="u.deactivated ? 'danger' : u.status === 'ACTIVE' ? 'success' : 'warn'"
+            />
+          </div>
+        </div>
+        <div class="user-actions">
+          @if (u.deactivated) {
+            <p-button
+              label="Réactiver le compte"
+              icon="pi pi-undo"
+              severity="success"
+              [loading]="actionLoading()"
+              (onClick)="reactivate()"
+            />
+          } @else {
+            <p-button
+              label="Désactiver le compte"
+              icon="pi pi-ban"
+              severity="danger"
+              [loading]="actionLoading()"
+              (onClick)="openDeactivate()"
+            />
+          }
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Téléphone</span>
+          <span class="info-value">{{ u.phone ?? '—' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Inscrit le</span>
+          <span class="info-value">{{ u.registrationDate | date:'dd/MM/yyyy' }}</span>
+        </div>
+        @if (u.role === 'LANDLORD') {
+          <div class="info-item">
+            <span class="info-label">Annonces actives</span>
+            <span class="info-value">{{ u.activeListingCount ?? 0 }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Revenus totaux</span>
+            <span class="info-value">{{ (u.totalRevenue ?? 0) | number }} FCFA</span>
+          </div>
+        }
+        @if (u.role === 'STUDENT') {
+          <div class="info-item">
+            <span class="info-label">Réservations</span>
+            <span class="info-value">{{ u.bookingCount ?? 0 }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Réservations confirmées</span>
+            <span class="info-value">{{ u.completedBookingCount ?? 0 }}</span>
+          </div>
+        }
+        <div class="info-item">
+          <span class="info-label">Avis rédigés</span>
+          <span class="info-value">{{ u.reviewCount ?? 0 }}</span>
+        </div>
+      </div>
+
+      @if (u.deactivated && u.deactivationReason) {
+        <div class="deactivation-reason">
+          <i class="pi pi-exclamation-triangle"></i>
+          <span>Motif de désactivation : {{ u.deactivationReason }}</span>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<p-dialog
+  header="Désactiver le compte"
+  [visible]="deactivateDialogVisible()"
+  (visibleChange)="deactivateDialogVisible.set($event)"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [draggable]="false"
+>
+  <form [formGroup]="deactivateForm" (ngSubmit)="submitDeactivate()" class="deactivate-form">
+    <div class="field-wrap">
+      <p-floatlabel>
+        <textarea
+          pTextarea
+          id="reason"
+          formControlName="reason"
+          rows="4"
+          style="width: 100%;"
+          [class.ng-invalid]="deactivateForm.controls.reason.invalid && deactivateForm.controls.reason.touched"
+        ></textarea>
+        <label for="reason">Motif de désactivation *</label>
+      </p-floatlabel>
+      @if (deactivateForm.controls.reason.invalid && deactivateForm.controls.reason.touched) {
+        <small class="field-error">Le motif est obligatoire (min. 10 caractères).</small>
+      }
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <p-button label="Annuler" severity="secondary" (onClick)="deactivateDialogVisible.set(false)" />
+    <p-button label="Désactiver" severity="danger" [loading]="actionLoading()" (onClick)="submitDeactivate()" />
+  </ng-template>
+</p-dialog>

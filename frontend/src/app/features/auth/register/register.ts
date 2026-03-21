@@ -13,10 +13,8 @@ import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputTextModule } from 'primeng/inputtext';
-import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
 import { SelectModule } from 'primeng/select';
-import { SelectButtonModule } from 'primeng/selectbutton';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth';
 
@@ -29,13 +27,13 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
   return null;
 }
 
-export interface Country {
+interface Country {
   flag: string;
   name: string;
   dialCode: string;
 }
 
-export const COUNTRIES: Country[] = [
+const COUNTRIES: Country[] = [
   { flag: '🇨🇲', name: 'Cameroun', dialCode: '+237' },
   { flag: '🇳🇬', name: 'Nigeria', dialCode: '+234' },
   { flag: '🇨🇮', name: "Côte d'Ivoire", dialCode: '+225' },
@@ -64,8 +62,6 @@ export const COUNTRIES: Country[] = [
     SelectModule,
     PasswordModule,
     ButtonModule,
-    SelectButtonModule,
-    MessageModule,
     FloatLabelModule,
     AutoFocusModule,
   ],
@@ -78,11 +74,6 @@ export class Register implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-
-  protected roleOptions = [
-    { label: 'Etudiant', value: 'STUDENT' },
-    { label: 'Proprietaire', value: 'LANDLORD' },
-  ];
 
   protected countries = COUNTRIES;
   protected selectedCountry = signal<Country>(COUNTRIES[0]);
@@ -111,7 +102,9 @@ export class Register implements OnInit {
   }
 
   protected onRoleChange(role: string): void {
-    this.selectedRole.set(role);
+    if (this.selectedRole() !== role) {
+      this.selectedRole.set(role);
+    }
   }
 
   protected onCountryChange(country: Country): void {
@@ -121,6 +114,7 @@ export class Register implements OnInit {
   protected onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.scrollToFirstError();
       return;
     }
 
@@ -140,6 +134,12 @@ export class Register implements OnInit {
         error: (err) => this.onError(err),
       });
     }
+  }
+
+  private scrollToFirstError(): void {
+    setTimeout(() => {
+      document.querySelector('.ng-invalid:not(form)')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
   }
 
   private onSuccess(): void {

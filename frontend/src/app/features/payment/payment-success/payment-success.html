@@ -1,0 +1,76 @@
+<div class="success-page">
+  @if (loading()) {
+    <div class="success-card">
+      <p-skeleton width="5rem" height="5rem" borderRadius="50%" />
+      <p-skeleton width="60%" height="2rem" />
+      <p-skeleton width="40%" height="1rem" />
+      <p-skeleton width="100%" height="8rem" />
+    </div>
+  } @else if (receipt(); as r) {
+    <div
+      class="success-card"
+      ngmMotion
+      [initial]="{ opacity: 0, scale: 0.9 }"
+      [animate]="{ opacity: 1, scale: 1 }"
+      [transition]="{ type: 'spring', stiffness: 260, damping: 20 }"
+    >
+      <div
+        class="success-icon"
+        ngmMotion
+        [initial]="{ scale: 0 }"
+        [animate]="{ scale: 1 }"
+        [transition]="{ type: 'spring', stiffness: 400, damping: 15, delay: 0.3 }"
+      >
+        <i class="pi pi-check" aria-hidden="true"></i>
+      </div>
+
+      <h1 class="success-title">Paiement confirmé !</h1>
+      <p class="success-amount">{{ formattedAmount() }} FCFA</p>
+      <p class="success-date">{{ formattedDate() }}</p>
+
+      <p-divider />
+
+      <div class="success-details">
+        <div class="detail-row">
+          <span class="detail-label">Logement</span>
+          <span class="detail-value">{{ r.listingTitle }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Transaction</span>
+          <span class="detail-value detail-value--mono">{{ r.transactionId }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Opérateur</span>
+          <span class="detail-value">{{ r.operator === 'MTN_MOMO' ? 'MTN Mobile Money' : 'Orange Money' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Téléphone</span>
+          <span class="detail-value">{{ r.payerPhone }}</span>
+        </div>
+      </div>
+
+      <p-divider />
+
+      <div
+        class="success-actions"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 10 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ delay: 0.5, duration: 0.3 }"
+      >
+        <p-button
+          label="Voir le reçu"
+          icon="pi pi-file"
+          [routerLink]="['/payments', paymentId, 'receipt']"
+        />
+        <p-button
+          label="Mes réservations"
+          icon="pi pi-arrow-right"
+          severity="secondary"
+          [outlined]="true"
+          routerLink="/my-bookings"
+        />
+      </div>
+    </div>
+  }
+</div>

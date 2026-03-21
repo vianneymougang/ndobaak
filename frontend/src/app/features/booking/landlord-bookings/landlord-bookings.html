@@ -1,0 +1,125 @@
+<div class="page-container">
+  <h1 class="page-title">Demandes de réservation</h1>
+
+  <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" class="bookings-tabs">
+    <p-tablist>
+      <p-tab [value]="0">Toutes</p-tab>
+      <p-tab [value]="1">En attente</p-tab>
+      <p-tab [value]="2">Confirmées</p-tab>
+      <p-tab [value]="3">Annulées</p-tab>
+    </p-tablist>
+  </p-tabs>
+
+  <div class="bookings-content" role="region" aria-live="polite" aria-label="Liste des demandes">
+    @if (loading()) {
+      @for (item of skeletonItems; track $index) {
+        <div class="booking-skeleton">
+          <p-skeleton width="120px" height="90px" styleClass="flex-shrink-0 rounded-xl" />
+          <div class="skeleton-lines">
+            <p-skeleton height="20px" styleClass="mb-2" />
+            <p-skeleton height="16px" width="70%" styleClass="mb-2" />
+            <p-skeleton height="14px" width="50%" />
+          </div>
+        </div>
+      }
+    } @else if (bookings().length === 0) {
+      <div class="empty-state" role="status">
+        <i class="pi pi-inbox empty-icon" aria-hidden="true"></i>
+        <h2 class="empty-title">Aucune demande de réservation</h2>
+        <p class="empty-subtitle">{{ emptyMessage() }}</p>
+      </div>
+    } @else {
+      <div class="bookings-list">
+        @for (booking of bookings(); track booking.id; let i = $index) {
+          <app-booking-card
+            ngmMotion
+            [initial]="{ opacity: 0, y: 20 }"
+            [animate]="{ opacity: 1, y: 0 }"
+            [transition]="{ duration: 0.35, delay: staggerDelay(i), ease: 'easeOut' }"
+            [booking]="booking"
+            viewMode="landlord"
+            (confirm)="confirmBooking($event)"
+            (reject)="openRejectDialog($event)"
+            (cancel)="openCancelDialog($event)"
+          />
+        }
+      </div>
+
+      @if (totalElements() > pageSize) {
+        <p-paginator
+          [rows]="pageSize"
+          [totalRecords]="totalElements()"
+          [first]="page() * pageSize"
+          (onPageChange)="onPageChange($event)"
+          class="bookings-paginator"
+        />
+      }
+    }
+  </div>
+</div>
+
+<p-dialog
+  [visible]="rejectDialogVisible()"
+  (visibleChange)="rejectDialogVisible.set($event)"
+  header="Refuser cette réservation"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '450px', 'max-width': '90vw' }"
+>
+  <p class="dialog-text">Voulez-vous vraiment refuser cette demande ?</p>
+  <p-floatlabel class="reject-reason-field">
+    <textarea
+      pTextarea
+      [ngModel]="rejectReason()"
+      (ngModelChange)="rejectReason.set($event)"
+      rows="3"
+      id="reject-reason"
+      class="w-full"
+      [autoResize]="true"
+    ></textarea>
+    <label for="reject-reason">Motif du refus (optionnel)</label>
+  </p-floatlabel>
+  <ng-template #footer>
+    <p-button
+      label="Annuler"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="rejectDialogVisible.set(false)"
+    />
+    <p-button
+      label="Refuser"
+      severity="danger"
+      [loading]="rejecting()"
+      (onClick)="doReject()"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  [visible]="cancelDialogVisible()"
+  (visibleChange)="cancelDialogVisible.set($event)"
+  header="Annuler la réservation"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '420px', 'max-width': '90vw' }"
+>
+  <p class="dialog-text">
+    Voulez-vous vraiment annuler cette réservation confirmée ? L'étudiant sera notifié.
+  </p>
+  <ng-template #footer>
+    <p-button
+      label="Non, garder"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="cancelDialogVisible.set(false)"
+    />
+    <p-button
+      label="Oui, annuler"
+      severity="danger"
+      [loading]="cancelling()"
+      (onClick)="doCancel()"
+    />
+  </ng-template>
+</p-dialog>

@@ -24,9 +24,10 @@ const angularApp = new AngularNodeAppEngine();
  * ```
  */
 
-/**
- * Serve static files from /browser
- */
+app.get('/health', (_req, res) => {
+  res.status(200).json({ status: 'UP' });
+});
+
 app.use(
   express.static(browserDistFolder, {
     maxAge: '1y',

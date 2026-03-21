@@ -6,6 +6,7 @@ import {
   CreateListingRequest,
   ListingResponse,
   ListingSearchResponse,
+  NearbyListingResponse,
   SearchPageResponse,
 } from '../models/listing.models';
 
@@ -44,6 +45,14 @@ export class ListingService {
 
   getListingById(id: number): Observable<ListingResponse> {
     return this.http.get<ListingResponse>(`${this.apiUrl}/listings/${id}`);
+  }
+
+  findNearby(lat: number, lng: number, radiusKm: number): Observable<NearbyListingResponse[]> {
+    const params = new HttpParams()
+      .set('lat', String(lat))
+      .set('lng', String(lng))
+      .set('radiusKm', String(radiusKm));
+    return this.http.get<NearbyListingResponse[]>(`${this.apiUrl}/geo/nearby`, { params });
   }
 
   search(filters: Record<string, unknown>): Observable<SearchPageResponse<ListingSearchResponse>> {

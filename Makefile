@@ -4,10 +4,10 @@ DOPPLER_CONFIG  := dev
 .PHONY: dev dev-build dev-down backend-reload dev-logs dev-ps infra infra-down backend
 
 dev:
-	doppler run --project $(DOPPLER_PROJECT) --config $(DOPPLER_CONFIG) -- docker compose up
+	doppler run --project $(DOPPLER_PROJECT) --config $(DOPPLER_CONFIG) -- docker compose up -d
 
 dev-build:
-	doppler run --project $(DOPPLER_PROJECT) --config $(DOPPLER_CONFIG) -- docker compose up --build
+	doppler run --project $(DOPPLER_PROJECT) --config $(DOPPLER_CONFIG) -- docker compose up --build -d
 
 dev-down:
 	docker compose down

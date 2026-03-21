@@ -1,6 +1,8 @@
 package com.ndobaak.backend.listing.service;
 
 import com.ndobaak.backend.common.enums.ListingStatus;
+import com.ndobaak.backend.geo.GeoUtils;
+import com.ndobaak.backend.common.enums.ReviewStatus;
 import com.ndobaak.backend.listing.dto.ListingSearchRequest;
 import com.ndobaak.backend.listing.dto.ListingSearchResponse;
 import com.ndobaak.backend.listing.dto.SearchPageResponse;
@@ -8,9 +10,11 @@ import com.ndobaak.backend.listing.entity.Listing;
 import com.ndobaak.backend.listing.entity.Photo;
 import com.ndobaak.backend.listing.repository.ListingRepository;
 import com.ndobaak.backend.listing.repository.ReviewRepository;
+import com.ndobaak.backend.media.service.StorageService;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,17 +25,19 @@ import java.util.Map;
 @Service
 public class ListingSearchService {
 
-    private static final double CAMPUS_LAT = 3.8480;
-    private static final double CAMPUS_LNG = 11.5021;
-
     private final ListingRepository listingRepository;
     private final ReviewRepository reviewRepository;
+    private final StorageService storageService;
 
-    public ListingSearchService(ListingRepository listingRepository, ReviewRepository reviewRepository) {
+    public ListingSearchService(ListingRepository listingRepository,
+                                ReviewRepository reviewRepository,
+                                StorageService storageService) {
         this.listingRepository = listingRepository;
         this.reviewRepository = reviewRepository;
+        this.storageService = storageService;
     }
 
+    @Transactional(readOnly = true)
     public SearchPageResponse<ListingSearchResponse> search(ListingSearchRequest request) {
         Specification<Listing> spec = buildSpecification(request);
         List<Listing> dbResults = listingRepository.findAll(spec);
@@ -40,7 +46,7 @@ public class ListingSearchService {
         Map<Long, double[]> ratingsMap = loadRatings(listingIds);
 
         List<ListingSearchResponse> results = dbResults.stream()
-                .map(listing -> toSearchResponse(listing, ratingsMap))
+                .map(listing -> toSearchResponse(listing, ratingsMap, request))
                 .toList();
 
         results = applyPostFilters(results, request);
@@ -104,8 +110,12 @@ public class ListingSearchService {
         List<ListingSearchResponse> filtered = new ArrayList<>(results);
 
         if (request.getMaxDistance() != null) {
+            boolean hasUserCoords = request.getUserLat() != null && request.getUserLng() != null;
             filtered = filtered.stream()
-                    .filter(r -> r.getDistanceToCampus() != null && r.getDistanceToCampus() <= request.getMaxDistance())
+                    .filter(r -> {
+                        Double distance = hasUserCoords ? r.getDistanceFromUser() : r.getDistanceToCampus();
+                        return distance != null && distance <= request.getMaxDistance();
+                    })
                     .toList();
         }
 
@@ -133,7 +143,8 @@ public class ListingSearchService {
             case "PRICE_ASC" -> sorted.sort(Comparator.comparing(ListingSearchResponse::getMonthlyPrice));
             case "PRICE_DESC" -> sorted.sort(Comparator.comparing(ListingSearchResponse::getMonthlyPrice).reversed());
             case "DISTANCE_ASC" -> sorted.sort(Comparator.comparing(
-                    ListingSearchResponse::getDistanceToCampus, Comparator.nullsLast(Comparator.naturalOrder())));
+                    r -> r.getDistanceFromUser() != null ? r.getDistanceFromUser() : r.getDistanceToCampus(),
+                    Comparator.nullsLast(Comparator.naturalOrder())));
             case "RATING_DESC" -> sorted.sort(Comparator.comparing(
                     ListingSearchResponse::getAvgRating, Comparator.nullsLast(Comparator.reverseOrder())));
             default -> {}
@@ -146,7 +157,7 @@ public class ListingSearchService {
         Map<Long, double[]> ratingsMap = new HashMap<>();
         if (listingIds.isEmpty()) return ratingsMap;
 
-        List<Object[]> ratings = reviewRepository.findAverageRatingsByListingIds(listingIds);
+        List<Object[]> ratings = reviewRepository.findAverageRatingsByListingIds(listingIds, ReviewStatus.APPROVED);
         for (Object[] row : ratings) {
             Long listingId = (Long) row[0];
             Double avgRating = (Double) row[1];
@@ -159,8 +170,9 @@ public class ListingSearchService {
         return ratingsMap;
     }
 
-    private ListingSearchResponse toSearchResponse(Listing listing, Map<Long, double[]> ratingsMap) {
-        String thumbnailUrl = listing.getPhotos().stream()
+    private ListingSearchResponse toSearchResponse(Listing listing, Map<Long, double[]> ratingsMap,
+                                                      ListingSearchRequest request) {
+        String thumbnailKey = listing.getPhotos().stream()
                 .filter(p -> p.getThumbnailUrl() != null)
                 .min(Comparator.comparing(Photo::getDisplayOrder, Comparator.nullsLast(Comparator.naturalOrder())))
                 .map(Photo::getThumbnailUrl)
@@ -178,9 +190,16 @@ public class ListingSearchService {
             longitude = listing.getLocation().getLongitude();
 
             if (distanceToCampus == null && latitude != null && longitude != null) {
-                distanceToCampus = ListingService.haversineDistance(latitude, longitude, CAMPUS_LAT, CAMPUS_LNG);
-                distanceToCampus = Math.round(distanceToCampus * 100.0) / 100.0;
+                distanceToCampus = GeoUtils.roundDistance(
+                        GeoUtils.haversineDistance(latitude, longitude, GeoUtils.CAMPUS_LAT, GeoUtils.CAMPUS_LNG));
             }
+        }
+
+        Double distanceFromUser = null;
+        if (request.getUserLat() != null && request.getUserLng() != null
+                && latitude != null && longitude != null) {
+            distanceFromUser = GeoUtils.roundDistance(
+                    GeoUtils.haversineDistance(request.getUserLat(), request.getUserLng(), latitude, longitude));
         }
 
         double[] ratingData = ratingsMap.getOrDefault(listing.getId(), null);
@@ -194,11 +213,12 @@ public class ListingSearchService {
         return ListingSearchResponse.builder()
                 .id(listing.getId())
                 .title(listing.getTitle())
-                .thumbnailUrl(thumbnailUrl)
+                .thumbnailUrl(storageService.resolvePublicUrl(thumbnailKey))
                 .monthlyPrice(listing.getMonthlyPrice())
                 .roomType(listing.getRoomType())
                 .neighborhood(neighborhood)
                 .distanceToCampus(distanceToCampus)
+                .distanceFromUser(distanceFromUser)
                 .avgRating(avgRating)
                 .reviewCount(reviewCount)
                 .amenities(amenityNames)

@@ -1,6 +1,7 @@
 package com.ndobaak.backend.listing.service;
 
 import com.ndobaak.backend.common.enums.ListingStatus;
+import com.ndobaak.backend.common.enums.ReviewStatus;
 import com.ndobaak.backend.common.enums.RoomType;
 import com.ndobaak.backend.listing.dto.ListingSearchRequest;
 import com.ndobaak.backend.listing.dto.ListingSearchResponse;
@@ -10,6 +11,7 @@ import com.ndobaak.backend.listing.entity.Listing;
 import com.ndobaak.backend.listing.entity.Location;
 import com.ndobaak.backend.listing.repository.ListingRepository;
 import com.ndobaak.backend.listing.repository.ReviewRepository;
+import com.ndobaak.backend.media.service.StorageService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,6 +37,8 @@ class ListingSearchServiceTest {
     private ListingRepository listingRepository;
     @Mock
     private ReviewRepository reviewRepository;
+    @Mock
+    private StorageService storageService;
 
     @InjectMocks
     private ListingSearchService searchService;
@@ -43,7 +47,7 @@ class ListingSearchServiceTest {
     void searchShouldReturnPaginatedResults() {
         Listing listing = buildPublishedListing(1L, "Studio Eyang", new BigDecimal("35000"), RoomType.STUDIO);
         when(listingRepository.findAll(any(Specification.class))).thenReturn(List.of(listing));
-        when(reviewRepository.findAverageRatingsByListingIds(List.of(1L)))
+        when(reviewRepository.findAverageRatingsByListingIds(List.of(1L), ReviewStatus.APPROVED))
                 .thenReturn(Collections.emptyList());
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -69,7 +73,7 @@ class ListingSearchServiceTest {
 
         when(listingRepository.findAll(any(Specification.class)))
                 .thenReturn(List.of(nearListing, farListing));
-        when(reviewRepository.findAverageRatingsByListingIds(anyList()))
+        when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -90,7 +94,7 @@ class ListingSearchServiceTest {
 
         when(listingRepository.findAll(any(Specification.class)))
                 .thenReturn(List.of(expensiveListing, cheapListing));
-        when(reviewRepository.findAverageRatingsByListingIds(anyList()))
+        when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -111,7 +115,7 @@ class ListingSearchServiceTest {
 
         when(listingRepository.findAll(any(Specification.class)))
                 .thenReturn(List.of(cheapListing, expensiveListing));
-        when(reviewRepository.findAverageRatingsByListingIds(anyList()))
+        when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -143,7 +147,7 @@ class ListingSearchServiceTest {
 
         when(listingRepository.findAll(any(Specification.class)))
                 .thenReturn(List.of(withBoth, withOnlyWifi));
-        when(reviewRepository.findAverageRatingsByListingIds(anyList()))
+        when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -166,7 +170,7 @@ class ListingSearchServiceTest {
         );
 
         when(listingRepository.findAll(any(Specification.class))).thenReturn(listings);
-        when(reviewRepository.findAverageRatingsByListingIds(anyList()))
+        when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -194,7 +198,7 @@ class ListingSearchServiceTest {
 
         List<Object[]> ratingResults = new ArrayList<>();
         ratingResults.add(new Object[]{1L, 4.5, 10L});
-        when(reviewRepository.findAverageRatingsByListingIds(List.of(1L)))
+        when(reviewRepository.findAverageRatingsByListingIds(List.of(1L), ReviewStatus.APPROVED))
                 .thenReturn(ratingResults);
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -215,7 +219,7 @@ class ListingSearchServiceTest {
 
         List<Object[]> ratingResults = new ArrayList<>();
         ratingResults.add(new Object[]{1L, 3.0, 5L});
-        when(reviewRepository.findAverageRatingsByListingIds(List.of(1L)))
+        when(reviewRepository.findAverageRatingsByListingIds(List.of(1L), ReviewStatus.APPROVED))
                 .thenReturn(ratingResults);
 
         ListingSearchRequest request = new ListingSearchRequest();
@@ -226,6 +230,77 @@ class ListingSearchServiceTest {
         SearchPageResponse<ListingSearchResponse> result = searchService.search(request);
 
         assertThat(result.getContent()).isEmpty();
+    }
+
+    @Test
+    void searchWithUserCoordsShouldComputeDistanceFromUser() {
+        Listing listing = buildPublishedListing(1L, "Studio Eyang", new BigDecimal("35000"), RoomType.STUDIO);
+        listing.setLocation(Location.builder()
+                .address("Eyang").latitude(3.849).longitude(11.503).distanceToCampus(0.15).build());
+
+        when(listingRepository.findAll(any(Specification.class))).thenReturn(List.of(listing));
+        when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
+                .thenReturn(Collections.emptyList());
+
+        ListingSearchRequest request = new ListingSearchRequest();
+        request.setUserLat(3.850);
+        request.setUserLng(11.504);
+        request.setPage(0);
+        request.setSize(10);
+
+        SearchPageResponse<ListingSearchResponse> result = searchService.search(request);
+
+        assertThat(result.getContent().get(0).getDistanceFromUser()).isNotNull();
+        assertThat(result.getContent().get(0).getDistanceFromUser()).isLessThan(1.0);
+        assertThat(result.getContent().get(0).getDistanceToCampus()).isEqualTo(0.15);
+    }
+
+    @Test
+    void searchWithoutUserCoordsShouldLeaveDistanceFromUserNull() {
+        Listing listing = buildPublishedListing(1L, "Studio", new BigDecimal("35000"), RoomType.STUDIO);
+        listing.setLocation(Location.builder()
+                .address("Eyang").latitude(3.849).longitude(11.503).distanceToCampus(0.15).build());
+
+        when(listingRepository.findAll(any(Specification.class))).thenReturn(List.of(listing));
+        when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
+                .thenReturn(Collections.emptyList());
+
+        ListingSearchRequest request = new ListingSearchRequest();
+        request.setPage(0);
+        request.setSize(10);
+
+        SearchPageResponse<ListingSearchResponse> result = searchService.search(request);
+
+        assertThat(result.getContent().get(0).getDistanceFromUser()).isNull();
+        assertThat(result.getContent().get(0).getDistanceToCampus()).isEqualTo(0.15);
+    }
+
+    @Test
+    void maxDistanceFilterShouldUseDistanceFromUserWhenCoordsProvided() {
+        Listing nearUser = buildPublishedListing(1L, "Near user", new BigDecimal("35000"), RoomType.STUDIO);
+        nearUser.setLocation(Location.builder()
+                .address("A").latitude(3.849).longitude(11.503).distanceToCampus(5.0).build());
+
+        Listing farFromUser = buildPublishedListing(2L, "Far from user", new BigDecimal("30000"), RoomType.APARTMENT);
+        farFromUser.setLocation(Location.builder()
+                .address("B").latitude(4.000).longitude(11.600).distanceToCampus(0.5).build());
+
+        when(listingRepository.findAll(any(Specification.class)))
+                .thenReturn(List.of(nearUser, farFromUser));
+        when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
+                .thenReturn(Collections.emptyList());
+
+        ListingSearchRequest request = new ListingSearchRequest();
+        request.setUserLat(3.850);
+        request.setUserLng(11.504);
+        request.setMaxDistance(2.0);
+        request.setPage(0);
+        request.setSize(10);
+
+        SearchPageResponse<ListingSearchResponse> result = searchService.search(request);
+
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getTitle()).isEqualTo("Near user");
     }
 
     private Listing buildPublishedListing(Long id, String title, BigDecimal price, RoomType roomType) {

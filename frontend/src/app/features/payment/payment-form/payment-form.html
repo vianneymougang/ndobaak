@@ -1,0 +1,223 @@
+<div class="payment-page">
+  <a routerLink="/my-bookings" class="back-link">
+    <i class="pi pi-arrow-left" aria-hidden="true"></i>
+    Retour à mes réservations
+  </a>
+
+  <h1 class="page-title">Paiement</h1>
+
+  @if (loading()) {
+    <div class="payment-layout">
+      <div class="form-column">
+        <p-skeleton height="3rem" />
+        <p-skeleton height="3rem" />
+        <p-skeleton height="3rem" />
+        <p-skeleton height="3rem" />
+      </div>
+      <div class="summary-column">
+        <p-skeleton height="16rem" borderRadius="16px" />
+      </div>
+    </div>
+  } @else if (booking(); as b) {
+    <div class="payment-layout">
+      <div
+        class="form-column"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 20 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ duration: 0.4 }"
+      >
+        @if (apiError(); as error) {
+          <div class="auth-error-banner" role="alert">
+            <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+            <span>{{ error }}</span>
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="submit()" class="payment-form">
+          <section class="form-section">
+            <h2 class="section-title">Mode de paiement</h2>
+
+            <div class="payment-type-cards">
+              <label class="type-card" [class.type-card--active]="form.controls.paymentType.value === 'INTEGRAL'">
+                <p-radioButton
+                  formControlName="paymentType"
+                  value="INTEGRAL"
+                  (onClick)="onPaymentTypeChange()"
+                />
+                <div class="type-card-content">
+                  <span class="type-card-label">Paiement intégral</span>
+                  <span class="type-card-desc">Réglez la totalité en une seule fois</span>
+                </div>
+              </label>
+
+              <label class="type-card" [class.type-card--active]="form.controls.paymentType.value === 'INSTALLMENT'">
+                <p-radioButton
+                  formControlName="paymentType"
+                  value="INSTALLMENT"
+                  (onClick)="onPaymentTypeChange()"
+                />
+                <div class="type-card-content">
+                  <span class="type-card-label">Paiement échelonné</span>
+                  <span class="type-card-desc">Répartissez vos paiements sur la durée</span>
+                </div>
+              </label>
+            </div>
+
+            @if (isInstallment()) {
+              <div class="field-wrap">
+                <p-floatlabel>
+                  <p-select
+                    formControlName="installmentFrequency"
+                    [options]="frequencyOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    inputId="frequency"
+                    [invalid]="form.controls.installmentFrequency.invalid && form.controls.installmentFrequency.touched"
+                  />
+                  <label for="frequency">Fréquence</label>
+                </p-floatlabel>
+                @if (form.controls.installmentFrequency.invalid && form.controls.installmentFrequency.touched) {
+                  <small class="field-error">
+                    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+                    Veuillez choisir une fréquence de paiement
+                  </small>
+                }
+              </div>
+            }
+          </section>
+
+          <p-divider />
+
+          <section class="form-section">
+            <h2 class="section-title">Mobile Money</h2>
+            <p class="section-subtitle">
+              Vous recevrez une demande de paiement sur votre téléphone
+            </p>
+
+            <div class="form-fields">
+              <div class="field-wrap">
+                <p-floatlabel>
+                  <p-select
+                    formControlName="operator"
+                    [options]="operatorOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    inputId="operator"
+                    [invalid]="form.controls.operator.invalid && form.controls.operator.touched"
+                  />
+                  <label for="operator">Opérateur</label>
+                </p-floatlabel>
+                @if (form.controls.operator.invalid && form.controls.operator.touched) {
+                  <small class="field-error">
+                    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+                    Veuillez sélectionner un opérateur
+                  </small>
+                }
+              </div>
+
+              <div class="field-wrap">
+                <p-floatlabel>
+                  <p-inputMask
+                    formControlName="phoneNumber"
+                    mask="+237 999 999 999"
+                    placeholder="+237 6XX XXX XXX"
+                    inputId="phone"
+                    [invalid]="form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched"
+                    [unmask]="true"
+                  />
+                  <label for="phone">Numéro de téléphone</label>
+                </p-floatlabel>
+                @if (form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched) {
+                  <small class="field-error">
+                    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+                    Numéro camerounais invalide (ex: 6XX XXX XXX)
+                  </small>
+                }
+              </div>
+            </div>
+          </section>
+
+          <div class="submit-desktop">
+            <p-button
+              type="submit"
+              label="Payer {{ formattedTotal() }} FCFA"
+              icon="pi pi-lock"
+              [loading]="submitting()"
+              [disabled]="submitting()"
+              styleClass="w-full"
+            />
+            <p class="secure-notice">
+              <i class="pi pi-shield" aria-hidden="true"></i>
+              Paiement sécurisé via NotchPay
+            </p>
+          </div>
+        </form>
+      </div>
+
+      <aside
+        class="summary-column"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 20 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ duration: 0.4, delay: 0.15 }"
+      >
+        <div class="summary-card">
+          @if (b.listing.thumbnailUrl) {
+            <img
+              [src]="b.listing.thumbnailUrl"
+              [alt]="b.listing.title"
+              class="summary-photo"
+            />
+          } @else {
+            <div class="summary-photo summary-photo--placeholder" aria-hidden="true">
+              <i class="pi pi-image"></i>
+            </div>
+          }
+
+          <div class="summary-details">
+            <h3 class="summary-title">{{ b.listing.title }}</h3>
+            <p class="summary-address">
+              <i class="pi pi-map-marker" aria-hidden="true"></i>
+              {{ b.listing.address }}
+            </p>
+          </div>
+
+          <p-divider />
+
+          <div class="summary-lines">
+            <div class="summary-line">
+              <span>Dates</span>
+              <span>{{ formattedStartDate() }} → {{ formattedEndDate() }}</span>
+            </div>
+            <div class="summary-line">
+              <span>Loyer mensuel</span>
+              <span>{{ formattedMonthlyRent() }} FCFA</span>
+            </div>
+          </div>
+
+          <p-divider />
+
+          <div class="summary-line summary-line--total">
+            <span>Total à payer</span>
+            <span>{{ formattedTotal() }} FCFA</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="mobile-bottom-bar">
+      <div class="mobile-total">
+        <span class="mobile-total-label">Total</span>
+        <span class="mobile-total-amount">{{ formattedTotal() }} FCFA</span>
+      </div>
+      <p-button
+        label="Payer"
+        icon="pi pi-lock"
+        [loading]="submitting()"
+        [disabled]="submitting()"
+        (onClick)="submit()"
+      />
+    </div>
+  }
+</div>

@@ -103,10 +103,10 @@
                       tabindex="0"
                       role="checkbox"
                       [attr.aria-checked]="amenity.selected"
-                      [attr.aria-label]="amenity.name"
+                      [attr.aria-label]="amenity.label"
                     >
                       <i [class]="amenity.icon"></i>
-                      <span>{{ amenity.name }}</span>
+                      <span>{{ amenity.label }}</span>
                     </div>
                   }
                 </div>
@@ -145,29 +145,33 @@
               </div>
 
               @if (!listing()) {
-                <p-message severity="warn" text="Sauvegardez d'abord le brouillon (etape 1) avant d'ajouter des photos." />
+                  <p-message severity="warn">Sauvegardez d'abord le brouillon (etape 1) avant d'ajouter des photos.</p-message>
               } @else {
                 <div class="upload-zone">
                   <label for="photo-upload" class="upload-area" (dragover)="$event.preventDefault()" (drop)="$event.preventDefault()">
                     <i class="pi pi-cloud-upload"></i>
                     <span>Cliquez ou deposez vos photos ici</span>
-                    <small>JPG, PNG — max 5 Mo par photo</small>
+                    <small>JPG, PNG, WebP — max 5 Mo par photo</small>
                     <input
                       id="photo-upload"
                       type="file"
                       accept="image/*"
                       multiple
                       (change)="onFileSelect($event)"
-                      [disabled]="photoCount() >= 10 || uploadingPhoto()"
+                      [disabled]="totalPhotoCount() >= 10 || uploadingPhotos()"
                       hidden
                     />
                   </label>
                 </div>
 
-                @if (uploadingPhoto()) {
+                @if (uploadingPhotos()) {
                   <div class="uploading-indicator">
-                    <p-progressSpinner [style]="{ width: '30px', height: '30px' }" />
-                    <span>Upload en cours...</span>
+                    <p-progressBar
+                      [value]="uploadTotal() > 0 ? (uploadProgress() / uploadTotal()) * 100 : 0"
+                      [showValue]="false"
+                      [style]="{ height: '6px' }"
+                    />
+                    <span>Upload {{ uploadProgress() }}/{{ uploadTotal() }}...</span>
                   </div>
                 }
 
@@ -191,6 +195,14 @@
                       <button class="remove-btn" (click)="removePhoto(photo)" aria-label="Supprimer la photo">
                         <i class="pi pi-times"></i>
                       </button>
+                    </div>
+                  }
+                  @for (pending of pendingPhotos(); track pending.localUrl) {
+                    <div class="photo-card photo-card-pending">
+                      <img [src]="pending.localUrl" alt="Upload en cours" />
+                      <div class="pending-overlay">
+                        <p-progressSpinner [style]="{ width: '24px', height: '24px' }" />
+                      </div>
                     </div>
                   }
                 </div>
@@ -319,7 +331,7 @@
                     }
                   </div>
                   @if (photoCount() < 3) {
-                    <p-message severity="warn" text="Minimum 3 photos requises pour soumettre." />
+                    <p-message severity="warn">Minimum 3 photos requises pour soumettre.</p-message>
                   }
                 </div>
 
@@ -342,10 +354,10 @@
                 <div class="summary-group">
                   <h4>Equipements</h4>
                   <div class="amenity-tags">
-                    @for (name of selectedAmenityNames(); track name) {
-                      <p-tag [value]="name" severity="info" />
+                    @for (label of selectedAmenityLabels(); track label) {
+                      <p-tag [value]="label" severity="info" />
                     }
-                    @if (selectedAmenityNames().length === 0) {
+                    @if (selectedAmenityLabels().length === 0) {
                       <span class="no-data">Aucun equipement selectionne</span>
                     }
                   </div>

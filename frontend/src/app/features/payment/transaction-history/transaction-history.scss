@@ -1,0 +1,114 @@
+@reference "../../../../tailwind.css";
+
+.history-page {
+  @apply max-w-3xl mx-auto px-4 py-6;
+
+  @media (min-width: 1024px) {
+    @apply px-8 py-10;
+  }
+}
+
+.page-title {
+  @apply text-2xl font-bold mb-6;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+
+  @media (min-width: 1024px) {
+    @apply text-3xl mb-8;
+  }
+}
+
+.transaction-list {
+  @apply flex flex-col gap-3;
+}
+
+.transaction-skeleton {
+  @apply flex items-center justify-between gap-4 p-4 rounded-xl;
+  background: white;
+  border: 1px solid var(--color-ndb-border);
+}
+
+.transaction-row {
+  @apply flex flex-col gap-2 p-4 rounded-xl;
+  background: white;
+  border: 1px solid var(--color-ndb-border);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-card);
+  }
+}
+
+.transaction-main {
+  @apply flex items-center justify-between gap-3;
+}
+
+.transaction-info {
+  @apply flex flex-col gap-0.5;
+}
+
+.transaction-operator {
+  @apply text-sm font-semibold;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.transaction-date {
+  @apply text-xs;
+  color: var(--color-ndb-muted);
+}
+
+.transaction-right {
+  @apply flex flex-col items-end gap-1;
+}
+
+.transaction-amount {
+  @apply text-base font-bold;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.transaction-meta {
+  @apply flex items-center justify-between text-xs;
+  color: var(--color-ndb-muted);
+}
+
+.transaction-id {
+  font-family: monospace;
+  @apply text-xs;
+}
+
+.receipt-link {
+  @apply inline-flex items-center gap-1 text-xs font-semibold;
+  color: var(--color-ndb-gold);
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--color-ndb-gold-dark);
+  }
+}
+
+.empty-state {
+  @apply flex flex-col items-center text-center gap-4 py-16;
+}
+
+.empty-icon {
+  @apply flex items-center justify-center w-16 h-16 rounded-full;
+  background: color-mix(in srgb, var(--color-ndb-gold) 10%, transparent);
+
+  i {
+    @apply text-3xl;
+    color: var(--color-ndb-gold);
+  }
+}
+
+.empty-title {
+  @apply text-lg font-semibold m-0;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.empty-desc {
+  @apply text-sm m-0;
+  color: var(--color-ndb-muted);
+}

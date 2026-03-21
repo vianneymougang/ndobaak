@@ -2,13 +2,13 @@
 
 .register-page {
   @apply min-h-screen flex;
-  background: var(--color-ndb-page);
+  background: var(--color-ndb-cream);
 }
 
 /* Visual panel */
 .register-visual {
   @apply hidden lg:flex flex-1 flex-col justify-between p-12;
-  background: linear-gradient(145deg, #1B3A5C 0%, #2D5F8A 50%, #1A7A5C 100%);
+  background: linear-gradient(150deg, var(--color-ndb-forest-dark) 0%, var(--color-ndb-forest) 45%, var(--color-ndb-forest-mid) 100%);
   position: relative;
   overflow: hidden;
 
@@ -20,7 +20,7 @@
     width: 500px;
     height: 500px;
     border-radius: 50%;
-    background: rgba(232, 118, 43, 0.12);
+    background: color-mix(in srgb, var(--color-ndb-gold) 10%, transparent);
   }
 }
 
@@ -34,12 +34,13 @@
 
   .logo-icon {
     @apply flex items-center justify-center w-10 h-10 rounded-xl text-white text-lg;
-    background: var(--color-ndb-orange);
+    background: var(--color-ndb-gold);
   }
 
   .logo-name {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-urbanist);
     @apply text-2xl font-bold text-white;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -51,7 +52,7 @@
 
     .feature-icon {
       @apply flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0;
-      background: rgba(255, 255, 255, 0.12);
+      background: color-mix(in srgb, white 12%, transparent);
 
       i {
         @apply text-lg text-white;
@@ -61,7 +62,7 @@
     .feature-text {
       h4 {
         @apply text-white font-semibold text-base mb-0.5;
-        font-family: 'Poppins', sans-serif;
+        font-family: var(--font-urbanist);
       }
 
       p {
@@ -98,7 +99,7 @@
   transition: color 0.15s ease;
 
   &:hover {
-    color: var(--color-ndb-navy);
+    color: var(--color-ndb-forest);
   }
 
   i {
@@ -116,46 +117,112 @@
 
   .logo-icon {
     @apply flex items-center justify-center w-9 h-9 rounded-xl text-white;
-    background: var(--color-ndb-orange);
+    background: var(--color-ndb-gold);
   }
 
   .logo-name {
-    font-family: 'Poppins', sans-serif;
-    @apply text-xl font-bold text-ndb-navy;
+    font-family: var(--font-urbanist);
+    @apply text-xl font-bold;
+    color: var(--color-ndb-ink);
   }
 }
 
 .register-title {
-  @apply text-3xl font-bold text-ndb-navy mb-1;
-  font-family: 'Poppins', sans-serif;
+  @apply text-3xl font-bold mb-1;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-ink);
+  letter-spacing: -0.01em;
 }
 
 .register-subtitle {
   @apply text-ndb-muted text-sm mb-6;
 }
 
-/* ── Role selector (tuiles) ── */
-.role-selector {
-  @apply mb-6;
+/* ── Role cards ── */
+.role-cards {
+  @apply grid grid-cols-2 gap-3 mb-6;
+}
 
-  ::ng-deep .p-selectbutton {
-    width: 100%;
+.role-card {
+  @apply flex flex-col items-center gap-3 p-4 rounded-xl w-full cursor-pointer;
+  position: relative;
+  border: 1.5px solid var(--color-ndb-border);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 
-    .p-togglebutton {
-      flex: 1;
-      justify-content: center;
-      height: 44px;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      border-radius: 8px !important;
+  --icon-bg: var(--color-ndb-cream-dark);
+  --icon-color: var(--color-ndb-muted);
+  --title-color: var(--color-ndb-forest);
+  --card-bg: #fff;
+  --check-opacity: 0;
+  --check-scale: 0.6;
+
+  background: var(--card-bg);
+
+  &:hover {
+    border-color: var(--color-ndb-gold);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-ndb-gold);
+    outline-offset: 2px;
+  }
+
+  &--active {
+    border: 2px solid var(--color-ndb-gold);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-ndb-gold) 12%, transparent);
+
+    --icon-bg: var(--color-ndb-gold);
+    --icon-color: #fff;
+    --title-color: var(--color-ndb-gold);
+    --card-bg: color-mix(in srgb, var(--color-ndb-gold) 4%, transparent);
+    --check-opacity: 1;
+    --check-scale: 1;
+  }
+
+  &__check {
+    position: absolute;
+    top: 8px;
+    right: 9px;
+    font-size: 0.9rem;
+    color: var(--color-ndb-gold);
+    opacity: var(--check-opacity);
+    transform: scale(var(--check-scale));
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    pointer-events: none;
+  }
+
+  &__icon {
+    @apply flex items-center justify-center w-12 h-12 rounded-xl flex-shrink-0;
+    background: var(--icon-bg);
+    transition: background 0.15s ease;
+
+    i {
+      font-size: 1.25rem;
+      color: var(--icon-color);
+      transition: color 0.15s ease;
     }
+  }
+
+  &__body {
+    @apply flex flex-col items-center gap-1 text-center;
+  }
+
+  &__title {
+    font-family: var(--font-urbanist);
+    @apply text-sm font-semibold;
+    color: var(--title-color);
+    transition: color 0.15s ease;
+  }
+
+  &__desc {
+    @apply text-xs;
+    color: var(--color-ndb-muted);
   }
 }
 
 /* ── Form ── */
 .register-form {
-  @apply flex flex-col gap-5;
+  @apply flex flex-col gap-9 pt-3;
 }
 
 .form-row {
@@ -180,8 +247,8 @@
 
   .country-code {
     @apply font-medium text-sm;
-    color: var(--color-ndb-navy);
-    font-family: 'Poppins', sans-serif;
+    color: var(--color-ndb-forest);
+    font-family: var(--font-urbanist);
 
     &--muted {
       @apply ml-auto text-xs font-normal;
@@ -223,17 +290,17 @@
   @apply w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg text-sm font-medium cursor-pointer;
   border: 1.5px solid #DADCE0;
   background: #fff;
-  color: var(--color-ndb-navy);
+  color: var(--color-ndb-forest);
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 
   &:hover {
-    background: #f8f9fa;
+    background: var(--color-ndb-cream);
     border-color: #BBBFC4;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px color-mix(in srgb, black 8%, transparent);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--color-ndb-orange);
+    outline: 2px solid var(--color-ndb-gold);
     outline-offset: 2px;
   }
 
@@ -257,7 +324,7 @@
 
   a {
     @apply font-semibold no-underline;
-    color: var(--color-ndb-orange);
+    color: var(--color-ndb-gold);
 
     &:hover {
       text-decoration: underline;

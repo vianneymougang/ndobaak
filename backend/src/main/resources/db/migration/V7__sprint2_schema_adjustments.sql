@@ -1,0 +1,64 @@
+ALTER TYPE booking_status ADD VALUE IF NOT EXISTS 'EXPIRED';
+
+ALTER TYPE payment_status ADD VALUE IF NOT EXISTS 'PROCESSING';
+ALTER TYPE payment_status ADD VALUE IF NOT EXISTS 'COMPLETED';
+
+ALTER TYPE installment_status RENAME VALUE 'UPCOMING' TO 'PENDING';
+ALTER TYPE installment_status ADD VALUE IF NOT EXISTS 'CANCELLED';
+
+ALTER TYPE review_status ADD VALUE IF NOT EXISTS 'PENDING';
+ALTER TYPE review_status ADD VALUE IF NOT EXISTS 'APPROVED';
+ALTER TYPE review_status ADD VALUE IF NOT EXISTS 'REJECTED';
+
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'BOOKING_CREATED';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'BOOKING_CONFIRMED';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'BOOKING_CANCELLED';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'PAYMENT_RECEIVED';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'PAYMENT_REMINDER';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'REVIEW_POSTED';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'LISTING_APPROVED';
+ALTER TYPE notification_type ADD VALUE IF NOT EXISTS 'LISTING_REJECTED';
+
+ALTER TABLE booking ADD COLUMN IF NOT EXISTS monthly_rent DECIMAL(12, 0);
+ALTER TABLE booking ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
+
+ALTER TABLE payment ADD COLUMN IF NOT EXISTS commission DECIMAL(12, 0);
+ALTER TABLE payment ADD COLUMN IF NOT EXISTS payment_method VARCHAR(50);
+ALTER TABLE payment ADD COLUMN IF NOT EXISTS payment_type VARCHAR(50);
+ALTER TABLE payment ADD COLUMN IF NOT EXISTS phone_number VARCHAR(20);
+ALTER TABLE payment ADD COLUMN IF NOT EXISTS payer_name VARCHAR(200);
+ALTER TABLE payment ADD COLUMN IF NOT EXISTS transaction_id VARCHAR(100);
+ALTER TABLE payment ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP;
+ALTER TABLE payment ADD COLUMN IF NOT EXISTS created_at TIMESTAMP;
+ALTER TABLE payment ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
+ALTER TABLE payment ALTER COLUMN created_at SET DEFAULT NOW();
+CREATE UNIQUE INDEX IF NOT EXISTS idx_payment_transaction_id ON payment(transaction_id) WHERE transaction_id IS NOT NULL;
+
+ALTER TABLE payment_schedule ADD COLUMN IF NOT EXISTS booking_id BIGINT REFERENCES booking(id);
+ALTER TABLE payment_schedule ADD COLUMN IF NOT EXISTS total_amount DECIMAL(12, 0);
+ALTER TABLE payment_schedule ADD COLUMN IF NOT EXISTS created_at TIMESTAMP;
+ALTER TABLE payment_schedule ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
+ALTER TABLE payment_schedule ALTER COLUMN created_at SET DEFAULT NOW();
+CREATE UNIQUE INDEX IF NOT EXISTS idx_payment_schedule_booking ON payment_schedule(booking_id) WHERE booking_id IS NOT NULL;
+
+ALTER TABLE installment ADD COLUMN IF NOT EXISTS installment_number INTEGER;
+ALTER TABLE installment ADD COLUMN IF NOT EXISTS payment_id BIGINT REFERENCES payment(id);
+ALTER TABLE installment ADD COLUMN IF NOT EXISTS created_at TIMESTAMP;
+ALTER TABLE installment ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
+ALTER TABLE installment ALTER COLUMN created_at SET DEFAULT NOW();
+
+ALTER TABLE review ADD COLUMN IF NOT EXISTS booking_id BIGINT REFERENCES booking(id);
+
+CREATE TABLE IF NOT EXISTS review_photo_urls (
+    review_id BIGINT NOT NULL REFERENCES review(id) ON DELETE CASCADE,
+    photo_url  VARCHAR(500) NOT NULL
+);
+
+ALTER TABLE notification ADD COLUMN IF NOT EXISTS channel notification_channel;
+ALTER TABLE notification ADD COLUMN IF NOT EXISTS reference_id BIGINT;
+ALTER TABLE notification ADD COLUMN IF NOT EXISTS reference_type VARCHAR(100);
+
+CREATE INDEX IF NOT EXISTS idx_booking_listing ON booking(listing_id);
+CREATE INDEX IF NOT EXISTS idx_booking_student_status ON booking(student_id, status);
+CREATE INDEX IF NOT EXISTS idx_installment_schedule ON installment(payment_schedule_id);
+CREATE INDEX IF NOT EXISTS idx_installment_status_due ON installment(status, due_date);

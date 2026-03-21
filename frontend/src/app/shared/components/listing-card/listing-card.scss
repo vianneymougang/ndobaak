@@ -7,16 +7,16 @@
 
   &:hover {
     box-shadow: var(--shadow-card-hover);
-    transform: translateY(-4px);
+    transform: translateY(-5px);
 
     .card-image img {
-      transform: scale(1.06);
+      transform: scale(1.05);
     }
 
     .voir-details-btn {
-      background: var(--color-ndb-orange);
-      color: #fff;
-      border-color: var(--color-ndb-orange);
+      background: var(--color-ndb-gold);
+      color: var(--color-ndb-forest);
+      border-color: var(--color-ndb-gold);
     }
   }
 }
@@ -26,15 +26,16 @@
   position: relative;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  background: var(--color-ndb-page);
+  background: var(--color-ndb-cream-dark);
 
   img {
     @apply w-full h-full object-cover;
-    transition: transform 0.4s ease;
+    transition: transform 0.45s ease;
   }
 
   .no-image {
-    @apply w-full h-full flex flex-col items-center justify-center gap-2 text-ndb-muted;
+    @apply w-full h-full flex flex-col items-center justify-center gap-2;
+    color: var(--color-ndb-muted);
 
     i {
       @apply text-4xl;
@@ -52,12 +53,13 @@
   top: 10px;
   left: 10px;
   @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-white;
-  background: #1A7A5C;
-  font-family: 'Poppins', sans-serif;
-  letter-spacing: 0.03em;
+  background: var(--color-ndb-forest);
+  font-family: var(--font-urbanist);
+  letter-spacing: 0.04em;
 
   i {
     @apply text-xs;
+    color: var(--color-ndb-gold);
   }
 }
 
@@ -66,10 +68,10 @@
   bottom: 10px;
   left: 10px;
   @apply px-2.5 py-1 rounded-md text-xs font-semibold;
-  background: rgba(27, 58, 92, 0.85);
+  background: color-mix(in srgb, var(--color-ndb-forest) 85%, transparent);
   color: #fff;
-  font-family: 'Inter', sans-serif;
-  backdrop-filter: blur(4px);
+  font-family: var(--font-urbanist);
+  backdrop-filter: blur(6px);
 }
 
 /* ── Content ── */
@@ -83,8 +85,9 @@
 }
 
 .card-title {
-  @apply text-base font-semibold text-ndb-navy m-0 leading-tight;
-  font-family: 'Poppins', sans-serif;
+  @apply text-base font-semibold m-0 leading-tight;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-ink);
   flex: 1;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -96,33 +99,36 @@
   @apply flex items-center gap-1 flex-shrink-0 ml-2;
 
   .rating-value {
-    @apply text-sm font-semibold text-ndb-navy;
-    font-family: 'Poppins', sans-serif;
+    @apply text-sm font-semibold;
+    font-family: var(--font-urbanist);
+    color: var(--color-ndb-ink);
   }
 
   .review-count {
-    @apply text-xs text-ndb-muted;
+    @apply text-xs;
+    color: var(--color-ndb-muted);
   }
 }
 
 .card-price {
   @apply font-bold m-0;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-urbanist);
   font-size: 20px;
-  color: var(--color-ndb-orange);
+  color: var(--color-ndb-gold);
   line-height: 1;
 }
 
 .card-location {
-  @apply flex items-center gap-1 text-sm text-ndb-muted m-0;
+  @apply flex items-center gap-1 text-sm m-0;
+  color: var(--color-ndb-muted);
 
   i {
     @apply text-xs flex-shrink-0;
-    color: var(--color-ndb-orange);
+    color: var(--color-ndb-gold);
   }
 
   .distance {
-    @apply text-ndb-muted;
+    color: var(--color-ndb-muted);
   }
 }
 
@@ -131,13 +137,15 @@
 }
 
 .amenity-tag {
-  @apply px-2 py-0.5 rounded text-xs text-ndb-navy;
-  background: rgba(27, 58, 92, 0.07);
-  font-family: 'Inter', sans-serif;
+  @apply px-2 py-0.5 rounded text-xs;
+  background: color-mix(in srgb, var(--color-ndb-forest) 7%, transparent);
+  color: var(--color-ndb-forest);
+  font-family: var(--font-lato);
 }
 
 .amenity-more {
-  @apply text-xs text-ndb-muted self-center;
+  @apply text-xs self-center;
+  color: var(--color-ndb-muted);
 }
 
 /* ── Footer ── */
@@ -149,12 +157,13 @@
 .voir-details-btn {
   @apply px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-all border;
   background: transparent;
-  color: var(--color-ndb-orange);
-  border-color: var(--color-ndb-orange);
-  font-family: 'Poppins', sans-serif;
+  color: var(--color-ndb-gold);
+  border-color: var(--color-ndb-gold);
+  font-family: var(--font-urbanist);
   letter-spacing: 0.04em;
 }
 
 .rooms-available {
-  @apply text-xs text-ndb-muted;
+  @apply text-xs;
+  color: var(--color-ndb-muted);
 }

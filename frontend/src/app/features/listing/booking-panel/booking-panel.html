@@ -1,0 +1,98 @@
+@if (loading()) {
+  <div class="booking-panel-skeleton">
+    <p-skeleton height="40px" styleClass="mb-3" />
+    <p-skeleton height="300px" styleClass="mb-3" />
+    <p-skeleton height="48px" styleClass="mb-2" />
+    <p-skeleton height="80px" styleClass="mb-3" />
+    <p-skeleton height="52px" />
+  </div>
+} @else if (!isOwner()) {
+  <div
+    ngmMotion
+    [initial]="{ opacity: 0, y: 20 }"
+    [animate]="{ opacity: 1, y: 0 }"
+    [transition]="{ duration: 0.4, ease: 'easeOut' }"
+    class="booking-panel"
+  >
+    <div class="panel-price">
+      <span class="panel-price-amount">{{ formattedPrice() }}</span>
+      <span class="panel-price-unit">FCFA / mois</span>
+    </div>
+
+    <div class="panel-section">
+      <label class="panel-label">
+        <i class="pi pi-calendar" aria-hidden="true"></i>
+        Date d'emménagement
+      </label>
+      <p-datepicker
+        [inline]="true"
+        [minDate]="minDate"
+        dateFormat="dd/mm/yy"
+        [ngModel]="startDate()"
+        (ngModelChange)="startDate.set($event)"
+        class="panel-datepicker"
+      />
+    </div>
+
+    <div class="panel-section">
+      <label class="panel-label">
+        <i class="pi pi-clock" aria-hidden="true"></i>
+        Durée du séjour
+      </label>
+      <p-select
+        [options]="durationOptions"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="duration()"
+        (ngModelChange)="duration.set($event)"
+        [fluid]="true"
+        placeholder="Choisir une durée"
+      />
+    </div>
+
+    <div class="panel-summary" aria-label="Récapitulatif">
+      <div class="summary-row">
+        <span class="summary-label">Loyer mensuel</span>
+        <span class="summary-value">{{ formattedPrice() }} FCFA</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Durée</span>
+        <span class="summary-value">{{ duration() }} mois</span>
+      </div>
+      <div class="summary-divider" role="separator"></div>
+      <div class="summary-row summary-row--total">
+        <span class="summary-label">Total estimé</span>
+        <span class="summary-value summary-value--total">{{ formattedTotal() }} FCFA</span>
+      </div>
+    </div>
+
+    <p-button
+      ngmMotion
+      [whileHover]="{ scale: 1.02 }"
+      [whileTap]="{ scale: 0.98 }"
+      [transition]="{ type: 'spring', stiffness: 400, damping: 25 }"
+      label="Réserver"
+      icon="pi pi-calendar-plus"
+      [fluid]="true"
+      [disabled]="!startDate()"
+      (onClick)="onReserveClick()"
+      class="panel-cta"
+    />
+  </div>
+} @else {
+  <div class="panel-landlord-notice" role="note">
+    <i class="pi pi-info-circle" aria-hidden="true"></i>
+    <p>Vous ne pouvez pas réserver votre propre annonce.</p>
+  </div>
+}
+
+@if (confirmDialogVisible()) {
+  <app-booking-confirm-dialog
+    [(visible)]="confirmDialogVisible"
+    [listing]="listing()"
+    [startDate]="startDate() ?? minDate"
+    [duration]="duration()"
+    [totalAmount]="totalAmount()"
+    (confirmed)="onBookingConfirmed($event)"
+  />
+}

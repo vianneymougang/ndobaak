@@ -1,0 +1,127 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  BACKEND_IMAGE: $ECR_REGISTRY/ndobaak-backend
+  FRONTEND_IMAGE: $ECR_REGISTRY/ndobaak-frontend
+  DOCKER_BUILDKIT: "1"
+
+# ──────────────────────────────────────────────
+# TEST
+# ──────────────────────────────────────────────
+
+test:backend:
+  stage: test
+  image: maven:3.9.9-eclipse-temurin-21-alpine
+  cache:
+    key: maven-$CI_COMMIT_REF_SLUG
+    paths:
+      - backend/.m2/repository
+  variables:
+    MAVEN_OPTS: -Dmaven.repo.local=backend/.m2/repository
+  script:
+    - cd backend && mvn test -B
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+# ──────────────────────────────────────────────
+# BUILD — backend
+# ──────────────────────────────────────────────
+
+build:backend:
+  stage: build
+  image: docker:27
+  services:
+    - docker:27-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    - apk add --no-cache aws-cli
+    - aws ecr get-login-password --region $AWS_DEFAULT_REGION
+      | docker login --username AWS --password-stdin $ECR_REGISTRY
+  script:
+    - |
+      docker build \
+        --cache-from $BACKEND_IMAGE:$CI_COMMIT_REF_SLUG \
+        --cache-from $BACKEND_IMAGE:latest \
+        --tag $BACKEND_IMAGE:$CI_COMMIT_SHA \
+        --tag $BACKEND_IMAGE:$CI_COMMIT_REF_SLUG \
+        ./backend
+    - docker push $BACKEND_IMAGE:$CI_COMMIT_SHA
+    - docker push $BACKEND_IMAGE:$CI_COMMIT_REF_SLUG
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+# ──────────────────────────────────────────────
+# BUILD — frontend
+# ──────────────────────────────────────────────
+
+build:frontend:
+  stage: build
+  image: docker:27
+  services:
+    - docker:27-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    - apk add --no-cache aws-cli
+    - aws ecr get-login-password --region $AWS_DEFAULT_REGION
+      | docker login --username AWS --password-stdin $ECR_REGISTRY
+  script:
+    - |
+      docker build \
+        --cache-from $FRONTEND_IMAGE:$CI_COMMIT_REF_SLUG \
+        --cache-from $FRONTEND_IMAGE:latest \
+        --tag $FRONTEND_IMAGE:$CI_COMMIT_SHA \
+        --tag $FRONTEND_IMAGE:$CI_COMMIT_REF_SLUG \
+        ./frontend
+    - docker push $FRONTEND_IMAGE:$CI_COMMIT_SHA
+    - docker push $FRONTEND_IMAGE:$CI_COMMIT_REF_SLUG
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+# ──────────────────────────────────────────────
+# DEPLOY — production (main → prod)
+# ──────────────────────────────────────────────
+
+deploy:production:
+  stage: deploy
+  image: alpine/curl:latest
+  environment:
+    name: production
+    url: https://ndobaak.com
+  script:
+    - |
+      curl --fail --silent --show-error \
+        -X POST "$DOKPLOY_WEBHOOK_PROD" \
+        -H "Authorization: Bearer $DOKPLOY_TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{\"tag\":\"$CI_COMMIT_SHA\"}"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# ──────────────────────────────────────────────
+# DEPLOY — préprod (develop → staging)
+# ──────────────────────────────────────────────
+
+deploy:staging:
+  stage: deploy
+  image: alpine/curl:latest
+  environment:
+    name: staging
+    url: https://staging.ndobaak.com
+  script:
+    - |
+      curl --fail --silent --show-error \
+        -X POST "$DOKPLOY_WEBHOOK_PREPROD" \
+        -H "Authorization: Bearer $DOKPLOY_TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{\"tag\":\"$CI_COMMIT_SHA\"}"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"

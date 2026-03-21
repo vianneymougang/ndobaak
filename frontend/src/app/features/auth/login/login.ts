@@ -1,26 +1,23 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
-import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
-import { TabsModule } from 'primeng/tabs';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-login',
   imports: [
+    FormsModule,
     ReactiveFormsModule,
     RouterLink,
     InputTextModule,
     PasswordModule,
     ButtonModule,
-    TabsModule,
-    MessageModule,
     FloatLabelModule,
     AutoFocusModule,
   ],
@@ -55,14 +52,17 @@ export class Login implements OnInit {
     }
   }
 
-  protected onTabChange(tab: string | number | undefined): void {
-    this.activeTab.set(String(tab ?? 'email'));
-    this.errorMessage.set(null);
+  protected onTabChange(tab: string | null): void {
+    if (tab) {
+      this.activeTab.set(tab);
+      this.errorMessage.set(null);
+    }
   }
 
   protected onEmailLogin(): void {
     if (this.emailForm.invalid) {
       this.emailForm.markAllAsTouched();
+      this.scrollToFirstError();
       return;
     }
 
@@ -79,6 +79,7 @@ export class Login implements OnInit {
   protected onPhoneLogin(): void {
     if (this.phoneForm.invalid) {
       this.phoneForm.markAllAsTouched();
+      this.scrollToFirstError();
       return;
     }
 
@@ -100,6 +101,12 @@ export class Login implements OnInit {
 
   protected onGoogleLogin(): void {
     window.location.href = `${environment.apiUrl}/oauth2/authorization/google?from=login`;
+  }
+
+  private scrollToFirstError(): void {
+    setTimeout(() => {
+      document.querySelector('.ng-invalid:not(form)')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
   }
 
   private onError(err: unknown): void {

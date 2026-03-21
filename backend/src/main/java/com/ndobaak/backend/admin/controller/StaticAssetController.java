@@ -33,16 +33,18 @@ public class StaticAssetController {
             @RequestParam MultipartFile file,
             @RequestParam String name) throws IOException {
 
-        ImageProcessingService.ResizedImages resized =
-                imageProcessingService.resize(file.getInputStream());
+        ImageProcessingService.ProcessedImages processed =
+                imageProcessingService.process(file.getInputStream());
 
-        byte[] original = resized.original();
+        byte[] original = processed.original();
 
-        String url = storageService.uploadNamed(
-                "static", name,
+        String key = storageService.uploadNamed(
+                "static", name + ".webp",
                 new ByteArrayInputStream(original),
                 original.length,
-                file.getContentType());
+                "image/webp");
+
+        String url = storageService.resolvePublicUrl(key);
 
         return ResponseEntity.ok(Map.of("url", url));
     }

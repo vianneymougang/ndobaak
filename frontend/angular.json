@@ -7,11 +7,12 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "frontend": {
+    "Ndobaak": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "scss"
+          "style": "scss",
+          "type": ""
         }
       },
       "root": "",
@@ -32,6 +33,7 @@
             ],
             "styles": [
               "src/tailwind.css",
+              "node_modules/leaflet/dist/leaflet.css",
               "node_modules/primeicons/primeicons.css",
               "src/styles.scss"
             ],
@@ -43,6 +45,12 @@
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
               "budgets": [
                 {
                   "type": "initial",
@@ -69,10 +77,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "frontend:build:production"
+              "buildTarget": "Ndobaak:build:production"
             },
             "development": {
-              "buildTarget": "frontend:build:development"
+              "buildTarget": "Ndobaak:build:development"
             }
           },
           "defaultConfiguration": "development",

@@ -78,42 +78,108 @@
         <span>ou</span>
       </div>
 
-      <div class="role-selector">
-        <p-selectbutton
-          [options]="roleOptions"
-          [ngModel]="selectedRole()"
-          (ngModelChange)="onRoleChange($event)"
-          optionLabel="label"
-          optionValue="value"
-        />
+      <div class="role-cards" role="group" aria-label="Type de compte">
+        <button
+          type="button"
+          class="role-card"
+          [class.role-card--active]="selectedRole() === 'STUDENT'"
+          (click)="onRoleChange('STUDENT')"
+          [attr.aria-pressed]="selectedRole() === 'STUDENT'"
+        >
+          <i class="role-card__check pi pi-check-circle" aria-hidden="true"></i>
+          <div class="role-card__icon">
+            <i class="pi pi-book"></i>
+          </div>
+          <div class="role-card__body">
+            <span class="role-card__title">Étudiant</span>
+            <span class="role-card__desc">Je cherche un logement</span>
+          </div>
+        </button>
+        <button
+          type="button"
+          class="role-card"
+          [class.role-card--active]="selectedRole() === 'LANDLORD'"
+          (click)="onRoleChange('LANDLORD')"
+          [attr.aria-pressed]="selectedRole() === 'LANDLORD'"
+        >
+          <i class="role-card__check pi pi-check-circle" aria-hidden="true"></i>
+          <div class="role-card__icon">
+            <i class="pi pi-home"></i>
+          </div>
+          <div class="role-card__body">
+            <span class="role-card__title">Propriétaire</span>
+            <span class="role-card__desc">Je propose un logement</span>
+          </div>
+        </button>
       </div>
 
       @if (errorMessage()) {
-      <p-message severity="error" [text]="errorMessage()!" />
+        <div class="auth-error-banner">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ errorMessage() }}</span>
+        </div>
       }
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="register-form">
         <div class="form-row">
+          <div class="field-wrap">
+            <p-floatlabel>
+              <input
+                pInputText
+                id="firstName"
+                [pAutoFocus]="true"
+                formControlName="firstName"
+                class="w-full"
+                [invalid]="form.controls.firstName.invalid && form.controls.firstName.touched"
+              />
+              <label for="firstName">Prénom</label>
+            </p-floatlabel>
+            @if (form.controls.firstName.invalid && form.controls.firstName.touched) {
+              <small class="field-error">
+                @if (form.controls.firstName.hasError('required')) { Prénom requis. }
+                @else { Minimum 2 caractères. }
+              </small>
+            }
+          </div>
+          <div class="field-wrap">
+            <p-floatlabel>
+              <input
+                pInputText
+                id="lastName"
+                formControlName="lastName"
+                class="w-full"
+                [invalid]="form.controls.lastName.invalid && form.controls.lastName.touched"
+              />
+              <label for="lastName">Nom</label>
+            </p-floatlabel>
+            @if (form.controls.lastName.invalid && form.controls.lastName.touched) {
+              <small class="field-error">
+                @if (form.controls.lastName.hasError('required')) { Nom requis. }
+                @else { Minimum 2 caractères. }
+              </small>
+            }
+          </div>
+        </div>
+
+        <div class="field-wrap">
           <p-floatlabel>
             <input
               pInputText
-              id="firstName"
-              [pAutoFocus]="true"
-              formControlName="firstName"
+              id="email"
+              formControlName="email"
+              type="email"
               class="w-full"
+              [invalid]="form.controls.email.invalid && form.controls.email.touched"
             />
-            <label for="firstName">Prénom</label>
+            <label for="email">Email</label>
           </p-floatlabel>
-          <p-floatlabel>
-            <input pInputText id="lastName" formControlName="lastName" class="w-full" />
-            <label for="lastName">Nom</label>
-          </p-floatlabel>
+          @if (form.controls.email.invalid && form.controls.email.touched) {
+            <small class="field-error">
+              @if (form.controls.email.hasError('required')) { Email requis. }
+              @else { Format d'email invalide. }
+            </small>
+          }
         </div>
-
-        <p-floatlabel>
-          <input pInputText id="email" formControlName="email" type="email" class="w-full" />
-          <label for="email">Email</label>
-        </p-floatlabel>
 
         <!-- Phone with country selector -->
         <div class="phone-field-wrap">
@@ -151,34 +217,56 @@
                 type="tel"
                 inputmode="numeric"
                 class="w-full"
+                [invalid]="form.controls.localPhone.invalid && form.controls.localPhone.touched"
               />
               <label for="localPhone">Téléphone</label>
             </p-floatlabel>
           </p-inputgroup>
-          @if (form.get('localPhone')?.invalid && form.get('localPhone')?.touched) {
-            <p-message severity="error" text="Numéro invalide (chiffres uniquement, 7 à 12 chiffres)." />
+          @if (form.controls.localPhone.invalid && form.controls.localPhone.touched) {
+            <small class="field-error">Numéro invalide (chiffres uniquement, 7 à 12 chiffres).</small>
           }
         </div>
 
-        <p-floatlabel>
-          <p-password id="password" formControlName="password" [toggleMask]="true" [fluid]="true" />
-          <label for="password">Mot de passe</label>
-        </p-floatlabel>
-
-        <div class="confirm-password-group">
+        <div class="field-wrap">
           <p-floatlabel>
             <p-password
-              id="confirmPassword"
-              formControlName="confirmPassword"
+              id="password"
+              formControlName="password"
               [toggleMask]="true"
-              [feedback]="false"
               [fluid]="true"
+              [invalid]="form.controls.password.invalid && form.controls.password.touched"
             />
-            <label for="confirmPassword">Confirmer le mot de passe</label>
+            <label for="password">Mot de passe</label>
           </p-floatlabel>
-          @if (form.hasError('passwordMismatch') && form.get('confirmPassword')?.touched) {
-          <p-message severity="error" text="Les mots de passe ne correspondent pas" />
+          @if (form.controls.password.invalid && form.controls.password.touched) {
+            <small class="field-error">
+              @if (form.controls.password.hasError('required')) { Mot de passe requis. }
+              @else { Minimum 8 caractères. }
+            </small>
           }
+        </div>
+
+        <div class="confirm-password-group">
+          <div class="field-wrap">
+            <p-floatlabel>
+              <p-password
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                [toggleMask]="true"
+                [feedback]="false"
+                [fluid]="true"
+                [invalid]="(form.controls.confirmPassword.invalid && form.controls.confirmPassword.touched) || (form.hasError('passwordMismatch') && form.controls.confirmPassword.touched)"
+              />
+              <label for="confirmPassword">Confirmer le mot de passe</label>
+            </p-floatlabel>
+            @if (form.controls.confirmPassword.touched) {
+              @if (form.controls.confirmPassword.hasError('required')) {
+                <small class="field-error">Confirmation requise.</small>
+              } @else if (form.hasError('passwordMismatch')) {
+                <small class="field-error">Les mots de passe ne correspondent pas.</small>
+              }
+            }
+          </div>
         </div>
 
         <p-button

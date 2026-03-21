@@ -1,0 +1,59 @@
+@reference "../../../../tailwind.css";
+
+.failure-page {
+  @apply flex items-center justify-center min-h-[70vh] px-4 py-8;
+}
+
+.failure-card {
+  @apply flex flex-col items-center text-center gap-5 p-8 rounded-2xl max-w-md w-full;
+  background: white;
+  border: 1px solid var(--color-ndb-border);
+  box-shadow: var(--shadow-card);
+}
+
+.failure-icon {
+  @apply flex items-center justify-center w-20 h-20 rounded-full;
+  background: var(--color-ndb-error-bg);
+
+  i {
+    @apply text-4xl;
+    color: var(--color-ndb-error);
+  }
+}
+
+.failure-title {
+  @apply text-2xl font-bold m-0;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-error-dark);
+}
+
+.failure-desc {
+  @apply text-sm m-0 leading-relaxed;
+  color: var(--color-ndb-muted);
+  max-width: 340px;
+}
+
+.failure-tips {
+  @apply w-full p-4 rounded-xl text-left;
+  background: color-mix(in srgb, var(--color-ndb-gold) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ndb-gold) 20%, transparent);
+}
+
+.tips-title {
+  @apply text-sm font-semibold m-0 mb-2;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.tips-list {
+  @apply text-sm m-0 pl-5 flex flex-col gap-1;
+  color: var(--color-ndb-body);
+}
+
+.failure-actions {
+  @apply flex flex-col gap-3 w-full mt-2;
+
+  @media (min-width: 640px) {
+    @apply flex-row;
+  }
+}

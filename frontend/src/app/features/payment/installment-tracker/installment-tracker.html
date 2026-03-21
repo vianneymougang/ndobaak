@@ -1,0 +1,162 @@
+<div class="tracker-page">
+  <a routerLink="/my-bookings" class="back-link">
+    <i class="pi pi-arrow-left" aria-hidden="true"></i>
+    Retour à mes réservations
+  </a>
+
+  <h1 class="page-title">Échéancier de paiement</h1>
+
+  @if (loading()) {
+    <div class="tracker-skeleton">
+      <p-skeleton height="6rem" borderRadius="16px" />
+      <p-skeleton height="3rem" />
+      <p-skeleton height="3rem" />
+      <p-skeleton height="3rem" />
+    </div>
+  } @else if (schedule(); as s) {
+    <div
+      class="progress-card"
+      ngmMotion
+      [initial]="{ opacity: 0, y: 15 }"
+      [animate]="{ opacity: 1, y: 0 }"
+      [transition]="{ duration: 0.35 }"
+    >
+      <div class="progress-header">
+        <div class="progress-info">
+          <span class="progress-label">Progression</span>
+          <span class="progress-fraction">
+            {{ s.paidInstallments }} / {{ s.numberOfInstallments }} échéances
+          </span>
+        </div>
+        <span class="progress-percent">{{ progressPercent() }}%</span>
+      </div>
+      <p-progressBar
+        [value]="progressPercent()"
+        [showValue]="false"
+        [style]="{ height: '10px' }"
+      />
+      <div class="progress-amounts">
+        <div class="amount-block">
+          <span class="amount-label">Payé</span>
+          <span class="amount-value amount-value--success">{{ formattedPaid() }} FCFA</span>
+        </div>
+        <div class="amount-block">
+          <span class="amount-label">Restant</span>
+          <span class="amount-value">{{ formattedRemaining() }} FCFA</span>
+        </div>
+        <div class="amount-block">
+          <span class="amount-label">Total</span>
+          <span class="amount-value amount-value--total">{{ formattedTotal() }} FCFA</span>
+        </div>
+      </div>
+      <p class="frequency-badge">
+        <i class="pi pi-calendar" aria-hidden="true"></i>
+        {{ frequencyLabel() }}
+      </p>
+    </div>
+
+    <h2 class="schedule-title">Détail des échéances</h2>
+
+    <div class="installment-list">
+      @for (inst of s.installments; track inst.id; let i = $index) {
+        <div
+          class="installment-row"
+          [class.installment-row--overdue]="inst.status === 'OVERDUE'"
+          ngmMotion
+          [initial]="{ opacity: 0, x: -10 }"
+          [animate]="{ opacity: 1, x: 0 }"
+          [transition]="{ duration: 0.25, delay: staggerDelay(i) }"
+        >
+          <div class="installment-number">{{ inst.installmentNumber }}</div>
+
+          <div class="installment-details">
+            <div class="installment-main">
+              <span class="installment-amount">{{ formatAmount(inst.amount) }} FCFA</span>
+              <span class="installment-commission">+ {{ formatAmount(inst.commission) }} frais</span>
+            </div>
+            <span class="installment-due">
+              <i class="pi pi-calendar" aria-hidden="true"></i>
+              {{ formatDate(inst.dueDate) }}
+            </span>
+          </div>
+
+          <div class="installment-actions">
+            <p-tag
+              [value]="statusLabels[inst.status]"
+              [severity]="statusSeverities[inst.status]"
+              [rounded]="true"
+            />
+            @if (canPay(inst)) {
+              <p-button
+                label="Payer"
+                icon="pi pi-wallet"
+                size="small"
+                (onClick)="openPayDialog(inst.id)"
+              />
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<p-dialog
+  header="Payer cette échéance"
+  [(visible)]="payDialogVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '420px' }"
+>
+  <form [formGroup]="payForm" (ngSubmit)="submitPay()" class="pay-dialog-form">
+    <div class="field-wrap">
+      <p-floatlabel>
+        <p-select
+          formControlName="operator"
+          [options]="operatorOptions"
+          optionLabel="label"
+          optionValue="value"
+          inputId="payOperator"
+          [invalid]="payForm.controls.operator.invalid && payForm.controls.operator.touched"
+        />
+        <label for="payOperator">Opérateur</label>
+      </p-floatlabel>
+      @if (payForm.controls.operator.invalid && payForm.controls.operator.touched) {
+        <small class="field-error">
+          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+          Veuillez sélectionner un opérateur
+        </small>
+      }
+    </div>
+
+    <div class="field-wrap">
+      <p-floatlabel>
+        <p-inputMask
+          formControlName="phoneNumber"
+          mask="+237 999 999 999"
+          placeholder="+237 6XX XXX XXX"
+          inputId="payPhone"
+          [invalid]="payForm.controls.phoneNumber.invalid && payForm.controls.phoneNumber.touched"
+          [unmask]="true"
+        />
+        <label for="payPhone">Numéro de téléphone</label>
+      </p-floatlabel>
+      @if (payForm.controls.phoneNumber.invalid && payForm.controls.phoneNumber.touched) {
+        <small class="field-error">
+          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+          Numéro camerounais invalide
+        </small>
+      }
+    </div>
+
+    <p-button
+      type="submit"
+      label="Confirmer le paiement"
+      icon="pi pi-lock"
+      [loading]="submitting()"
+      [disabled]="submitting()"
+      styleClass="w-full"
+    />
+  </form>
+</p-dialog>

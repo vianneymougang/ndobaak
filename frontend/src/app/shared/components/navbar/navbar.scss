@@ -1,44 +1,88 @@
 @reference "../../../../tailwind.css";
 
-.navbar {
-  @apply bg-ndb-navy sticky top-0 z-50;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
+:host {
+  @apply sticky top-0 z-50 block;
 }
 
+.navbar {
+  background: transparent;
+  transition: background 0.35s ease, box-shadow 0.35s ease, border-bottom-color 0.35s ease;
+  border-bottom: 1px solid transparent;
+
+  &:not(.navbar--transparent) {
+    background: var(--color-ndb-forest);
+    box-shadow: var(--shadow-navbar);
+    border-bottom-color: color-mix(in srgb, white 8%, transparent);
+  }
+
+  &.navbar--transparent {
+    background: transparent;
+    box-shadow: none;
+    border-bottom-color: transparent;
+  }
+
+  &.navbar--scrolled {
+    background: var(--color-ndb-forest);
+    box-shadow: var(--shadow-navbar);
+    border-bottom: 1px solid color-mix(in srgb, white 8%, transparent);
+  }
+}
+
+/* ── Container ── */
 .navbar-container {
-  @apply max-w-7xl mx-auto px-4 flex items-center justify-between;
   height: 64px;
+  @apply max-w-7xl mx-auto px-4 flex items-center justify-between;
+
+  @media (max-width: 767px) {
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    align-items: center;
+    gap: 0;
+    padding-inline: 12px;
+  }
 }
 
 /* ── Brand ── */
 .navbar-brand {
-  @apply flex items-center gap-2 no-underline;
+  @apply flex items-center gap-2.5 no-underline;
+  transition: opacity 0.15s ease;
+
+  @media (max-width: 767px) {
+    justify-content: center;
+  }
+
+  &:hover {
+    opacity: 0.88;
+  }
 }
 
-.brand-icon {
-  @apply flex items-center justify-center w-8 h-8 rounded-lg bg-ndb-orange text-white text-sm;
+.brand-icon-svg {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
 }
 
 .brand-text {
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-urbanist);
   @apply text-xl font-bold text-white tracking-tight;
+  letter-spacing: -0.01em;
 }
 
 /* ── Desktop links ── */
 .navbar-links {
-  @apply hidden md:flex items-center gap-6;
+  @apply hidden md:flex items-center gap-4;
 
   a {
-    @apply text-white/80 no-underline text-sm font-medium flex items-center gap-1.5 transition-colors;
+    @apply text-white/75 no-underline text-sm font-semibold flex items-center gap-1.5 transition-colors;
+    font-family: var(--font-urbanist);
+    white-space: nowrap;
 
     i {
       @apply text-xs opacity-70;
     }
 
-    &:hover,
-    &.active {
+    &:hover {
       @apply text-white;
-      text-shadow: 0 0 20px rgba(232, 118, 43, 0.4);
 
       i {
         @apply opacity-100;
@@ -46,112 +90,254 @@
     }
 
     &.active {
-      @apply text-ndb-orange;
+      color: var(--color-ndb-gold);
+
+      i {
+        @apply opacity-100;
+      }
     }
   }
 }
 
-/* ── Auth actions ── */
+/* ── Desktop auth ── */
 .navbar-auth {
-  @apply hidden md:flex items-center gap-4;
+  @apply hidden md:flex items-center gap-3;
 }
 
-.nav-link-auth {
-  @apply text-white/80 text-sm font-medium no-underline transition-colors;
+/* ── Buttons ── */
+.btn-nav-post {
+  @apply inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold no-underline transition-all;
+  color: color-mix(in srgb, white 90%, transparent);
+  border: 1.5px solid color-mix(in srgb, white 30%, transparent);
+  font-family: var(--font-urbanist);
 
   &:hover {
-    @apply text-white;
+    border-color: color-mix(in srgb, white 70%, transparent);
+    background: color-mix(in srgb, white 8%, transparent);
   }
 }
 
-.btn-cta {
+.btn-nav-outline {
+  @apply inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold no-underline transition-all;
+  color: color-mix(in srgb, white 90%, transparent);
+  border: 1.5px solid color-mix(in srgb, white 40%, transparent);
+  font-family: var(--font-urbanist);
+
+  &:hover {
+    border-color: color-mix(in srgb, white 80%, transparent);
+    background: color-mix(in srgb, white 10%, transparent);
+  }
+}
+
+.btn-nav-gold {
   @apply inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold no-underline transition-all;
-  background: #E8762B;
-  color: #ffffff;
-  font-family: 'Poppins', sans-serif;
+  background: var(--color-ndb-gold);
+  color: var(--color-ndb-forest);
+  font-family: var(--font-urbanist);
   letter-spacing: 0.02em;
 
   &:hover {
-    background: #C9611B;
+    background: var(--color-ndb-gold-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(232, 118, 43, 0.4);
+    box-shadow: var(--shadow-gold);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 }
 
-.btn-cta-outline {
-  @apply inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold no-underline transition-all;
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  font-family: 'Poppins', sans-serif;
-
-  &:hover {
-    border-color: rgba(255, 255, 255, 0.95);
-    background: rgba(255, 255, 255, 0.12);
-  }
-}
-
-/* ── User menu ── */
+/* ── User menu (desktop) ── */
 .user-menu {
   @apply flex items-center gap-3;
 }
 
 .user-avatar {
-  @apply w-9 h-9 rounded-full bg-ndb-orange text-white text-sm font-bold flex items-center justify-center flex-shrink-0;
-  font-family: 'Poppins', sans-serif;
+  @apply w-9 h-9 rounded-full text-sm font-bold flex items-center justify-center flex-shrink-0;
+  background: var(--color-ndb-gold);
+  color: var(--color-ndb-forest);
+  font-family: var(--font-urbanist);
 }
 
 .user-info {
-  @apply hidden md:flex flex-col;
+  @apply flex flex-col;
 
   .user-name {
     @apply text-white text-sm font-semibold leading-tight;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-urbanist);
   }
 
   .user-role {
-    @apply text-white/60 text-xs;
+    @apply text-white/55 text-xs;
   }
 }
 
 .logout-btn {
   @apply flex items-center justify-center w-9 h-9 rounded-lg text-white/70 transition-all cursor-pointer border-0;
-  background: rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, white 8%, transparent);
 
   &:hover {
-    @apply text-white bg-white/15;
+    @apply text-white;
+    background: color-mix(in srgb, white 15%, transparent);
   }
 }
 
-/* ── Mobile toggle ── */
+/* ── Mobile hamburger (left) ── */
 .menu-toggle {
-  @apply flex md:hidden items-center justify-center w-10 h-10 text-white text-xl cursor-pointer rounded-lg transition-colors border-0;
-  background: rgba(255, 255, 255, 0.1);
+  @apply flex md:hidden items-center justify-center w-10 h-10 text-white text-lg cursor-pointer rounded-lg transition-colors border-0;
+  background: color-mix(in srgb, white 10%, transparent);
 
   &:hover {
-    background: rgba(255, 255, 255, 0.18);
+    background: color-mix(in srgb, white 18%, transparent);
   }
 }
 
-/* ── Mobile nav ── */
-.mobile-nav {
-  @apply md:hidden border-t flex flex-col px-4 pb-4 gap-1;
-  border-color: rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
+/* ── Mobile right side ── */
+.navbar-mobile-right {
+  @apply flex md:hidden items-center justify-end;
+}
 
-  a {
-    @apply text-white/85 no-underline py-3 text-sm font-medium flex items-center gap-2 transition-colors border-b;
-    border-color: rgba(255, 255, 255, 0.08);
+.user-avatar-mobile {
+  @apply w-9 h-9 rounded-full text-sm font-bold flex items-center justify-center cursor-pointer border-0 transition-opacity;
+  background: var(--color-ndb-gold);
+  color: var(--color-ndb-forest);
+  font-family: var(--font-urbanist);
 
-    &:last-of-type {
-      @apply border-b-0;
+  &:hover {
+    opacity: 0.88;
+  }
+}
+
+.btn-nav-outline-mobile {
+  @apply inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold no-underline transition-all;
+  color: color-mix(in srgb, white 90%, transparent);
+  border: 1.5px solid color-mix(in srgb, white 40%, transparent);
+  font-family: var(--font-urbanist);
+  white-space: nowrap;
+
+  &:hover {
+    background: color-mix(in srgb, white 10%, transparent);
+  }
+}
+
+/* ════════════════════════════════
+   DRAWER STYLES
+   ════════════════════════════════ */
+.drawer-brand {
+  @apply flex items-center gap-2.5;
+}
+
+.drawer-brand-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.drawer-brand-text {
+  font-family: var(--font-urbanist);
+  @apply text-lg font-bold;
+  color: var(--color-ndb-ink);
+  letter-spacing: -0.01em;
+}
+
+.drawer-nav {
+  @apply flex flex-col gap-1 pt-2;
+}
+
+.drawer-link {
+  @apply flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold no-underline transition-all;
+  color: var(--color-ndb-body);
+  font-family: var(--font-urbanist);
+
+  i {
+    @apply text-base;
+    color: var(--color-ndb-muted);
+    transition: color 0.15s ease;
+    width: 20px;
+    text-align: center;
+  }
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-ndb-forest) 6%, transparent);
+    color: var(--color-ndb-forest);
+
+    i {
+      color: var(--color-ndb-forest);
+    }
+  }
+
+  &--cta {
+    background: color-mix(in srgb, var(--color-ndb-gold) 10%, transparent);
+    color: #92600a;
+    margin-bottom: 4px;
+
+    i {
+      color: var(--color-ndb-gold);
     }
 
     &:hover {
-      @apply text-white;
+      background: color-mix(in srgb, var(--color-ndb-gold) 18%, transparent);
+      color: #78500a;
     }
   }
 }
 
-.mobile-auth {
-  @apply flex gap-3 pt-3;
+.drawer-divider {
+  height: 1px;
+  background: color-mix(in srgb, black 7%, transparent);
+  margin: 8px 0;
+}
+
+/* ── Drawer footer ── */
+.drawer-footer {
+  @apply flex flex-col gap-3;
+}
+
+.drawer-user {
+  @apply flex items-center gap-3 px-1;
+}
+
+.drawer-user-avatar {
+  @apply w-10 h-10 rounded-full text-sm font-bold flex items-center justify-center flex-shrink-0;
+  background: var(--color-ndb-gold);
+  color: var(--color-ndb-forest);
+  font-family: var(--font-urbanist);
+}
+
+.drawer-user-info {
+  @apply flex flex-col;
+}
+
+.drawer-user-name {
+  @apply text-sm font-semibold;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-ink);
+}
+
+.drawer-user-role {
+  @apply text-xs;
+  color: var(--color-ndb-muted);
+}
+
+.drawer-logout-btn {
+  @apply flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm font-semibold cursor-pointer border-0 transition-all;
+  background: color-mix(in srgb, var(--color-ndb-error) 7%, transparent);
+  color: var(--color-ndb-error-dark);
+  font-family: var(--font-urbanist);
+
+  i {
+    @apply text-sm;
+  }
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-ndb-error) 13%, transparent);
+  }
+}
+
+.drawer-footer-auth {
+  @apply flex flex-col gap-2;
+}
+
+.drawer-auth-btn {
+  @apply justify-center w-full;
 }

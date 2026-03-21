@@ -43,91 +43,129 @@
       <p class="login-subtitle">Connectez-vous à votre compte Ndobaâk</p>
 
       @if (errorMessage()) {
-      <p-message severity="error" [text]="errorMessage()!" />
+        <div class="auth-error-banner">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ errorMessage() }}</span>
+        </div>
       }
 
-      <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
-        <p-tablist>
-          <p-tab value="email">Email</p-tab>
-          <p-tab value="phone">Téléphone</p-tab>
-        </p-tablist>
+      <div class="method-tabs" role="group" aria-label="Méthode de connexion">
+        <button
+          type="button"
+          class="method-tab"
+          [class.method-tab--active]="activeTab() === 'email'"
+          (click)="onTabChange('email')"
+          [attr.aria-pressed]="activeTab() === 'email'"
+        >Email</button>
+        <button
+          type="button"
+          class="method-tab"
+          [class.method-tab--active]="activeTab() === 'phone'"
+          (click)="onTabChange('phone')"
+          [attr.aria-pressed]="activeTab() === 'phone'"
+        >Téléphone</button>
+      </div>
 
-        <p-tabpanels>
-          <p-tabpanel value="email">
-            <form [formGroup]="emailForm" (ngSubmit)="onEmailLogin()" class="login-form">
-              <p-floatlabel>
-                <input
-                  pInputText
-                  [pAutoFocus]="true"
-                  id="loginEmail"
-                  formControlName="email"
-                  type="email"
-                  class="w-full"
-                />
-                <label for="loginEmail">Email</label>
-              </p-floatlabel>
-              <div class="password-field-wrap">
-                <p-floatlabel>
-                  <p-password
-                    id="loginPassword"
-                    formControlName="password"
-                    [toggleMask]="true"
-                    [feedback]="false"
-                    [fluid]="true"
-                  />
-                  <label for="loginPassword">Mot de passe</label>
-                </p-floatlabel>
-                <a routerLink="/auth/forgot-password" class="forgot-link">Mot de passe oublié ?</a>
-              </div>
-              <p-button
-                type="submit"
-                label="Se connecter"
-                [loading]="loading()"
-                [fluid]="true"
-                severity="primary"
+      @if (activeTab() === 'email') {
+        <form [formGroup]="emailForm" (ngSubmit)="onEmailLogin()" class="login-form">
+          <div class="field-wrap">
+            <p-floatlabel>
+              <input
+                pInputText
+                [pAutoFocus]="true"
+                id="loginEmail"
+                formControlName="email"
+                type="email"
+                class="w-full"
+                [invalid]="emailForm.controls.email.invalid && emailForm.controls.email.touched"
               />
-            </form>
-          </p-tabpanel>
-
-          <p-tabpanel value="phone">
-            <form [formGroup]="phoneForm" (ngSubmit)="onPhoneLogin()" class="login-form">
+              <label for="loginEmail">Email</label>
+            </p-floatlabel>
+            @if (emailForm.controls.email.invalid && emailForm.controls.email.touched) {
+              <small class="field-error">
+                @if (emailForm.controls.email.hasError('required')) { Email requis. }
+                @else { Format d'email invalide. }
+              </small>
+            }
+          </div>
+          <div class="password-field-wrap">
+            <div class="field-wrap">
               <p-floatlabel>
-                <input
-                  pInputText
-                  [pAutoFocus]="true"
-                  id="loginPhone"
-                  formControlName="phone"
-                  type="tel"
-                  inputmode="numeric"
-                  placeholder="Ex : 677 00 00 00"
-                  class="w-full"
+                <p-password
+                  id="loginPassword"
+                  formControlName="password"
+                  [toggleMask]="true"
+                  [feedback]="false"
+                  [fluid]="true"
+                  [invalid]="emailForm.controls.password.invalid && emailForm.controls.password.touched"
                 />
-                <label for="loginPhone">Téléphone</label>
+                <label for="loginPassword">Mot de passe</label>
               </p-floatlabel>
-              <div class="password-field-wrap">
-                <p-floatlabel>
-                  <p-password
-                    id="loginPhonePassword"
-                    formControlName="password"
-                    [toggleMask]="true"
-                    [feedback]="false"
-                    [fluid]="true"
-                  />
-                  <label for="loginPhonePassword">Mot de passe</label>
-                </p-floatlabel>
-                <a routerLink="/auth/forgot-password" class="forgot-link">Mot de passe oublié ?</a>
-              </div>
-              <p-button
-                type="submit"
-                label="Se connecter"
-                [loading]="loading()"
-                [fluid]="true"
-                severity="primary"
+              @if (emailForm.controls.password.invalid && emailForm.controls.password.touched) {
+                <small class="field-error">Mot de passe requis.</small>
+              }
+            </div>
+            <a routerLink="/auth/forgot-password" class="forgot-link">Mot de passe oublié ?</a>
+          </div>
+          <p-button
+            type="submit"
+            label="Se connecter"
+            [loading]="loading()"
+            [fluid]="true"
+            severity="primary"
+          />
+        </form>
+      } @else {
+        <form [formGroup]="phoneForm" (ngSubmit)="onPhoneLogin()" class="login-form">
+          <div class="field-wrap">
+            <p-floatlabel>
+              <input
+                pInputText
+                [pAutoFocus]="true"
+                id="loginPhone"
+                formControlName="phone"
+                type="tel"
+                inputmode="numeric"
+                class="w-full"
+                [invalid]="phoneForm.controls.phone.invalid && phoneForm.controls.phone.touched"
               />
-            </form>
-          </p-tabpanel>
-        </p-tabpanels>
-      </p-tabs>
+              <label for="loginPhone">Téléphone</label>
+            </p-floatlabel>
+            @if (phoneForm.controls.phone.invalid && phoneForm.controls.phone.touched) {
+              <small class="field-error">
+                @if (phoneForm.controls.phone.hasError('required')) { Numéro requis. }
+                @else { Minimum 9 chiffres. }
+              </small>
+            }
+          </div>
+          <div class="password-field-wrap">
+            <div class="field-wrap">
+              <p-floatlabel>
+                <p-password
+                  id="loginPhonePassword"
+                  formControlName="password"
+                  [toggleMask]="true"
+                  [feedback]="false"
+                  [fluid]="true"
+                  [invalid]="phoneForm.controls.password.invalid && phoneForm.controls.password.touched"
+                />
+                <label for="loginPhonePassword">Mot de passe</label>
+              </p-floatlabel>
+              @if (phoneForm.controls.password.invalid && phoneForm.controls.password.touched) {
+                <small class="field-error">Mot de passe requis.</small>
+              }
+            </div>
+            <a routerLink="/auth/forgot-password" class="forgot-link">Mot de passe oublié ?</a>
+          </div>
+          <p-button
+            type="submit"
+            label="Se connecter"
+            [loading]="loading()"
+            [fluid]="true"
+            severity="primary"
+          />
+        </form>
+      }
 
       <div class="social-divider">
         <span>ou</span>

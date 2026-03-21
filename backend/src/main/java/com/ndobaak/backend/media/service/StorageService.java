@@ -15,14 +15,14 @@ public class StorageService {
 
     private final S3Client s3Client;
     private final String bucket;
-    private final String endpoint;
+    private final String publicUrl;
 
     public StorageService(S3Client s3Client,
                           @Value("${app.storage.bucket}") String bucket,
-                          @Value("${app.storage.endpoint}") String endpoint) {
+                          @Value("${app.storage.public-url}") String publicUrl) {
         this.s3Client = s3Client;
         this.bucket = bucket;
-        this.endpoint = endpoint;
+        this.publicUrl = publicUrl;
     }
 
     public String upload(String folder, String originalFilename, InputStream inputStream,
@@ -34,11 +34,12 @@ public class StorageService {
                 .bucket(bucket)
                 .key(key)
                 .contentType(contentType)
+                .cacheControl("public, max-age=31536000, immutable")
                 .build();
 
         s3Client.putObject(request, RequestBody.fromInputStream(inputStream, contentLength));
 
-        return endpoint + "/" + bucket + "/" + key;
+        return key;
     }
 
     public String uploadNamed(String folder, String filename, InputStream inputStream,
@@ -49,29 +50,42 @@ public class StorageService {
                 .bucket(bucket)
                 .key(key)
                 .contentType(contentType)
+                .cacheControl("public, max-age=31536000, immutable")
                 .build();
 
         s3Client.putObject(request, RequestBody.fromInputStream(inputStream, contentLength));
 
-        return endpoint + "/" + bucket + "/" + key;
+        return key;
     }
 
-    public void delete(String fileUrl) {
-        String key = extractKey(fileUrl);
-        if (key != null) {
-            s3Client.deleteObject(DeleteObjectRequest.builder()
-                    .bucket(bucket)
-                    .key(key)
-                    .build());
-        }
+    public void delete(String key) {
+        if (key == null) return;
+        String resolved = stripToKey(key);
+        s3Client.deleteObject(DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(resolved)
+                .build());
     }
 
-    private String extractKey(String fileUrl) {
-        String prefix = endpoint + "/" + bucket + "/";
-        if (fileUrl.startsWith(prefix)) {
-            return fileUrl.substring(prefix.length());
+    public String resolvePublicUrl(String key) {
+        if (key == null) return null;
+        if (key.startsWith("http://") || key.startsWith("https://")) {
+            return key;
         }
-        return null;
+        return publicUrl + "/" + key;
+    }
+
+    private String stripToKey(String value) {
+        if (value.startsWith("http://") || value.startsWith("https://")) {
+            int bucketSlash = value.indexOf('/', value.indexOf("//") + 2);
+            if (bucketSlash >= 0) {
+                int keyStart = value.indexOf('/', bucketSlash + 1);
+                if (keyStart >= 0) {
+                    return value.substring(keyStart + 1);
+                }
+            }
+        }
+        return value;
     }
 
     private String getExtension(String filename) {

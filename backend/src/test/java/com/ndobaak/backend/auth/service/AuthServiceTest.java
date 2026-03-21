@@ -11,6 +11,7 @@ import com.ndobaak.backend.common.exception.DuplicateResourceException;
 import com.ndobaak.backend.common.exception.UnauthorizedException;
 import com.ndobaak.backend.common.security.JwtProperties;
 import com.ndobaak.backend.common.security.JwtTokenProvider;
+import com.ndobaak.backend.notification.service.NotificationPreferenceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,6 +43,8 @@ class AuthServiceTest {
     private JwtProperties jwtProperties;
     @Mock
     private UserMapper userMapper;
+    @Mock
+    private NotificationPreferenceService notificationPreferenceService;
 
     @InjectMocks
     private AuthService authService;
@@ -175,11 +178,11 @@ class AuthServiceTest {
         request.setPassword("password123");
 
         Student student = Student.builder()
-                .email("jean@test.com").phone("690000001")
+                .email("jean@test.com").phone("+237690000001")
                 .password("$2a$10$hashed").build();
         student.setId(1L);
 
-        when(userRepository.findByPhone("690000001")).thenReturn(Optional.of(student));
+        when(userRepository.findByPhone("+237690000001")).thenReturn(Optional.of(student));
         when(passwordEncoder.matches("password123", "$2a$10$hashed")).thenReturn(true);
         when(jwtTokenProvider.generateAccessToken(eq(1L), eq("jean@test.com"), eq("STUDENT")))
                 .thenReturn("access-token");

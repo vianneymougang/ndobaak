@@ -1,0 +1,374 @@
+<div class="dashboard">
+  <div class="dashboard-top">
+    <div class="dashboard-greeting-mobile">
+      <h1 class="greeting-title">Tableau de bord</h1>
+    </div>
+    <div class="period-selector">
+      <p-selectButton
+        [options]="periodOptions"
+        [(ngModel)]="selectedPeriod"
+        optionLabel="label"
+        optionValue="value"
+        (onChange)="onPeriodChange()"
+        [pt]="{
+          pcToggleButton: {
+            root: { style: 'font-family: var(--font-urbanist); font-weight: 600; font-size: 0.8125rem; min-height: 36px; padding: 0.375rem 0.875rem; border-radius: 8px;' }
+          }
+        }"
+      />
+    </div>
+  </div>
+
+  <section class="kpi-section" aria-label="Indicateurs clés">
+    @if (kpiError()) {
+      <div class="state-card state-card--error">
+        <div class="state-icon">
+          <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        </div>
+        <p class="state-text">Impossible de charger les statistiques. Vérifiez votre connexion et réessayez.</p>
+        <p-button
+          label="Réessayer"
+          icon="pi pi-refresh"
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          (onClick)="retryKpi()"
+        />
+      </div>
+    } @else {
+      <div class="kpi-grid">
+        <app-kpi-card
+          icon="pi-home"
+          label="Annonces publiées"
+          [value]="kpiLoading() ? '' : '' + (dashboard()?.totalListings ?? 0)"
+          [loading]="kpiLoading()"
+          [animationDelay]="staggerDelay(0)"
+          routerLink="/landlord/listings"
+        />
+        <app-kpi-card
+          icon="pi-calendar"
+          label="Réservations actives"
+          [value]="kpiLoading() ? '' : '' + ((dashboard()?.confirmedBookings ?? 0) + (dashboard()?.completedBookings ?? 0))"
+          [loading]="kpiLoading()"
+          [animationDelay]="staggerDelay(1)"
+          routerLink="/landlord/bookings"
+        />
+        <app-kpi-card
+          icon="pi-clock"
+          label="Demandes en attente"
+          [value]="kpiLoading() ? '' : '' + (dashboard()?.pendingBookings ?? 0)"
+          [loading]="kpiLoading()"
+          [accent]="!kpiLoading() && (dashboard()?.pendingBookings ?? 0) > 0"
+          [animationDelay]="staggerDelay(2)"
+          routerLink="/landlord/bookings"
+        />
+        <app-kpi-card
+          icon="pi-wallet"
+          label="Revenus cumulés"
+          [value]="kpiLoading() ? '' : formatXAF(dashboard()?.totalRevenue ?? 0)"
+          [trend]="kpiLoading() ? null : (dashboard()?.revenueChangePercent ?? null)"
+          [loading]="kpiLoading()"
+          [animationDelay]="staggerDelay(3)"
+          routerLink="/landlord/transactions"
+        />
+        <app-kpi-card
+          icon="pi-chart-pie"
+          label="Taux d'occupation"
+          [value]="kpiLoading() ? '' : formatPercent(dashboard()?.occupancyRate ?? 0)"
+          [loading]="kpiLoading()"
+          [animationDelay]="staggerDelay(4)"
+        />
+        <app-kpi-card
+          icon="pi-eye"
+          label="Vues totales"
+          [value]="kpiLoading() ? '' : '' + (dashboard()?.totalViews ?? 0)"
+          [loading]="kpiLoading()"
+          [animationDelay]="staggerDelay(5)"
+        />
+      </div>
+    }
+  </section>
+
+  <section
+    class="charts-section"
+    aria-label="Graphiques"
+    ngmMotion
+    [initial]="{ opacity: 0, y: 20 }"
+    [animate]="{ opacity: 1, y: 0 }"
+    [transition]="{ duration: 0.4, delay: 0.3, ease: 'easeOut' }"
+  >
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h2 class="chart-title">
+          <i class="pi pi-chart-line" aria-hidden="true"></i>
+          Revenus sur la période
+        </h2>
+        @if (chartsLoading()) {
+          <div class="chart-skeleton">
+            <p-skeleton height="100%" borderRadius="8px" />
+          </div>
+        } @else if (chartsError()) {
+          <div class="state-inline">
+            <p class="state-text">Impossible de charger le graphique.</p>
+            <button class="retry-link" (click)="retryCharts()">
+              <i class="pi pi-refresh" aria-hidden="true"></i> Réessayer
+            </button>
+          </div>
+        } @else if (revenueChartData()) {
+          <div class="chart-wrapper">
+            <p-chart type="line" [data]="revenueChartData()" [options]="revenueChartOptions()" />
+          </div>
+        } @else {
+          <div class="state-inline">
+            <i class="pi pi-chart-bar state-inline-icon" aria-hidden="true"></i>
+            <p class="state-text">Pas encore de données pour cette période</p>
+          </div>
+        }
+      </div>
+
+      <div class="chart-card">
+        <h2 class="chart-title">
+          <i class="pi pi-eye" aria-hidden="true"></i>
+          Vues et réservations
+        </h2>
+        @if (chartsLoading()) {
+          <div class="chart-skeleton">
+            <p-skeleton height="100%" borderRadius="8px" />
+          </div>
+        } @else if (chartsError()) {
+          <div class="state-inline">
+            <p class="state-text">Impossible de charger le graphique.</p>
+            <button class="retry-link" (click)="retryCharts()">
+              <i class="pi pi-refresh" aria-hidden="true"></i> Réessayer
+            </button>
+          </div>
+        } @else if (viewsChartData()) {
+          <div class="chart-wrapper">
+            <p-chart type="line" [data]="viewsChartData()" [options]="viewsChartOptions()" />
+          </div>
+        } @else {
+          <div class="state-inline">
+            <i class="pi pi-chart-line state-inline-icon" aria-hidden="true"></i>
+            <p class="state-text">Pas encore de données pour cette période</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="content-section"
+    ngmMotion
+    [initial]="{ opacity: 0, y: 20 }"
+    [animate]="{ opacity: 1, y: 0 }"
+    [transition]="{ duration: 0.4, delay: 0.4, ease: 'easeOut' }"
+  >
+    <div class="content-grid">
+      <div class="content-card">
+        <app-section-header
+          title="Demandes en attente"
+          [count]="pendingCount()"
+          viewAllLink="/landlord/bookings"
+          [viewAllQueryParams]="{ status: 'PENDING' }"
+        />
+
+        @if (kpiLoading()) {
+          @for (_ of [1, 2]; track $index) {
+            <div class="pending-skeleton">
+              <div class="pending-skeleton-left">
+                <p-skeleton width="2rem" height="2rem" borderRadius="50%" />
+                <div class="pending-skeleton-text">
+                  <p-skeleton width="60%" height="0.875rem" />
+                  <p-skeleton width="80%" height="0.75rem" />
+                  <p-skeleton width="40%" height="0.625rem" />
+                </div>
+              </div>
+              <div class="pending-skeleton-actions">
+                <p-skeleton width="2.5rem" height="2.5rem" borderRadius="50%" />
+                <p-skeleton width="2.5rem" height="2.5rem" borderRadius="50%" />
+              </div>
+            </div>
+          }
+        } @else if (pendingError()) {
+          <div class="state-inline">
+            <p class="state-text">Impossible de charger les demandes.</p>
+            <button class="retry-link" (click)="retryPending()">
+              <i class="pi pi-refresh" aria-hidden="true"></i> Réessayer
+            </button>
+          </div>
+        } @else if (visibleBookings().length === 0) {
+          <div class="empty-section">
+            <div class="empty-icon-wrap">
+              <i class="pi pi-check-circle" aria-hidden="true"></i>
+            </div>
+            <p class="empty-title">Aucune demande en attente</p>
+            <p class="empty-sub">Tout est à jour !</p>
+          </div>
+        } @else {
+          <div class="pending-list">
+            @for (booking of visibleBookings(); track booking.bookingId; let i = $index) {
+              <div
+                class="pending-card"
+                ngmMotion
+                [initial]="{ opacity: 0, x: -12 }"
+                [animate]="{ opacity: 1, x: 0 }"
+                [transition]="{ duration: 0.3, delay: staggerDelay(i), ease: 'easeOut' }"
+                [whileHover]="{ y: -2 }"
+              >
+                <div class="pending-avatar">
+                  <span>{{ booking.studentName.charAt(0) }}</span>
+                </div>
+                <div class="pending-info">
+                  <span class="pending-student">{{ booking.studentName }}</span>
+                  <span class="pending-listing">{{ booking.listingTitle }}</span>
+                  <span class="pending-date">À partir du {{ formatDateFr(booking.startDate) }}</span>
+                </div>
+                <div class="pending-actions">
+                  <p-button
+                    icon="pi pi-check"
+                    severity="success"
+                    [rounded]="true"
+                    [text]="true"
+                    aria-label="Confirmer la réservation"
+                    pTooltip="Accepter"
+                    tooltipPosition="top"
+                    [loading]="isBookingLoading(booking.bookingId)"
+                    (onClick)="confirmBooking(booking.bookingId)"
+                    ngmMotion
+                    [whileHover]="{ scale: 1.1 }"
+                    [whileTap]="{ scale: 0.9 }"
+                    [transition]="{ type: 'spring', stiffness: 400, damping: 25 }"
+                  />
+                  <p-button
+                    icon="pi pi-times"
+                    severity="danger"
+                    [rounded]="true"
+                    [text]="true"
+                    aria-label="Refuser la réservation"
+                    pTooltip="Refuser"
+                    tooltipPosition="top"
+                    [loading]="isBookingLoading(booking.bookingId)"
+                    (onClick)="rejectBooking(booking.bookingId)"
+                    ngmMotion
+                    [whileHover]="{ scale: 1.1 }"
+                    [whileTap]="{ scale: 0.9 }"
+                    [transition]="{ type: 'spring', stiffness: 400, damping: 25 }"
+                  />
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="content-card subscription-card">
+        <app-section-header
+          title="Abonnement"
+          viewAllLink="/landlord/subscription"
+        />
+
+        @if (subscriptionLoading()) {
+          <div class="sub-skeleton">
+            <p-skeleton width="5rem" height="1.5rem" borderRadius="6px" />
+            <p-skeleton width="100%" height="0.5rem" borderRadius="4px" styleClass="mt-3" />
+            <p-skeleton width="40%" height="0.75rem" styleClass="mt-2" />
+          </div>
+        } @else if (subscription(); as sub) {
+          <div class="sub-content">
+            <div class="sub-status-row">
+              <p-tag
+                [value]="sub.status === 'ACTIVE' ? 'ACTIF' : sub.status === 'EXPIRED' ? 'EXPIRÉ' : 'ANNULÉ'"
+                [severity]="sub.status === 'ACTIVE' ? 'success' : 'danger'"
+                [rounded]="true"
+              />
+              @if (subscriptionExpiringSoon()) {
+                <p-tag value="Expire bientôt" severity="warn" [rounded]="true" />
+              }
+            </div>
+
+            <div class="sub-progress-section">
+              <p-progressbar
+                [value]="subscriptionProgress()"
+                [showValue]="false"
+                [pt]="{
+                  root: { style: 'height: 6px; border-radius: 100px; background: var(--color-ndb-cream-dark);' },
+                  value: { style: 'background: ' + progressBarValueColor() + ';' }
+                }"
+              />
+            </div>
+
+            <div class="sub-details">
+              @if (sub.status === 'ACTIVE') {
+                <span class="sub-days">
+                  <i class="pi pi-clock" aria-hidden="true"></i>
+                  {{ sub.daysRemaining }} jours restants
+                </span>
+                <span class="sub-expiry">Expire le {{ formatDateFr(sub.endDate) }}</span>
+              } @else {
+                <span class="sub-expired-text">
+                  Expiré le {{ formatDateFr(sub.endDate) }}
+                </span>
+              }
+            </div>
+
+            @if (subscriptionExpiringSoon() || sub.status !== 'ACTIVE') {
+              <p-button
+                label="Renouveler"
+                icon="pi pi-refresh"
+                severity="secondary"
+                size="small"
+                routerLink="/landlord/subscription"
+                [pt]="{ root: { style: 'width: 100%; justify-content: center;' } }"
+                ngmMotion
+                [whileHover]="{ scale: 1.02 }"
+                [whileTap]="{ scale: 0.98 }"
+                [transition]="{ type: 'spring', stiffness: 400, damping: 25 }"
+              />
+            }
+          </div>
+        } @else {
+          <div class="empty-section">
+            <div class="empty-icon-wrap empty-icon-wrap--gold">
+              <i class="pi pi-star" aria-hidden="true"></i>
+            </div>
+            <p class="empty-title">Aucun abonnement actif</p>
+            <p class="empty-sub">Souscrivez pour publier vos annonces</p>
+            <p-button
+              label="Souscrire"
+              icon="pi pi-star"
+              routerLink="/landlord/subscription"
+              size="small"
+              ngmMotion
+              [whileHover]="{ scale: 1.02 }"
+              [whileTap]="{ scale: 0.98 }"
+              [transition]="{ type: 'spring', stiffness: 400, damping: 25 }"
+            />
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="activity-section"
+    ngmMotion
+    [initial]="{ opacity: 0, y: 20 }"
+    [animate]="{ opacity: 1, y: 0 }"
+    [transition]="{ duration: 0.4, delay: 0.5, ease: 'easeOut' }"
+  >
+    <div class="content-card">
+      <app-section-header
+        title="Activité récente"
+        viewAllLink="/notifications"
+      />
+      <app-activity-timeline
+        [items]="activityItems()"
+        [loading]="kpiLoading()"
+        [error]="activityError()"
+        emptyMessage="Aucune activité récente"
+        (itemClicked)="onActivityItemClick($event)"
+        (retry)="retryActivity()"
+      />
+    </div>
+  </section>
+</div>

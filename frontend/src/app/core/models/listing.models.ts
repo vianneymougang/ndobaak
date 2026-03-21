@@ -77,6 +77,7 @@ export interface ListingSearchResponse {
   roomType: RoomType;
   neighborhood?: string;
   distanceToCampus?: number;
+  distanceFromUser?: number;
   avgRating?: number;
   reviewCount: number;
   amenities: string[];
@@ -92,4 +93,20 @@ export interface SearchPageResponse<T> {
   totalPages: number;
   page: number;
   size: number;
+}
+
+export interface NearbyListingResponse {
+  id: number;
+  title: string;
+  thumbnailUrl?: string;
+  monthlyPrice: number;
+  roomType: RoomType;
+  neighborhood?: string;
+  distanceToCampus?: number;
+  distanceFromUser?: number;
+  latitude?: number;
+  longitude?: number;
+  avgRating?: number;
+  reviewCount: number;
+  verified: boolean;
 }

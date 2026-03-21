@@ -1,0 +1,55 @@
+@reference "../../../../tailwind.css";
+
+.processing-page {
+  @apply flex items-center justify-center min-h-[70vh] px-4;
+}
+
+.processing-card {
+  @apply flex flex-col items-center text-center gap-5 p-8 rounded-2xl max-w-md w-full;
+  background: white;
+  border: 1px solid var(--color-ndb-border);
+  box-shadow: var(--shadow-card);
+}
+
+.phone-animation {
+  @apply flex items-center justify-center w-20 h-20 rounded-full;
+  background: color-mix(in srgb, var(--color-ndb-gold) 10%, transparent);
+}
+
+.phone-icon {
+  i {
+    @apply text-4xl;
+    color: var(--color-ndb-gold);
+  }
+}
+
+.processing-title {
+  @apply text-xl font-bold m-0;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.processing-desc {
+  @apply text-sm m-0 leading-relaxed;
+  color: var(--color-ndb-muted);
+  max-width: 320px;
+}
+
+.elapsed {
+  @apply text-xs m-0;
+  color: var(--color-ndb-muted);
+}
+
+.timeout-icon {
+  @apply flex items-center justify-center w-20 h-20 rounded-full;
+  background: color-mix(in srgb, var(--color-ndb-warning) 12%, transparent);
+
+  i {
+    @apply text-4xl;
+    color: var(--color-ndb-warning);
+  }
+}
+
+.timeout-actions {
+  @apply flex flex-col gap-3 w-full mt-2;
+}

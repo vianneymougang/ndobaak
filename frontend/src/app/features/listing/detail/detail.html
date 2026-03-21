@@ -71,7 +71,7 @@
             <h2>Équipements</h2>
             <div class="amenities-list">
               @for (amenity of l.amenities; track amenity.id) {
-                <p-chip [label]="amenity.name" [icon]="amenity.icon" />
+                <p-chip [label]="amenityLabel(amenity.name)" [icon]="amenityIcon(amenity.name)" />
               }
             </div>
           </section>
@@ -83,61 +83,80 @@
             <div #detailMap class="detail-map"></div>
           </section>
         }
+
+        @if (l.landlord) {
+          <section class="detail-section">
+            <div class="landlord-card">
+              <p-avatar [label]="landlordInitials()" shape="circle" size="large" />
+              <div class="landlord-info">
+                <p class="landlord-name">{{ l.landlord.firstName }} {{ l.landlord.lastName }}</p>
+                @if (l.landlord.phone) {
+                  <p class="landlord-contact"><i class="pi pi-phone"></i> {{ l.landlord.phone }}</p>
+                }
+                @if (l.landlord.email) {
+                  <p class="landlord-contact"><i class="pi pi-envelope"></i> {{ l.landlord.email }}</p>
+                }
+              </div>
+            </div>
+          </section>
+        }
+
+        <!-- ── Reviews Section ── -->
+        <section class="detail-section">
+          <h2>Avis</h2>
+          <app-review-list #reviewList [listingId]="l.id" />
+        </section>
+
+        @if (canShowReviewForm()) {
+          <section class="detail-section">
+            <app-review-form
+              [listingId]="l.id"
+              (reviewCreated)="onReviewCreated()"
+            />
+          </section>
+        }
       </div>
     </div>
 
-    <aside class="detail-sidebar">
+    <!-- Desktop sidebar with booking panel -->
+    <aside class="detail-sidebar" aria-label="Réserver ce logement">
       <div class="sidebar-card">
-        <p class="sidebar-price">{{ formattedPrice() }}</p>
-
-        <div class="sidebar-info">
-          <div class="info-row">
-            <span class="info-label">Type</span>
-            <span class="info-value">{{ roomTypeLabel() }}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Chambres disponibles</span>
-            <span class="info-value">{{ l.availableRooms }}</span>
-          </div>
-          @if (l.availableDate) {
-            <div class="info-row">
-              <span class="info-label">Disponible le</span>
-              <span class="info-value">{{ l.availableDate }}</span>
-            </div>
-          }
-        </div>
-
-        <p-button label="Réserver" [fluid]="true" severity="primary" icon="pi pi-calendar" [disabled]="true" />
-        <p-button
-          label="Contacter le propriétaire"
-          [fluid]="true"
-          [outlined]="true"
-          severity="secondary"
-          icon="pi pi-phone"
-          [disabled]="true"
+        <app-booking-panel
+          [listing]="l"
+          [loading]="loading()"
+          (bookingCreated)="onBookingCreated($event)"
         />
-
-        @if (l.landlord) {
-          <div class="landlord-card">
-            <p-avatar [label]="landlordInitials()" shape="circle" size="large" />
-            <div class="landlord-info">
-              <p class="landlord-name">{{ l.landlord.firstName }} {{ l.landlord.lastName }}</p>
-              @if (l.landlord.phone) {
-                <p class="landlord-contact"><i class="pi pi-phone"></i> {{ l.landlord.phone }}</p>
-              }
-              @if (l.landlord.email) {
-                <p class="landlord-contact"><i class="pi pi-envelope"></i> {{ l.landlord.email }}</p>
-              }
-            </div>
-          </div>
-        }
       </div>
     </aside>
   </div>
 
-  <!-- Mobile sticky bar -->
+  <!-- Mobile sticky bottom bar -->
   <div class="mobile-bottom-bar">
     <span class="mobile-price">{{ formattedPrice() }}</span>
-    <p-button label="Réserver" severity="primary" [disabled]="true" />
+    <p-button
+      label="Réserver"
+      severity="primary"
+      (onClick)="mobileDrawerVisible.set(true)"
+    />
   </div>
+
+  <!-- Mobile bottom drawer -->
+  <p-drawer
+    [visible]="mobileDrawerVisible()"
+    (visibleChange)="mobileDrawerVisible.set($event)"
+    position="bottom"
+    [modal]="true"
+    [style]="{ height: 'auto', 'max-height': '90vh' }"
+  >
+    <ng-template #header>
+      <h3 class="drawer-booking-title">Réserver ce logement</h3>
+    </ng-template>
+    <div class="drawer-booking-content">
+      <app-booking-panel
+        [listing]="l"
+        [loading]="loading()"
+        (bookingCreated)="onBookingCreated($event)"
+      />
+    </div>
+  </p-drawer>
 }

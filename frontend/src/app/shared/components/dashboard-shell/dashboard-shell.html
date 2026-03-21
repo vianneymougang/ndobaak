@@ -1,0 +1,171 @@
+<div class="shell">
+  <aside class="shell-sidebar">
+    <div class="sidebar-brand">
+      <svg class="sidebar-brand-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect width="36" height="36" rx="8" fill="rgba(255,255,255,0.12)"/>
+        <rect x="7.5" y="10.5" width="4" height="16" rx="0.5" fill="white"/>
+        <rect x="24.5" y="10.5" width="4" height="16" rx="0.5" fill="white"/>
+        <path d="M 11.5 10.5 L 24.5 26.5" stroke="white" stroke-width="4" stroke-linecap="round"/>
+        <path d="M 14 9 L 18 5 L 22 9" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="sidebar-brand-text">{{ brandLabel() }}</span>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Navigation principale">
+      @for (item of menuItems(); track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="sidebar-nav-item--active"
+          class="sidebar-nav-item"
+          [title]="item.label"
+        >
+          <i class="pi {{ item.icon }}" aria-hidden="true"></i>
+          <span>{{ item.label }}</span>
+          @if (item.badge && item.badge > 0) {
+            <span
+              class="sidebar-badge"
+              ngmMotion
+              [initial]="{ scale: 0 }"
+              [animate]="{ scale: 1 }"
+              [transition]="{ type: 'spring', stiffness: 400, damping: 15 }"
+            >
+              {{ item.badge }}
+            </span>
+          }
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <a routerLink="/" class="sidebar-nav-item" title="Retour au site">
+        <i class="pi pi-arrow-left" aria-hidden="true"></i>
+        <span>Retour au site</span>
+      </a>
+      <button class="sidebar-nav-item sidebar-nav-item--logout" (click)="logout()" title="Déconnexion">
+        <i class="pi pi-sign-out" aria-hidden="true"></i>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="shell-main">
+    <header class="shell-topbar shell-topbar--desktop">
+      <h1 class="topbar-greeting">{{ greeting() }}</h1>
+      <div class="topbar-actions">
+        @if (topbarActions()) {
+          <ng-container [ngTemplateOutlet]="topbarActions()!" />
+        }
+        <app-notification-bell />
+        <div class="topbar-user">
+          <p-avatar
+            [label]="userInitials()"
+            shape="circle"
+            size="normal"
+            [pt]="{ root: { style: 'background: var(--color-ndb-forest); color: white; font-family: var(--font-urbanist); font-weight: 700;' } }"
+          />
+        </div>
+      </div>
+    </header>
+
+    <header class="shell-topbar shell-topbar--mobile">
+      <a routerLink="/" class="topbar-mobile-brand">
+        <svg class="topbar-mobile-brand-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="36" height="36" rx="8" fill="#1b4332"/>
+          <rect x="7.5" y="10.5" width="4" height="16" rx="0.5" fill="white"/>
+          <rect x="24.5" y="10.5" width="4" height="16" rx="0.5" fill="white"/>
+          <path d="M 11.5 10.5 L 24.5 26.5" stroke="white" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 14 9 L 18 5 L 22 9" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <div class="topbar-actions">
+        <app-notification-bell />
+        <p-avatar
+            [label]="userInitials()"
+            shape="circle"
+            size="normal"
+            [pt]="{ root: { style: 'background: var(--color-ndb-forest); color: white; font-family: var(--font-urbanist); font-weight: 700;' } }"
+          />
+      </div>
+    </header>
+
+    <main class="shell-content">
+      <ng-content />
+    </main>
+  </div>
+
+  <nav class="shell-bottom-tabs" role="navigation" aria-label="Navigation mobile">
+    @for (tab of bottomTabItems(); track tab.label) {
+      @if (tab.isMore) {
+        <button
+          class="bottom-tab"
+          (click)="openMoreSheet()"
+          aria-label="Plus d'options"
+        >
+          <span class="bottom-tab-icon-wrap">
+            <i class="pi {{ tab.icon }}" aria-hidden="true"></i>
+          </span>
+          <span class="bottom-tab-label">{{ tab.label }}</span>
+        </button>
+      } @else {
+        <a
+          [routerLink]="tab.route"
+          routerLinkActive="bottom-tab--active"
+          class="bottom-tab"
+          [attr.aria-label]="tab.label"
+        >
+          <span class="bottom-tab-icon-wrap">
+            <i class="pi {{ tab.icon }}" aria-hidden="true"></i>
+            @if (tab.badge && tab.badge > 0) {
+              <span
+                class="bottom-tab-badge"
+                ngmMotion
+                [initial]="{ scale: 0 }"
+                [animate]="{ scale: 1 }"
+                [transition]="{ type: 'spring', stiffness: 400, damping: 15 }"
+              >
+                {{ tab.badge }}
+              </span>
+            }
+          </span>
+          <span class="bottom-tab-label">{{ tab.label }}</span>
+        </a>
+      }
+    }
+  </nav>
+</div>
+
+<p-drawer
+  [visible]="moreSheetVisible()"
+  (visibleChange)="moreSheetVisible.set($event)"
+  position="bottom"
+  [style]="{ 'max-height': '50vh', 'border-radius': '20px 20px 0 0' }"
+  appendTo="body"
+  [modal]="true"
+>
+  <ng-template #header>
+    <span class="more-sheet-title">Plus</span>
+  </ng-template>
+  <div class="more-sheet-items">
+    @for (item of moreItems(); track item.label) {
+      @if (item.route) {
+        <a
+          [routerLink]="item.route"
+          class="more-sheet-item"
+          (click)="closeMoreSheet()"
+        >
+          <i class="pi {{ item.icon }}" aria-hidden="true"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      } @else {
+        <button
+          class="more-sheet-item"
+          [class.more-sheet-item--danger]="item.action === 'logout'"
+          (click)="onMoreItemClick(item)"
+        >
+          <i class="pi {{ item.icon }}" aria-hidden="true"></i>
+          <span>{{ item.label }}</span>
+        </button>
+      }
+    }
+  </div>
+</p-drawer>

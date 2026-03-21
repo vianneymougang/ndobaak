@@ -1,0 +1,89 @@
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">Transactions</h1>
+  </div>
+
+  <div class="filters-bar">
+    <p-select
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Statut"
+      (onChange)="onStatusChange($event.value)"
+    />
+    <p-select
+      [options]="typeOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Type"
+      (onChange)="onTypeChange($event.value)"
+    />
+  </div>
+
+  <p-table
+    [value]="loading() ? skeletonRows : (page()?.content ?? [])"
+    [tableStyle]="{ 'min-width': '70rem' }"
+    styleClass="p-datatable-sm"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Montant</th>
+        <th>Type</th>
+        <th>Statut</th>
+        <th>Payeur</th>
+        <th>Opérateur</th>
+        <th>Date</th>
+        <th>Anomalie</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-row>
+      @if (loading()) {
+        <tr>
+          @for (c of [1,2,3,4,5,6,7]; track c) { <td><p-skeleton /></td> }
+        </tr>
+      } @else {
+        <tr [class.row-anomaly]="row.anomaly">
+          <td class="amount">{{ row.amount | number }} FCFA</td>
+          <td>
+            <p-tag
+              [value]="row.paymentType === 'BOOKING' ? 'Réservation' : 'Abonnement'"
+              [severity]="row.paymentType === 'BOOKING' ? 'info' : 'warn'"
+            />
+          </td>
+          <td>
+            <p-tag [value]="row.status" [severity]="statusSeverity(row.status)" />
+          </td>
+          <td>{{ row.payerName ?? '—' }}</td>
+          <td>{{ row.operator ?? row.providerName ?? '—' }}</td>
+          <td>{{ row.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            @if (row.anomaly) {
+              <span [pTooltip]="row.anomalyReason" tooltipPosition="top">
+                <p-tag value="Anomalie" severity="danger" />
+              </span>
+            }
+          </td>
+        </tr>
+      }
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" class="empty-cell">
+          <div class="empty-state">
+            <i class="pi pi-credit-card empty-icon"></i>
+            <p>Aucune transaction trouvée.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  @if (page(); as p) {
+    <p-paginator
+      [rows]="20"
+      [totalRecords]="p.totalElements"
+      [first]="currentPage() * 20"
+      (onPageChange)="onPageChange($event)"
+    />
+  }
+</div>

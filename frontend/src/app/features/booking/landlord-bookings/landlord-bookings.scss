@@ -1,0 +1,65 @@
+@reference "../../../../tailwind.css";
+
+.page-container {
+  @apply max-w-4xl mx-auto px-4 py-8;
+}
+
+.page-title {
+  @apply text-3xl font-bold mb-6;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.bookings-tabs {
+  @apply mb-6;
+}
+
+.bookings-content {
+  @apply flex flex-col gap-4;
+}
+
+.booking-skeleton {
+  @apply flex gap-4 p-4 bg-white rounded-2xl;
+  border: 1px solid var(--color-ndb-border);
+}
+
+.skeleton-lines {
+  @apply flex flex-col flex-1;
+}
+
+.empty-state {
+  @apply flex flex-col items-center justify-center py-20 text-center;
+}
+
+.empty-icon {
+  @apply text-6xl mb-4;
+  color: var(--color-ndb-muted);
+}
+
+.empty-title {
+  @apply text-xl font-semibold mb-2;
+  font-family: var(--font-urbanist);
+  color: var(--color-ndb-navy);
+}
+
+.empty-subtitle {
+  @apply text-sm max-w-xs;
+  color: var(--color-ndb-muted);
+}
+
+.bookings-list {
+  @apply flex flex-col gap-4;
+}
+
+.bookings-paginator {
+  @apply mt-4;
+}
+
+.dialog-text {
+  @apply m-0 mb-4 text-sm;
+  color: var(--color-ndb-body);
+}
+
+.reject-reason-field {
+  @apply block mt-4;
+}

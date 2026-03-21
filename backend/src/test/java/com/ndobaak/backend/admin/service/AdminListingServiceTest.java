@@ -1,6 +1,9 @@
 package com.ndobaak.backend.admin.service;
 
+import com.ndobaak.backend.admin.dto.RejectionMotifRequest;
+import com.ndobaak.backend.auth.entity.Landlord;
 import com.ndobaak.backend.common.enums.ListingStatus;
+import com.ndobaak.backend.common.enums.RejectionMotif;
 import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.listing.dto.ListingResponse;
@@ -8,6 +11,7 @@ import com.ndobaak.backend.listing.entity.Listing;
 import com.ndobaak.backend.listing.mapper.ListingMapper;
 import com.ndobaak.backend.listing.repository.ListingRepository;
 import com.ndobaak.backend.listing.repository.PhotoRepository;
+import com.ndobaak.backend.notification.service.NotificationDispatcher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,9 +36,17 @@ class AdminListingServiceTest {
     private PhotoRepository photoRepository;
     @Mock
     private ListingMapper listingMapper;
+    @Mock
+    private NotificationDispatcher notificationDispatcher;
 
     @InjectMocks
     private AdminListingService adminListingService;
+
+    private RejectionMotifRequest motifRequest(RejectionMotif motif) {
+        RejectionMotifRequest req = new RejectionMotifRequest();
+        req.setMotif(motif);
+        return req;
+    }
 
     @Test
     void getPendingListingsShouldReturnOnlyPendingReview() {
@@ -56,8 +69,11 @@ class AdminListingServiceTest {
 
     @Test
     void validateListingShouldChangeStatusToPublished() {
+        Landlord landlord = Landlord.builder().firstName("Jean").build();
+        landlord.setId(10L);
+
         Listing listing = Listing.builder()
-                .title("Test Listing").status(ListingStatus.PENDING_REVIEW).build();
+                .title("Test Listing").status(ListingStatus.PENDING_REVIEW).landlord(landlord).build();
         listing.setId(1L);
 
         when(listingRepository.findByIdWithDetails(1L)).thenReturn(Optional.of(listing));
@@ -66,6 +82,8 @@ class AdminListingServiceTest {
         when(listingMapper.toResponse(any(), eq(false))).thenReturn(
                 ListingResponse.builder().photos(java.util.Collections.emptyList())
                         .amenities(java.util.Collections.emptyList()).build());
+        doNothing().when(notificationDispatcher).dispatch(
+                anyLong(), any(), anyString(), anyString(), anyLong(), anyString(), anyMap(), anyMap());
 
         adminListingService.validateListing(1L);
 
@@ -111,8 +129,11 @@ class AdminListingServiceTest {
 
     @Test
     void rejectListingShouldSetRejectedStatusAndReason() {
+        Landlord landlord = Landlord.builder().firstName("Jean").build();
+        landlord.setId(10L);
+
         Listing listing = Listing.builder()
-                .title("Test").status(ListingStatus.PENDING_REVIEW).build();
+                .title("Test").status(ListingStatus.PENDING_REVIEW).landlord(landlord).build();
         listing.setId(1L);
 
         when(listingRepository.findByIdWithDetails(1L)).thenReturn(Optional.of(listing));
@@ -120,27 +141,15 @@ class AdminListingServiceTest {
         when(listingMapper.toResponse(any(), eq(false))).thenReturn(
                 ListingResponse.builder().photos(java.util.Collections.emptyList())
                         .amenities(java.util.Collections.emptyList()).build());
+        doNothing().when(notificationDispatcher).dispatch(
+                anyLong(), any(), anyString(), anyString(), anyLong(), anyString(), anyMap(), anyMap());
 
-        adminListingService.rejectListing(1L, "Photos de mauvaise qualite");
+        adminListingService.rejectListing(1L, motifRequest(RejectionMotif.INACCURATE_PHOTOS));
 
         verify(listingRepository).save(argThat(l ->
                 l.getStatus() == ListingStatus.REJECTED &&
-                "Photos de mauvaise qualite".equals(l.getRejectionReason())
+                l.getRejectionReason() != null && !l.getRejectionReason().isBlank()
         ));
-    }
-
-    @Test
-    void rejectListingWithoutReasonShouldThrow() {
-        assertThatThrownBy(() -> adminListingService.rejectListing(1L, ""))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("Rejection reason is required");
-    }
-
-    @Test
-    void rejectListingWithNullReasonShouldThrow() {
-        assertThatThrownBy(() -> adminListingService.rejectListing(1L, null))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("Rejection reason is required");
     }
 
     @Test
@@ -151,7 +160,7 @@ class AdminListingServiceTest {
 
         when(listingRepository.findByIdWithDetails(1L)).thenReturn(Optional.of(listing));
 
-        assertThatThrownBy(() -> adminListingService.rejectListing(1L, "Some reason"))
+        assertThatThrownBy(() -> adminListingService.rejectListing(1L, motifRequest(RejectionMotif.OTHER)))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("PENDING_REVIEW");
     }

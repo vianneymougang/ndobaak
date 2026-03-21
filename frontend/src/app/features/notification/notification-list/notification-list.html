@@ -1,0 +1,67 @@
+<div class="notifications-page">
+  <div class="notifications-header">
+    <h1 class="notifications-title">Notifications</h1>
+    @if (notifications().length > 0) {
+      <p-button
+        label="Tout marquer comme lu"
+        icon="pi pi-check-circle"
+        [text]="true"
+        severity="secondary"
+        (onClick)="markAllAsRead()"
+      />
+    }
+  </div>
+
+  <div class="notifications-list">
+    @if (loading()) {
+      @for (_ of [1, 2, 3, 4, 5]; track $index) {
+        <div class="notification-skeleton">
+          <p-skeleton shape="circle" size="2.5rem" />
+          <div class="notification-skeleton-text">
+            <p-skeleton width="40%" height="1rem" />
+            <p-skeleton width="80%" height="0.875rem" />
+            <p-skeleton width="25%" height="0.75rem" />
+          </div>
+        </div>
+      }
+    } @else if (notifications().length === 0) {
+      <div class="notifications-empty">
+        <i class="pi pi-inbox" aria-hidden="true"></i>
+        <h2>Aucune notification</h2>
+        <p>Vos notifications apparaîtront ici lorsque vous recevrez des mises à jour.</p>
+      </div>
+    } @else {
+      @for (n of notifications(); track n.id) {
+        <button
+          class="notification-row"
+          [class.notification-row--unread]="!n.read"
+          (click)="markAsRead(n)"
+        >
+          <div class="notification-row-icon">
+            <i class="pi" [class]="getIcon(n.type)" aria-hidden="true"></i>
+          </div>
+          <div class="notification-row-content">
+            <span class="notification-row-title">{{ n.title }}</span>
+            <span class="notification-row-message">{{ n.message }}</span>
+            <span class="notification-row-time">{{ n.createdAt | date: 'dd MMM yyyy à HH:mm' }}</span>
+          </div>
+          @if (!n.read) {
+            <span class="notification-row-dot" aria-label="Non lu"></span>
+          }
+          @if (getRoute(n)) {
+            <i class="pi pi-chevron-right notification-row-arrow" aria-hidden="true"></i>
+          }
+        </button>
+      }
+    }
+  </div>
+
+  @if (totalElements() > pageSize) {
+    <p-paginator
+      [rows]="pageSize"
+      [totalRecords]="totalElements()"
+      [first]="page() * pageSize"
+      (onPageChange)="onPageChange($event)"
+    />
+  }
+</div>

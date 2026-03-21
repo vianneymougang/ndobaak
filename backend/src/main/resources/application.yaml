@@ -36,3 +36,21 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
+
+twilio:
+  account-sid: ${TWILIO_ACCOUNT_SID:}
+  auth-token: ${TWILIO_AUTH_TOKEN:}
+  from-number: ${TWILIO_FROM_NUMBER:}
+  enabled: ${TWILIO_ENABLED:false}
+
+app:
+  payment:
+    commission-rate: 0.05
+    installment-threshold: 500000
+    primary-gateway: ${PAYMENT_GATEWAY:mock}
+    frontend-callback-url: ${PAYMENT_CALLBACK_URL:http://localhost:4200/payments/callback}
+    notchpay:
+      base-url: ${NOTCHPAY_BASE_URL:https://api.notchpay.co}
+      public-key: ${NOTCHPAY_PUBLIC_KEY:}
+      webhook-hash: ${NOTCHPAY_WEBHOOK_HASH:}
+      callback-url: ${NOTCHPAY_CALLBACK_URL:http://localhost:4200/payments/callback}

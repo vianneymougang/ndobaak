@@ -1,0 +1,118 @@
+@use '../../../../styles' as *;
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  border-radius: 12px;
+  background: var(--color-ndb-surface);
+  border: 1px solid var(--color-ndb-border);
+}
+
+.review-form-title {
+  font-family: var(--font-urbanist);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-ndb-navy);
+  margin: 0;
+}
+
+.field-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-family: var(--font-urbanist);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-ndb-body);
+}
+
+.field-error {
+  font-family: var(--font-lato);
+  font-size: 0.8rem;
+  color: var(--color-ndb-error);
+}
+
+.char-count {
+  font-family: var(--font-lato);
+  font-size: 0.75rem;
+  color: var(--color-ndb-muted);
+  text-align: right;
+}
+
+.photo-upload-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.photo-previews {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.photo-preview {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.photo-remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: color-mix(in srgb, var(--color-ndb-navy) 80%, transparent);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: var(--color-ndb-error);
+  }
+}
+
+.photo-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 2px dashed var(--color-ndb-border);
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-urbanist);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-ndb-forest);
+  transition: border-color 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-ndb-forest);
+    color: var(--color-ndb-navy);
+  }
+
+  i {
+    font-size: 1rem;
+  }
+}

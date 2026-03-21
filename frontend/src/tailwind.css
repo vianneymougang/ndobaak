@@ -1,48 +1,159 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap');
+/* ─────────────────────────────────────────────
+   Ndobaâk — Urbanist (headings) & Lato (body)
+   ───────────────────────────────────────────── */
+@font-face {
+  font-family: 'Urbanist';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('/fonts/urbanist-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Urbanist';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url('/fonts/urbanist-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Urbanist';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('/fonts/urbanist-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Urbanist';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 800;
+  src: url('/fonts/urbanist-latin-800-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300;
+  src: url('/fonts/lato-latin-300-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('/fonts/lato-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('/fonts/lato-latin-700-normal.woff2') format('woff2');
+}
 
 @import "tailwindcss";
 @import "tailwindcss-primeui";
 
+/* ══════════════════════════════════════════════
+   @theme — minimal set for @apply utility classes
+   (Tailwind tree-shakes these — only keep tokens
+    that are consumed via @apply in component SCSS)
+   ══════════════════════════════════════════════ */
 @theme {
-  /* ── Ndobaâk brand colors (ndb prefix to avoid Tailwind conflicts) ── */
-  --color-ndb-navy:        #1B3A5C;
-  --color-ndb-navy-light:  #2D5F8A;
-  --color-ndb-green:       #1A7A5C;
-  --color-ndb-orange:      #E8762B;
-  --color-ndb-orange-dark: #C9611B;
-  --color-ndb-page:        #F5F7FA;
-  --color-ndb-stats:       #EBF3FA;
-  --color-ndb-body:        #2C3E50;
-  --color-ndb-muted:       #6C757D;
-  --color-ndb-border:      #DEE2E6;
-  --color-ndb-star:        #FFC107;
-
-  /* Status badge backgrounds */
-  --color-ndb-green-bg:    #E8F5E9;
-  --color-ndb-warn-bg:     #FFF3E0;
-  --color-ndb-error-bg:    #FFEBEE;
-
-  /* ── Fonts ── */
-  --font-poppins: 'Poppins', sans-serif;
-  --font-inter:   'Inter', sans-serif;
-
-  /* ── Design tokens ── */
-  --shadow-card:       0 2px 12px rgba(0, 0, 0, 0.06);
-  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
-  --shadow-elevated:   0 16px 40px rgba(27, 58, 92, 0.15);
+  --color-ndb-navy:       #1B4332;
+  --color-ndb-navy-light: #2D6A4F;
+  --color-ndb-green:      #40916C;
+  --color-ndb-orange:     #D4A017;
+  --color-ndb-muted:      #6B7280;
+  --color-ndb-body:       #374151;
+  --color-ndb-page:       #FAFAF7;
+  --color-ndb-stats:      #F2F0EB;
+  --color-ndb-border:     #E5E0D8;
 }
 
+/* ══════════════════════════════════════════════
+   @layer base — design tokens guaranteed to emit
+   All var(--color-ndb-*) usages in component SCSS
+   rely on these being present in the output CSS.
+   ══════════════════════════════════════════════ */
 @layer base {
+  :root {
+    /* ── Primary — Forest Green ── */
+    --color-ndb-forest:        #1B4332;
+    --color-ndb-forest-mid:    #2D6A4F;
+    --color-ndb-forest-light:  #40916C;
+    --color-ndb-forest-pale:   #D8F3DC;
+    --color-ndb-forest-darkest: #0B1E14;
+    --color-ndb-forest-dark:    #0D2B1C;
+    --color-ndb-forest-darker:  #143526;
+
+    /* ── Accent — Gold ── */
+    --color-ndb-gold:          #D4A017;
+    --color-ndb-gold-dark:     #B8860B;
+    --color-ndb-gold-pale:     #F9E5A0;
+
+    /* ── Backgrounds — Warm Cream ── */
+    --color-ndb-cream:         #FAFAF7;
+    --color-ndb-cream-dark:    #F2F0EB;
+
+    /* ── Text ── */
+    --color-ndb-ink:           #111827;
+    --color-ndb-body:          #374151;
+    --color-ndb-muted:         #6B7280;
+    --color-ndb-border:        #E5E0D8;
+
+    /* ── Semantic ── */
+    --color-ndb-success:       #22C55E;
+    --color-ndb-error:         #EF4444;
+    --color-ndb-warning:       #F59E0B;
+    --color-ndb-info:          #3B82F6;
+
+    /* ── Status bg tints ── */
+    --color-ndb-green-bg:      #D8F3DC;
+    --color-ndb-warn-bg:       #F9E5A0;
+    --color-ndb-error-bg:      #FEE2E2;
+
+    /* ── Error variants ── */
+    --color-ndb-error-dark:    #DC2626;
+    --color-ndb-error-darker:  #B91C1C;
+
+    /* ── Backward-compat aliases ── */
+    --color-ndb-navy:          #1B4332;
+    --color-ndb-navy-light:    #2D6A4F;
+    --color-ndb-green:         #40916C;
+    --color-ndb-orange:        #D4A017;
+    --color-ndb-orange-dark:   #B8860B;
+    --color-ndb-page:          #FAFAF7;
+    --color-ndb-stats:         #F2F0EB;
+    --color-ndb-star:          #D4A017;
+
+    /* ── Fonts ── */
+    --font-urbanist: 'Urbanist', sans-serif;
+    --font-lato:     'Lato', sans-serif;
+    --font-poppins:  'Urbanist', sans-serif;
+    --font-inter:    'Lato', sans-serif;
+
+    /* ── Shadows ── */
+    --shadow-card:       0 2px 16px rgba(27, 67, 50, 0.08);
+    --shadow-card-hover: 0 12px 40px rgba(27, 67, 50, 0.16);
+    --shadow-elevated:   0 24px 60px rgba(27, 67, 50, 0.22);
+    --shadow-navbar:     0 2px 20px rgba(27, 67, 50, 0.3);
+    --shadow-gold:       0 4px 14px rgba(212, 160, 23, 0.4);
+    --shadow-gold-lg:    0 8px 24px rgba(212, 160, 23, 0.45);
+  }
+
   body {
-    font-family: 'Inter', sans-serif;
-    background-color: #F5F7FA;
-    color: #2C3E50;
+    font-family: var(--font-lato);
+    background-color: var(--color-ndb-cream);
+    color: var(--color-ndb-body);
     line-height: 1.6;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Poppins', sans-serif;
-    line-height: 1.3;
+    font-family: var(--font-urbanist);
+    line-height: 1.25;
+    color: var(--color-ndb-ink);
   }
 
   a {

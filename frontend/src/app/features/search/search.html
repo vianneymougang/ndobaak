@@ -3,6 +3,8 @@
   <!-- ── Filter Bar ── -->
   <div class="filter-bar">
     <div class="filter-inner">
+
+      <!-- Search input -->
       <div class="filter-search">
         <i class="pi pi-search filter-search-icon"></i>
         <input
@@ -15,52 +17,303 @@
 
       <div class="filter-separator"></div>
 
-      <p-select
-        [options]="roomTypeOptions"
-        [(ngModel)]="roomType"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="Type de chambre"
-        class="filter-select"
-      />
+      <!-- Desktop chips (lg+) -->
+      <div class="filter-chips">
 
-      <div class="filter-price-range">
-        <p-inputNumber
-          [(ngModel)]="priceMin"
-          placeholder="Min"
-          [useGrouping]="true"
-          mode="decimal"
-          class="filter-price-input"
-        />
-        <span class="price-dash">—</span>
-        <p-inputNumber
-          [(ngModel)]="priceMax"
-          placeholder="Max FCFA"
-          [useGrouping]="true"
-          mode="decimal"
-          class="filter-price-input"
-        />
+        <!-- Type chip -->
+        <button
+          class="filter-chip"
+          [class.filter-chip--active]="roomType !== ''"
+          (click)="typePopover.toggle($event)"
+          type="button"
+        >
+          <span>{{ activeRoomTypeLabel }}</span>
+          @if (roomType) {
+            <i class="pi pi-times filter-chip-clear" (click)="$event.stopPropagation(); clearRoomType()"></i>
+          } @else {
+            <i class="pi pi-chevron-down filter-chip-chevron"></i>
+          }
+        </button>
+        <p-popover #typePopover appendTo="body">
+          <div class="filter-popover-content">
+            <div class="filter-popover-title">Type de logement</div>
+            @for (option of roomTypeOptions; track option.value) {
+              <button
+                class="filter-type-option"
+                [class.active]="roomType === option.value"
+                (click)="selectRoomType(option.value); typePopover.hide()"
+                type="button"
+              >
+                <i class="pi pi-check option-check" [class.visible]="roomType === option.value"></i>
+                {{ option.label }}
+              </button>
+            }
+          </div>
+        </p-popover>
+
+        <!-- Price chip -->
+        <button
+          class="filter-chip"
+          [class.filter-chip--active]="hasPriceFilter"
+          (click)="pricePopover.toggle($event)"
+          type="button"
+        >
+          <span>{{ activePriceLabel }}</span>
+          @if (hasPriceFilter) {
+            <i class="pi pi-times filter-chip-clear" (click)="$event.stopPropagation(); clearPrice()"></i>
+          } @else {
+            <i class="pi pi-chevron-down filter-chip-chevron"></i>
+          }
+        </button>
+        <p-popover #pricePopover appendTo="body">
+          <div class="filter-popover-content filter-popover-price">
+            <div class="filter-popover-title">Fourchette de prix</div>
+            <p-slider
+              [ngModel]="priceRange"
+              (ngModelChange)="onSliderValueChange($event)"
+              [range]="true"
+              [min]="0"
+              [max]="maxPrice"
+              [step]="5000"
+            />
+            <div class="price-range-labels">
+              <span>0</span>
+              <span>300 000 FCFA</span>
+            </div>
+            <div class="price-inputs">
+              <div class="price-input-wrap">
+                <label class="price-input-label">Min (FCFA)</label>
+                <input
+                  type="number"
+                  class="price-input"
+                  [(ngModel)]="priceMin"
+                  (change)="onPriceInputChange()"
+                  placeholder="0"
+                  min="0"
+                  [max]="maxPrice"
+                />
+              </div>
+              <span class="price-dash">—</span>
+              <div class="price-input-wrap">
+                <label class="price-input-label">Max (FCFA)</label>
+                <input
+                  type="number"
+                  class="price-input"
+                  [(ngModel)]="priceMax"
+                  (change)="onPriceInputChange()"
+                  placeholder="300 000"
+                  min="0"
+                  [max]="maxPrice"
+                />
+              </div>
+            </div>
+            @if (hasPriceFilter) {
+              <button class="price-reset-btn" (click)="clearPrice()" type="button">Réinitialiser</button>
+            }
+          </div>
+        </p-popover>
+
+        <!-- Sort chip -->
+        <button
+          class="filter-chip"
+          [class.filter-chip--active]="sortBy !== ''"
+          (click)="sortPopover.toggle($event)"
+          type="button"
+        >
+          <span>{{ activeSortLabel }}</span>
+          @if (sortBy) {
+            <i class="pi pi-times filter-chip-clear" (click)="$event.stopPropagation(); clearSort()"></i>
+          } @else {
+            <i class="pi pi-chevron-down filter-chip-chevron"></i>
+          }
+        </button>
+        <p-popover #sortPopover appendTo="body">
+          <div class="filter-popover-content">
+            <div class="filter-popover-title">Trier par</div>
+            @for (option of sortOptions; track option.value) {
+              <button
+                class="filter-type-option"
+                [class.active]="sortBy === option.value"
+                (click)="selectSort(option.value); sortPopover.hide()"
+                type="button"
+              >
+                <i class="pi pi-check option-check" [class.visible]="sortBy === option.value"></i>
+                {{ option.label }}
+              </button>
+            }
+          </div>
+        </p-popover>
+
+        <!-- Radius selector (visible when geolocation active) -->
+        @if (!locationDenied() && userPosition()) {
+          <div class="filter-radius">
+            <p-selectbutton
+              [options]="radiusOptions"
+              [ngModel]="activeRadius()"
+              (ngModelChange)="onRadiusChange($event)"
+              optionLabel="label"
+              optionValue="value"
+              size="small"
+            />
+          </div>
+        }
+
       </div>
 
-      <p-select
-        [options]="sortOptions"
-        [(ngModel)]="sortBy"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="Trier par"
-        class="filter-select"
-      />
-
-      <button class="filter-btn-search" (click)="doSearch()">
-        <i class="pi pi-search"></i>
-        RECHERCHER
+      <!-- Mobile filter button (< lg) -->
+      <button class="filter-mobile-btn" (click)="drawerVisible.set(true)" type="button">
+        <i class="pi pi-sliders-h"></i>
+        <span>Filtres</span>
+        @if (activeFilterCount > 0) {
+          <span class="filter-badge">{{ activeFilterCount }}</span>
+        }
       </button>
+
+      <button class="filter-btn-search" (click)="doSearch()" type="button">
+        <i class="pi pi-search"></i>
+        <span class="search-btn-label">RECHERCHER</span>
+      </button>
+
     </div>
   </div>
+
+  <!-- ── Mobile Filters Drawer ── -->
+  <p-drawer
+    [visible]="drawerVisible()"
+    (visibleChange)="drawerVisible.set($event)"
+    position="bottom"
+    header="Filtres"
+    [pt]="{
+      root: { style: { borderRadius: '20px 20px 0 0', height: 'auto', maxHeight: '85vh' } },
+      content: { style: { padding: '0', overflowY: 'auto' } }
+    }"
+  >
+    <div class="drawer-content">
+
+      <!-- Type -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">Type de logement</div>
+        <div class="drawer-type-grid">
+          @for (option of roomTypeOptions; track option.value) {
+            <button
+              class="drawer-type-btn"
+              [class.active]="roomType === option.value"
+              (click)="selectRoomType(option.value)"
+              type="button"
+            >
+              {{ option.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Price -->
+      <div class="drawer-section">
+        <div class="drawer-section-header">
+          <span class="drawer-section-title">Prix mensuel</span>
+          @if (hasPriceFilter) {
+            <button class="drawer-reset-link" (click)="clearPrice()" type="button">Réinitialiser</button>
+          }
+        </div>
+        <p-slider
+          [ngModel]="priceRange"
+          (ngModelChange)="onSliderValueChange($event)"
+          [range]="true"
+          [min]="0"
+          [max]="maxPrice"
+          [step]="5000"
+        />
+        <div class="price-range-labels">
+          <span>0 FCFA</span>
+          <span>300 000 FCFA</span>
+        </div>
+        <div class="price-inputs">
+          <div class="price-input-wrap">
+            <label class="price-input-label">Min (FCFA)</label>
+            <input
+              type="number"
+              class="price-input"
+              [(ngModel)]="priceMin"
+              (change)="onPriceInputChange()"
+              placeholder="0"
+              min="0"
+              [max]="maxPrice"
+            />
+          </div>
+          <span class="price-dash">—</span>
+          <div class="price-input-wrap">
+            <label class="price-input-label">Max (FCFA)</label>
+            <input
+              type="number"
+              class="price-input"
+              [(ngModel)]="priceMax"
+              (change)="onPriceInputChange()"
+              placeholder="300 000"
+              min="0"
+              [max]="maxPrice"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Sort -->
+      <div class="drawer-section">
+        <div class="drawer-section-title">Trier par</div>
+        <div class="drawer-sort-options">
+          @for (option of sortOptions; track option.value) {
+            <button
+              class="drawer-sort-btn"
+              [class.active]="sortBy === option.value"
+              (click)="selectSort(option.value)"
+              type="button"
+            >
+              {{ option.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Radius (visible when geolocation active) -->
+      @if (!locationDenied() && userPosition()) {
+        <div class="drawer-section">
+          <div class="drawer-section-title">Rayon de recherche</div>
+          <p-selectbutton
+            [options]="radiusOptions"
+            [ngModel]="activeRadius()"
+            (ngModelChange)="onRadiusChange($event)"
+            optionLabel="label"
+            optionValue="value"
+          />
+        </div>
+      }
+
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="drawer-actions">
+        @if (activeFilterCount > 0) {
+          <button class="drawer-clear-btn" (click)="clearAllFilters()" type="button">Tout effacer</button>
+        }
+        <button class="drawer-apply-btn" (click)="doSearch()" type="button">
+          Rechercher
+          @if (activeFilterCount > 0) {
+            · {{ activeFilterCount }} filtre{{ activeFilterCount > 1 ? 's' : '' }}
+          }
+        </button>
+      </div>
+    </ng-template>
+  </p-drawer>
 
   <!-- ── Main content ── -->
   <div class="search-body">
     <div class="search-results">
+
+      @if (locationDenied()) {
+        <div class="location-banner">
+          <i class="pi pi-map-marker"></i>
+          <span>Activez la localisation pour voir les distances depuis votre position.</span>
+        </div>
+      }
 
       @if (loading()) {
         <div class="results-header">
@@ -83,7 +336,7 @@
           <div class="empty-icon"><i class="pi pi-search"></i></div>
           <h3>Aucun résultat trouvé</h3>
           <p>Essayez de modifier vos critères de recherche pour trouver des logements disponibles.</p>
-          <button class="empty-cta" (click)="keyword=''; roomType=''; priceMin=null; priceMax=null; doSearch()">
+          <button class="empty-cta" (click)="keyword=''; clearAllFilters(); doSearch()">
             Réinitialiser les filtres
           </button>
         </div>
@@ -114,6 +367,12 @@
     <!-- ── Map panel ── -->
     <div class="search-map-panel">
       <div #mapContainer class="map-container"></div>
+      @if (searchThisAreaVisible()) {
+        <button class="search-area-btn" (click)="searchInCurrentMapArea()" type="button">
+          <i class="pi pi-search"></i>
+          Rechercher dans cette zone
+        </button>
+      }
     </div>
   </div>
 </div>

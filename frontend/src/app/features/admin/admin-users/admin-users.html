@@ -1,0 +1,103 @@
+<div class="page">
+  <div class="page-header">
+    <h1 class="page-title">Utilisateurs</h1>
+  </div>
+
+  <div class="filters-bar">
+    <p-iconfield>
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        type="search"
+        placeholder="Rechercher…"
+        (input)="onSearch($event)"
+      />
+    </p-iconfield>
+
+    <p-select
+      [options]="roleOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Rôle"
+      (onChange)="onRoleChange($event.value)"
+    />
+
+    <p-select
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Statut"
+      (onChange)="onStatusChange($event.value)"
+    />
+  </div>
+
+  <p-table
+    [value]="loading() ? skeletonRows : (page()?.content ?? [])"
+    [tableStyle]="{ 'min-width': '70rem' }"
+    styleClass="p-datatable-sm"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Rôle</th>
+        <th>Statut</th>
+        <th>Inscrit le</th>
+        <th>Annonces</th>
+        <th>Réservations</th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-row>
+      @if (loading()) {
+        <tr>
+          @for (c of [1,2,3,4,5,6,7,8]; track c) { <td><p-skeleton /></td> }
+        </tr>
+      } @else {
+        <tr>
+          <td>{{ row.firstName }} {{ row.lastName }}</td>
+          <td>{{ row.email }}</td>
+          <td>
+            <p-tag
+              [value]="row.role"
+              [severity]="roleSeverity(row.role)"
+            />
+          </td>
+          <td>
+            <p-tag
+              [value]="row.deactivated ? 'Désactivé' : row.status"
+              [severity]="row.deactivated ? 'danger' : row.status === 'ACTIVE' ? 'success' : 'warn'"
+            />
+          </td>
+          <td>{{ row.registrationDate | date:'dd/MM/yyyy' }}</td>
+          <td>{{ row.listingCount ?? 0 }}</td>
+          <td>{{ row.bookingCount ?? 0 }}</td>
+          <td>
+            <a [routerLink]="['/admin/users', row.id]">
+              <p-button icon="pi pi-eye" severity="secondary" size="small" pTooltip="Voir le profil" tooltipPosition="top" />
+            </a>
+          </td>
+        </tr>
+      }
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="empty-cell">
+          <div class="empty-state">
+            <i class="pi pi-users empty-icon"></i>
+            <p>Aucun utilisateur trouvé.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  @if (page(); as p) {
+    <p-paginator
+      [rows]="20"
+      [totalRecords]="p.totalElements"
+      [first]="currentPage() * 20"
+      (onPageChange)="onPageChange($event)"
+    />
+  }
+</div>

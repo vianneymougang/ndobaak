@@ -13,18 +13,30 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { TagModule } from 'primeng/tag';
 import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ProgressBarModule } from 'primeng/progressbar';
 import { MessageService } from 'primeng/api';
+import { concat, EMPTY } from 'rxjs';
+import { finalize, tap } from 'rxjs/operators';
 import { ListingService } from '../../../core/services/listing';
 import { ListingResponse, RoomType, CreateListingRequest, PhotoResponse } from '../../../core/models/listing.models';
-import * as L from 'leaflet';
+import { AMENITY_CONFIG } from '../../../core/models/amenity.config';
+import { L } from '../../../core/utils/leaflet-fix';
+import { SubscriptionService } from '../../../core/services/subscription';
 
-const CAMPUS_LAT = 3.8480;
-const CAMPUS_LNG = 11.5021;
+const CAMPUS_LAT = 3.8844536562668015;
+const CAMPUS_LNG = 11.391160302004234;
 
 interface AmenityOption {
   name: string;
+  label: string;
   icon: string;
   selected: boolean;
+}
+
+interface PendingPhoto {
+  localUrl: string;
+  file: File;
+  uploading: boolean;
 }
 
 @Component({
@@ -43,6 +55,7 @@ interface AmenityOption {
     TagModule,
     MessageModule,
     ProgressSpinnerModule,
+    ProgressBarModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './create.html',
@@ -51,6 +64,7 @@ interface AmenityOption {
 export class Create implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private listingService = inject(ListingService);
+  private subscriptionService = inject(SubscriptionService);
   private messageService = inject(MessageService);
   private router = inject(Router);
 
@@ -58,8 +72,11 @@ export class Create implements OnInit, OnDestroy {
   protected saving = signal(false);
   protected submitting = signal(false);
   protected listing = signal<ListingResponse | null>(null);
-  protected uploadingPhoto = signal(false);
+  protected uploadingPhotos = signal(false);
+  protected uploadProgress = signal(0);
+  protected uploadTotal = signal(0);
   protected photos = signal<PhotoResponse[]>([]);
+  protected pendingPhotos = signal<PendingPhoto[]>([]);
   protected map: L.Map | null = null;
   private marker: L.Marker | null = null;
 
@@ -70,17 +87,14 @@ export class Create implements OnInit, OnDestroy {
     { label: 'Appartement', value: 'APARTMENT' as RoomType },
   ];
 
-  protected amenities = signal<AmenityOption[]>([
-    { name: 'WiFi', icon: 'pi pi-wifi', selected: false },
-    { name: 'Running Water', icon: 'pi pi-compass', selected: false },
-    { name: 'Electricity', icon: 'pi pi-bolt', selected: false },
-    { name: 'Private Shower', icon: 'pi pi-home', selected: false },
-    { name: 'Kitchen', icon: 'pi pi-warehouse', selected: false },
-    { name: 'Security Guard', icon: 'pi pi-shield', selected: false },
-    { name: 'Parking', icon: 'pi pi-car', selected: false },
-    { name: 'Fan', icon: 'pi pi-sun', selected: false },
-    { name: 'Furnished', icon: 'pi pi-box', selected: false },
-  ]);
+  protected amenities = signal<AmenityOption[]>(
+    Object.entries(AMENITY_CONFIG).map(([name, config]) => ({
+      name,
+      label: config.label,
+      icon: config.icon,
+      selected: false,
+    }))
+  );
 
   protected infoForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(10)]],
@@ -115,7 +129,14 @@ export class Create implements OnInit, OnDestroy {
       .map((a) => a.name)
   );
 
+  protected selectedAmenityLabels = computed(() =>
+    this.amenities()
+      .filter((a) => a.selected)
+      .map((a) => a.label)
+  );
+
   protected photoCount = computed(() => this.photos().length);
+  protected totalPhotoCount = computed(() => this.photos().length + this.pendingPhotos().length);
   protected canSubmit = computed(() => this.photoCount() >= 3 && this.photoCount() <= 10);
 
   protected distanceToCampus = computed(() => {
@@ -125,8 +146,27 @@ export class Create implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
+    this.checkSubscription();
     this.infoForm.get('description')?.valueChanges.subscribe(() => {});
     this.infoForm.get('title')?.valueChanges.subscribe(() => {});
+  }
+
+  private checkSubscription(): void {
+    this.subscriptionService.getMySubscription().subscribe({
+      next: (sub) => {
+        if (!sub || sub.status !== 'ACTIVE') {
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Abonnement requis',
+            detail: 'Un abonnement actif est requis pour publier une annonce.',
+          });
+          this.router.navigate(['/subscription']);
+        }
+      },
+      error: () => {
+        this.router.navigate(['/subscription']);
+      },
+    });
   }
 
   ngOnDestroy(): void {
@@ -134,6 +174,7 @@ export class Create implements OnInit, OnDestroy {
       this.map.remove();
       this.map = null;
     }
+    this.pendingPhotos().forEach((p) => URL.revokeObjectURL(p.localUrl));
   }
 
   protected initMap(): void {
@@ -197,27 +238,60 @@ export class Create implements OnInit, OnDestroy {
     }
 
     const files = Array.from(input.files);
-    const remaining = 10 - this.photoCount();
+    const remaining = 10 - this.totalPhotoCount();
     const filesToUpload = files.slice(0, remaining);
 
-    filesToUpload.forEach((file) => {
-      this.uploadingPhoto.set(true);
-      this.listingService.uploadPhoto(currentListing.id, file).subscribe({
-        next: (updated) => {
+    if (filesToUpload.length === 0) {
+      input.value = '';
+      return;
+    }
+
+    const newPending: PendingPhoto[] = filesToUpload.map((file) => ({
+      localUrl: URL.createObjectURL(file),
+      file,
+      uploading: false,
+    }));
+
+    this.pendingPhotos.update((list) => [...list, ...newPending]);
+    this.uploadingPhotos.set(true);
+    this.uploadProgress.set(0);
+    this.uploadTotal.set(filesToUpload.length);
+
+    const uploads = filesToUpload.map((file, index) =>
+      this.listingService.uploadPhoto(currentListing.id, file).pipe(
+        tap((updated) => {
           this.listing.set(updated);
           this.photos.set(updated.photos);
-          this.uploadingPhoto.set(false);
-        },
-        error: () => {
-          this.uploadingPhoto.set(false);
+          this.uploadProgress.set(index + 1);
+
+          const pendingUrl = newPending[index].localUrl;
+          URL.revokeObjectURL(pendingUrl);
+          this.pendingPhotos.update((list) => list.filter((p) => p.localUrl !== pendingUrl));
+        })
+      )
+    );
+
+    concat(...uploads)
+      .pipe(
+        finalize(() => {
+          this.uploadingPhotos.set(false);
+          this.uploadProgress.set(0);
+          this.uploadTotal.set(0);
+        })
+      )
+      .subscribe({
+        error: (err) => {
+          this.pendingPhotos.update((list) => {
+            list.forEach((p) => URL.revokeObjectURL(p.localUrl));
+            return [];
+          });
           this.messageService.add({
             severity: 'error',
             summary: 'Erreur',
-            detail: `Echec de l'upload de ${file.name}`,
+            detail: 'Echec de l\'upload d\'une ou plusieurs photos.',
           });
         },
       });
-    });
 
     input.value = '';
   }
@@ -260,8 +334,17 @@ export class Create implements OnInit, OnDestroy {
           detail: 'Brouillon sauvegarde avec succes.',
         });
       },
-      error: () => {
+      error: (err) => {
         this.saving.set(false);
+        if (err?.error?.code === 'SUBSCRIPTION_REQUIRED') {
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Abonnement requis',
+            detail: 'Un abonnement actif est requis pour publier une annonce.',
+          });
+          this.router.navigate(['/subscription']);
+          return;
+        }
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur',
@@ -288,10 +371,19 @@ export class Create implements OnInit, OnDestroy {
               summary: 'Soumise',
               detail: 'Votre annonce a ete soumise pour validation.',
             });
-            this.router.navigate(['/my-listings']);
+            this.router.navigate(['/landlord/listings']);
           },
-          error: () => {
+          error: (err) => {
             this.submitting.set(false);
+            if (err?.error?.code === 'SUBSCRIPTION_REQUIRED') {
+              this.messageService.add({
+                severity: 'info',
+                summary: 'Abonnement requis',
+                detail: 'Un abonnement actif est requis pour publier une annonce.',
+              });
+              this.router.navigate(['/subscription']);
+              return;
+            }
             this.messageService.add({
               severity: 'error',
               summary: 'Erreur',
@@ -300,8 +392,17 @@ export class Create implements OnInit, OnDestroy {
           },
         });
       },
-      error: () => {
+      error: (err) => {
         this.submitting.set(false);
+        if (err?.error?.code === 'SUBSCRIPTION_REQUIRED') {
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Abonnement requis',
+            detail: 'Un abonnement actif est requis pour publier une annonce.',
+          });
+          this.router.navigate(['/subscription']);
+          return;
+        }
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur',
