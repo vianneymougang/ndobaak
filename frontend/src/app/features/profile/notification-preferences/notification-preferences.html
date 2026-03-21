@@ -41,7 +41,7 @@
               @for (pref of group.preferences; track pref.notificationType) {
                 <div class="pref-row" [class.pref-row--critical]="pref.critical">
                   <span class="pref-row-label">
-                    {{ NOTIFICATION_LABELS[pref.notificationType] ?? pref.notificationType }}
+                    {{ NOTIFICATION_LABELS[pref.notificationType] }}
                     @if (pref.critical) {
                       <span class="pref-critical-badge">Critique</span>
                     }
