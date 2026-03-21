@@ -92,6 +92,75 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'landlord',
+    canActivate: [authGuard, roleGuard('LANDLORD')],
+    loadComponent: () =>
+      import('./features/dashboard/landlord-layout/landlord-layout').then(
+        (m) => m.LandlordLayout,
+      ),
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        title: 'Tableau de bord',
+        loadComponent: () =>
+          import('./features/dashboard/landlord-dashboard/landlord-dashboard').then(
+            (m) => m.LandlordDashboard,
+          ),
+      },
+      {
+        path: 'bookings',
+        title: 'Demandes de réservation',
+        loadComponent: () =>
+          import('./features/booking/landlord-bookings/landlord-bookings').then(
+            (m) => m.LandlordBookings,
+          ),
+      },
+      {
+        path: 'listings',
+        title: 'Mes annonces',
+        loadComponent: () =>
+          import('./features/listing/my-listings/my-listings').then((m) => m.MyListings),
+      },
+      {
+        path: 'subscription',
+        title: 'Mon abonnement',
+        loadComponent: () =>
+          import('./features/subscription/subscription-page/subscription-page').then(
+            (m) => m.SubscriptionPage,
+          ),
+      },
+      {
+        path: 'transactions',
+        title: 'Mes transactions',
+        loadComponent: () =>
+          import('./features/payment/transaction-history/transaction-history').then(
+            (m) => m.TransactionHistory,
+          ),
+      },
+      {
+        path: 'profile',
+        title: 'Mon profil',
+        loadComponent: () =>
+          import('./features/profile/landlord-profile/landlord-profile').then(
+            (m) => m.LandlordProfile,
+          ),
+      },
+      {
+        path: 'profile/notifications',
+        title: 'Préférences de notification',
+        loadComponent: () =>
+          import('./features/profile/notification-preferences/notification-preferences').then(
+            (m) => m.NotificationPreferences,
+          ),
+      },
+    ],
+  },
+  {
     path: '',
     loadComponent: () => import('./shared/components/layout/layout').then((m) => m.Layout),
     children: [
@@ -115,36 +184,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/listing/detail/detail').then((m) => m.Detail),
       },
       {
-        path: 'my-listings',
-        title: 'Mes annonces',
-        canActivate: [authGuard, roleGuard('LANDLORD')],
-        loadComponent: () =>
-          import('./features/listing/my-listings/my-listings').then((m) => m.MyListings),
-      },
-      {
         path: 'my-bookings',
         title: 'Mes réservations',
         canActivate: [authGuard, roleGuard('STUDENT')],
         loadComponent: () =>
           import('./features/booking/my-bookings/my-bookings').then((m) => m.MyBookings),
-      },
-      {
-        path: 'landlord/bookings',
-        title: 'Demandes de réservation',
-        canActivate: [authGuard, roleGuard('LANDLORD')],
-        loadComponent: () =>
-          import('./features/booking/landlord-bookings/landlord-bookings').then(
-            (m) => m.LandlordBookings,
-          ),
-      },
-      {
-        path: 'landlord/dashboard',
-        title: 'Tableau de bord',
-        canActivate: [authGuard, roleGuard('LANDLORD')],
-        loadComponent: () =>
-          import('./features/dashboard/landlord-dashboard/landlord-dashboard').then(
-            (m) => m.LandlordDashboard,
-          ),
       },
       {
         path: 'notifications',
@@ -201,7 +245,7 @@ export const routes: Routes = [
       {
         path: 'transactions',
         title: 'Mes transactions',
-        canActivate: [authGuard],
+        canActivate: [authGuard, roleGuard('STUDENT')],
         loadComponent: () =>
           import('./features/payment/transaction-history/transaction-history').then(
             (m) => m.TransactionHistory,
@@ -214,15 +258,6 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/payment/installment-tracker/installment-tracker').then(
             (m) => m.InstallmentTracker,
-          ),
-      },
-      {
-        path: 'subscription',
-        title: 'Mon abonnement',
-        canActivate: [authGuard, roleGuard('LANDLORD')],
-        loadComponent: () =>
-          import('./features/subscription/subscription-page/subscription-page').then(
-            (m) => m.SubscriptionPage,
           ),
       },
       {
