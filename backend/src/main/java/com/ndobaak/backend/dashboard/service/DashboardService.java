@@ -77,9 +77,10 @@ public class DashboardService {
         long totalListings = listingRepository.countByLandlordId(landlordId);
         long confirmedBookings = bookingRepository.countByListingLandlordIdAndStatus(landlordId, BookingStatus.CONFIRMED);
         long completedBookings = bookingRepository.countByListingLandlordIdAndStatus(landlordId, BookingStatus.COMPLETED);
-        long activeBookings = confirmedBookings + completedBookings;
-        long pendingRequests = bookingRepository.countByListingLandlordIdAndStatus(landlordId, BookingStatus.PENDING);
+        long pendingCount = bookingRepository.countByListingLandlordIdAndStatus(landlordId, BookingStatus.PENDING);
         long cancelledBookings = bookingRepository.countByListingLandlordIdAndStatus(landlordId, BookingStatus.CANCELLED);
+        long activeListings = confirmedBookings + completedBookings;
+        long totalBookings = pendingCount + confirmedBookings + completedBookings + cancelledBookings;
 
         BigDecimal totalRevenue = paymentRepository.sumAmountByLandlordIdAndStatus(landlordId, PaymentStatus.COMPLETED);
 
@@ -106,7 +107,7 @@ public class DashboardService {
         double occupancyRate = 0.0;
         if (totalAvailableRooms > 0) {
             occupancyRate = Math.min(
-                    (double) (confirmedBookings + completedBookings) / totalAvailableRooms * 100,
+                    (double) activeListings / totalAvailableRooms * 100,
                     100.0);
         }
 
@@ -114,7 +115,7 @@ public class DashboardService {
         long totalViews = viewsMap.values().stream().mapToLong(Long::longValue).sum();
 
         PageRequest pendingPageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
-        List<LandlordDashboardResponse.PendingBookingSummary> pendingBookings =
+        List<LandlordDashboardResponse.PendingBookingSummary> recentPendingBookings =
                 bookingRepository.findByListingLandlordIdAndStatus(landlordId, BookingStatus.PENDING, pendingPageable)
                         .getContent()
                         .stream()
@@ -122,7 +123,7 @@ public class DashboardService {
                         .toList();
 
         PageRequest activityPageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-        List<LandlordDashboardResponse.RecentActivityItem> recentActivity =
+        List<LandlordDashboardResponse.RecentActivityItem> recentActivities =
                 notificationRepository.findByUserIdOrderByCreatedAtDesc(landlordId, activityPageable)
                         .getContent()
                         .stream()
@@ -132,12 +133,13 @@ public class DashboardService {
         List<MonthlyRevenueDTO> revenueChart = buildRevenueChart(landlordId, 12);
         List<DailyViewsDTO> viewsChart = listingViewService.getDailyViewsForLandlord(landlordId, from, to);
         BookingsByStatusDTO bookingsByStatus = new BookingsByStatusDTO(
-                pendingRequests, confirmedBookings, completedBookings, cancelledBookings);
+                pendingCount, confirmedBookings, completedBookings, cancelledBookings);
 
         return LandlordDashboardResponse.builder()
                 .totalListings(totalListings)
-                .activeBookings(activeBookings)
-                .pendingRequests(pendingRequests)
+                .activeListings(activeListings)
+                .totalBookings(totalBookings)
+                .pendingBookings(pendingCount)
                 .totalRevenue(totalRevenue)
                 .totalViews(totalViews)
                 .occupancyRate(occupancyRate)
@@ -145,8 +147,8 @@ public class DashboardService {
                 .completedBookings(completedBookings)
                 .previousPeriodRevenue(previousRevenue)
                 .revenueChangePercent(revenueChangePercent)
-                .pendingBookings(pendingBookings)
-                .recentActivity(recentActivity)
+                .recentPendingBookings(recentPendingBookings)
+                .recentActivities(recentActivities)
                 .revenueChart(revenueChart)
                 .viewsChart(viewsChart)
                 .bookingsByStatus(bookingsByStatus)

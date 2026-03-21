@@ -1,0 +1,66 @@
+@if (loading()) {
+  <div class="timeline">
+    @for (_ of [1, 2, 3]; track $index) {
+      <div class="timeline-item timeline-item--skeleton">
+        <div class="timeline-dot-col">
+          <p-skeleton width="2rem" height="2rem" borderRadius="50%" />
+          <div class="timeline-line"></div>
+        </div>
+        <div class="timeline-content">
+          <p-skeleton width="50%" height="0.875rem" />
+          <p-skeleton width="80%" height="0.75rem" styleClass="mt-1" />
+          <p-skeleton width="25%" height="0.625rem" styleClass="mt-1" />
+        </div>
+      </div>
+    }
+  </div>
+} @else if (error()) {
+  <div class="timeline-state">
+    <div class="timeline-state-icon">
+      <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+    </div>
+    <p class="timeline-state-text">Impossible de charger l'activité récente.</p>
+    <button class="timeline-retry" (click)="retry.emit()">
+      <i class="pi pi-refresh" aria-hidden="true"></i>
+      Réessayer
+    </button>
+  </div>
+} @else if (items().length === 0) {
+  <div class="timeline-state">
+    <div class="timeline-state-icon">
+      <i class="pi pi-clock" aria-hidden="true"></i>
+    </div>
+    <p class="timeline-state-text">{{ emptyMessage() }}</p>
+  </div>
+} @else {
+  <div class="timeline">
+    @for (item of items(); track item.referenceId + item.createdAt; let i = $index; let last = $last) {
+      <div
+        class="timeline-item"
+        role="button"
+        tabindex="0"
+        (click)="itemClicked.emit(item)"
+        (keydown.enter)="itemClicked.emit(item)"
+        ngmMotion
+        [initial]="{ opacity: 0, x: -12 }"
+        [animate]="{ opacity: 1, x: 0 }"
+        [transition]="{ duration: 0.3, delay: staggerDelay(i), ease: 'easeOut' }"
+        [whileHover]="{ x: 4 }"
+      >
+        <div class="timeline-dot-col">
+          <div class="timeline-icon {{ getIconClass(item.type) }}">
+            <i class="pi {{ getIcon(item.type) }}" aria-hidden="true"></i>
+          </div>
+          @if (!last) {
+            <div class="timeline-line"></div>
+          }
+        </div>
+        <div class="timeline-content">
+          <span class="timeline-title">{{ item.title }}</span>
+          <span class="timeline-message">{{ item.message }}</span>
+          <span class="timeline-time">{{ item.createdAt | relativeTime }}</span>
+        </div>
+      </div>
+    }
+  </div>
+}

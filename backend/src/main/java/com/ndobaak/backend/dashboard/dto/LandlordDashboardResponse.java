@@ -15,8 +15,9 @@ import java.util.List;
 public class LandlordDashboardResponse {
 
     private long totalListings;
-    private long activeBookings;
-    private long pendingRequests;
+    private long activeListings;
+    private long totalBookings;
+    private long pendingBookings;
     private BigDecimal totalRevenue;
     private long totalViews;
     private double occupancyRate;
@@ -24,8 +25,8 @@ public class LandlordDashboardResponse {
     private long completedBookings;
     private BigDecimal previousPeriodRevenue;
     private double revenueChangePercent;
-    private List<PendingBookingSummary> pendingBookings;
-    private List<RecentActivityItem> recentActivity;
+    private List<PendingBookingSummary> recentPendingBookings;
+    private List<RecentActivityItem> recentActivities;
     private List<MonthlyRevenueDTO> revenueChart;
     private List<DailyViewsDTO> viewsChart;
     private BookingsByStatusDTO bookingsByStatus;

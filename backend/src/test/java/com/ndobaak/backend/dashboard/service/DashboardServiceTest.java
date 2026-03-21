@@ -174,11 +174,11 @@ class DashboardServiceTest {
         LandlordDashboardResponse response = dashboardService.getLandlordDashboard(FROM, TO);
 
         assertThat(response.getTotalListings()).isEqualTo(5L);
-        assertThat(response.getActiveBookings()).isEqualTo(3L);
-        assertThat(response.getPendingRequests()).isEqualTo(2L);
+        assertThat(response.getActiveListings()).isEqualTo(3L);
+        assertThat(response.getPendingBookings()).isEqualTo(2L);
         assertThat(response.getTotalRevenue()).isEqualByComparingTo(new BigDecimal("210000"));
-        assertThat(response.getPendingBookings()).hasSize(1);
-        assertThat(response.getRecentActivity()).hasSize(1);
+        assertThat(response.getRecentPendingBookings()).hasSize(1);
+        assertThat(response.getRecentActivities()).hasSize(1);
     }
 
     @Test
@@ -190,11 +190,11 @@ class DashboardServiceTest {
         LandlordDashboardResponse response = dashboardService.getLandlordDashboard(FROM, TO);
 
         assertThat(response.getTotalListings()).isZero();
-        assertThat(response.getActiveBookings()).isZero();
-        assertThat(response.getPendingRequests()).isZero();
+        assertThat(response.getActiveListings()).isZero();
+        assertThat(response.getPendingBookings()).isZero();
         assertThat(response.getTotalRevenue()).isEqualByComparingTo(BigDecimal.ZERO);
-        assertThat(response.getPendingBookings()).isEmpty();
-        assertThat(response.getRecentActivity()).isEmpty();
+        assertThat(response.getRecentPendingBookings()).isEmpty();
+        assertThat(response.getRecentActivities()).isEmpty();
     }
 
     @Test
@@ -254,8 +254,8 @@ class DashboardServiceTest {
 
         LandlordDashboardResponse response = dashboardService.getLandlordDashboard(FROM, TO);
 
-        assertThat(response.getPendingBookings()).hasSize(1);
-        LandlordDashboardResponse.PendingBookingSummary summary = response.getPendingBookings().getFirst();
+        assertThat(response.getRecentPendingBookings()).hasSize(1);
+        LandlordDashboardResponse.PendingBookingSummary summary = response.getRecentPendingBookings().getFirst();
         assertThat(summary.getBookingId()).isEqualTo(42L);
         assertThat(summary.getStudentName()).isEqualTo("Paul Biya");
         assertThat(summary.getListingTitle()).isEqualTo("Chambre Moderne Eyang");
@@ -291,8 +291,8 @@ class DashboardServiceTest {
 
         LandlordDashboardResponse response = dashboardService.getLandlordDashboard(FROM, TO);
 
-        assertThat(response.getRecentActivity()).hasSize(1);
-        LandlordDashboardResponse.RecentActivityItem activity = response.getRecentActivity().getFirst();
+        assertThat(response.getRecentActivities()).hasSize(1);
+        LandlordDashboardResponse.RecentActivityItem activity = response.getRecentActivities().getFirst();
         assertThat(activity.getType()).isEqualTo("PAYMENT_RECEIVED");
         assertThat(activity.getTitle()).isEqualTo("Paiement recu");
         assertThat(activity.getMessage()).isEqualTo("Le paiement de 35 000 FCFA a ete recu.");
@@ -325,11 +325,11 @@ class DashboardServiceTest {
         LandlordDashboardResponse response = dashboardService.getLandlordDashboard(FROM, TO);
 
         assertThat(response.getTotalListings()).isEqualTo(3L);
-        assertThat(response.getActiveBookings()).isEqualTo(2L);
-        assertThat(response.getPendingRequests()).isZero();
+        assertThat(response.getActiveListings()).isEqualTo(2L);
+        assertThat(response.getPendingBookings()).isZero();
         assertThat(response.getTotalRevenue()).isEqualByComparingTo(new BigDecimal("70000"));
-        assertThat(response.getPendingBookings()).isEmpty();
-        assertThat(response.getRecentActivity()).isEmpty();
+        assertThat(response.getRecentPendingBookings()).isEmpty();
+        assertThat(response.getRecentActivities()).isEmpty();
     }
 
     @Test

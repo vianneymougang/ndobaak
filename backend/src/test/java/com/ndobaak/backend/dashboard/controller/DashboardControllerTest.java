@@ -62,11 +62,11 @@ class DashboardControllerTest {
 
         return LandlordDashboardResponse.builder()
                 .totalListings(5)
-                .activeBookings(3)
-                .pendingRequests(2)
+                .activeListings(3)
+                .pendingBookings(2)
                 .totalRevenue(new BigDecimal("210000"))
-                .pendingBookings(List.of(pendingBooking))
-                .recentActivity(List.of(activity))
+                .recentPendingBookings(List.of(pendingBooking))
+                .recentActivities(List.of(activity))
                 .build();
     }
 
@@ -78,11 +78,11 @@ class DashboardControllerTest {
         mockMvc.perform(get("/dashboard/landlord"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalListings").value(5))
-                .andExpect(jsonPath("$.activeBookings").value(3))
-                .andExpect(jsonPath("$.pendingRequests").value(2))
+                .andExpect(jsonPath("$.activeListings").value(3))
+                .andExpect(jsonPath("$.pendingBookings").value(2))
                 .andExpect(jsonPath("$.totalRevenue").value(210000))
-                .andExpect(jsonPath("$.pendingBookings").isArray())
-                .andExpect(jsonPath("$.recentActivity").isArray());
+                .andExpect(jsonPath("$.recentPendingBookings").isArray())
+                .andExpect(jsonPath("$.recentActivities").isArray());
     }
 
     @Test
@@ -92,16 +92,16 @@ class DashboardControllerTest {
 
         mockMvc.perform(get("/dashboard/landlord"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.pendingBookings[0].bookingId").value(1))
-                .andExpect(jsonPath("$.pendingBookings[0].studentName").value("John Doe"))
-                .andExpect(jsonPath("$.pendingBookings[0].listingTitle").value("Studio Eyang"))
-                .andExpect(jsonPath("$.pendingBookings[0].startDate").value("2026-04-01"))
-                .andExpect(jsonPath("$.pendingBookings[0].createdAt").value("2026-03-18T10:00:00"))
-                .andExpect(jsonPath("$.recentActivity[0].type").value("BOOKING_CREATED"))
-                .andExpect(jsonPath("$.recentActivity[0].title").value("Nouvelle reservation"))
-                .andExpect(jsonPath("$.recentActivity[0].message").value("Une reservation a ete creee."))
-                .andExpect(jsonPath("$.recentActivity[0].createdAt").value("2026-03-18T10:00:00"))
-                .andExpect(jsonPath("$.recentActivity[0].referenceId").value(1));
+                .andExpect(jsonPath("$.recentPendingBookings[0].bookingId").value(1))
+                .andExpect(jsonPath("$.recentPendingBookings[0].studentName").value("John Doe"))
+                .andExpect(jsonPath("$.recentPendingBookings[0].listingTitle").value("Studio Eyang"))
+                .andExpect(jsonPath("$.recentPendingBookings[0].startDate").value("2026-04-01"))
+                .andExpect(jsonPath("$.recentPendingBookings[0].createdAt").value("2026-03-18T10:00:00"))
+                .andExpect(jsonPath("$.recentActivities[0].type").value("BOOKING_CREATED"))
+                .andExpect(jsonPath("$.recentActivities[0].title").value("Nouvelle reservation"))
+                .andExpect(jsonPath("$.recentActivities[0].message").value("Une reservation a ete creee."))
+                .andExpect(jsonPath("$.recentActivities[0].createdAt").value("2026-03-18T10:00:00"))
+                .andExpect(jsonPath("$.recentActivities[0].referenceId").value(1));
     }
 
     @Test
@@ -109,11 +109,11 @@ class DashboardControllerTest {
     void getLandlordDashboardShouldOmitNullRevenue() throws Exception {
         LandlordDashboardResponse response = LandlordDashboardResponse.builder()
                 .totalListings(0)
-                .activeBookings(0)
-                .pendingRequests(0)
+                .activeListings(0)
+                .pendingBookings(0)
                 .totalRevenue(null)
-                .pendingBookings(List.of())
-                .recentActivity(List.of())
+                .recentPendingBookings(List.of())
+                .recentActivities(List.of())
                 .build();
 
         when(dashboardService.getLandlordDashboard(any(), any())).thenReturn(response);
@@ -122,7 +122,7 @@ class DashboardControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalRevenue").doesNotExist())
                 .andExpect(jsonPath("$.totalListings").value(0))
-                .andExpect(jsonPath("$.pendingBookings").isEmpty())
-                .andExpect(jsonPath("$.recentActivity").isEmpty());
+                .andExpect(jsonPath("$.recentPendingBookings").isEmpty())
+                .andExpect(jsonPath("$.recentActivities").isEmpty());
     }
 }
