@@ -34,21 +34,13 @@
       </a>
       @if (isLandlord()) {
         <a routerLink="/landlord/dashboard" routerLinkActive="active">
-          <i class="pi pi-objects-column" aria-hidden="true"></i> Tableau de bord
-        </a>
-        <a routerLink="/my-listings" routerLinkActive="active">
-          <i class="pi pi-list" aria-hidden="true"></i> Mes annonces
-        </a>
-        <a routerLink="/landlord/bookings" routerLinkActive="active">
-          <i class="pi pi-calendar" aria-hidden="true"></i> Réservations reçues
+          <i class="pi pi-objects-column" aria-hidden="true"></i> Mon espace
         </a>
       }
       @if (isStudent()) {
         <a routerLink="/my-bookings" routerLinkActive="active">
           <i class="pi pi-calendar" aria-hidden="true"></i> Mes réservations
         </a>
-      }
-      @if (isAuthenticated()) {
         <a routerLink="/transactions" routerLinkActive="active">
           <i class="pi pi-wallet" aria-hidden="true"></i> Transactions
         </a>
@@ -136,15 +128,7 @@
     @if (isLandlord()) {
       <a routerLink="/landlord/dashboard" (click)="drawerOpen.set(false)" class="drawer-link">
         <i class="pi pi-objects-column" aria-hidden="true"></i>
-        Tableau de bord
-      </a>
-      <a routerLink="/my-listings" (click)="drawerOpen.set(false)" class="drawer-link">
-        <i class="pi pi-list" aria-hidden="true"></i>
-        Mes annonces
-      </a>
-      <a routerLink="/landlord/bookings" (click)="drawerOpen.set(false)" class="drawer-link">
-        <i class="pi pi-calendar" aria-hidden="true"></i>
-        Réservations reçues
+        Mon espace
       </a>
     }
 
@@ -153,20 +137,20 @@
         <i class="pi pi-calendar" aria-hidden="true"></i>
         Mes réservations
       </a>
-    }
-
-    @if (isAuthenticated()) {
       <a routerLink="/transactions" (click)="drawerOpen.set(false)" class="drawer-link">
         <i class="pi pi-wallet" aria-hidden="true"></i>
         Transactions
       </a>
-      <a routerLink="/notifications" (click)="drawerOpen.set(false)" class="drawer-link">
-        <i class="pi pi-bell" aria-hidden="true"></i>
-        Notifications
-      </a>
       <a routerLink="/profile/notifications" (click)="drawerOpen.set(false)" class="drawer-link">
         <i class="pi pi-sliders-h" aria-hidden="true"></i>
         Préférences de notification
+      </a>
+    }
+
+    @if (isAuthenticated()) {
+      <a routerLink="/notifications" (click)="drawerOpen.set(false)" class="drawer-link">
+        <i class="pi pi-bell" aria-hidden="true"></i>
+        Notifications
       </a>
     }
 

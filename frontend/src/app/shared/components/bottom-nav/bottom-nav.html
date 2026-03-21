@@ -11,9 +11,9 @@
 
   <div class="island-sep" aria-hidden="true"></div>
 
-  @if (isAuthenticated()) {
+  @if (isAuthenticated() && !isLandlord()) {
     <a
-      [routerLink]="isLandlord() ? '/landlord/bookings' : '/my-bookings'"
+      routerLink="/my-bookings"
       routerLinkActive="island-item--active"
       class="island-item"
       aria-label="Mes réservations"
@@ -27,14 +27,13 @@
 
   @if (isLandlord()) {
     <a
-      routerLink="/my-listings"
+      routerLink="/landlord/dashboard"
       routerLinkActive="island-item--active"
-      [routerLinkActiveOptions]="{ exact: true }"
       class="island-item"
-      aria-label="Mes annonces"
+      aria-label="Mon espace"
     >
       <span class="island-avatar" aria-hidden="true">{{ userInitials() }}</span>
-      <span>{{ accountLabel() }}</span>
+      <span>Mon espace</span>
     </a>
   } @else if (isAuthenticated()) {
     <button class="island-item" (click)="openDrawer()" aria-label="Mon compte">
