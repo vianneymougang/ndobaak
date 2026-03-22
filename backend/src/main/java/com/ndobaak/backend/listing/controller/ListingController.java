@@ -68,7 +68,7 @@ public class ListingController {
         request.setUserLat(userLat);
         request.setUserLng(userLng);
         request.setPage(page);
-        request.setSize(size);
+        request.setSize(Math.min(size, 50));
 
         return ResponseEntity.ok(listingSearchService.search(request));
     }
