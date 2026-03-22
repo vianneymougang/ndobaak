@@ -42,7 +42,7 @@ public class Installment extends BaseEntity {
     @Column(nullable = false, precision = 12, scale = 0)
     private BigDecimal amount;
 
-    @Column(name = "due_date", nullable = false)
+    @Column(name = "due_date")
     private LocalDate dueDate;
 
     @Enumerated(EnumType.STRING)

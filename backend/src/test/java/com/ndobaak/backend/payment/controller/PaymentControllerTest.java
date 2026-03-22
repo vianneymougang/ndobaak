@@ -82,12 +82,10 @@ class PaymentControllerTest {
     void initiatePaymentShouldReturn201() throws Exception {
         InitiatePaymentRequest request = new InitiatePaymentRequest();
         request.setBookingId(1L);
-        request.setPaymentType(PaymentType.INTEGRAL);
         request.setOperator(MobileMoneyOperator.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
 
         PaymentResponse response = buildPaymentResponse(1L, PaymentStatus.PROCESSING);
-        response.setAuthorizationUrl("https://pay.example.com");
 
         when(paymentService.initiatePayment(any())).thenReturn(response);
 
@@ -96,8 +94,7 @@ class PaymentControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.status").value("PROCESSING"))
-                .andExpect(jsonPath("$.authorizationUrl").value("https://pay.example.com"));
+                .andExpect(jsonPath("$.status").value("PROCESSING"));
     }
 
     @Test
@@ -114,7 +111,6 @@ class PaymentControllerTest {
     void initiatePaymentShouldReturn400OnBusinessError() throws Exception {
         InitiatePaymentRequest request = new InitiatePaymentRequest();
         request.setBookingId(1L);
-        request.setPaymentType(PaymentType.INTEGRAL);
         request.setOperator(MobileMoneyOperator.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
 
@@ -133,7 +129,7 @@ class PaymentControllerTest {
 
         mockMvc.perform(post("/payments/webhook/notchpay")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Notchpay-Signature", "valid-sig")
+                        .header("x-notch-signature", "valid-sig")
                         .content("{\"event\":\"payment.complete\",\"reference\":\"ref-123\"}"))
                 .andExpect(status().isOk());
 
@@ -147,7 +143,7 @@ class PaymentControllerTest {
 
         mockMvc.perform(post("/payments/webhook/notchpay")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-Notchpay-Signature", "bad-sig")
+                        .header("x-notch-signature", "bad-sig")
                         .content("{\"event\":\"payment.complete\"}"))
                 .andExpect(status().isBadRequest());
     }

@@ -1,0 +1,3 @@
+ALTER TYPE schedule_frequency ADD VALUE IF NOT EXISTS 'BLOCK';
+
+ALTER TABLE installment ALTER COLUMN due_date DROP NOT NULL;

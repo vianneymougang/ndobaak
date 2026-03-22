@@ -47,7 +47,7 @@ public class PaymentController {
             @PathVariable String provider,
             HttpServletRequest request) throws IOException {
         String payload = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-        String signature = request.getHeader("X-Notchpay-Signature");
+        String signature = request.getHeader("x-notch-signature");
 
         paymentService.handleWebhook(provider, payload, signature);
         return ResponseEntity.ok().build();

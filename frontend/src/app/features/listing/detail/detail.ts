@@ -8,7 +8,9 @@ import {
   viewChild,
   computed,
   effect,
+  PLATFORM_ID,
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GalleriaModule } from 'primeng/galleria';
 import { ButtonModule } from 'primeng/button';
@@ -26,8 +28,7 @@ import { environment } from '../../../../environments/environment';
 import { BookingPanel } from '../booking-panel/booking-panel';
 import { ReviewList } from '../../../shared/components/review-list/review-list';
 import { ReviewForm } from '../../review/review-form/review-form';
-
-import { L } from '../../../core/utils/leaflet-fix';
+import type * as LeafletNS from 'leaflet';
 
 @Component({
   selector: 'app-detail',
@@ -52,14 +53,16 @@ export class Detail implements OnInit {
   private router = inject(Router);
   private listingService = inject(ListingService);
   protected authService = inject(AuthService);
+  private platformId = inject(PLATFORM_ID);
 
   protected detailMap = viewChild<ElementRef>('detailMap');
-  private map: L.Map | null = null;
+  private L: typeof LeafletNS | null = null;
+  private map: LeafletNS.Map | null = null;
 
   private mapEffect = effect(() => {
     const el = this.detailMap();
     const listing = this.listing();
-    if (el && listing?.location) {
+    if (el && listing?.location && isPlatformBrowser(this.platformId)) {
       this.initDetailMap();
     }
   });
@@ -119,12 +122,13 @@ export class Detail implements OnInit {
     this.reviewListRef()?.ngOnInit();
   }
 
-  private initDetailMap(): void {
-    if (typeof L === 'undefined') return;
+  private async initDetailMap(): Promise<void> {
     const el = this.detailMap()?.nativeElement;
     const loc = this.listing()?.location;
-    if (!el || !loc) return;
-    if (this.map) return;
+    if (!el || !loc || this.map) return;
+
+    const { L } = await import('../../../core/utils/leaflet-fix');
+    this.L = L;
 
     this.map = L.map(el).setView([loc.latitude, loc.longitude], 15);
     L.tileLayer(environment.mapTileUrl, {
