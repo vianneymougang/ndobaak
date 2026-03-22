@@ -5,7 +5,9 @@ import {
   signal,
   computed,
   OnInit,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -47,6 +49,7 @@ export class PaymentForm implements OnInit {
   private bookingService = inject(BookingService);
   private paymentService = inject(PaymentService);
   private messageService = inject(MessageService);
+  private destroyRef = inject(DestroyRef);
 
   protected booking = signal<BookingResponse | null>(null);
   protected loading = signal(true);
@@ -97,7 +100,7 @@ export class PaymentForm implements OnInit {
 
   ngOnInit(): void {
     const bookingId = Number(this.route.snapshot.paramMap.get('bookingId'));
-    this.bookingService.getBookingById(bookingId).subscribe({
+    this.bookingService.getBookingById(bookingId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (booking) => {
         this.booking.set(booking);
         this.loading.set(false);
@@ -133,6 +136,7 @@ export class PaymentForm implements OnInit {
         operator: operator!,
         phoneNumber: `237${phoneNumber}`,
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (payment) => {
           this.submitting.set(false);

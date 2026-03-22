@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -28,6 +29,7 @@ export class AdminUserDetail implements OnInit {
   private adminService = inject(AdminService);
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
+  private destroyRef = inject(DestroyRef);
 
   protected user = signal<AdminUserDetailData | null>(null);
   protected loading = signal(true);
@@ -40,7 +42,7 @@ export class AdminUserDetail implements OnInit {
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.adminService.getUserDetail(id).subscribe({
+    this.adminService.getUserDetail(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data: AdminUserDetailData) => { this.user.set(data); this.loading.set(false); },
       error: () => this.loading.set(false),
     });
@@ -56,7 +58,7 @@ export class AdminUserDetail implements OnInit {
     const id = this.user()?.id;
     if (!id) return;
     this.actionLoading.set(true);
-    this.adminService.deactivateUser(id, { reason: this.deactivateForm.value.reason! }).subscribe({
+    this.adminService.deactivateUser(id, { reason: this.deactivateForm.value.reason! }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.messageService.add({ severity: 'warn', summary: 'Compte désactivé', life: 3000 });
         this.deactivateDialogVisible.set(false);
@@ -71,7 +73,7 @@ export class AdminUserDetail implements OnInit {
     const id = this.user()?.id;
     if (!id) return;
     this.actionLoading.set(true);
-    this.adminService.reactivateUser(id).subscribe({
+    this.adminService.reactivateUser(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Compte réactivé', life: 3000 });
         this.reload(id);
@@ -86,7 +88,7 @@ export class AdminUserDetail implements OnInit {
   }
 
   private reload(id: number): void {
-    this.adminService.getUserDetail(id).subscribe({
+    this.adminService.getUserDetail(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => this.user.set(data),
     });
   }

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -74,6 +75,7 @@ export class Register implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
 
   protected countries = COUNTRIES;
   protected selectedCountry = signal<Country>(COUNTRIES[0]);
@@ -124,12 +126,12 @@ export class Register implements OnInit {
     const phone = this.selectedCountry().dialCode + localPhone;
 
     if (this.selectedRole() === 'STUDENT') {
-      this.authService.registerStudent({ firstName, lastName, email, phone, password }).subscribe({
+      this.authService.registerStudent({ firstName, lastName, email, phone, password }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: () => this.onSuccess(),
         error: (err) => this.onError(err),
       });
     } else {
-      this.authService.registerLandlord({ firstName, lastName, email, phone, password }).subscribe({
+      this.authService.registerLandlord({ firstName, lastName, email, phone, password }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: () => this.onSuccess(),
         error: (err) => this.onError(err),
       });

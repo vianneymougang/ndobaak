@@ -5,7 +5,9 @@ import {
   signal,
   OnInit,
   OnDestroy,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ButtonModule } from 'primeng/button';
@@ -25,6 +27,7 @@ export class PaymentProcessing implements OnInit, OnDestroy {
   private router = inject(Router);
   private paymentService = inject(PaymentService);
   private messageService = inject(MessageService);
+  private destroyRef = inject(DestroyRef);
 
   protected timedOut = signal(false);
   protected elapsedSeconds = signal(0);
@@ -71,7 +74,7 @@ export class PaymentProcessing implements OnInit, OnDestroy {
   }
 
   private checkStatus(): void {
-    this.paymentService.getPaymentsByBooking(Number(this.bookingId)).subscribe({
+    this.paymentService.getPaymentsByBooking(Number(this.bookingId)).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (payments) => {
         const payment = payments.find((p) => p.id === this.paymentId);
         if (!payment) return;

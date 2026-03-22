@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -30,6 +31,7 @@ export class AdminListingDetail implements OnInit {
   private adminService = inject(AdminService);
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
+  private destroyRef = inject(DestroyRef);
 
   protected listing = signal<ListingResponse | null>(null);
   protected loading = signal(true);
@@ -48,7 +50,7 @@ export class AdminListingDetail implements OnInit {
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.adminService.getListingDetail(id).subscribe({
+    this.adminService.getListingDetail(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => { this.listing.set(data); this.loading.set(false); },
       error: () => this.loading.set(false),
     });
@@ -58,7 +60,7 @@ export class AdminListingDetail implements OnInit {
     const id = this.listing()?.id;
     if (!id) return;
     this.actionLoading.set(true);
-    this.adminService.validateListing(id).subscribe({
+    this.adminService.validateListing(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Annonce approuvée', life: 3000 });
         this.actionLoading.set(false);
@@ -80,7 +82,7 @@ export class AdminListingDetail implements OnInit {
     this.adminService.rejectListing(id, {
       motif: this.rejectForm.value.motif!,
       additionalReason: this.rejectForm.value.additionalReason ?? undefined,
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.messageService.add({ severity: 'info', summary: 'Annonce refusée', life: 3000 });
         this.rejectDialogVisible.set(false);

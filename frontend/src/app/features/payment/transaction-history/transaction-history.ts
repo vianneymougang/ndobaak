@@ -5,7 +5,9 @@ import {
   signal,
   computed,
   effect,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
@@ -35,6 +37,7 @@ import { PaymentResponse, PaymentStatus } from '../../../core/models/payment.mod
 export class TransactionHistory {
   private paymentService = inject(PaymentService);
   private messageService = inject(MessageService);
+  private destroyRef = inject(DestroyRef);
 
   protected payments = signal<PaymentResponse[]>([]);
   protected loading = signal(true);
@@ -72,7 +75,7 @@ export class TransactionHistory {
 
   private loadPayments(page: number): void {
     this.loading.set(true);
-    this.paymentService.getPaymentHistory(page, this.pageSize).subscribe({
+    this.paymentService.getPaymentHistory(page, this.pageSize).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.payments.set(res.content);
         this.totalElements.set(res.totalElements);

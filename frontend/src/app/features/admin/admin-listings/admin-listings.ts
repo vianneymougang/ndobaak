@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TableModule } from 'primeng/table';
@@ -34,6 +35,7 @@ export class AdminListings implements OnInit {
   private adminService = inject(AdminService);
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
+  private destroyRef = inject(DestroyRef);
 
   protected listings = signal<ListingResponse[]>([]);
   protected loading = signal(true);
@@ -58,7 +60,7 @@ export class AdminListings implements OnInit {
 
   protected loadListings(): void {
     this.loading.set(true);
-    this.adminService.getPendingListings().subscribe({
+    this.adminService.getPendingListings().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => { this.listings.set(data); this.loading.set(false); },
       error: () => this.loading.set(false),
     });
@@ -66,7 +68,7 @@ export class AdminListings implements OnInit {
 
   protected validate(listingId: number): void {
     this.actionLoading.set(true);
-    this.adminService.validateListing(listingId).subscribe({
+    this.adminService.validateListing(listingId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Annonce approuvée', life: 3000 });
         this.loadListings();
@@ -90,7 +92,7 @@ export class AdminListings implements OnInit {
     this.adminService.rejectListing(id, {
       motif: this.rejectForm.value.motif!,
       additionalReason: this.rejectForm.value.additionalReason ?? undefined,
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.messageService.add({ severity: 'info', summary: 'Annonce refusée', life: 3000 });
         this.rejectDialogVisible.set(false);

@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -21,6 +22,7 @@ type ReviewQueue = 'pending' | 'flagged' | 'all';
 export class AdminReviews implements OnInit {
   private adminService = inject(AdminService);
   private messageService = inject(MessageService);
+  private destroyRef = inject(DestroyRef);
 
   protected reviews = signal<AdminReview[]>([]);
   protected loading = signal(true);
@@ -40,7 +42,7 @@ export class AdminReviews implements OnInit {
 
   private load(queue: ReviewQueue): void {
     this.loading.set(true);
-    this.adminService.getReviews(queue).subscribe({
+    this.adminService.getReviews(queue).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => { this.reviews.set(data.content); this.loading.set(false); },
       error: () => this.loading.set(false),
     });
@@ -48,7 +50,7 @@ export class AdminReviews implements OnInit {
 
   protected approve(id: number): void {
     this.actionLoading.set(true);
-    this.adminService.approveReview(id).subscribe({
+    this.adminService.approveReview(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Avis approuvé', life: 3000 });
         this.load(this.activeQueue());
@@ -60,7 +62,7 @@ export class AdminReviews implements OnInit {
 
   protected reject(id: number): void {
     this.actionLoading.set(true);
-    this.adminService.rejectReview(id).subscribe({
+    this.adminService.rejectReview(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.messageService.add({ severity: 'info', summary: 'Avis rejeté', life: 3000 });
         this.load(this.activeQueue());

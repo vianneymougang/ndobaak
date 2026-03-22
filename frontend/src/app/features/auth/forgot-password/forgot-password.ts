@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -17,6 +18,7 @@ import { AuthService } from '../../../core/services/auth';
 export class ForgotPassword {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private destroyRef = inject(DestroyRef);
 
   protected loading = signal(false);
   protected submitted = signal(false);
@@ -33,7 +35,7 @@ export class ForgotPassword {
 
     this.loading.set(true);
 
-    this.authService.forgotPassword(this.form.getRawValue().email).subscribe({
+    this.authService.forgotPassword(this.form.getRawValue().email).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.loading.set(false);
         this.submitted.set(true);

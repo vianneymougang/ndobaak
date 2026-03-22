@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TableModule } from 'primeng/table';
@@ -27,6 +28,7 @@ import { AdminUserListItem, AdminPage } from '../../../core/models/admin.models'
 })
 export class AdminUsers implements OnInit {
   private adminService = inject(AdminService);
+  private destroyRef = inject(DestroyRef);
 
   protected page = signal<AdminPage<AdminUserListItem> | null>(null);
   protected loading = signal(true);
@@ -63,6 +65,7 @@ export class AdminUsers implements OnInit {
         this.searchQuery() || undefined,
         this.currentPage(),
       )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => { this.page.set(data); this.loading.set(false); },
         error: () => this.loading.set(false),

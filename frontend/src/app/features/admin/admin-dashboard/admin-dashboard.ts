@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CardModule } from 'primeng/card';
@@ -19,6 +20,7 @@ import { GlobalStats } from '../../../core/models/admin.models';
 })
 export class AdminDashboard implements OnInit {
   private adminService = inject(AdminService);
+  private destroyRef = inject(DestroyRef);
 
   protected stats = signal<GlobalStats | null>(null);
   protected loading = signal(true);
@@ -33,7 +35,7 @@ export class AdminDashboard implements OnInit {
   };
 
   ngOnInit(): void {
-    this.adminService.getGlobalStats().subscribe({
+    this.adminService.getGlobalStats().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.stats.set(data);
         this.buildCharts(data);

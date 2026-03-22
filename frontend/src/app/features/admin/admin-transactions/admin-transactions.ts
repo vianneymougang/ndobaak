@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -25,6 +26,7 @@ import { AdminTransaction, AdminPage } from '../../../core/models/admin.models';
 })
 export class AdminTransactions implements OnInit {
   private adminService = inject(AdminService);
+  private destroyRef = inject(DestroyRef);
 
   protected page = signal<AdminPage<AdminTransaction> | null>(null);
   protected loading = signal(true);
@@ -58,6 +60,7 @@ export class AdminTransactions implements OnInit {
         this.typeFilter() || undefined,
         this.currentPage(),
       )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => { this.page.set(data); this.loading.set(false); },
         error: () => this.loading.set(false),
