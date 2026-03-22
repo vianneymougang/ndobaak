@@ -12,6 +12,8 @@ public interface PaymentGateway {
 
     PaymentInitiationResult initiatePayment(PaymentGatewayRequest request);
 
+    void triggerCharge(String providerReference, PaymentGatewayRequest request);
+
     PaymentVerificationResult verifyPayment(String reference);
 
     boolean verifyWebhookSignature(String payload, String signature);

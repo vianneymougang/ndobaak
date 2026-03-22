@@ -96,14 +96,27 @@ public class NotchPayGateway implements PaymentGateway {
                 .retrieve()
                 .body(Map.class);
 
-        String authorizationUrl = (String) response.get("authorization_url");
         Map<String, Object> transaction = (Map<String, Object>) response.get("transaction");
         String providerRef = transaction != null ? (String) transaction.get("reference") : null;
         String status = transaction != null ? (String) transaction.get("status") : "pending";
 
-        log.info("NotchPay payment initiated: providerRef={}, status={}", providerRef, status);
+        log.info("NotchPay payment initialized: providerRef={}, status={}", providerRef, status);
 
-        return new PaymentInitiationResult(providerRef, authorizationUrl, status);
+        return new PaymentInitiationResult(providerRef, null, status);
+    }
+
+    @Override
+    public void triggerCharge(String providerReference, PaymentGatewayRequest request) {
+        Map<String, Object> chargeBody = Map.of(
+                "channel", mapOperatorToChannel(request.operator()),
+                "data", Map.of("phone", request.phoneNumber())
+        );
+        restClient.post()
+                .uri("/payments/{reference}", providerReference)
+                .body(chargeBody)
+                .retrieve()
+                .toBodilessEntity();
+        log.info("NotchPay USSD push triggered: providerRef={}, phone={}", providerReference, request.phoneNumber());
     }
 
     @Override
@@ -151,7 +164,11 @@ public class NotchPayGateway implements PaymentGateway {
     public WebhookEvent parseWebhookPayload(String payload) {
         try {
             Map<String, Object> event = objectMapper.readValue(payload, new TypeReference<>() {});
+            log.debug("NotchPay webhook payload: {}", payload);
             String type = (String) event.get("type");
+            if (type == null) {
+                type = (String) event.get("event");
+            }
 
             @SuppressWarnings("unchecked")
             Map<String, Object> data = (Map<String, Object>) event.get("data");

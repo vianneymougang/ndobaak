@@ -135,19 +135,16 @@ class PaymentServiceTest {
     private InitiatePaymentRequest buildIntegralRequest() {
         InitiatePaymentRequest request = new InitiatePaymentRequest();
         request.setBookingId(1L);
-        request.setPaymentType(PaymentType.INTEGRAL);
         request.setOperator(MobileMoneyOperator.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
         return request;
     }
 
-    private InitiatePaymentRequest buildInstallmentRequest() {
+    private InitiatePaymentRequest buildSplitRequest() {
         InitiatePaymentRequest request = new InitiatePaymentRequest();
         request.setBookingId(1L);
-        request.setPaymentType(PaymentType.INSTALLMENT);
         request.setOperator(MobileMoneyOperator.ORANGE_MONEY);
         request.setPhoneNumber("+237690000000");
-        request.setInstallmentFrequency(ScheduleFrequency.MONTHLY);
         return request;
     }
 
@@ -172,6 +169,7 @@ class PaymentServiceTest {
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
         when(paymentRepository.findByBookingId(1L)).thenReturn(Collections.emptyList());
         when(scheduleRepository.findByBookingId(1L)).thenReturn(Optional.empty());
+        when(paymentProperties.getInstallmentThreshold()).thenReturn(new BigDecimal("500000"));
         when(paymentProperties.getCommissionRate()).thenReturn(new BigDecimal("0.05"));
         when(paymentProperties.getFrontendCallbackUrl()).thenReturn("http://localhost:4200/callback");
         stubGateway();
@@ -199,14 +197,14 @@ class PaymentServiceTest {
     }
 
     @Test
-    void initiateInstallmentPaymentShouldCreateSchedule() {
+    void initiateBlockPaymentShouldCreateScheduleWithTwoBlocks() {
         booking.setTotalAmount(new BigDecimal("600000"));
         when(authService.getAuthenticatedUser()).thenReturn(student);
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
         when(paymentRepository.findByBookingId(1L)).thenReturn(Collections.emptyList());
         when(scheduleRepository.findByBookingId(1L)).thenReturn(Optional.empty());
-        when(paymentProperties.getCommissionRate()).thenReturn(new BigDecimal("0.05"));
         when(paymentProperties.getInstallmentThreshold()).thenReturn(new BigDecimal("500000"));
+        when(paymentProperties.getCommissionRate()).thenReturn(new BigDecimal("0.05"));
         when(paymentProperties.getFrontendCallbackUrl()).thenReturn("http://localhost:4200/callback");
         stubGateway();
         when(paymentRepository.save(any(Payment.class))).thenAnswer(inv -> {
@@ -222,10 +220,10 @@ class PaymentServiceTest {
         when(installmentRepository.save(any(Installment.class))).thenAnswer(inv -> inv.getArgument(0));
         when(paymentMapper.toResponse(any())).thenReturn(buildDummyResponse());
 
-        paymentService.initiatePayment(buildInstallmentRequest());
+        paymentService.initiatePayment(buildSplitRequest());
 
-        verify(scheduleRepository).save(any(PaymentSchedule.class));
-        verify(installmentRepository, times(6)).save(any(Installment.class));
+        verify(scheduleRepository, times(2)).save(any(PaymentSchedule.class));
+        verify(installmentRepository, times(2)).save(any(Installment.class));
     }
 
     @Test
@@ -269,7 +267,7 @@ class PaymentServiceTest {
     }
 
     @Test
-    void initiatePaymentShouldThrowWhenAlreadyPaidIntegrally() {
+    void initiatePaymentShouldThrowWhenAlreadyPaid() {
         Payment existing = Payment.builder()
                 .status(PaymentStatus.COMPLETED)
                 .paymentType(PaymentType.INTEGRAL)
@@ -278,37 +276,11 @@ class PaymentServiceTest {
         when(authService.getAuthenticatedUser()).thenReturn(student);
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
         when(paymentRepository.findByBookingId(1L)).thenReturn(List.of(existing));
-
-        assertThatThrownBy(() -> paymentService.initiatePayment(buildIntegralRequest()))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("intégralement");
-    }
-
-    @Test
-    void initiatePaymentShouldThrowWhenScheduleAlreadyExists() {
-        when(authService.getAuthenticatedUser()).thenReturn(student);
-        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
-        when(paymentRepository.findByBookingId(1L)).thenReturn(Collections.emptyList());
-        when(scheduleRepository.findByBookingId(1L)).thenReturn(Optional.of(new PaymentSchedule()));
-
-        assertThatThrownBy(() -> paymentService.initiatePayment(buildIntegralRequest()))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("échéancier");
-    }
-
-    @Test
-    void initiateInstallmentShouldThrowWhenBelowThreshold() {
-        booking.setTotalAmount(new BigDecimal("400000"));
-
-        when(authService.getAuthenticatedUser()).thenReturn(student);
-        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
-        when(paymentRepository.findByBookingId(1L)).thenReturn(Collections.emptyList());
         when(scheduleRepository.findByBookingId(1L)).thenReturn(Optional.empty());
-        when(paymentProperties.getInstallmentThreshold()).thenReturn(new BigDecimal("500000"));
 
-        assertThatThrownBy(() -> paymentService.initiatePayment(buildInstallmentRequest()))
+        assertThatThrownBy(() -> paymentService.initiatePayment(buildIntegralRequest()))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("500");
+                .hasMessageContaining("payée");
     }
 
     @Test

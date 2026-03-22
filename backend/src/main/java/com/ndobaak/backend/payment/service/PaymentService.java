@@ -45,9 +45,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -98,60 +98,56 @@ public class PaymentService {
         validateBookingOwnership(booking, student);
         validateBookingConfirmed(booking);
         validateNoActivePayment(booking);
+        cleanupFailedScheduleIfPresent(booking);
 
-        BigDecimal paymentAmount;
-        if (request.getPaymentType() == PaymentType.INTEGRAL) {
-            paymentAmount = booking.getTotalAmount();
-        } else {
-            validateInstallmentEligibility(booking);
-            ScheduleFrequency frequency = request.getInstallmentFrequency() != null
-                    ? request.getInstallmentFrequency()
-                    : ScheduleFrequency.MONTHLY;
-            int numberOfInstallments = calculateNumberOfInstallments(booking, frequency);
-            paymentAmount = booking.getTotalAmount()
-                    .divide(BigDecimal.valueOf(numberOfInstallments), 0, RoundingMode.FLOOR);
-        }
+        BigDecimal totalAmount = booking.getTotalAmount();
+        BigDecimal threshold = paymentProperties.getInstallmentThreshold();
+        boolean isSplit = totalAmount.compareTo(threshold) > 0;
 
-        BigDecimal commission = paymentAmount
+        PaymentType paymentType = isSplit ? PaymentType.INSTALLMENT : PaymentType.INTEGRAL;
+        BigDecimal firstBlockAmount = isSplit ? threshold : totalAmount;
+
+        BigDecimal commission = firstBlockAmount
                 .multiply(paymentProperties.getCommissionRate())
                 .setScale(0, RoundingMode.CEILING);
 
         String reference = UUID.randomUUID().toString();
+        String payerName = student.getFirstName() + " " + student.getLastName();
 
         Payment payment = Payment.builder()
                 .booking(booking)
-                .amount(paymentAmount)
+                .amount(firstBlockAmount)
                 .commission(commission)
                 .paymentMethod(PaymentMethod.MOBILE_MONEY)
                 .mobileMoneyOperator(request.getOperator())
-                .paymentType(request.getPaymentType())
+                .paymentType(paymentType)
                 .transactionId(reference)
                 .status(PaymentStatus.PENDING)
                 .phoneNumber(request.getPhoneNumber())
-                .payerName(student.getFirstName() + " " + student.getLastName())
+                .payerName(payerName)
                 .build();
 
         payment = paymentRepository.save(payment);
 
-        if (request.getPaymentType() == PaymentType.INSTALLMENT) {
-            ScheduleFrequency frequency = request.getInstallmentFrequency() != null
-                    ? request.getInstallmentFrequency()
-                    : ScheduleFrequency.MONTHLY;
-            createPaymentSchedule(booking, frequency, payment);
+        if (isSplit) {
+            createBlockSchedule(booking, totalAmount, threshold, payment);
         }
 
         PaymentGateway gateway = gatewayRouter.resolveGateway(request.getOperator());
-        BigDecimal totalCharged = paymentAmount.add(commission);
+        BigDecimal totalCharged = firstBlockAmount;
+        String description = isSplit
+                ? "Bloc 1 - " + booking.getListing().getTitle()
+                : "Paiement Ndobaak - " + booking.getListing().getTitle();
 
         PaymentGatewayRequest gatewayRequest = new PaymentGatewayRequest(
                 reference,
                 totalCharged,
                 "XAF",
-                payment.getPayerName(),
+                payerName,
                 student.getEmail(),
                 request.getPhoneNumber(),
                 request.getOperator(),
-                "Paiement Ndobaak - " + booking.getListing().getTitle(),
+                description,
                 paymentProperties.getFrontendCallbackUrl()
         );
 
@@ -162,12 +158,12 @@ public class PaymentService {
         payment.setProviderReference(result.providerReference());
         paymentRepository.save(payment);
 
-        log.info("Payment initiated: reference={}, provider={}, amount={} XAF",
-                reference, gateway.getProviderName(), totalCharged);
+        gateway.triggerCharge(result.providerReference(), gatewayRequest);
 
-        PaymentResponse response = paymentMapper.toResponse(payment);
-        response.setAuthorizationUrl(result.authorizationUrl());
-        return response;
+        log.info("Payment initiated: reference={}, provider={}, amount={} XAF, split={}",
+                reference, gateway.getProviderName(), totalCharged, isSplit);
+
+        return paymentMapper.toResponse(payment);
     }
 
     @Transactional
@@ -245,7 +241,7 @@ public class PaymentService {
 
         WebhookEvent event = gateway.parseWebhookPayload(payload);
 
-        Payment payment = paymentRepository.findByTransactionId(event.reference())
+        Payment payment = paymentRepository.findByProviderReference(event.reference())
                 .orElseThrow(() -> {
                     log.warn("Webhook received for unknown reference={}", event.reference());
                     return new ResourceNotFoundException("Payment", "reference", event.reference());
@@ -257,10 +253,15 @@ public class PaymentService {
             return;
         }
 
-        switch (event.type()) {
+        String eventType = event.type();
+        if (eventType == null) {
+            log.warn("Webhook event type is null, raw payload keys: {}", event.rawData().keySet());
+            return;
+        }
+        switch (eventType) {
             case "payment.complete" -> handlePaymentComplete(payment);
             case "payment.failed" -> handlePaymentFailed(payment);
-            default -> log.warn("Unhandled webhook event type: {}", event.type());
+            default -> log.warn("Unhandled webhook event type: {}", eventType);
         }
     }
 
@@ -333,24 +334,111 @@ public class PaymentService {
         updateInstallmentStatus(payment);
 
         Booking booking = payment.getBooking();
-        String amountFormatted = formatAmount(payment.getAmount());
+        boolean nextBlockTriggered = scheduleRepository.findByBookingId(booking.getId())
+                .filter(s -> s.getFrequency() == ScheduleFrequency.BLOCK)
+                .map(s -> triggerNextBlock(payment, s))
+                .orElse(false);
+
+        if (!nextBlockTriggered) {
+            sendPaymentCompletionNotifications(payment, booking);
+        }
+    }
+
+    private boolean triggerNextBlock(Payment completedPayment, PaymentSchedule schedule) {
+        List<Installment> pendingBlocks = installmentRepository.findByPaymentScheduleId(schedule.getId())
+                .stream()
+                .filter(i -> i.getStatus() == InstallmentStatus.PENDING && i.getPayment() == null)
+                .sorted(Comparator.comparingInt(Installment::getInstallmentNumber))
+                .toList();
+
+        if (pendingBlocks.isEmpty()) {
+            sendPaymentCompletionNotifications(completedPayment, schedule.getBooking());
+            return false;
+        }
+
+        Installment nextBlock = pendingBlocks.get(0);
+        BigDecimal commission = nextBlock.getAmount()
+                .multiply(paymentProperties.getCommissionRate())
+                .setScale(0, RoundingMode.CEILING);
+
+        String reference = UUID.randomUUID().toString();
+
+        Payment nextPayment = Payment.builder()
+                .booking(completedPayment.getBooking())
+                .amount(nextBlock.getAmount())
+                .commission(commission)
+                .paymentMethod(PaymentMethod.MOBILE_MONEY)
+                .mobileMoneyOperator(completedPayment.getMobileMoneyOperator())
+                .paymentType(PaymentType.INSTALLMENT)
+                .transactionId(reference)
+                .status(PaymentStatus.PENDING)
+                .phoneNumber(completedPayment.getPhoneNumber())
+                .payerName(completedPayment.getPayerName())
+                .build();
+
+        nextPayment = paymentRepository.save(nextPayment);
+        nextBlock.setPayment(nextPayment);
+        installmentRepository.save(nextBlock);
+
+        PaymentGateway gateway = gatewayRouter.resolveGateway(completedPayment.getMobileMoneyOperator());
+        BigDecimal totalCharged = nextBlock.getAmount();
+        String description = "Bloc " + nextBlock.getInstallmentNumber()
+                + "/" + schedule.getNumberOfInstallments()
+                + " - " + completedPayment.getBooking().getListing().getTitle();
+
+        PaymentGatewayRequest gatewayRequest = new PaymentGatewayRequest(
+                reference,
+                totalCharged,
+                "XAF",
+                completedPayment.getPayerName(),
+                completedPayment.getBooking().getStudent().getEmail(),
+                completedPayment.getPhoneNumber(),
+                completedPayment.getMobileMoneyOperator(),
+                description,
+                paymentProperties.getFrontendCallbackUrl()
+        );
+
+        try {
+            PaymentInitiationResult result = gateway.initiatePayment(gatewayRequest);
+            nextPayment.setStatus(PaymentStatus.PROCESSING);
+            nextPayment.setProviderName(gateway.getProviderName());
+            nextPayment.setProviderReference(result.providerReference());
+            paymentRepository.save(nextPayment);
+            gateway.triggerCharge(result.providerReference(), gatewayRequest);
+            log.info("Next block triggered: block={}/{}, reference={}",
+                    nextBlock.getInstallmentNumber(), schedule.getNumberOfInstallments(), reference);
+        } catch (Exception e) {
+            log.error("Failed to trigger next block: block={}, error={}",
+                    nextBlock.getInstallmentNumber(), e.getMessage());
+            nextPayment.setStatus(PaymentStatus.FAILED);
+            paymentRepository.save(nextPayment);
+        }
+        return true;
+    }
+
+    private void sendPaymentCompletionNotifications(Payment payment, Booking booking) {
+        booking.setStatus(BookingStatus.PAID);
+        bookingRepository.save(booking);
+
+        String totalFormatted = formatAmount(booking.getTotalAmount());
+        String listingTitle = booking.getListing().getTitle();
 
         notificationDispatcher.dispatch(
                 booking.getStudent().getId(),
                 NotificationType.PAYMENT_RECEIVED,
                 "Paiement reçu",
-                "Votre paiement de " + amountFormatted + " FCFA pour \""
-                        + booking.getListing().getTitle() + "\" a été confirmé.",
+                "Votre paiement de " + totalFormatted + " FCFA pour \""
+                        + listingTitle + "\" a été confirmé.",
                 payment.getId(),
                 "PAYMENT",
                 Map.of(
                         "payerName", payment.getPayerName(),
-                        "amount", amountFormatted + " FCFA",
-                        "listingTitle", booking.getListing().getTitle(),
+                        "amount", totalFormatted + " FCFA",
+                        "listingTitle", listingTitle,
                         "receiptUrl", ""
                 ),
                 Map.of(
-                        "amount", amountFormatted,
+                        "amount", totalFormatted,
                         "reference", payment.getTransactionId()
                 )
         );
@@ -359,23 +447,24 @@ public class PaymentService {
                 booking.getListing().getLandlord().getId(),
                 NotificationType.PAYMENT_RECEIVED,
                 "Paiement reçu",
-                "Un paiement de " + amountFormatted + " FCFA a été reçu pour \""
-                        + booking.getListing().getTitle() + "\".",
+                "Un paiement de " + totalFormatted + " FCFA a été reçu pour \""
+                        + listingTitle + "\".",
                 payment.getId(),
                 "PAYMENT",
                 Map.of(
                         "payerName", payment.getPayerName(),
-                        "amount", amountFormatted + " FCFA",
-                        "listingTitle", booking.getListing().getTitle(),
+                        "amount", totalFormatted + " FCFA",
+                        "listingTitle", listingTitle,
                         "receiptUrl", ""
                 ),
                 Map.of(
-                        "amount", amountFormatted,
+                        "amount", totalFormatted,
                         "reference", payment.getTransactionId()
                 )
         );
 
-        log.info("Payment completed: reference={}, amount={}", payment.getTransactionId(), payment.getAmount());
+        log.info("Payment fully completed: booking={}, total={} XAF",
+                booking.getId(), booking.getTotalAmount());
     }
 
     private void handlePaymentFailed(Payment payment) {
@@ -423,56 +512,54 @@ public class PaymentService {
                 });
     }
 
-    private PaymentSchedule createPaymentSchedule(Booking booking, ScheduleFrequency frequency, Payment firstPayment) {
-        int numberOfInstallments = calculateNumberOfInstallments(booking, frequency);
-        BigDecimal installmentAmount = booking.getTotalAmount()
-                .divide(BigDecimal.valueOf(numberOfInstallments), 0, RoundingMode.FLOOR);
-        BigDecimal lastInstallmentAmount = booking.getTotalAmount()
-                .subtract(installmentAmount.multiply(BigDecimal.valueOf(numberOfInstallments - 1)));
+    private void createBlockSchedule(Booking booking, BigDecimal totalAmount, BigDecimal blockSize, Payment firstPayment) {
+        int blockCount = totalAmount.divide(blockSize, 0, RoundingMode.CEILING).intValue();
 
         PaymentSchedule schedule = PaymentSchedule.builder()
                 .booking(booking)
-                .totalAmount(booking.getTotalAmount())
-                .frequency(frequency)
-                .numberOfInstallments(numberOfInstallments)
+                .totalAmount(totalAmount)
+                .frequency(ScheduleFrequency.BLOCK)
+                .numberOfInstallments(blockCount)
                 .build();
 
         schedule = scheduleRepository.save(schedule);
 
-        List<Installment> installments = new ArrayList<>();
-        int monthIncrement = frequency == ScheduleFrequency.MONTHLY ? 1 : 3;
+        List<Installment> blocks = new ArrayList<>();
+        BigDecimal remaining = totalAmount;
 
-        for (int i = 1; i <= numberOfInstallments; i++) {
-            BigDecimal amount = (i == numberOfInstallments) ? lastInstallmentAmount : installmentAmount;
-            LocalDate dueDate = booking.getStartDate().plusMonths((long) (i - 1) * monthIncrement);
+        for (int i = 1; i <= blockCount; i++) {
+            BigDecimal blockAmount = remaining.min(blockSize);
+            remaining = remaining.subtract(blockAmount);
 
-            Installment installment = Installment.builder()
+            Installment block = Installment.builder()
                     .paymentSchedule(schedule)
                     .installmentNumber(i)
-                    .amount(amount)
-                    .dueDate(dueDate)
+                    .amount(blockAmount)
                     .status(InstallmentStatus.PENDING)
                     .build();
 
             if (i == 1) {
-                installment.setPayment(firstPayment);
+                block.setPayment(firstPayment);
             }
 
-            installments.add(installmentRepository.save(installment));
+            blocks.add(installmentRepository.save(block));
         }
 
-        schedule.setInstallments(installments);
-        return schedule;
+        schedule.setInstallments(blocks);
+        scheduleRepository.save(schedule);
     }
 
-    private int calculateNumberOfInstallments(Booking booking, ScheduleFrequency frequency) {
-        long months = java.time.temporal.ChronoUnit.MONTHS.between(booking.getStartDate(), booking.getEndDate());
-        if (months < 1) months = 1;
-
-        return switch (frequency) {
-            case MONTHLY -> (int) months;
-            case QUARTERLY -> Math.max(1, (int) (months / 3));
-        };
+    private void cleanupFailedScheduleIfPresent(Booking booking) {
+        scheduleRepository.findByBookingId(booking.getId()).ifPresent(schedule -> {
+            boolean allFailed = schedule.getInstallments().stream()
+                    .allMatch(i -> i.getPayment() == null
+                            || i.getPayment().getStatus() == PaymentStatus.FAILED);
+            if (allFailed) {
+                installmentRepository.deleteAll(schedule.getInstallments());
+                scheduleRepository.delete(schedule);
+                log.info("Cleaned up fully-failed block schedule for booking={}", booking.getId());
+            }
+        });
     }
 
     private Booking findBookingById(Long bookingId) {
@@ -501,25 +588,16 @@ public class PaymentService {
             throw new BusinessException("Un paiement est déjà en cours pour cette réservation.");
         }
 
-        boolean hasCompletedIntegral = existingPayments.stream()
-                .anyMatch(p -> p.getStatus() == PaymentStatus.COMPLETED
-                        && p.getPaymentType() == PaymentType.INTEGRAL);
-        if (hasCompletedIntegral) {
-            throw new BusinessException("Cette réservation a déjà été payée intégralement.");
-        }
-
-        boolean hasSchedule = scheduleRepository.findByBookingId(booking.getId()).isPresent();
-        if (hasSchedule) {
-            throw new BusinessException(
-                    "Un échéancier existe déjà pour cette réservation. Utilisez le paiement par échéance.");
-        }
-    }
-
-    private void validateInstallmentEligibility(Booking booking) {
-        if (booking.getTotalAmount().compareTo(paymentProperties.getInstallmentThreshold()) < 0) {
-            throw new BusinessException(
-                    "Le paiement en plusieurs fois n'est disponible qu'à partir de "
-                            + formatAmount(paymentProperties.getInstallmentThreshold()) + " FCFA.");
+        boolean hasCompleted = existingPayments.stream()
+                .anyMatch(p -> p.getStatus() == PaymentStatus.COMPLETED);
+        if (hasCompleted) {
+            boolean allBlocksCompleted = scheduleRepository.findByBookingId(booking.getId())
+                    .map(s -> s.getInstallments().stream()
+                            .allMatch(i -> i.getStatus() == InstallmentStatus.PAID))
+                    .orElse(true);
+            if (allBlocksCompleted) {
+                throw new BusinessException("Cette réservation a déjà été payée.");
+            }
         }
     }
 
