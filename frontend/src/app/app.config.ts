@@ -2,7 +2,7 @@ import { ApplicationConfig, APP_INITIALIZER, provideBrowserGlobalErrorListeners 
 import { provideRouter, withInMemoryScrolling, TitleStrategy } from '@angular/router';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { of, catchError } from 'rxjs';
@@ -14,10 +14,7 @@ import { AuthService } from './core/services/auth';
 import { AppTitleStrategy } from './core/strategies/app-title-strategy';
 
 function initAuth(authService: AuthService) {
-  return () => {
-    if (!authService.token) return of(null);
-    return authService.loadCurrentUser().pipe(catchError(() => of(null)));
-  };
+  return () => authService.loadCurrentUser().pipe(catchError(() => of(null)));
 }
 
 export const appConfig: ApplicationConfig = {
@@ -27,7 +24,11 @@ export const appConfig: ApplicationConfig = {
     { provide: TitleStrategy, useClass: AppTitleStrategy },
     provideClientHydration(withEventReplay()),
     provideAnimationsAsync(),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([authInterceptor]),
+      withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-XSRF-TOKEN' }),
+    ),
     {
       provide: APP_INITIALIZER,
       useFactory: (authService: AuthService) => initAuth(authService),

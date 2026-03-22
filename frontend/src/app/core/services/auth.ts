@@ -1,5 +1,4 @@
-import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, catchError } from 'rxjs';
@@ -18,51 +17,43 @@ import {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private platformId = inject(PLATFORM_ID);
   private apiUrl = environment.apiUrl;
 
   private currentUser = signal<UserProfile | null>(null);
-  private tokenSignal = signal<string | null>(this.getStoredToken());
 
   readonly user = this.currentUser.asReadonly();
-  readonly isAuthenticated = computed(() => !!this.tokenSignal());
+  readonly isAuthenticated = computed(() => !!this.currentUser());
   readonly userRole = computed(() => this.currentUser()?.role ?? null);
-
-  get token(): string | null {
-    return this.tokenSignal();
-  }
 
   registerStudent(request: RegisterStudentRequest): Observable<AuthResponse> {
     return this.http
-      .post<AuthResponse>(`${this.apiUrl}/auth/register/student`, request)
-      .pipe(tap((response) => this.handleAuthResponse(response)));
+      .post<AuthResponse>(`${this.apiUrl}/auth/register/student`, request, { withCredentials: true })
+      .pipe(tap(() => this.loadCurrentUser().subscribe()));
   }
 
   registerLandlord(request: RegisterLandlordRequest): Observable<AuthResponse> {
     return this.http
-      .post<AuthResponse>(`${this.apiUrl}/auth/register/landlord`, request)
-      .pipe(tap((response) => this.handleAuthResponse(response)));
+      .post<AuthResponse>(`${this.apiUrl}/auth/register/landlord`, request, { withCredentials: true })
+      .pipe(tap(() => this.loadCurrentUser().subscribe()));
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
     return this.http
-      .post<AuthResponse>(`${this.apiUrl}/auth/login`, request)
-      .pipe(tap((response) => this.handleAuthResponse(response)));
+      .post<AuthResponse>(`${this.apiUrl}/auth/login`, request, { withCredentials: true })
+      .pipe(tap(() => this.loadCurrentUser().subscribe()));
   }
 
   loadCurrentUser(): Observable<UserProfile> {
-    return this.http.get<UserProfile>(`${this.apiUrl}/auth/me`).pipe(
+    return this.http.get<UserProfile>(`${this.apiUrl}/auth/me`, { withCredentials: true }).pipe(
       tap((user) => this.currentUser.set(user)),
       catchError((err) => {
-        this.logout();
+        this.currentUser.set(null);
         throw err;
       }),
     );
   }
 
-  handleOAuthCallback(token: string, refreshToken: string): Observable<UserProfile> {
-    this.setStoredTokens(token, refreshToken);
-    this.tokenSignal.set(token);
+  handleOAuthCallback(): Observable<UserProfile> {
     return this.loadCurrentUser();
   }
 
@@ -75,31 +66,15 @@ export class AuthService {
   }
 
   logout(): void {
-    this.clearStoredTokens();
-    this.tokenSignal.set(null);
-    this.currentUser.set(null);
-    this.router.navigate(['/']);
-  }
-
-  private handleAuthResponse(response: AuthResponse): void {
-    this.setStoredTokens(response.accessToken, response.refreshToken);
-    this.tokenSignal.set(response.accessToken);
-  }
-
-  private getStoredToken(): string | null {
-    if (!isPlatformBrowser(this.platformId)) return null;
-    return localStorage.getItem('access_token');
-  }
-
-  private setStoredTokens(accessToken: string, refreshToken: string): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-    localStorage.setItem('access_token', accessToken);
-    localStorage.setItem('refresh_token', refreshToken);
-  }
-
-  private clearStoredTokens(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+    this.http.post(`${this.apiUrl}/auth/logout`, {}, { withCredentials: true }).subscribe({
+      complete: () => {
+        this.currentUser.set(null);
+        this.router.navigate(['/']);
+      },
+      error: () => {
+        this.currentUser.set(null);
+        this.router.navigate(['/']);
+      },
+    });
   }
 }
