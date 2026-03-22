@@ -1,11 +1,13 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  DestroyRef,
   inject,
   signal,
   computed,
   effect,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { TabsModule } from 'primeng/tabs';
 import { PaginatorModule } from 'primeng/paginator';
@@ -41,6 +43,7 @@ import { BookingResponse, BookingStatus } from '../../../core/models/booking.mod
 export class LandlordBookings {
   private bookingService = inject(BookingService);
   private messageService = inject(MessageService);
+  private destroyRef = inject(DestroyRef);
 
   protected activeTab = signal(1);
   protected bookings = signal<BookingResponse[]>([]);
@@ -91,7 +94,7 @@ export class LandlordBookings {
     const status = this.tabStatuses[tab];
     this.loading.set(true);
     this.bookings.set([]);
-    this.bookingService.getLandlordBookings(status, page, this.pageSize).subscribe({
+    this.bookingService.getLandlordBookings(status, page, this.pageSize).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.bookings.set(res.content);
         this.totalElements.set(res.totalElements);
@@ -123,7 +126,7 @@ export class LandlordBookings {
 
   protected confirmBooking(id: number): void {
     this.confirming.set(true);
-    this.bookingService.confirmBooking(id).subscribe({
+    this.bookingService.confirmBooking(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.confirming.set(false);
         this.messageService.add({
@@ -155,7 +158,7 @@ export class LandlordBookings {
     if (!id) return;
     this.rejecting.set(true);
     const reason = this.rejectReason().trim() || undefined;
-    this.bookingService.rejectBooking(id, reason).subscribe({
+    this.bookingService.rejectBooking(id, reason).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.rejecting.set(false);
         this.rejectDialogVisible.set(false);
@@ -187,7 +190,7 @@ export class LandlordBookings {
     const id = this.cancellingId();
     if (!id) return;
     this.cancelling.set(true);
-    this.bookingService.cancelBooking(id).subscribe({
+    this.bookingService.cancelBooking(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.cancelling.set(false);
         this.cancelDialogVisible.set(false);
