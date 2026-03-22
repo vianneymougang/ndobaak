@@ -35,59 +35,13 @@
         }
 
         <form [formGroup]="form" (ngSubmit)="submit()" class="payment-form">
-          <section class="form-section">
-            <h2 class="section-title">Mode de paiement</h2>
-
-            <div class="payment-type-cards">
-              <label class="type-card" [class.type-card--active]="form.controls.paymentType.value === 'INTEGRAL'">
-                <p-radioButton
-                  formControlName="paymentType"
-                  value="INTEGRAL"
-                  (onClick)="onPaymentTypeChange()"
-                />
-                <div class="type-card-content">
-                  <span class="type-card-label">Paiement intégral</span>
-                  <span class="type-card-desc">Réglez la totalité en une seule fois</span>
-                </div>
-              </label>
-
-              <label class="type-card" [class.type-card--active]="form.controls.paymentType.value === 'INSTALLMENT'">
-                <p-radioButton
-                  formControlName="paymentType"
-                  value="INSTALLMENT"
-                  (onClick)="onPaymentTypeChange()"
-                />
-                <div class="type-card-content">
-                  <span class="type-card-label">Paiement échelonné</span>
-                  <span class="type-card-desc">Répartissez vos paiements sur la durée</span>
-                </div>
-              </label>
-            </div>
-
-            @if (isInstallment()) {
-              <div class="field-wrap">
-                <p-floatlabel>
-                  <p-select
-                    formControlName="installmentFrequency"
-                    [options]="frequencyOptions"
-                    optionLabel="label"
-                    optionValue="value"
-                    inputId="frequency"
-                    [invalid]="form.controls.installmentFrequency.invalid && form.controls.installmentFrequency.touched"
-                  />
-                  <label for="frequency">Fréquence</label>
-                </p-floatlabel>
-                @if (form.controls.installmentFrequency.invalid && form.controls.installmentFrequency.touched) {
-                  <small class="field-error">
-                    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-                    Veuillez choisir une fréquence de paiement
-                  </small>
-                }
-              </div>
-            }
-          </section>
-
-          <p-divider />
+          @if (needsSplitPayment()) {
+            <p-message
+              severity="info"
+              styleClass="block mb-4"
+              [text]="'Votre paiement sera effectué en ' + blockCount() + ' tranches de 500 000 FCFA maximum. Vous recevrez une demande de validation pour chaque tranche successivement.'"
+            />
+          }
 
           <section class="form-section">
             <h2 class="section-title">Mobile Money</h2>
@@ -104,6 +58,7 @@
                     optionLabel="label"
                     optionValue="value"
                     inputId="operator"
+                    [fluid]="true"
                     [invalid]="form.controls.operator.invalid && form.controls.operator.touched"
                   />
                   <label for="operator">Opérateur</label>
@@ -123,6 +78,7 @@
                     mask="+237 999 999 999"
                     placeholder="+237 6XX XXX XXX"
                     inputId="phone"
+                    [fluid]="true"
                     [invalid]="form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched"
                     [unmask]="true"
                   />

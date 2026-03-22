@@ -6,16 +6,14 @@ export type PaymentType = 'INTEGRAL' | 'INSTALLMENT';
 
 export type MobileMoneyOperator = 'MTN_MOMO' | 'ORANGE_MONEY';
 
-export type ScheduleFrequency = 'MONTHLY' | 'QUARTERLY';
+export type ScheduleFrequency = 'MONTHLY' | 'QUARTERLY' | 'BLOCK';
 
 export type InstallmentStatus = 'PENDING' | 'PAID' | 'OVERDUE' | 'CANCELLED';
 
 export interface InitiatePaymentRequest {
   bookingId: number;
-  paymentType: PaymentType;
   operator: MobileMoneyOperator;
   phoneNumber: string;
-  installmentFrequency?: ScheduleFrequency;
 }
 
 export interface PayInstallmentRequest {

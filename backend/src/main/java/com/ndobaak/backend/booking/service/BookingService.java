@@ -81,6 +81,7 @@ public class BookingService {
                 .listing(listing)
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
+                .contractDuration((int) months)
                 .monthlyRent(monthlyRent)
                 .totalAmount(totalAmount)
                 .status(BookingStatus.PENDING)

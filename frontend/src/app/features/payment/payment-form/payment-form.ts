@@ -10,7 +10,6 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
-import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputMaskModule } from 'primeng/inputmask';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { DividerModule } from 'primeng/divider';
@@ -21,11 +20,7 @@ import { MessageService } from 'primeng/api';
 import { BookingService } from '../../../core/services/booking';
 import { PaymentService } from '../../../core/services/payment';
 import { BookingResponse } from '../../../core/models/booking.models';
-import {
-  MobileMoneyOperator,
-  PaymentType,
-  ScheduleFrequency,
-} from '../../../core/models/payment.models';
+import { MobileMoneyOperator } from '../../../core/models/payment.models';
 
 @Component({
   selector: 'app-payment-form',
@@ -34,7 +29,6 @@ import {
     RouterLink,
     ButtonModule,
     SelectModule,
-    RadioButtonModule,
     InputMaskModule,
     FloatLabelModule,
     DividerModule,
@@ -59,24 +53,27 @@ export class PaymentForm implements OnInit {
   protected submitting = signal(false);
   protected apiError = signal<string | null>(null);
 
+  protected readonly BLOCK_THRESHOLD = 500_000;
+
   protected readonly operatorOptions: { label: string; value: MobileMoneyOperator }[] = [
     { label: 'MTN Mobile Money', value: 'MTN_MOMO' },
     { label: 'Orange Money', value: 'ORANGE_MONEY' },
   ];
 
-  protected readonly frequencyOptions: { label: string; value: ScheduleFrequency }[] = [
-    { label: 'Mensuel', value: 'MONTHLY' },
-    { label: 'Trimestriel', value: 'QUARTERLY' },
-  ];
-
   protected form = this.fb.nonNullable.group({
-    paymentType: ['INTEGRAL' as PaymentType, Validators.required],
     operator: [null as MobileMoneyOperator | null, Validators.required],
     phoneNumber: ['', [Validators.required, Validators.pattern(/^6[0-9]{8}$/)]],
-    installmentFrequency: [null as ScheduleFrequency | null],
   });
 
-  protected isInstallment = signal(false);
+  protected needsSplitPayment = computed(() => {
+    const b = this.booking();
+    return b ? b.totalAmount > this.BLOCK_THRESHOLD : false;
+  });
+
+  protected blockCount = computed(() => {
+    const b = this.booking();
+    return b ? Math.ceil(b.totalAmount / this.BLOCK_THRESHOLD) : 0;
+  });
 
   protected formattedMonthlyRent = computed(() => {
     const b = this.booking();
@@ -116,20 +113,6 @@ export class PaymentForm implements OnInit {
     });
   }
 
-  protected onPaymentTypeChange(): void {
-    const isInst = this.form.controls.paymentType.value === 'INSTALLMENT';
-    this.isInstallment.set(isInst);
-
-    const ctrl = this.form.controls.installmentFrequency;
-    if (isInst) {
-      ctrl.setValidators(Validators.required);
-    } else {
-      ctrl.clearValidators();
-      ctrl.setValue(null);
-    }
-    ctrl.updateValueAndValidity();
-  }
-
   protected submit(): void {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
@@ -143,14 +126,12 @@ export class PaymentForm implements OnInit {
     this.submitting.set(true);
     this.apiError.set(null);
 
-    const { paymentType, operator, phoneNumber, installmentFrequency } = this.form.getRawValue();
+    const { operator, phoneNumber } = this.form.getRawValue();
     this.paymentService
       .initiatePayment({
         bookingId: booking.id,
-        paymentType,
         operator: operator!,
         phoneNumber: `237${phoneNumber}`,
-        installmentFrequency: installmentFrequency ?? undefined,
       })
       .subscribe({
         next: (payment) => {

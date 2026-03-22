@@ -76,46 +76,14 @@
   color: var(--color-ndb-muted);
 }
 
-.payment-type-cards {
-  @apply flex flex-col gap-3;
-
-  @media (min-width: 640px) {
-    @apply flex-row;
-  }
-}
-
-.type-card {
-  @apply flex items-start gap-3 p-4 rounded-xl cursor-pointer flex-1;
-  border: 2px solid var(--color-ndb-border);
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: color-mix(in srgb, var(--color-ndb-gold) 50%, transparent);
-  }
-
-  &--active {
-    border-color: var(--color-ndb-gold);
-    background: color-mix(in srgb, var(--color-ndb-gold) 4%, transparent);
-  }
-}
-
-.type-card-content {
-  @apply flex flex-col gap-0.5;
-}
-
-.type-card-label {
-  @apply text-sm font-semibold;
-  font-family: var(--font-urbanist);
-  color: var(--color-ndb-navy);
-}
-
-.type-card-desc {
-  @apply text-xs;
-  color: var(--color-ndb-muted);
-}
-
 .form-fields {
-  @apply flex flex-col gap-7 pt-3;
+  @apply flex flex-col gap-8 pt-4;
+
+  p-floatlabel,
+  p-select,
+  p-inputmask {
+    width: 100%;
+  }
 }
 
 .submit-desktop {

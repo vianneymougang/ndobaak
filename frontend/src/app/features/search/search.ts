@@ -24,8 +24,7 @@ import { GeolocationService } from '../../core/services/geolocation';
 import { ListingSearchResponse, NearbyListingResponse } from '../../core/models/listing.models';
 import { ListingCard } from '../../shared/components/listing-card/listing-card';
 import { environment } from '../../../environments/environment';
-
-import { L } from '../../core/utils/leaflet-fix';
+import type * as LeafletNS from 'leaflet';
 
 const MAX_PRICE = 300_000;
 
@@ -55,10 +54,11 @@ export class Search implements OnInit {
   private geolocationService = inject(GeolocationService);
 
   protected mapContainer = viewChild<ElementRef>('mapContainer');
-  private map: L.Map | null = null;
-  private markers: L.Marker[] = [];
-  private userMarker: L.CircleMarker | null = null;
-  private radiusCircle: L.Circle | null = null;
+  private L: typeof LeafletNS | null = null;
+  private map: LeafletNS.Map | null = null;
+  private markers: LeafletNS.Marker[] = [];
+  private userMarker: LeafletNS.CircleMarker | null = null;
+  private radiusCircle: LeafletNS.Circle | null = null;
 
   protected results = signal<ListingSearchResponse[]>([]);
   protected totalElements = signal(0);
@@ -135,16 +135,15 @@ export class Search implements OnInit {
   }
 
   ngOnInit(): void {
-    this.geolocationService.requestPosition().subscribe(() => {
-      this.route.queryParams.subscribe((params) => {
-        this.keyword = params['keyword'] ?? '';
-        this.roomType = params['roomType'] ?? '';
-        this.priceMin = params['priceMin'] ? +params['priceMin'] : null;
-        this.priceMax = params['priceMax'] ? +params['priceMax'] : null;
-        this.sortBy = params['sortBy'] ?? '';
-        this.priceRange = [this.priceMin ?? 0, this.priceMax ?? MAX_PRICE];
-        this.doSearch();
-      });
+    this.geolocationService.requestPosition().subscribe();
+    this.route.queryParams.subscribe((params) => {
+      this.keyword = params['keyword'] ?? '';
+      this.roomType = params['roomType'] ?? '';
+      this.priceMin = params['priceMin'] ? +params['priceMin'] : null;
+      this.priceMax = params['priceMax'] ? +params['priceMax'] : null;
+      this.sortBy = params['sortBy'] ?? '';
+      this.priceRange = [this.priceMin ?? 0, this.priceMax ?? MAX_PRICE];
+      this.doSearch();
     });
   }
 
@@ -202,16 +201,15 @@ export class Search implements OnInit {
   protected doSearch(): void {
     this.drawerVisible.set(false);
     this.loading.set(true);
-    const pos = this.geolocationService.position();
     const filters: Record<string, unknown> = {
       keyword: this.keyword || null,
       roomType: this.roomType || null,
       priceMin: this.priceMin,
       priceMax: this.priceMax,
       sortBy: this.sortBy || null,
-      userLat: pos?.latitude ?? null,
-      userLng: pos?.longitude ?? null,
-      maxDistance: pos ? this.activeRadius() : null,
+      userLat: CAMPUS_LAT,
+      userLng: CAMPUS_LNG,
+      maxDistance: this.activeRadius(),
       page: this.page,
       size: this.size,
     };
@@ -283,10 +281,12 @@ export class Search implements OnInit {
     return value >= 1000 ? `${Math.round(value / 1000)}k FCFA` : `${value} FCFA`;
   }
 
-  private initMap(): void {
-    if (typeof L === 'undefined') return;
+  private async initMap(): Promise<void> {
     const el = this.mapContainer()?.nativeElement;
     if (!el) return;
+
+    const { L } = await import('../../core/utils/leaflet-fix');
+    this.L = L;
 
     this.map = L.map(el).setView([CAMPUS_LAT, CAMPUS_LNG], 14);
     if (!environment.production) {
@@ -320,7 +320,9 @@ export class Search implements OnInit {
   }
 
   private updateUserMarker(): void {
-    if (!this.map) return;
+    if (!this.map || !this.L) return;
+    const L = this.L;
+
     if (this.userMarker) {
       this.userMarker.remove();
       this.userMarker = null;
@@ -340,16 +342,15 @@ export class Search implements OnInit {
   }
 
   private updateRadiusCircle(): void {
-    if (!this.map) return;
+    if (!this.map || !this.L) return;
+    const L = this.L;
+
     if (this.radiusCircle) {
       this.radiusCircle.remove();
       this.radiusCircle = null;
     }
 
-    const pos = this.geolocationService.position();
-    if (!pos) return;
-
-    this.radiusCircle = L.circle([pos.latitude, pos.longitude], {
+    this.radiusCircle = L.circle([CAMPUS_LAT, CAMPUS_LNG], {
       radius: this.activeRadius() * 1000,
       fillColor: '#4A90D9',
       fillOpacity: 0.08,
@@ -360,7 +361,8 @@ export class Search implements OnInit {
   }
 
   private updateMapMarkers(listings: ListingSearchResponse[]): void {
-    if (!this.map) return;
+    if (!this.map || !this.L) return;
+    const L = this.L;
 
     this.markers.forEach((m) => m.remove());
     this.markers = [];

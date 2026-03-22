@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Observable, of, Subject } from 'rxjs';
 
 export interface UserPosition {
@@ -14,11 +15,17 @@ export class GeolocationService {
   private static readonly MAX_AGE_MS = 300_000;
   private static readonly TIMEOUT_MS = 10_000;
 
+  private platformId = inject(PLATFORM_ID);
+
   readonly position = signal<UserPosition | null>(this.loadFromSession());
   readonly denied = signal(false);
   readonly loading = signal(false);
 
   requestPosition(): Observable<UserPosition | null> {
+    if (!isPlatformBrowser(this.platformId)) {
+      return of(null);
+    }
+
     const cached = this.loadFromSession();
     if (cached) {
       this.position.set(cached);
