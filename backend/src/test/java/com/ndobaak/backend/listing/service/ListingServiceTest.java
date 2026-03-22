@@ -24,7 +24,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -347,6 +349,73 @@ class ListingServiceTest {
 
         assertThatThrownBy(() -> listingService.deletePhoto(1L, 10L))
                 .isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    void uploadPhotoWithValidPngShouldSucceed() throws IOException {
+        Landlord landlord = buildLandlord(2L);
+        Listing listing = Listing.builder().title("Test").landlord(landlord).build();
+        listing.setId(1L);
+
+        byte[] pngContent = new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x00};
+        MockMultipartFile file = new MockMultipartFile("file", "photo.png", "image/png", pngContent);
+
+        when(listingRepository.findByIdWithDetails(1L)).thenReturn(Optional.of(listing));
+        when(authService.getAuthenticatedUser()).thenReturn(landlord);
+        when(photoRepository.countByListingId(1L)).thenReturn(0);
+        when(imageProcessingService.process(any())).thenReturn(
+                new ImageProcessingService.ProcessedImages(new byte[100], new byte[50], new byte[25]));
+        when(storageService.upload(anyString(), anyString(), any(), anyLong(), anyString())).thenReturn("key");
+        when(photoRepository.findMaxDisplayOrderByListingId(1L)).thenReturn(Optional.empty());
+        when(photoRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(listingRepository.findByIdWithDetails(1L)).thenReturn(Optional.of(listing));
+        when(listingMapper.toResponse(any(), eq(false))).thenReturn(DUMMY_RESPONSE);
+
+        ListingResponse result = listingService.uploadPhoto(1L, file);
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    void uploadPhotoWithPdfShouldThrow() {
+        byte[] pdfContent = new byte[]{0x25, 0x50, 0x44, 0x46};
+        MockMultipartFile file = new MockMultipartFile("file", "doc.pdf", "application/pdf", pdfContent);
+
+        assertThatThrownBy(() -> listingService.uploadPhoto(1L, file))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("Format de fichier non accepté");
+    }
+
+    @Test
+    void uploadPhotoTooLargeShouldThrow() {
+        byte[] largeContent = new byte[11 * 1024 * 1024];
+        largeContent[0] = (byte) 0x89;
+        largeContent[1] = 0x50;
+        largeContent[2] = 0x4E;
+        largeContent[3] = 0x47;
+        MockMultipartFile file = new MockMultipartFile("file", "big.png", "image/png", largeContent);
+
+        assertThatThrownBy(() -> listingService.uploadPhoto(1L, file))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("taille maximale");
+    }
+
+    @Test
+    void uploadPhotoEmptyShouldThrow() {
+        MockMultipartFile file = new MockMultipartFile("file", "empty.png", "image/png", new byte[0]);
+
+        assertThatThrownBy(() -> listingService.uploadPhoto(1L, file))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("vide");
+    }
+
+    @Test
+    void uploadPhotoWithFakeMimeShouldThrow() {
+        byte[] exeContent = new byte[]{0x4D, 0x5A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        MockMultipartFile file = new MockMultipartFile("file", "hack.jpg", "image/jpeg", exeContent);
+
+        assertThatThrownBy(() -> listingService.uploadPhoto(1L, file))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("Format de fichier non accepté");
     }
 
     private Landlord buildLandlord(Long id) {
