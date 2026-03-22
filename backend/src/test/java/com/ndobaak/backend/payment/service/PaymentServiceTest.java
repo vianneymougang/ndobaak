@@ -366,7 +366,7 @@ class PaymentServiceTest {
         when(gatewayRouter.resolveGatewayByProvider("mock")).thenReturn(gateway);
         when(gateway.verifyWebhookSignature("payload", "sig")).thenReturn(true);
         when(gateway.parseWebhookPayload("payload")).thenReturn(event);
-        when(paymentRepository.findByTransactionId("ref-123")).thenReturn(Optional.of(payment));
+        when(paymentRepository.findByProviderReference("ref-123")).thenReturn(Optional.of(payment));
         when(scheduleRepository.findByBookingId(1L)).thenReturn(Optional.empty());
 
         paymentService.handleWebhook("mock", "payload", "sig");
@@ -394,7 +394,7 @@ class PaymentServiceTest {
         when(gatewayRouter.resolveGatewayByProvider("mock")).thenReturn(gateway);
         when(gateway.verifyWebhookSignature("payload", "sig")).thenReturn(true);
         when(gateway.parseWebhookPayload("payload")).thenReturn(event);
-        when(paymentRepository.findByTransactionId("ref-456")).thenReturn(Optional.of(payment));
+        when(paymentRepository.findByProviderReference("ref-456")).thenReturn(Optional.of(payment));
 
         paymentService.handleWebhook("mock", "payload", "sig");
 
@@ -429,7 +429,7 @@ class PaymentServiceTest {
         when(gatewayRouter.resolveGatewayByProvider("mock")).thenReturn(gateway);
         when(gateway.verifyWebhookSignature("payload", "sig")).thenReturn(true);
         when(gateway.parseWebhookPayload("payload")).thenReturn(event);
-        when(paymentRepository.findByTransactionId("ref-789")).thenReturn(Optional.of(payment));
+        when(paymentRepository.findByProviderReference("ref-789")).thenReturn(Optional.of(payment));
 
         paymentService.handleWebhook("mock", "payload", "sig");
 
