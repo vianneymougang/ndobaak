@@ -9,6 +9,7 @@ import com.ndobaak.backend.common.enums.UserRole;
 import com.ndobaak.backend.common.exception.DuplicateResourceException;
 import com.ndobaak.backend.common.exception.UnauthorizedException;
 import com.ndobaak.backend.common.security.JwtAuthenticationFilter;
+import com.ndobaak.backend.common.security.JwtProperties;
 import com.ndobaak.backend.common.security.OAuth2AuthenticationFailureHandler;
 import com.ndobaak.backend.common.security.OAuth2AuthenticationSuccessHandler;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,8 @@ class AuthControllerTest {
     private PasswordResetService passwordResetService;
     @MockitoBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @MockitoBean
+    private JwtProperties jwtProperties;
     @MockitoBean
     private CustomOAuth2UserService customOAuth2UserService;
     @MockitoBean
