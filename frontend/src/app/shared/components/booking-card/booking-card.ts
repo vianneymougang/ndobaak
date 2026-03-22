@@ -52,6 +52,7 @@ export class BookingCard {
     const map: Record<BookingStatus, 'warn' | 'success' | 'danger' | 'info' | 'secondary'> = {
       PENDING: 'warn',
       CONFIRMED: 'success',
+      PAID: 'info',
       CANCELLED: 'danger',
       COMPLETED: 'info',
       EXPIRED: 'secondary',
@@ -63,6 +64,7 @@ export class BookingCard {
     const map: Record<BookingStatus, string> = {
       PENDING: 'En attente',
       CONFIRMED: 'Confirmée',
+      PAID: 'Payée',
       CANCELLED: 'Annulée',
       COMPLETED: 'Terminée',
       EXPIRED: 'Expirée',

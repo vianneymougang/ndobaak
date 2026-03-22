@@ -47,6 +47,9 @@ public class Booking extends BaseEntity {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
+    @Column(name = "contract_duration", nullable = false)
+    private Integer contractDuration;
+
     @Column(name = "monthly_rent", precision = 12, scale = 0)
     private BigDecimal monthlyRent;
 

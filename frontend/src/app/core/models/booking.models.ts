@@ -19,7 +19,7 @@ export interface BookingStudentSummary {
   profilePhotoUrl: string | null;
 }
 
-export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'EXPIRED' | 'COMPLETED';
+export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'PAID' | 'CANCELLED' | 'EXPIRED' | 'COMPLETED';
 
 export interface BookingResponse {
   id: number;
