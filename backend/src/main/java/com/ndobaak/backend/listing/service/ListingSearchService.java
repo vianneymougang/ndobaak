@@ -12,6 +12,9 @@ import com.ndobaak.backend.listing.repository.ListingRepository;
 import com.ndobaak.backend.listing.repository.ReviewRepository;
 import com.ndobaak.backend.media.service.StorageService;
 import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,8 @@ import java.util.Map;
 
 @Service
 public class ListingSearchService {
+
+    private static final int MAX_OVERSIZED_WINDOW = 500;
 
     private final ListingRepository listingRepository;
     private final ReviewRepository reviewRepository;
@@ -40,12 +45,47 @@ public class ListingSearchService {
     @Transactional(readOnly = true)
     public SearchPageResponse<ListingSearchResponse> search(ListingSearchRequest request) {
         Specification<Listing> spec = buildSpecification(request);
-        List<Listing> dbResults = listingRepository.findAll(spec);
+        boolean needsPostFilter = hasPostFilters(request);
+        boolean needsComplexSort = needsComplexSorting(request.getSortBy());
 
-        List<Long> listingIds = dbResults.stream().map(Listing::getId).toList();
+        if (!needsPostFilter && !needsComplexSort) {
+            return searchWithDbPagination(spec, request);
+        }
+        return searchWithOversizedWindow(spec, request);
+    }
+
+    private SearchPageResponse<ListingSearchResponse> searchWithDbPagination(
+            Specification<Listing> spec, ListingSearchRequest request) {
+        Sort sort = resolveDbSort(request.getSortBy());
+        PageRequest pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
+        Page<Listing> page = listingRepository.findAll(spec, pageable);
+
+        List<Long> listingIds = page.getContent().stream().map(Listing::getId).toList();
         Map<Long, double[]> ratingsMap = loadRatings(listingIds);
 
-        List<ListingSearchResponse> results = dbResults.stream()
+        List<ListingSearchResponse> results = page.getContent().stream()
+                .map(listing -> toSearchResponse(listing, ratingsMap, request))
+                .toList();
+
+        return SearchPageResponse.<ListingSearchResponse>builder()
+                .content(results)
+                .totalElements((int) page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .page(request.getPage())
+                .size(request.getSize())
+                .build();
+    }
+
+    private SearchPageResponse<ListingSearchResponse> searchWithOversizedWindow(
+            Specification<Listing> spec, ListingSearchRequest request) {
+        int windowSize = Math.min(request.getSize() * 3, MAX_OVERSIZED_WINDOW);
+        PageRequest pageable = PageRequest.of(0, windowSize);
+        Page<Listing> page = listingRepository.findAll(spec, pageable);
+
+        List<Long> listingIds = page.getContent().stream().map(Listing::getId).toList();
+        Map<Long, double[]> ratingsMap = loadRatings(listingIds);
+
+        List<ListingSearchResponse> results = page.getContent().stream()
                 .map(listing -> toSearchResponse(listing, ratingsMap, request))
                 .toList();
 
@@ -53,10 +93,10 @@ public class ListingSearchService {
         results = applySorting(results, request.getSortBy());
 
         int totalElements = results.size();
-        int page = request.getPage();
+        int pageNum = request.getPage();
         int size = request.getSize();
         int totalPages = (int) Math.ceil((double) totalElements / size);
-        int fromIndex = Math.min(page * size, totalElements);
+        int fromIndex = Math.min(pageNum * size, totalElements);
         int toIndex = Math.min(fromIndex + size, totalElements);
 
         List<ListingSearchResponse> pageContent = results.subList(fromIndex, toIndex);
@@ -65,9 +105,32 @@ public class ListingSearchService {
                 .content(pageContent)
                 .totalElements(totalElements)
                 .totalPages(totalPages)
-                .page(page)
+                .page(pageNum)
                 .size(size)
                 .build();
+    }
+
+    private boolean hasPostFilters(ListingSearchRequest request) {
+        return request.getMaxDistance() != null
+                || request.getMinRating() != null
+                || (request.getAmenities() != null && !request.getAmenities().isEmpty());
+    }
+
+    private boolean needsComplexSorting(String sortBy) {
+        if (sortBy == null) return false;
+        return switch (sortBy.toUpperCase()) {
+            case "DISTANCE_ASC", "RATING_DESC" -> true;
+            default -> false;
+        };
+    }
+
+    private Sort resolveDbSort(String sortBy) {
+        if (sortBy == null) return Sort.by(Sort.Direction.DESC, "createdAt");
+        return switch (sortBy.toUpperCase()) {
+            case "PRICE_ASC" -> Sort.by(Sort.Direction.ASC, "monthlyPrice");
+            case "PRICE_DESC" -> Sort.by(Sort.Direction.DESC, "monthlyPrice");
+            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+        };
     }
 
     private Specification<Listing> buildSpecification(ListingSearchRequest request) {
