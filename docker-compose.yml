@@ -70,6 +70,9 @@ services:
       dockerfile: Dockerfile
     container_name: ndobaak-backend
     restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     ports:
       - "8080:8080"
     environment:
@@ -82,6 +85,9 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-dev-placeholder}
       JWT_SECRET: ${JWT_SECRET:-ndobaak-dev-secret-key-change-in-production-2026}
       APP_STORAGE_ENDPOINT: http://minio:9000
+      PAYMENT_GATEWAY: ${PAYMENT_GATEWAY:-mock}
+      NOTCHPAY_PUBLIC_KEY: ${NOTCHPAY_PUBLIC_KEY:-}
+      NOTCHPAY_WEBHOOK_HASH: ${NOTCHPAY_WEBHOOK_HASH:-}
     depends_on:
       postgres:
         condition: service_healthy
