@@ -10,16 +10,16 @@
       @if (l.photos.length > 0) {
         <div class="photo-grid">
           <div class="photo-main">
-            <img [src]="l.photos[0].mediumUrl || l.photos[0].url" [alt]="l.title" />
+            <img [src]="l.photos[0].mediumUrl || l.photos[0].url" [alt]="l.title" fetchpriority="high" />
           </div>
           @if (l.photos.length > 1) {
             <div class="photo-secondary">
-              <img [src]="l.photos[1].mediumUrl || l.photos[1].url" [alt]="l.title" />
+              <img [src]="l.photos[1].mediumUrl || l.photos[1].url" [alt]="l.title" loading="lazy" />
             </div>
           }
           @if (l.photos.length > 2) {
             <div class="photo-secondary">
-              <img [src]="l.photos[2].mediumUrl || l.photos[2].url" [alt]="l.title" />
+              <img [src]="l.photos[2].mediumUrl || l.photos[2].url" [alt]="l.title" loading="lazy" />
             </div>
           }
           @if (l.photos.length > 3) {
@@ -27,7 +27,7 @@
               class="photo-secondary photo-overlay-more"
               [attr.data-extra]="l.photos.length - 3"
             >
-              <img [src]="l.photos[3].mediumUrl || l.photos[3].url" [alt]="l.title" />
+              <img [src]="l.photos[3].mediumUrl || l.photos[3].url" [alt]="l.title" loading="lazy" />
             </div>
           }
         </div>
