@@ -17,6 +17,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
@@ -46,7 +48,7 @@ class ListingSearchServiceTest {
     @Test
     void searchShouldReturnPaginatedResults() {
         Listing listing = buildPublishedListing(1L, "Studio Eyang", new BigDecimal("35000"), RoomType.STUDIO);
-        when(listingRepository.findAll(any(Specification.class))).thenReturn(List.of(listing));
+        when(listingRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(listing)));
         when(reviewRepository.findAverageRatingsByListingIds(List.of(1L), ReviewStatus.APPROVED))
                 .thenReturn(Collections.emptyList());
 
@@ -71,8 +73,8 @@ class ListingSearchServiceTest {
         farListing.setLocation(Location.builder()
                 .address("Douala").latitude(4.05).longitude(9.7).distanceToCampus(200.0).build());
 
-        when(listingRepository.findAll(any(Specification.class)))
-                .thenReturn(List.of(nearListing, farListing));
+        when(listingRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(nearListing, farListing)));
         when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
@@ -92,8 +94,8 @@ class ListingSearchServiceTest {
         Listing cheapListing = buildPublishedListing(1L, "Cheap", new BigDecimal("25000"), RoomType.SINGLE_ROOM);
         Listing expensiveListing = buildPublishedListing(2L, "Expensive", new BigDecimal("75000"), RoomType.APARTMENT);
 
-        when(listingRepository.findAll(any(Specification.class)))
-                .thenReturn(List.of(expensiveListing, cheapListing));
+        when(listingRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(cheapListing, expensiveListing)));
         when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
@@ -113,8 +115,8 @@ class ListingSearchServiceTest {
         Listing cheapListing = buildPublishedListing(1L, "Cheap", new BigDecimal("25000"), RoomType.SINGLE_ROOM);
         Listing expensiveListing = buildPublishedListing(2L, "Expensive", new BigDecimal("75000"), RoomType.APARTMENT);
 
-        when(listingRepository.findAll(any(Specification.class)))
-                .thenReturn(List.of(cheapListing, expensiveListing));
+        when(listingRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(expensiveListing, cheapListing)));
         when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
@@ -145,8 +147,8 @@ class ListingSearchServiceTest {
         Listing withOnlyWifi = buildPublishedListing(2L, "Partial", new BigDecimal("40000"), RoomType.SINGLE_ROOM);
         withOnlyWifi.setAmenities(new HashSet<>(Set.of(wifi)));
 
-        when(listingRepository.findAll(any(Specification.class)))
-                .thenReturn(List.of(withBoth, withOnlyWifi));
+        when(listingRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(withBoth, withOnlyWifi)));
         when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
@@ -163,13 +165,19 @@ class ListingSearchServiceTest {
 
     @Test
     void searchPaginationShouldWork() {
-        List<Listing> listings = List.of(
+        List<Listing> allListings = List.of(
                 buildPublishedListing(1L, "L1", new BigDecimal("30000"), RoomType.STUDIO),
                 buildPublishedListing(2L, "L2", new BigDecimal("35000"), RoomType.STUDIO),
                 buildPublishedListing(3L, "L3", new BigDecimal("40000"), RoomType.STUDIO)
         );
 
-        when(listingRepository.findAll(any(Specification.class))).thenReturn(listings);
+        when(listingRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenAnswer(inv -> {
+                    Pageable pageable = inv.getArgument(1);
+                    int start = (int) pageable.getOffset();
+                    int end = Math.min(start + pageable.getPageSize(), allListings.size());
+                    return new PageImpl<>(allListings.subList(start, end), pageable, allListings.size());
+                });
         when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
@@ -194,7 +202,7 @@ class ListingSearchServiceTest {
     void searchWithRatingsShouldIncludeAverages() {
         Listing listing = buildPublishedListing(1L, "Rated", new BigDecimal("50000"), RoomType.STUDIO);
 
-        when(listingRepository.findAll(any(Specification.class))).thenReturn(List.of(listing));
+        when(listingRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(listing)));
 
         List<Object[]> ratingResults = new ArrayList<>();
         ratingResults.add(new Object[]{1L, 4.5, 10L});
@@ -215,7 +223,7 @@ class ListingSearchServiceTest {
     void searchShouldFilterByMinRating() {
         Listing listing = buildPublishedListing(1L, "Good", new BigDecimal("50000"), RoomType.STUDIO);
 
-        when(listingRepository.findAll(any(Specification.class))).thenReturn(List.of(listing));
+        when(listingRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(listing)));
 
         List<Object[]> ratingResults = new ArrayList<>();
         ratingResults.add(new Object[]{1L, 3.0, 5L});
@@ -238,7 +246,7 @@ class ListingSearchServiceTest {
         listing.setLocation(Location.builder()
                 .address("Eyang").latitude(3.849).longitude(11.503).distanceToCampus(0.15).build());
 
-        when(listingRepository.findAll(any(Specification.class))).thenReturn(List.of(listing));
+        when(listingRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(listing)));
         when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
@@ -261,7 +269,7 @@ class ListingSearchServiceTest {
         listing.setLocation(Location.builder()
                 .address("Eyang").latitude(3.849).longitude(11.503).distanceToCampus(0.15).build());
 
-        when(listingRepository.findAll(any(Specification.class))).thenReturn(List.of(listing));
+        when(listingRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(listing)));
         when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
@@ -285,8 +293,8 @@ class ListingSearchServiceTest {
         farFromUser.setLocation(Location.builder()
                 .address("B").latitude(4.000).longitude(11.600).distanceToCampus(0.5).build());
 
-        when(listingRepository.findAll(any(Specification.class)))
-                .thenReturn(List.of(nearUser, farFromUser));
+        when(listingRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(nearUser, farFromUser)));
         when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
