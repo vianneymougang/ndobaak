@@ -10,6 +10,8 @@ import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.listing.dto.CreateListingRequest;
 import com.ndobaak.backend.listing.dto.ListingResponse;
 import com.ndobaak.backend.listing.dto.LocationRequest;
+import com.ndobaak.backend.listing.dto.UpdateListingRequest;
+import com.ndobaak.backend.listing.dto.UpdateLocationRequest;
 import com.ndobaak.backend.listing.entity.Amenity;
 import com.ndobaak.backend.listing.entity.Listing;
 import com.ndobaak.backend.listing.entity.Location;
@@ -113,7 +115,7 @@ public class ListingService {
     }
 
     @Transactional
-    public ListingResponse updateListing(Long listingId, CreateListingRequest request) {
+    public ListingResponse updateListing(Long listingId, UpdateListingRequest request) {
         Listing listing = getOwnedListing(listingId);
 
         if (request.getTitle() != null) listing.setTitle(request.getTitle());
@@ -127,7 +129,7 @@ public class ListingService {
             if (listing.getLocation() != null) {
                 updateLocation(listing.getLocation(), request.getLocation());
             } else {
-                listing.setLocation(buildLocation(request.getLocation()));
+                listing.setLocation(buildLocationFromUpdate(request.getLocation()));
             }
         }
 
@@ -313,7 +315,31 @@ public class ListingService {
         if (request.getLongitude() != null) location.setLongitude(request.getLongitude());
         if (request.getNeighborhood() != null) location.setNeighborhood(request.getNeighborhood());
         if (request.getCity() != null) location.setCity(request.getCity());
+        recalculateDistance(location);
+    }
 
+    private void updateLocation(Location location, UpdateLocationRequest request) {
+        if (request.getAddress() != null) location.setAddress(request.getAddress());
+        if (request.getLatitude() != null) location.setLatitude(request.getLatitude());
+        if (request.getLongitude() != null) location.setLongitude(request.getLongitude());
+        if (request.getNeighborhood() != null) location.setNeighborhood(request.getNeighborhood());
+        if (request.getCity() != null) location.setCity(request.getCity());
+        recalculateDistance(location);
+    }
+
+    private Location buildLocationFromUpdate(UpdateLocationRequest request) {
+        Location location = Location.builder()
+                .address(request.getAddress())
+                .latitude(request.getLatitude())
+                .longitude(request.getLongitude())
+                .neighborhood(request.getNeighborhood())
+                .city(request.getCity())
+                .build();
+        recalculateDistance(location);
+        return location;
+    }
+
+    private void recalculateDistance(Location location) {
         if (location.getLatitude() != null && location.getLongitude() != null) {
             double distance = GeoUtils.haversineDistance(
                     location.getLatitude(), location.getLongitude(),

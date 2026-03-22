@@ -80,7 +80,7 @@ public class ListingController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ListingResponse> updateListing(@PathVariable Long id,
-                                                         @Valid @RequestBody CreateListingRequest request) {
+                                                         @Valid @RequestBody UpdateListingRequest request) {
         return ResponseEntity.ok(listingService.updateListing(id, request));
     }
 

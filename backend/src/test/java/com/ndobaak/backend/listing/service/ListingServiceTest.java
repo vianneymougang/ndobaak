@@ -10,6 +10,7 @@ import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.listing.dto.CreateListingRequest;
 import com.ndobaak.backend.listing.dto.ListingResponse;
 import com.ndobaak.backend.listing.dto.LocationRequest;
+import com.ndobaak.backend.listing.dto.UpdateListingRequest;
 import com.ndobaak.backend.listing.entity.Amenity;
 import com.ndobaak.backend.listing.entity.Listing;
 import com.ndobaak.backend.listing.entity.Location;
@@ -174,7 +175,7 @@ class ListingServiceTest {
         when(listingRepository.save(any(Listing.class))).thenAnswer(inv -> inv.getArgument(0));
         when(listingMapper.toResponse(any(), eq(false))).thenReturn(DUMMY_RESPONSE);
 
-        CreateListingRequest request = new CreateListingRequest();
+        UpdateListingRequest request = new UpdateListingRequest();
         request.setTitle("New Title Updated");
         request.setMonthlyPrice(new BigDecimal("50000"));
 
@@ -198,7 +199,7 @@ class ListingServiceTest {
         when(listingRepository.findByIdWithDetails(1L)).thenReturn(Optional.of(listing));
         when(authService.getAuthenticatedUser()).thenReturn(other);
 
-        assertThatThrownBy(() -> listingService.updateListing(1L, new CreateListingRequest()))
+        assertThatThrownBy(() -> listingService.updateListing(1L, new UpdateListingRequest()))
                 .isInstanceOf(ForbiddenException.class);
     }
 

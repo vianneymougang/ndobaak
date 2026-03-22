@@ -140,7 +140,10 @@ class ListingControllerTest {
     @WithMockUser(roles = "LANDLORD")
     void createListingShouldReturn201() throws Exception {
         CreateListingRequest request = new CreateListingRequest();
-        request.setTitle("Chambre meublée à Melen");
+        request.setTitle("Chambre meublée à Melen près du campus");
+        request.setDescription("Belle chambre meublée, spacieuse et bien éclairée, située à proximité du campus universitaire");
+        request.setRoomType(RoomType.SINGLE_ROOM);
+        request.setMonthlyPrice(new BigDecimal("35000"));
 
         when(listingService.createListing(any())).thenReturn(buildListingResponse(1L));
 
