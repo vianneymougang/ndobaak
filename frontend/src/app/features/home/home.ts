@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, OnInit, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { environment } from '../../../environments/environment';
 import { EMPTY, catchError } from 'rxjs';
 import { Router, RouterLink } from '@angular/router';
@@ -21,6 +22,7 @@ export class Home implements OnInit {
   private router = inject(Router);
   private listingService = inject(ListingService);
   private authService = inject(AuthService);
+  private destroyRef = inject(DestroyRef);
 
   protected isLandlord = computed(() => this.authService.userRole() === 'LANDLORD');
   protected isStudent = computed(() => this.authService.userRole() === 'STUDENT');
@@ -79,7 +81,7 @@ export class Home implements OnInit {
   ngOnInit(): void {
     this.listingService
       .search({ sortBy: 'RATING_DESC', size: 3 })
-      .pipe(catchError(() => EMPTY))
+      .pipe(catchError(() => EMPTY), takeUntilDestroyed(this.destroyRef))
       .subscribe((res) => this.popularListings.set(res.content));
   }
 

@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, OnInit, OnDestroy, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -15,7 +16,7 @@ import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { MessageService } from 'primeng/api';
-import { concat, EMPTY } from 'rxjs';
+import { concat, EMPTY, switchMap } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { ListingService } from '../../../core/services/listing';
 import { ListingResponse, RoomType, CreateListingRequest, PhotoResponse } from '../../../core/models/listing.models';
@@ -67,6 +68,7 @@ export class Create implements OnInit, OnDestroy {
   private subscriptionService = inject(SubscriptionService);
   private messageService = inject(MessageService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   protected activeStep = signal(1);
   protected saving = signal(false);
@@ -147,12 +149,18 @@ export class Create implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.checkSubscription();
-    this.infoForm.get('description')?.valueChanges.subscribe(() => {});
-    this.infoForm.get('title')?.valueChanges.subscribe(() => {});
+    this.infoForm.get('description')?.valueChanges.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {});
+    this.infoForm.get('title')?.valueChanges.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {});
   }
 
   private checkSubscription(): void {
-    this.subscriptionService.getMySubscription().subscribe({
+    this.subscriptionService.getMySubscription().pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (sub) => {
         if (!sub || sub.status !== 'ACTIVE') {
           this.messageService.add({
@@ -277,7 +285,8 @@ export class Create implements OnInit, OnDestroy {
           this.uploadingPhotos.set(false);
           this.uploadProgress.set(0);
           this.uploadTotal.set(0);
-        })
+        }),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
         error: (err) => {
@@ -300,7 +309,9 @@ export class Create implements OnInit, OnDestroy {
     const currentListing = this.listing();
     if (!currentListing) return;
 
-    this.listingService.deletePhoto(currentListing.id, photo.id).subscribe({
+    this.listingService.deletePhoto(currentListing.id, photo.id).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: () => {
         this.photos.update((list) => list.filter((p) => p.id !== photo.id));
       },
@@ -323,7 +334,9 @@ export class Create implements OnInit, OnDestroy {
       ? this.listingService.updateListing(currentListing.id, request)
       : this.listingService.createListing(request);
 
-    save$.subscribe({
+    save$.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (saved) => {
         this.listing.set(saved);
         this.photos.set(saved.photos);
@@ -361,36 +374,18 @@ export class Create implements OnInit, OnDestroy {
     this.submitting.set(true);
 
     const request = this.buildRequest();
-    this.listingService.updateListing(currentListing.id, request).subscribe({
-      next: (updated) => {
-        this.listingService.submitForReview(updated.id).subscribe({
-          next: () => {
-            this.submitting.set(false);
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Soumise',
-              detail: 'Votre annonce a ete soumise pour validation.',
-            });
-            this.router.navigate(['/landlord/listings']);
-          },
-          error: (err) => {
-            this.submitting.set(false);
-            if (err?.error?.code === 'SUBSCRIPTION_REQUIRED') {
-              this.messageService.add({
-                severity: 'info',
-                summary: 'Abonnement requis',
-                detail: 'Un abonnement actif est requis pour publier une annonce.',
-              });
-              this.router.navigate(['/subscription']);
-              return;
-            }
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Erreur',
-              detail: 'Echec de la soumission. Verifiez les champs requis.',
-            });
-          },
+    this.listingService.updateListing(currentListing.id, request).pipe(
+      switchMap(updated => this.listingService.submitForReview(updated.id)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Soumise',
+          detail: 'Votre annonce a ete soumise pour validation.',
         });
+        this.router.navigate(['/landlord/listings']);
       },
       error: (err) => {
         this.submitting.set(false);
@@ -406,7 +401,7 @@ export class Create implements OnInit, OnDestroy {
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur',
-          detail: 'Echec de la sauvegarde avant soumission.',
+          detail: 'Echec de la soumission. Verifiez les champs requis.',
         });
       },
     });

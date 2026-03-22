@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
@@ -15,12 +16,15 @@ import { ListingResponse, ListingStatus } from '../../../core/models/listing.mod
 })
 export class MyListings implements OnInit {
   private listingService = inject(ListingService);
+  private destroyRef = inject(DestroyRef);
 
   protected listings = signal<ListingResponse[]>([]);
   protected loading = signal(true);
 
   ngOnInit(): void {
-    this.listingService.getMyListings().subscribe({
+    this.listingService.getMyListings().pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (listings) => {
         this.listings.set(listings);
         this.loading.set(false);
@@ -56,7 +60,9 @@ export class MyListings implements OnInit {
   }
 
   protected submitForReview(listing: ListingResponse): void {
-    this.listingService.submitForReview(listing.id).subscribe((updated) => {
+    this.listingService.submitForReview(listing.id).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((updated) => {
       this.listings.update((list) =>
         list.map((l) => (l.id === updated.id ? updated : l))
       );

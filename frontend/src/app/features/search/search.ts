@@ -1,6 +1,7 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  DestroyRef,
   inject,
   signal,
   OnInit,
@@ -9,6 +10,7 @@ import {
   viewChild,
   PLATFORM_ID,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -52,6 +54,7 @@ export class Search implements OnInit {
   private route = inject(ActivatedRoute);
   private listingService = inject(ListingService);
   private geolocationService = inject(GeolocationService);
+  private destroyRef = inject(DestroyRef);
 
   protected mapContainer = viewChild<ElementRef>('mapContainer');
   private L: typeof LeafletNS | null = null;
@@ -135,8 +138,8 @@ export class Search implements OnInit {
   }
 
   ngOnInit(): void {
-    this.geolocationService.requestPosition().subscribe();
-    this.route.queryParams.subscribe((params) => {
+    this.geolocationService.requestPosition().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       this.keyword = params['keyword'] ?? '';
       this.roomType = params['roomType'] ?? '';
       this.priceMin = params['priceMin'] ? +params['priceMin'] : null;
@@ -214,7 +217,7 @@ export class Search implements OnInit {
       size: this.size,
     };
 
-    this.listingService.search(filters).subscribe({
+    this.listingService.search(filters).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.results.set(res.content);
         this.totalElements.set(res.totalElements);
@@ -239,7 +242,7 @@ export class Search implements OnInit {
     const center = this.map.getCenter();
     const radius = this.activeRadius();
 
-    this.listingService.findNearby(center.lat, center.lng, radius).subscribe({
+    this.listingService.findNearby(center.lat, center.lng, radius).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (nearby) => {
         const mapped = this.mapNearbyToSearch(nearby);
         this.results.set(mapped);
