@@ -44,6 +44,5 @@ export interface UserProfile {
   matricule?: string;
   fieldOfStudy?: string;
   yearOfStudy?: number;
-  idCardNumber?: string;
-  taxId?: string;
+  verified?: boolean;
 }

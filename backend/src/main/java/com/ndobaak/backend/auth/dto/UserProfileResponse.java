@@ -23,6 +23,5 @@ public class UserProfileResponse {
     private String fieldOfStudy;
     private Integer yearOfStudy;
 
-    private String idCardNumber;
-    private String taxId;
+    private Boolean verified;
 }

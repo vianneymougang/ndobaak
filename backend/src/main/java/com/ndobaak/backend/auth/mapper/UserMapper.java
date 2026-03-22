@@ -26,8 +26,7 @@ public class UserMapper {
                     .fieldOfStudy(student.getFieldOfStudy())
                     .yearOfStudy(student.getYearOfStudy());
         } else if (user instanceof Landlord landlord) {
-            builder.idCardNumber(landlord.getIdCardNumber())
-                    .taxId(landlord.getTaxId());
+            builder.verified(landlord.getIdCardNumber() != null);
         }
 
         return builder.build();
