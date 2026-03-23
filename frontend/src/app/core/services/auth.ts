@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap, catchError } from 'rxjs';
+import { Observable, tap, catchError, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   AuthResponse,
@@ -25,22 +25,22 @@ export class AuthService {
   readonly isAuthenticated = computed(() => !!this.currentUser());
   readonly userRole = computed(() => this.currentUser()?.role ?? null);
 
-  registerStudent(request: RegisterStudentRequest): Observable<AuthResponse> {
+  registerStudent(request: RegisterStudentRequest): Observable<UserProfile> {
     return this.http
       .post<AuthResponse>(`${this.apiUrl}/auth/register/student`, request, { withCredentials: true })
-      .pipe(tap(() => this.loadCurrentUser().subscribe()));
+      .pipe(switchMap(() => this.loadCurrentUser()));
   }
 
-  registerLandlord(request: RegisterLandlordRequest): Observable<AuthResponse> {
+  registerLandlord(request: RegisterLandlordRequest): Observable<UserProfile> {
     return this.http
       .post<AuthResponse>(`${this.apiUrl}/auth/register/landlord`, request, { withCredentials: true })
-      .pipe(tap(() => this.loadCurrentUser().subscribe()));
+      .pipe(switchMap(() => this.loadCurrentUser()));
   }
 
-  login(request: LoginRequest): Observable<AuthResponse> {
+  login(request: LoginRequest): Observable<UserProfile> {
     return this.http
       .post<AuthResponse>(`${this.apiUrl}/auth/login`, request, { withCredentials: true })
-      .pipe(tap(() => this.loadCurrentUser().subscribe()));
+      .pipe(switchMap(() => this.loadCurrentUser()));
   }
 
   loadCurrentUser(): Observable<UserProfile> {

@@ -19,7 +19,16 @@ export class OauthCallback implements OnInit {
 
   ngOnInit(): void {
     this.authService.handleOAuthCallback().subscribe({
-      next: () => this.router.navigate(['/']),
+      next: () => {
+        const role = this.authService.userRole();
+        if (role === 'ADMIN') {
+          this.router.navigate(['/admin']);
+        } else if (role === 'LANDLORD') {
+          this.router.navigate(['/landlord']);
+        } else {
+          this.router.navigate(['/']);
+        }
+      },
       error: () => this.status.set('error'),
     });
   }

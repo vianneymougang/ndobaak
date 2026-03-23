@@ -1,4 +1,5 @@
-import { ApplicationConfig, APP_INITIALIZER, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, APP_INITIALIZER, PLATFORM_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { provideRouter, withInMemoryScrolling, TitleStrategy } from '@angular/router';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -6,15 +7,17 @@ import { provideHttpClient, withFetch, withInterceptors, withXsrfConfiguration }
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { of, catchError } from 'rxjs';
-import { provideMotionConfig, provideMotionFeatures, ngmAnimationFeatures } from '@scripttype/ng-motion';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth-interceptor';
 import { AuthService } from './core/services/auth';
 import { AppTitleStrategy } from './core/strategies/app-title-strategy';
 
-function initAuth(authService: AuthService) {
-  return () => authService.loadCurrentUser().pipe(catchError(() => of(null)));
+function initAuth(authService: AuthService, platformId: object) {
+  return () => {
+    if (!isPlatformBrowser(platformId)) return of(null);
+    return authService.loadCurrentUser().pipe(catchError(() => of(null)));
+  };
 }
 
 export const appConfig: ApplicationConfig = {
@@ -31,8 +34,8 @@ export const appConfig: ApplicationConfig = {
     ),
     {
       provide: APP_INITIALIZER,
-      useFactory: (authService: AuthService) => initAuth(authService),
-      deps: [AuthService],
+      useFactory: (authService: AuthService, platformId: object) => initAuth(authService, platformId),
+      deps: [AuthService, PLATFORM_ID],
       multi: true,
     },
     providePrimeNG({
@@ -47,7 +50,5 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
-    provideMotionConfig({ reducedMotion: 'user' }),
-    provideMotionFeatures(ngmAnimationFeatures),
   ],
 };
