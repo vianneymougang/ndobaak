@@ -1,0 +1,57 @@
+@if (loading()) {
+  <div class="metrics-strip">
+    @for (i of [1,2,3,4,5]; track i) {
+      <div class="metric-tile metric-tile--skeleton">
+        <p-skeleton width="1.5rem" height="1.5rem" borderRadius="8px" />
+        <p-skeleton width="50%" height="0.625rem" styleClass="mt-2" />
+        <p-skeleton width="65%" height="1.5rem" styleClass="mt-1" />
+        <p-skeleton width="40%" height="0.625rem" styleClass="mt-1" />
+      </div>
+    }
+  </div>
+} @else if (error()) {
+  <div class="metrics-error">
+    <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+    <span>Impossible de charger les métriques.</span>
+    <p-button
+      label="Réessayer"
+      icon="pi pi-refresh"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (click)="retry.emit()"
+    />
+  </div>
+} @else {
+  <div class="metrics-strip">
+    @for (metric of metrics(); track metric.key; let i = $index) {
+      <a
+        [routerLink]="metric.route"
+        class="metric-tile fade-slide-up hover-lift"
+        [style.animation-delay]="i * 0.05 + 's'"
+      >
+        <div class="metric-header">
+          <i [class]="metric.icon" aria-hidden="true"></i>
+          @if (metric.delta && metric.delta.percent !== 0) {
+            <span
+              class="metric-delta scale-pop"
+              [class.metric-delta--up]="isDeltaPositive(metric.delta)"
+              [class.metric-delta--down]="isDeltaNegative(metric.delta)"
+              [style.animation-delay]="i * 0.05 + 0.2 + 's'"
+            >
+              {{ formatDelta(metric.delta) }}
+            </span>
+          }
+        </div>
+        <span class="metric-label">{{ metric.label }}</span>
+        <span class="metric-value">{{ metric.getValue(stats()!) }}</span>
+        @if (metric.getSub(stats()!)) {
+          <span class="metric-sub">{{ metric.getSub(stats()!) }}</span>
+        }
+        @if (metric.sparkData.length >= 2) {
+          <canvas #sparkCanvas class="metric-spark" aria-hidden="true"></canvas>
+        }
+      </a>
+    }
+  </div>
+}

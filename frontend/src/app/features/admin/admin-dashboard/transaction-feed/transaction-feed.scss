@@ -1,0 +1,155 @@
+@reference "../../../../../tailwind.css";
+
+:host {
+  display: block;
+}
+
+.feed-panel {
+  @apply flex flex-col;
+  padding: 1.25rem;
+  border-radius: 16px;
+  background: white;
+  box-shadow: var(--shadow-card);
+}
+
+.feed-list {
+  @apply flex flex-col;
+  gap: 0.25rem;
+}
+
+.feed-item {
+  @apply flex items-center relative;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s ease;
+  min-height: 48px;
+
+  &:hover {
+    background: var(--color-ndb-cream);
+  }
+
+  &--anomaly {
+    background: color-mix(in srgb, var(--color-ndb-error) 3%, transparent);
+
+    &:hover {
+      background: color-mix(in srgb, var(--color-ndb-error) 6%, transparent);
+    }
+  }
+}
+
+.feed-item-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--color-ndb-forest) 8%, transparent);
+
+  i {
+    font-size: 0.875rem;
+    color: var(--color-ndb-forest);
+  }
+
+  &--anomaly {
+    background: var(--color-ndb-error-bg);
+
+    i {
+      color: var(--color-ndb-error);
+    }
+  }
+}
+
+.feed-item-info {
+  @apply flex flex-col;
+  gap: 0.0625rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.feed-item-name {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-ndb-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feed-item-meta {
+  font-family: var(--font-lato);
+  font-size: 0.6875rem;
+  color: var(--color-ndb-muted);
+}
+
+.feed-item-right {
+  @apply flex flex-col items-end;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.feed-item-amount {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  color: var(--color-ndb-ink);
+  white-space: nowrap;
+}
+
+.feed-item-anomaly-badge {
+  position: absolute;
+  top: 0.375rem;
+  right: 0.375rem;
+  font-size: 0.625rem;
+  color: var(--color-ndb-error);
+}
+
+.feed-item-skeleton {
+  @apply flex items-center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+}
+
+.feed-item-skeleton-text {
+  @apply flex flex-col;
+  gap: 0.375rem;
+  flex: 1;
+}
+
+.feed-error {
+  @apply flex items-center justify-center flex-wrap;
+  gap: 0.75rem;
+  padding: 1.5rem;
+
+  i {
+    color: var(--color-ndb-error);
+  }
+
+  span {
+    font-family: var(--font-lato);
+    font-size: 0.875rem;
+    color: var(--color-ndb-body);
+  }
+}
+
+.feed-empty {
+  @apply flex flex-col items-center justify-center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  color: var(--color-ndb-muted);
+
+  i {
+    font-size: 1.5rem;
+  }
+
+  p {
+    font-family: var(--font-lato);
+    font-size: 0.8125rem;
+    margin: 0;
+  }
+}

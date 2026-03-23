@@ -1,0 +1,72 @@
+@reference "../../../../../tailwind.css";
+
+.tab-content {
+  @apply flex flex-col;
+  gap: 0.75rem;
+}
+
+.moderation-card {
+  display: block;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+
+  &--anomaly {
+    border-left: 3px solid var(--color-ndb-error);
+  }
+}
+
+.card-body {
+  @apply flex items-center justify-between;
+  padding: 1rem 1.25rem 0.5rem;
+  gap: 1rem;
+
+  @media (max-width: 639px) {
+    @apply flex-col items-start;
+    gap: 0.5rem;
+  }
+}
+
+.card-info {
+  @apply flex flex-col;
+  gap: 0.125rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.card-title {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--color-ndb-ink);
+}
+
+.card-reason {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-muted);
+}
+
+.card-right {
+  @apply flex items-center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.card-amount {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--color-ndb-gold);
+  white-space: nowrap;
+}
+
+.card-footer {
+  padding: 0.375rem 1.25rem 0.75rem;
+  font-family: var(--font-lato);
+  font-size: 0.75rem;
+  color: var(--color-ndb-muted);
+}

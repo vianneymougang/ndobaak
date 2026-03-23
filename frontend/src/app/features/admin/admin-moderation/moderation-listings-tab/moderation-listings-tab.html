@@ -1,0 +1,71 @@
+@if (loading()) {
+  <div class="tab-content">
+    @for (i of [1,2,3]; track i) {
+      <div class="card-skeleton">
+        <p-skeleton width="100%" height="5rem" borderRadius="12px" />
+      </div>
+    }
+  </div>
+} @else if (error()) {
+  <app-admin-error-state
+    message="Impossible de charger les annonces en attente."
+    (retry)="retry.emit()"
+  />
+} @else if (listings().length === 0) {
+  <app-admin-empty-state
+    icon="pi pi-check-circle"
+    title="Aucune annonce en attente"
+    subtitle="Toutes les annonces ont été traitées."
+  />
+} @else {
+  <div class="tab-content">
+    @for (listing of listings(); track listing.id; let i = $index) {
+      <div
+        class="moderation-card fade-slide-in hover-lift-sm"
+        [style.animation-delay]="i * 0.05 + 's'"
+      >
+        <div class="card-body" (click)="viewDetail.emit(listing)" role="button" tabindex="0">
+          <div class="card-info">
+            <span class="card-title">{{ listing.title }}</span>
+            <span class="card-meta">
+              {{ listing.landlord.firstName }} {{ listing.landlord.lastName }}
+              · {{ listing.createdAt | relativeTime }}
+            </span>
+          </div>
+          <div class="card-right">
+            @if (listing.waitingDays && listing.waitingDays >= 2) {
+              <p-tag
+                [value]="listing.waitingDays + 'j en attente'"
+                severity="warn"
+                [pt]="{ root: { style: 'font-size: 0.625rem; padding: 0.125rem 0.5rem; font-family: var(--font-urbanist); font-weight: 700;' } }"
+              />
+            }
+            <span class="card-price">{{ formatXAF(listing.monthlyPrice) }}</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <p-button
+            icon="pi pi-check"
+            label="Approuver"
+            severity="success"
+            size="small"
+            [outlined]="true"
+            [loading]="isLoading('listing-' + listing.id)"
+            (click)="validate.emit(listing)"
+            styleClass="hover-lift"
+          />
+          <p-button
+            icon="pi pi-times"
+            label="Rejeter"
+            severity="danger"
+            size="small"
+            [outlined]="true"
+            [loading]="isLoading('listing-reject-' + listing.id)"
+            (click)="reject.emit(listing)"
+            styleClass="hover-lift"
+          />
+        </div>
+      </div>
+    }
+  </div>
+}

@@ -1,0 +1,50 @@
+<div class="insights-panel">
+  <app-section-header title="Insights plateforme" />
+
+  @if (loading()) {
+    <div class="insights-list">
+      @for (i of [1,2,3]; track i) {
+        <div class="insight-skeleton">
+          <p-skeleton width="1.5rem" height="1.5rem" borderRadius="8px" />
+          <p-skeleton width="90%" height="0.75rem" />
+        </div>
+      }
+    </div>
+  } @else if (error()) {
+    <div class="insights-error">
+      <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+      <span>Impossible de charger les insights.</span>
+      <p-button
+        label="Réessayer"
+        icon="pi pi-refresh"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (click)="retry.emit()"
+      />
+    </div>
+  } @else if (insights().length === 0) {
+    <div class="insights-empty">
+      <i class="pi pi-info-circle" aria-hidden="true"></i>
+      <p>Aucune activité récente</p>
+    </div>
+  } @else {
+    <div class="insights-list">
+      @for (insight of insights(); track $index; let i = $index) {
+        <div
+          class="insight-card fade-slide-in"
+          [class.insight-card--success]="insight.type === 'success'"
+          [class.insight-card--warning]="insight.type === 'warning'"
+          [class.insight-card--error]="insight.type === 'error'"
+          [class.insight-card--info]="insight.type === 'info'"
+          [style.animation-delay]="i * 0.08 + 's'"
+        >
+          <div class="insight-icon">
+            <i [class]="insight.icon" aria-hidden="true"></i>
+          </div>
+          <p class="insight-text">{{ insight.text }}</p>
+        </div>
+      }
+    </div>
+  }
+</div>

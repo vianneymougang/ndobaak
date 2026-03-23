@@ -1,0 +1,95 @@
+<div class="moderation-page">
+  <div class="page-header">
+    <h1 class="page-title">Modération</h1>
+    <p class="page-subtitle">
+      @if (totalPending() > 0) {
+        {{ totalPending() }} élément{{ totalPending() > 1 ? 's' : '' }} en attente de traitement
+      } @else {
+        Toutes les actions urgentes sont traitées
+      }
+    </p>
+  </div>
+
+  <div class="kpi-strip fade-slide-up">
+    <div class="kpi-card" [class.kpi-card--alert]="pendingListings().length > 0">
+      <i class="pi pi-home kpi-icon" aria-hidden="true"></i>
+      <span class="kpi-value">{{ loadingListings() ? '—' : pendingListings().length }}</span>
+      <span class="kpi-label">Annonces</span>
+    </div>
+    <div class="kpi-card" [class.kpi-card--alert]="pendingReviews().length > 0">
+      <i class="pi pi-star kpi-icon" aria-hidden="true"></i>
+      <span class="kpi-value">{{ loadingReviews() ? '—' : pendingReviews().length }}</span>
+      <span class="kpi-label">Avis</span>
+    </div>
+    <div class="kpi-card" [class.kpi-card--alert]="anomalies().length > 0">
+      <i class="pi pi-exclamation-triangle kpi-icon" aria-hidden="true"></i>
+      <span class="kpi-value">{{ loadingAnomalies() ? '—' : anomalies().length }}</span>
+      <span class="kpi-label">Anomalies</span>
+    </div>
+  </div>
+
+  <p-tabs value="listings">
+    <p-tablist>
+      <p-tab value="listings">
+        Annonces en attente
+        @if (pendingListings().length > 0) {
+          <p-badge [value]="'' + pendingListings().length" severity="warn" />
+        }
+      </p-tab>
+      <p-tab value="reviews">
+        Avis à modérer
+        @if (pendingReviews().length > 0) {
+          <p-badge [value]="'' + pendingReviews().length" severity="warn" />
+        }
+      </p-tab>
+      <p-tab value="anomalies">
+        Anomalies
+        @if (anomalies().length > 0) {
+          <p-badge [value]="'' + anomalies().length" severity="danger" />
+        }
+      </p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+      <p-tabpanel value="listings">
+        <app-moderation-listings-tab
+          [listings]="pendingListings()"
+          [loading]="loadingListings()"
+          [error]="errorListings()"
+          [actionLoading]="actionLoading()"
+          (validate)="onValidateListing($event)"
+          (reject)="onRejectListing($event)"
+          (viewDetail)="onViewListingDetail($event)"
+          (retry)="retryListings()"
+        />
+      </p-tabpanel>
+      <p-tabpanel value="reviews">
+        <app-moderation-reviews-tab
+          [reviews]="pendingReviews()"
+          [loading]="loadingReviews()"
+          [error]="errorReviews()"
+          [actionLoading]="actionLoading()"
+          (approve)="onApproveReview($event)"
+          (reject)="onRejectReview($event)"
+          (retry)="retryReviews()"
+        />
+      </p-tabpanel>
+      <p-tabpanel value="anomalies">
+        <app-moderation-anomalies-tab
+          [anomalies]="anomalies()"
+          [loading]="loadingAnomalies()"
+          [error]="errorAnomalies()"
+          (retry)="retryAnomalies()"
+        />
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>
+
+<app-listing-detail-drawer
+  [listingId]="selectedListingId()"
+  [showActions]="true"
+  (validated)="onListingValidated($event)"
+  (rejected)="onListingRejected($event)"
+  (closed)="onDrawerClosed()"
+/>

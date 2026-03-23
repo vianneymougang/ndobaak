@@ -1,0 +1,177 @@
+@reference "../../../../../tailwind.css";
+
+:host {
+  display: block;
+}
+
+.attention-panel {
+  @apply flex flex-col;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 16px;
+  background: white;
+  box-shadow: var(--shadow-card);
+}
+
+.panel-header {
+  @apply flex items-center justify-between;
+}
+
+.panel-title {
+  @apply flex items-center;
+  gap: 0.5rem;
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--color-ndb-ink);
+  margin: 0;
+
+  i {
+    color: var(--color-ndb-gold);
+    font-size: 1.125rem;
+  }
+}
+
+.panel-empty {
+  @apply flex flex-col items-center;
+  gap: 0.375rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 2rem;
+  color: var(--color-ndb-success);
+  margin-bottom: 0.5rem;
+}
+
+.empty-title {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-ndb-ink);
+  margin: 0;
+}
+
+.empty-sub {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-muted);
+  margin: 0;
+}
+
+.queue-section {
+  @apply flex flex-col;
+  gap: 0.5rem;
+
+  &--error {
+    @apply flex-row items-center justify-center flex-wrap;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 12px;
+    background: var(--color-ndb-cream-dark);
+  }
+}
+
+.queue-item {
+  @apply flex items-center justify-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--color-ndb-border);
+  background: var(--color-ndb-cream);
+  transition: border-color 0.15s ease, background 0.15s ease;
+  text-decoration: none;
+  color: inherit;
+  min-height: 48px;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--color-ndb-forest) 20%, transparent);
+    background: white;
+  }
+
+  &--anomaly {
+    border-color: color-mix(in srgb, var(--color-ndb-error) 15%, transparent);
+
+    &:hover {
+      border-color: color-mix(in srgb, var(--color-ndb-error) 30%, transparent);
+    }
+  }
+}
+
+.queue-item-body {
+  @apply flex items-center flex-wrap;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.queue-item-info {
+  @apply flex flex-col;
+  gap: 0.125rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.queue-item-title {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-ndb-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.queue-item-meta {
+  font-family: var(--font-lato);
+  font-size: 0.6875rem;
+  color: var(--color-ndb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.queue-item-price {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  color: var(--color-ndb-ink);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.queue-item-operator {
+  font-family: var(--font-lato);
+  font-size: 0.6875rem;
+  color: var(--color-ndb-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.queue-item-actions {
+  @apply flex items-center;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+.queue-item-skeleton {
+  margin-top: 0.25rem;
+}
+
+.review-stars {
+  @apply flex items-center;
+  gap: 0.125rem;
+  margin-bottom: 0.125rem;
+
+  i {
+    font-size: 0.6875rem;
+    color: var(--color-ndb-gold);
+  }
+}
+
+.error-text {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-body);
+}
