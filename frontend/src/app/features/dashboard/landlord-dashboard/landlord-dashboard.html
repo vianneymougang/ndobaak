@@ -90,9 +90,12 @@
   </section>
 
   <section
-    class="charts-section fade-slide-up"
+    class="charts-section"
     aria-label="Graphiques"
-    style="animation-delay: 0.3s"
+    ngmMotion
+    [initial]="{ opacity: 0, y: 20 }"
+    [animate]="{ opacity: 1, y: 0 }"
+    [transition]="{ duration: 0.4, delay: 0.3, ease: 'easeOut' }"
   >
     <div class="charts-grid">
       <div class="chart-card">
@@ -154,8 +157,11 @@
   </section>
 
   <section
-    class="content-section fade-slide-up"
-    style="animation-delay: 0.4s"
+    class="content-section"
+    ngmMotion
+    [initial]="{ opacity: 0, y: 20 }"
+    [animate]="{ opacity: 1, y: 0 }"
+    [transition]="{ duration: 0.4, delay: 0.4, ease: 'easeOut' }"
   >
     <div class="content-grid">
       <div class="content-card">
@@ -202,8 +208,12 @@
           <div class="pending-list">
             @for (booking of visibleBookings(); track booking.bookingId; let i = $index) {
               <div
-                class="pending-card fade-slide-in hover-lift-sm"
-                [style.animation-delay]="staggerDelay(i) + 's'"
+                class="pending-card"
+                ngmMotion
+                [initial]="{ opacity: 0, x: -12 }"
+                [animate]="{ opacity: 1, x: 0 }"
+                [transition]="{ duration: 0.3, delay: staggerDelay(i), ease: 'easeOut' }"
+                [whileHover]="{ y: -2 }"
               >
                 <div class="pending-avatar">
                   <span>{{ booking.studentName.charAt(0) }}</span>
@@ -224,7 +234,10 @@
                     tooltipPosition="top"
                     [loading]="isBookingLoading(booking.bookingId)"
                     (onClick)="confirmBooking(booking.bookingId)"
-                    class="hover-lift"
+                    ngmMotion
+                    [whileHover]="{ scale: 1.1 }"
+                    [whileTap]="{ scale: 0.9 }"
+                    [transition]="{ type: 'spring', stiffness: 400, damping: 25 }"
                   />
                   <p-button
                     icon="pi pi-times"
@@ -236,7 +249,10 @@
                     tooltipPosition="top"
                     [loading]="isBookingLoading(booking.bookingId)"
                     (onClick)="rejectBooking(booking.bookingId)"
-                    class="hover-lift"
+                    ngmMotion
+                    [whileHover]="{ scale: 1.1 }"
+                    [whileTap]="{ scale: 0.9 }"
+                    [transition]="{ type: 'spring', stiffness: 400, damping: 25 }"
                   />
                 </div>
               </div>
@@ -303,7 +319,10 @@
                 size="small"
                 routerLink="/landlord/subscription"
                 [pt]="{ root: { style: 'width: 100%; justify-content: center;' } }"
-                class="hover-lift"
+                ngmMotion
+                [whileHover]="{ scale: 1.02 }"
+                [whileTap]="{ scale: 0.98 }"
+                [transition]="{ type: 'spring', stiffness: 400, damping: 25 }"
               />
             }
           </div>
@@ -319,7 +338,10 @@
               icon="pi pi-star"
               routerLink="/landlord/subscription"
               size="small"
-              class="hover-lift"
+              ngmMotion
+              [whileHover]="{ scale: 1.02 }"
+              [whileTap]="{ scale: 0.98 }"
+              [transition]="{ type: 'spring', stiffness: 400, damping: 25 }"
             />
           </div>
         }
@@ -328,8 +350,11 @@
   </section>
 
   <section
-    class="activity-section fade-slide-up"
-    style="animation-delay: 0.5s"
+    class="activity-section"
+    ngmMotion
+    [initial]="{ opacity: 0, y: 20 }"
+    [animate]="{ opacity: 1, y: 0 }"
+    [transition]="{ duration: 0.4, delay: 0.5, ease: 'easeOut' }"
   >
     <div class="content-card">
       <app-section-header

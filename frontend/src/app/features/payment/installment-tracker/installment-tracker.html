@@ -14,7 +14,13 @@
       <p-skeleton height="3rem" />
     </div>
   } @else if (schedule(); as s) {
-    <div class="progress-card fade-slide-up">
+    <div
+      class="progress-card"
+      ngmMotion
+      [initial]="{ opacity: 0, y: 15 }"
+      [animate]="{ opacity: 1, y: 0 }"
+      [transition]="{ duration: 0.35 }"
+    >
       <div class="progress-header">
         <div class="progress-info">
           <span class="progress-label">Progression</span>
@@ -54,9 +60,12 @@
     <div class="installment-list">
       @for (inst of s.installments; track inst.id; let i = $index) {
         <div
-          class="installment-row fade-slide-in"
+          class="installment-row"
           [class.installment-row--overdue]="inst.status === 'OVERDUE'"
-          [style.animation-delay]="i * 0.05 + 's'"
+          ngmMotion
+          [initial]="{ opacity: 0, x: -10 }"
+          [animate]="{ opacity: 1, x: 0 }"
+          [transition]="{ duration: 0.25, delay: staggerDelay(i) }"
         >
           <div class="installment-number">{{ inst.installmentNumber }}</div>
 

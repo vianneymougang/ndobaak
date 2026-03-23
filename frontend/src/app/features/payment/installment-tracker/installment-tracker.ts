@@ -19,6 +19,7 @@ import { SelectModule } from 'primeng/select';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputMaskModule } from 'primeng/inputmask';
 import { SkeletonModule } from 'primeng/skeleton';
+import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { MessageService } from 'primeng/api';
 import { PaymentService } from '../../../core/services/payment';
 import {
@@ -42,6 +43,7 @@ import {
     FloatLabelModule,
     InputMaskModule,
     SkeletonModule,
+    NgmMotionDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './installment-tracker.html',

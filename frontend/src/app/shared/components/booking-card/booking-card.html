@@ -1,5 +1,8 @@
 <div
-  class="booking-card hover-lift"
+  ngmMotion
+  [whileHover]="{ y: -3 }"
+  [transition]="{ type: 'spring', stiffness: 400, damping: 30 }"
+  class="booking-card"
 >
   @if (booking().listing.thumbnailUrl) {
     <img

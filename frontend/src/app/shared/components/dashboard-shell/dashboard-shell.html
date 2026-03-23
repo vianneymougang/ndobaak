@@ -22,7 +22,13 @@
           <i class="pi {{ item.icon }}" aria-hidden="true"></i>
           <span>{{ item.label }}</span>
           @if (item.badge && item.badge > 0) {
-            <span class="sidebar-badge badge-pop">
+            <span
+              class="sidebar-badge"
+              ngmMotion
+              [initial]="{ scale: 0 }"
+              [animate]="{ scale: 1 }"
+              [transition]="{ type: 'spring', stiffness: 400, damping: 15 }"
+            >
               {{ item.badge }}
             </span>
           }
@@ -110,7 +116,13 @@
           <span class="bottom-tab-icon-wrap">
             <i class="pi {{ tab.icon }}" aria-hidden="true"></i>
             @if (tab.badge && tab.badge > 0) {
-              <span class="bottom-tab-badge badge-pop">
+              <span
+                class="bottom-tab-badge"
+                ngmMotion
+                [initial]="{ scale: 0 }"
+                [animate]="{ scale: 1 }"
+                [transition]="{ type: 'spring', stiffness: 400, damping: 15 }"
+              >
                 {{ tab.badge }}
               </span>
             }

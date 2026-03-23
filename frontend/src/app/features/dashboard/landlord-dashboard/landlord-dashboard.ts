@@ -21,6 +21,7 @@ import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
+import { NgmMotionDirective } from '@scripttype/ng-motion';
 import type { ChartData, ChartOptions, TooltipItem } from 'chart.js';
 import { DashboardService } from '../../../core/services/dashboard';
 import { BookingService } from '../../../core/services/booking';
@@ -57,6 +58,7 @@ interface PeriodOption {
     TagModule,
     ProgressBarModule,
     TooltipModule,
+    NgmMotionDirective,
     KpiCard,
     SectionHeader,
     ActivityTimeline,
@@ -77,7 +79,7 @@ export class LandlordDashboard implements OnInit {
 
   protected readonly periodOptions: PeriodOption[] = [
     { label: '7j', value: '7d', days: 7, months: 1 },
-    { label: '30j', value: '30d', days: 30, months: 1 },
+    { label: '30j', value: '30d', days: 30, months: 3 },
     { label: '3 mois', value: '3m', days: 90, months: 3 },
     { label: '12 mois', value: '12m', days: 365, months: 12 },
   ];

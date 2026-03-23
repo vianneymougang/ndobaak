@@ -16,6 +16,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { DialogModule } from 'primeng/dialog';
 import { TextareaModule } from 'primeng/textarea';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { MessageService } from 'primeng/api';
 import { BookingCard } from '../../../shared/components/booking-card/booking-card';
 import { BookingService } from '../../../core/services/booking';
@@ -32,6 +33,7 @@ import { BookingResponse, BookingStatus } from '../../../core/models/booking.mod
     DialogModule,
     TextareaModule,
     FloatLabelModule,
+    NgmMotionDirective,
     BookingCard,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

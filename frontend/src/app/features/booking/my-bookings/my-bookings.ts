@@ -14,6 +14,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { DialogModule } from 'primeng/dialog';
+import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { MessageService } from 'primeng/api';
 import { BookingCard } from '../../../shared/components/booking-card/booking-card';
 import { BookingService } from '../../../core/services/booking';
@@ -28,6 +29,7 @@ import { BookingResponse, BookingStatus } from '../../../core/models/booking.mod
     ButtonModule,
     SkeletonModule,
     DialogModule,
+    NgmMotionDirective,
     BookingCard,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -110,6 +112,10 @@ export class MyBookings {
   protected openCancelDialog(id: number): void {
     this.cancellingId.set(id);
     this.cancelDialogVisible.set(true);
+  }
+
+  protected staggerDelay(i: number): number {
+    return Math.min(i, 10) * 0.06;
   }
 
   protected confirmCancel(): void {

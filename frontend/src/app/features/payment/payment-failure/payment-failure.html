@@ -1,6 +1,18 @@
 <div class="failure-page">
-  <div class="failure-card scale-fade-in">
-    <div class="failure-icon scale-pop" style="animation-delay: 0.2s">
+  <div
+    class="failure-card"
+    ngmMotion
+    [initial]="{ opacity: 0, scale: 0.95 }"
+    [animate]="{ opacity: 1, scale: 1 }"
+    [transition]="{ type: 'spring', stiffness: 300, damping: 25 }"
+  >
+    <div
+      class="failure-icon"
+      ngmMotion
+      [initial]="{ scale: 0 }"
+      [animate]="{ scale: 1 }"
+      [transition]="{ type: 'spring', stiffness: 400, damping: 15, delay: 0.2 }"
+    >
       <i class="pi pi-times" aria-hidden="true"></i>
     </div>
 
@@ -19,7 +31,13 @@
       </ul>
     </div>
 
-    <div class="failure-actions fade-slide-up" style="animation-delay: 0.4s">
+    <div
+      class="failure-actions"
+      ngmMotion
+      [initial]="{ opacity: 0, y: 10 }"
+      [animate]="{ opacity: 1, y: 0 }"
+      [transition]="{ delay: 0.4, duration: 0.3 }"
+    >
       <p-button
         label="Réessayer le paiement"
         icon="pi pi-refresh"

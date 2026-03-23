@@ -20,6 +20,7 @@ import { TagModule } from 'primeng/tag';
 import { DividerModule } from 'primeng/divider';
 import { MessageModule } from 'primeng/message';
 import { MessageService } from 'primeng/api';
+import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { SubscriptionService } from '../../../core/services/subscription';
 import { Subscription, SubscriptionStatus } from '../../../core/models/subscription.models';
 import { MobileMoneyOperator } from '../../../core/models/payment.models';
@@ -39,6 +40,7 @@ import { MobileMoneyOperator } from '../../../core/models/payment.models';
     TagModule,
     DividerModule,
     MessageModule,
+    NgmMotionDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './subscription-page.html',

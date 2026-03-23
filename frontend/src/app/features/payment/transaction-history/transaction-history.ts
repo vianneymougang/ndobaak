@@ -14,6 +14,7 @@ import { ButtonModule } from 'primeng/button';
 import { PaginatorModule } from 'primeng/paginator';
 import { SkeletonModule } from 'primeng/skeleton';
 import { SelectModule } from 'primeng/select';
+import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { MessageService } from 'primeng/api';
 import { PaymentService } from '../../../core/services/payment';
 import { PaymentResponse, PaymentStatus } from '../../../core/models/payment.models';
@@ -27,6 +28,7 @@ import { PaymentResponse, PaymentStatus } from '../../../core/models/payment.mod
     PaginatorModule,
     SkeletonModule,
     SelectModule,
+    NgmMotionDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './transaction-history.html',

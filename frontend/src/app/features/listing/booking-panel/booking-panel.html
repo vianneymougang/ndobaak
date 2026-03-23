@@ -7,7 +7,13 @@
     <p-skeleton height="52px" />
   </div>
 } @else if (!isOwner()) {
-  <div class="booking-panel fade-slide-up">
+  <div
+    ngmMotion
+    [initial]="{ opacity: 0, y: 20 }"
+    [animate]="{ opacity: 1, y: 0 }"
+    [transition]="{ duration: 0.4, ease: 'easeOut' }"
+    class="booking-panel"
+  >
     <div class="panel-price">
       <span class="panel-price-amount">{{ formattedPrice() }}</span>
       <span class="panel-price-unit">FCFA / mois</span>
@@ -61,12 +67,16 @@
     </div>
 
     <p-button
+      ngmMotion
+      [whileHover]="{ scale: 1.02 }"
+      [whileTap]="{ scale: 0.98 }"
+      [transition]="{ type: 'spring', stiffness: 400, damping: 25 }"
       label="Réserver"
       icon="pi pi-calendar-plus"
       [fluid]="true"
       [disabled]="!startDate()"
       (onClick)="onReserveClick()"
-      class="panel-cta hover-lift"
+      class="panel-cta"
     />
   </div>
 } @else {

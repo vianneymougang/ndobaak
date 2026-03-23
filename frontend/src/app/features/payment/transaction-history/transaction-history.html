@@ -32,8 +32,11 @@
     <div class="transaction-list">
       @for (payment of payments(); track payment.id; let i = $index) {
         <div
-          class="transaction-row fade-slide-up"
-          [style.animation-delay]="i * 0.05 + 's'"
+          class="transaction-row"
+          ngmMotion
+          [initial]="{ opacity: 0, y: 10 }"
+          [animate]="{ opacity: 1, y: 0 }"
+          [transition]="{ duration: 0.25, delay: staggerDelay(i) }"
         >
           <div class="transaction-main">
             <div class="transaction-info">

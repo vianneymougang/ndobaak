@@ -7,8 +7,20 @@
       <p-skeleton width="100%" height="8rem" />
     </div>
   } @else if (receipt(); as r) {
-    <div class="success-card scale-fade-in">
-      <div class="success-icon scale-pop" style="animation-delay: 0.3s">
+    <div
+      class="success-card"
+      ngmMotion
+      [initial]="{ opacity: 0, scale: 0.9 }"
+      [animate]="{ opacity: 1, scale: 1 }"
+      [transition]="{ type: 'spring', stiffness: 260, damping: 20 }"
+    >
+      <div
+        class="success-icon"
+        ngmMotion
+        [initial]="{ scale: 0 }"
+        [animate]="{ scale: 1 }"
+        [transition]="{ type: 'spring', stiffness: 400, damping: 15, delay: 0.3 }"
+      >
         <i class="pi pi-check" aria-hidden="true"></i>
       </div>
 
@@ -39,7 +51,13 @@
 
       <p-divider />
 
-      <div class="success-actions fade-slide-up" style="animation-delay: 0.5s">
+      <div
+        class="success-actions"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 10 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ delay: 0.5, duration: 0.3 }"
+      >
         <p-button
           label="Voir le reçu"
           icon="pi pi-file"

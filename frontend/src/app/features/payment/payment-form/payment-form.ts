@@ -17,6 +17,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { DividerModule } from 'primeng/divider';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageModule } from 'primeng/message';
+import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { MessageService } from 'primeng/api';
 import { BookingService } from '../../../core/services/booking';
 import { PaymentService } from '../../../core/services/payment';
@@ -35,6 +36,7 @@ import { MobileMoneyOperator } from '../../../core/models/payment.models';
     DividerModule,
     SkeletonModule,
     MessageModule,
+    NgmMotionDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './payment-form.html',

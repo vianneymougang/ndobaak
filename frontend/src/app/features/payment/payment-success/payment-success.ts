@@ -12,13 +12,14 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 import { SkeletonModule } from 'primeng/skeleton';
+import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { MessageService } from 'primeng/api';
 import { PaymentService } from '../../../core/services/payment';
 import { ReceiptResponse } from '../../../core/models/payment.models';
 
 @Component({
   selector: 'app-payment-success',
-  imports: [RouterLink, ButtonModule, DividerModule, SkeletonModule],
+  imports: [RouterLink, ButtonModule, DividerModule, SkeletonModule, NgmMotionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './payment-success.html',
   styleUrl: './payment-success.scss',

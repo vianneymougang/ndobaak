@@ -10,7 +10,13 @@
     @let sub = subscription();
 
     @if (!sub) {
-      <div class="cta-card fade-slide-up">
+      <div
+        class="cta-card"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 24 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ duration: 0.4 }"
+      >
         <div class="cta-header">
           <div class="cta-icon-wrap" aria-hidden="true">
             <i class="pi pi-shield"></i>
@@ -45,7 +51,13 @@
       </div>
 
     } @else if (sub.status === 'ACTIVE') {
-      <div class="status-card fade-slide-up">
+      <div
+        class="status-card"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 24 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ duration: 0.4 }"
+      >
         <div class="status-header">
           <div class="status-title-row">
             <h2 class="status-title">Mon abonnement</h2>
@@ -130,7 +142,13 @@
       </div>
 
     } @else if (sub.status === 'PENDING_PAYMENT') {
-      <div class="pending-card fade-slide-up">
+      <div
+        class="pending-card"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 24 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ duration: 0.4 }"
+      >
         <i class="pi pi-clock pending-icon" aria-hidden="true"></i>
         <h2 class="pending-title">Paiement en cours</h2>
         <p class="pending-desc">
@@ -153,7 +171,13 @@
         </div>
       </div>
 
-      <div class="renew-cta fade-slide-up">
+      <div
+        class="renew-cta"
+        ngmMotion
+        [initial]="{ opacity: 0, y: 24 }"
+        [animate]="{ opacity: 1, y: 0 }"
+        [transition]="{ duration: 0.4 }"
+      >
         <p class="renew-text">
           Votre abonnement a expiré le {{ sub.endDate | date: 'dd MMMM yyyy' : '' : 'fr' }}.
         </p>

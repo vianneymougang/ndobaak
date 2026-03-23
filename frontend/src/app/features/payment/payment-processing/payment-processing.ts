@@ -11,12 +11,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ButtonModule } from 'primeng/button';
+import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { MessageService } from 'primeng/api';
 import { PaymentService } from '../../../core/services/payment';
 
 @Component({
   selector: 'app-payment-processing',
-  imports: [ProgressSpinnerModule, ButtonModule],
+  imports: [ProgressSpinnerModule, ButtonModule, NgmMotionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './payment-processing.html',
   styleUrl: './payment-processing.scss',
