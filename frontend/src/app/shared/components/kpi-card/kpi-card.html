@@ -7,16 +7,12 @@
   </div>
 } @else {
   <a
-    class="kpi-card"
+    class="kpi-card fade-slide-up hover-lift"
     [class.kpi-card--accent]="accent()"
     [routerLink]="routerLink()"
     [attr.role]="routerLink() ? null : 'button'"
     [attr.tabindex]="routerLink() ? null : '0'"
-    ngmMotion
-    [initial]="{ opacity: 0, y: 15 }"
-    [animate]="{ opacity: 1, y: 0 }"
-    [transition]="{ duration: 0.3, delay: animationDelay(), ease: 'easeOut' }"
-    [whileHover]="{ y: -3 }"
+    [style.animation-delay]="animationDelay() + 's'"
   >
     <div class="kpi-icon-wrap" [class.kpi-icon-wrap--accent]="accent()">
       <i class="pi {{ icon() }}" aria-hidden="true"></i>
@@ -25,13 +21,10 @@
     <span class="kpi-value">{{ value() }}</span>
     @if (trend() !== null && trend() !== 0) {
       <span
-        class="kpi-trend"
+        class="kpi-trend scale-pop"
         [class.kpi-trend--up]="trendPositive()"
         [class.kpi-trend--down]="trendNegative()"
-        ngmMotion
-        [initial]="{ scale: 0 }"
-        [animate]="{ scale: 1 }"
-        [transition]="{ type: 'spring', stiffness: 400, damping: 15, delay: animationDelay() + 0.2 }"
+        [style.animation-delay]="(animationDelay() + 0.2) + 's'"
       >
         <i
           class="pi"

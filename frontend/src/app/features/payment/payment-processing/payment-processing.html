@@ -1,19 +1,8 @@
 <div class="processing-page">
-  <div
-    class="processing-card"
-    ngmMotion
-    [initial]="{ opacity: 0, scale: 0.95 }"
-    [animate]="{ opacity: 1, scale: 1 }"
-    [transition]="{ type: 'spring', stiffness: 300, damping: 30 }"
-  >
+  <div class="processing-card scale-fade-in">
     @if (!timedOut()) {
       <div class="phone-animation">
-        <div
-          class="phone-icon"
-          ngmMotion
-          [animate]="{ rotate: [0, -5, 5, -5, 0] }"
-          [transition]="{ duration: 0.6, repeat: 9999, repeatDelay: 2 }"
-        >
+        <div class="phone-icon phone-wiggle">
           <i class="pi pi-mobile" aria-hidden="true"></i>
         </div>
       </div>

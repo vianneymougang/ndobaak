@@ -1,6 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { SkeletonModule } from 'primeng/skeleton';
-import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { RelativeTimePipe } from '../../pipes/relative-time-pipe';
 
 export interface ActivityItem {
@@ -13,7 +12,7 @@ export interface ActivityItem {
 
 @Component({
   selector: 'app-activity-timeline',
-  imports: [SkeletonModule, NgmMotionDirective, RelativeTimePipe],
+  imports: [SkeletonModule, RelativeTimePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './activity-timeline.html',
   styleUrl: './activity-timeline.scss',

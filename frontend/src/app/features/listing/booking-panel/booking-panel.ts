@@ -13,7 +13,6 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
-import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { ListingResponse } from '../../../core/models/listing.models';
 import { BookingResponse } from '../../../core/models/booking.models';
 import { BookingConfirmDialog } from '../booking-confirm-dialog/booking-confirm-dialog';
@@ -27,7 +26,6 @@ import { AuthService } from '../../../core/services/auth';
     SelectModule,
     ButtonModule,
     SkeletonModule,
-    NgmMotionDirective,
     BookingConfirmDialog,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

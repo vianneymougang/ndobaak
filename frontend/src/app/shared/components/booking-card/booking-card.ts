@@ -9,12 +9,11 @@ import { RouterLink } from '@angular/router';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
-import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { BookingResponse, BookingStatus } from '../../../core/models/booking.models';
 
 @Component({
   selector: 'app-booking-card',
-  imports: [RouterLink, TagModule, ButtonModule, AvatarModule, NgmMotionDirective],
+  imports: [RouterLink, TagModule, ButtonModule, AvatarModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './booking-card.html',
   styleUrl: './booking-card.scss',

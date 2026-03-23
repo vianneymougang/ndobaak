@@ -22,7 +22,6 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { FileUploadModule } from 'primeng/fileupload';
 import { MessageService } from 'primeng/api';
-import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { AuthService } from '../../../core/services/auth';
 import { ProfileService } from '../../../core/services/profile';
 
@@ -40,7 +39,6 @@ import { ProfileService } from '../../../core/services/profile';
     SkeletonModule,
     TooltipModule,
     FileUploadModule,
-    NgmMotionDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './landlord-profile.html',
@@ -91,7 +89,10 @@ export class LandlordProfile implements OnInit {
   });
 
   ngOnInit(): void {
-    if (isPlatformBrowser(this.platformId)) {
+    if (this.user()) {
+      this.loading.set(false);
+      this.populateForm();
+    } else if (isPlatformBrowser(this.platformId)) {
       this.loadProfile();
     }
   }

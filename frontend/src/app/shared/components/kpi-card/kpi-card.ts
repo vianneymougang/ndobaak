@@ -1,11 +1,10 @@
 import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SkeletonModule } from 'primeng/skeleton';
-import { NgmMotionDirective } from '@scripttype/ng-motion';
 
 @Component({
   selector: 'app-kpi-card',
-  imports: [RouterLink, SkeletonModule, NgmMotionDirective],
+  imports: [RouterLink, SkeletonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './kpi-card.html',
   styleUrl: './kpi-card.scss',

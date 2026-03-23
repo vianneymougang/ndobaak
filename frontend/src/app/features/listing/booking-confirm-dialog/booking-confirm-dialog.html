@@ -9,12 +9,7 @@
   [style]="{ width: '500px', 'max-width': '90vw' }"
 >
   <div class="confirm-body">
-    <div
-      ngmMotion
-      [initial]="{ opacity: 0, y: 10 }"
-      [animate]="{ opacity: 1, y: 0 }"
-      [transition]="{ duration: 0.3, delay: 0.05 }"
-    >
+    <div class="fade-slide-up" style="animation-delay: 0.05s">
       <div class="listing-card-preview">
         @if (thumbnailUrl()) {
           <img
@@ -37,13 +32,7 @@
       </div>
     </div>
 
-    <div
-      ngmMotion
-      [initial]="{ opacity: 0, y: 10 }"
-      [animate]="{ opacity: 1, y: 0 }"
-      [transition]="{ duration: 0.3, delay: 0.1 }"
-      class="confirm-dates"
-    >
+    <div class="confirm-dates fade-slide-up" style="animation-delay: 0.1s">
       <div class="date-row">
         <span class="date-label"><i class="pi pi-calendar" aria-hidden="true"></i> Emménagement</span>
         <span class="date-value">{{ formattedStartDate() }}</span>
@@ -58,13 +47,7 @@
       </div>
     </div>
 
-    <div
-      ngmMotion
-      [initial]="{ opacity: 0, y: 10 }"
-      [animate]="{ opacity: 1, y: 0 }"
-      [transition]="{ duration: 0.3, delay: 0.15 }"
-      class="confirm-summary"
-    >
+    <div class="confirm-summary fade-slide-up" style="animation-delay: 0.15s">
       <div class="summary-row">
         <span class="summary-label">Loyer mensuel</span>
         <span class="summary-value">{{ formattedMonthlyRent() }} FCFA</span>

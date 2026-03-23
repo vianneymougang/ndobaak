@@ -20,13 +20,7 @@
     </div>
   } @else if (booking(); as b) {
     <div class="payment-layout">
-      <div
-        class="form-column"
-        ngmMotion
-        [initial]="{ opacity: 0, y: 20 }"
-        [animate]="{ opacity: 1, y: 0 }"
-        [transition]="{ duration: 0.4 }"
-      >
+      <div class="form-column fade-slide-up">
         @if (apiError(); as error) {
           <div class="auth-error-banner" role="alert">
             <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
@@ -111,13 +105,7 @@
         </form>
       </div>
 
-      <aside
-        class="summary-column"
-        ngmMotion
-        [initial]="{ opacity: 0, y: 20 }"
-        [animate]="{ opacity: 1, y: 0 }"
-        [transition]="{ duration: 0.4, delay: 0.15 }"
-      >
+      <aside class="summary-column fade-slide-up" style="animation-delay: 0.15s">
         <div class="summary-card">
           @if (b.listing.thumbnailUrl) {
             <img

@@ -14,7 +14,6 @@ import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
-import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { MessageService } from 'primeng/api';
 import { ListingResponse } from '../../../core/models/listing.models';
 import { BookingResponse } from '../../../core/models/booking.models';
@@ -22,7 +21,7 @@ import { BookingService } from '../../../core/services/booking';
 
 @Component({
   selector: 'app-booking-confirm-dialog',
-  imports: [FormsModule, DialogModule, ButtonModule, CheckboxModule, NgmMotionDirective],
+  imports: [FormsModule, DialogModule, ButtonModule, CheckboxModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './booking-confirm-dialog.html',
   styleUrl: './booking-confirm-dialog.scss',

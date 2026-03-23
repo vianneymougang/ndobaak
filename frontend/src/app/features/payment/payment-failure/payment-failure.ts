@@ -9,14 +9,13 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { MessageService } from 'primeng/api';
 import { PaymentService } from '../../../core/services/payment';
 import { PaymentResponse } from '../../../core/models/payment.models';
 
 @Component({
   selector: 'app-payment-failure',
-  imports: [RouterLink, ButtonModule, NgmMotionDirective],
+  imports: [RouterLink, ButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './payment-failure.html',
   styleUrl: './payment-failure.scss',

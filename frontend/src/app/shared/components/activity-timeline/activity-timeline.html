@@ -41,11 +41,8 @@
         tabindex="0"
         (click)="itemClicked.emit(item)"
         (keydown.enter)="itemClicked.emit(item)"
-        ngmMotion
-        [initial]="{ opacity: 0, x: -12 }"
-        [animate]="{ opacity: 1, x: 0 }"
-        [transition]="{ duration: 0.3, delay: staggerDelay(i), ease: 'easeOut' }"
-        [whileHover]="{ x: 4 }"
+        class="fade-slide-in hover-lift-sm"
+        [style.animation-delay]="staggerDelay(i) + 's'"
       >
         <div class="timeline-dot-col">
           <div class="timeline-icon {{ getIconClass(item.type) }}">

@@ -14,7 +14,6 @@ import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
 import { DrawerModule } from 'primeng/drawer';
 import { ButtonModule } from 'primeng/button';
-import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { AuthService } from '../../../core/services/auth';
 import { NotificationBell } from '../notification-bell/notification-bell';
 
@@ -50,7 +49,6 @@ export interface ShellMoreItem {
     BadgeModule,
     DrawerModule,
     ButtonModule,
-    NgmMotionDirective,
     NotificationBell,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

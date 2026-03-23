@@ -32,10 +32,8 @@
       <div class="bookings-list">
         @for (booking of bookings(); track booking.id; let i = $index) {
           <app-booking-card
-            ngmMotion
-            [initial]="{ opacity: 0, y: 20 }"
-            [animate]="{ opacity: 1, y: 0 }"
-            [transition]="{ duration: 0.35, delay: staggerDelay(i), ease: 'easeOut' }"
+            class="fade-slide-up"
+            [style.animation-delay]="staggerDelay(i) + 's'"
             [booking]="booking"
             viewMode="landlord"
             (confirm)="confirmBooking($event)"
