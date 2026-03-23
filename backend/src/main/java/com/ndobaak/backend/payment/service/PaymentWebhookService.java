@@ -129,7 +129,6 @@ public class PaymentWebhookService {
                 .toList();
 
         if (pendingBlocks.isEmpty()) {
-            notificationService.sendPaymentCompletionNotifications(completedPayment, schedule.getBooking());
             return false;
         }
 

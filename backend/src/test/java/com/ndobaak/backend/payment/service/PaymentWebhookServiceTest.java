@@ -5,7 +5,9 @@ import com.ndobaak.backend.booking.entity.Booking;
 import com.ndobaak.backend.common.enums.BookingStatus;
 import com.ndobaak.backend.common.enums.PaymentStatus;
 import com.ndobaak.backend.common.enums.PaymentType;
+import com.ndobaak.backend.common.enums.ScheduleFrequency;
 import com.ndobaak.backend.common.exception.BusinessException;
+import com.ndobaak.backend.payment.entity.PaymentSchedule;
 import com.ndobaak.backend.listing.entity.Listing;
 import com.ndobaak.backend.payment.entity.Payment;
 import com.ndobaak.backend.payment.gateway.PaymentGateway;
@@ -25,6 +27,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -161,5 +165,39 @@ class PaymentWebhookServiceTest {
 
         verify(paymentRepository, never()).save(any());
         verify(notificationService, never()).sendPaymentCompletionNotifications(any(), any());
+    }
+
+    @Test
+    void handleWebhookLastBlockShouldSendSingleNotification() {
+        Payment payment = Payment.builder()
+                .booking(booking).amount(new BigDecimal("150000"))
+                .transactionId("ref-block-2").status(PaymentStatus.PROCESSING)
+                .paymentType(PaymentType.INSTALLMENT)
+                .payerName("John Doe").phoneNumber("+237600000000")
+                .build();
+        payment.setId(2L);
+
+        PaymentSchedule schedule = PaymentSchedule.builder()
+                .booking(booking)
+                .totalAmount(new BigDecimal("650000"))
+                .frequency(ScheduleFrequency.BLOCK)
+                .numberOfInstallments(2)
+                .build();
+        schedule.setId(1L);
+
+        WebhookEvent event = new WebhookEvent(
+                "payment.complete", "ref-block-2", "complete",
+                new BigDecimal("157500"), "XAF", Map.of());
+
+        when(gatewayRouter.resolveGatewayByProvider("mock")).thenReturn(gateway);
+        when(gateway.verifyWebhookSignature("payload", "sig")).thenReturn(true);
+        when(gateway.parseWebhookPayload("payload")).thenReturn(event);
+        when(paymentRepository.findByProviderReference("ref-block-2")).thenReturn(Optional.of(payment));
+        when(scheduleRepository.findByBookingId(1L)).thenReturn(Optional.of(schedule));
+        when(installmentRepository.findByPaymentScheduleId(1L)).thenReturn(Collections.emptyList());
+
+        service.handleWebhook("mock", "payload", "sig");
+
+        verify(notificationService, times(1)).sendPaymentCompletionNotifications(payment, booking);
     }
 }
