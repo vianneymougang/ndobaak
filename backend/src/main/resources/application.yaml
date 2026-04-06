@@ -54,3 +54,4 @@ app:
       public-key: ${NOTCHPAY_PUBLIC_KEY:}
       webhook-hash: ${NOTCHPAY_WEBHOOK_HASH:}
       callback-url: ${NOTCHPAY_CALLBACK_URL:http://localhost:4200/payments/callback}
+      private-key: ${NOTCHPAY_PRIVATE_KEY:}
