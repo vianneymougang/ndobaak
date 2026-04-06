@@ -4,6 +4,7 @@ import com.ndobaak.backend.booking.entity.Booking;
 import com.ndobaak.backend.booking.repository.BookingRepository;
 import com.ndobaak.backend.common.enums.ApplicationStatus;
 import com.ndobaak.backend.common.enums.BookingStatus;
+import com.ndobaak.backend.common.enums.DocumentStatus;
 import com.ndobaak.backend.common.enums.TenantDocumentType;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.media.service.StorageService;
@@ -145,7 +146,7 @@ public class TenantApplicationService {
         application.setDecidedById(adminId);
         application.setDecisionComment(decision.comment());
 
-        if (decision.status() == com.ndobaak.backend.common.enums.DocumentStatus.APPROVED) {
+        if (decision.status() == DocumentStatus.APPROVED) {
             application.setStatus(ApplicationStatus.APPROVED);
             booking.setStatus(BookingStatus.APPLICATION_APPROVED);
         } else {
