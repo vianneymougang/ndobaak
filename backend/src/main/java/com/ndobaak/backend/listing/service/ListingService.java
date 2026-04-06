@@ -22,6 +22,7 @@ import com.ndobaak.backend.listing.repository.ListingRepository;
 import com.ndobaak.backend.listing.repository.PhotoRepository;
 import com.ndobaak.backend.media.service.ImageProcessingService;
 import com.ndobaak.backend.media.service.StorageService;
+import com.ndobaak.backend.subscription.service.SubscriptionService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -56,13 +57,13 @@ public class ListingService {
     private final ImageProcessingService imageProcessingService;
     private final AuthService authService;
     private final ListingMapper listingMapper;
-    private final com.ndobaak.backend.subscription.service.SubscriptionService subscriptionService;
+    private final SubscriptionService subscriptionService;
 
     public ListingService(ListingRepository listingRepository, AmenityRepository amenityRepository,
                           PhotoRepository photoRepository, StorageService storageService,
                           ImageProcessingService imageProcessingService, AuthService authService,
                           ListingMapper listingMapper,
-                          com.ndobaak.backend.subscription.service.SubscriptionService subscriptionService) {
+                          SubscriptionService subscriptionService) {
         this.listingRepository = listingRepository;
         this.amenityRepository = amenityRepository;
         this.photoRepository = photoRepository;
@@ -78,14 +79,14 @@ public class ListingService {
         User landlord = authService.getAuthenticatedUser();
 
         if (!subscriptionService.hasActiveSubscription(landlord.getId())) {
-            throw new com.ndobaak.backend.common.exception.BusinessException(
+            throw new BusinessException(
                     "Vous devez souscrire à un abonnement pour publier des annonces.");
         }
 
         long currentListingCount = listingRepository.countByLandlordId(landlord.getId());
         int maxListings = subscriptionService.getMaxListings(landlord.getId());
         if (currentListingCount >= maxListings) {
-            throw new com.ndobaak.backend.common.exception.BusinessException(
+            throw new BusinessException(
                     "Vous avez atteint la limite de " + maxListings
                             + " annonces autorisées par votre abonnement.");
         }
