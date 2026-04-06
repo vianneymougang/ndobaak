@@ -1,0 +1,120 @@
+<div class="container mx-auto px-4 py-8">
+  <p-card header="Dossier Locataire">
+    @if (!application()) {
+      <form [formGroup]="applicationForm" (ngSubmit)="onSubmitApplication()">
+        <h3 class="text-xl font-semibold mb-4">Informations Garant(s)</h3>
+        
+        <div formArrayName="guarantors">
+          @for (guarantor of guarantors.controls; track $index) {
+            <div [formGroupName]="$index" class="mb-6 p-4 border rounded">
+              <h4 class="font-medium mb-3">Garant {{ $index + 1 }}</h4>
+              
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block mb-2">Nom</label>
+                  <input pInputText formControlName="lastName" class="w-full" />
+                </div>
+                
+                <div>
+                  <label class="block mb-2">Prénom</label>
+                  <input pInputText formControlName="firstName" class="w-full" />
+                </div>
+                
+                <div>
+                  <label class="block mb-2">Numéro CNI</label>
+                  <input pInputText formControlName="idCardNumber" class="w-full" />
+                </div>
+                
+                <div>
+                  <label class="block mb-2">Téléphone</label>
+                  <input pInputText formControlName="phone" class="w-full" placeholder="+237XXXXXXXXX" />
+                </div>
+                
+                <div class="col-span-2">
+                  <label class="block mb-2">Adresse</label>
+                  <input pInputText formControlName="address" class="w-full" />
+                </div>
+                
+                <div class="col-span-2">
+                  <label class="block mb-2">Lien avec le locataire</label>
+                  <input pInputText formControlName="relationshipToTenant" class="w-full" />
+                </div>
+              </div>
+              
+              @if (guarantors.length > 1) {
+                <button 
+                  type="button" 
+                  pButton 
+                  label="Retirer" 
+                  severity="danger" 
+                  class="mt-3"
+                  (click)="removeGuarantor($index)">
+                </button>
+              }
+            </div>
+          }
+        </div>
+        
+        <div class="flex gap-3 mt-4">
+          <button type="button" pButton label="Ajouter un garant" severity="secondary" (click)="addGuarantor()"></button>
+          <button type="submit" pButton label="Créer le dossier" [loading]="submitting()"></button>
+        </div>
+      </form>
+    } @else {
+      <div>
+        <h3 class="text-xl font-semibold mb-4">Documents requis</h3>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block mb-2">Carte d'identité (CNI)</label>
+            <p-fileUpload 
+              mode="basic" 
+              chooseLabel="Choisir"
+              accept="image/*,application/pdf"
+              [maxFileSize]="5000000"
+              (onSelect)="onUploadDocument($event, 'ID_CARD')">
+            </p-fileUpload>
+          </div>
+          
+          <div>
+            <label class="block mb-2">Carte étudiant</label>
+            <p-fileUpload 
+              mode="basic" 
+              chooseLabel="Choisir"
+              accept="image/*,application/pdf"
+              [maxFileSize]="5000000"
+              (onSelect)="onUploadDocument($event, 'STUDENT_CARD')">
+            </p-fileUpload>
+          </div>
+          
+          <div>
+            <label class="block mb-2">Justificatif de domicile (optionnel)</label>
+            <p-fileUpload 
+              mode="basic" 
+              chooseLabel="Choisir"
+              accept="image/*,application/pdf"
+              [maxFileSize]="5000000"
+              (onSelect)="onUploadDocument($event, 'PROOF_OF_ADDRESS')">
+            </p-fileUpload>
+          </div>
+        </div>
+        
+        <div class="mt-6">
+          <button 
+            pButton 
+            label="Soumettre pour validation" 
+            [loading]="submitting()"
+            (click)="onSubmitForValidation()">
+          </button>
+        </div>
+        
+        <div class="mt-6">
+          <h4 class="font-semibold mb-2">Statut : {{ application()?.status }}</h4>
+          @if (application()?.decisionComment) {
+            <p class="text-gray-600">{{ application()?.decisionComment }}</p>
+          }
+        </div>
+      </div>
+    }
+  </p-card>
+</div>
