@@ -4,6 +4,7 @@ import com.ndobaak.backend.auth.entity.Landlord;
 import com.ndobaak.backend.auth.entity.User;
 import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.common.enums.MobileMoneyOperator;
+import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.common.enums.NotificationType;
 import com.ndobaak.backend.common.enums.SubscriptionStatus;
 import com.ndobaak.backend.common.exception.BusinessException;

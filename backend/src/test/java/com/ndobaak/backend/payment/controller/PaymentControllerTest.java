@@ -3,6 +3,7 @@ package com.ndobaak.backend.payment.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndobaak.backend.auth.service.CustomOAuth2UserService;
 import com.ndobaak.backend.common.enums.MobileMoneyOperator;
+import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.common.enums.PaymentStatus;
 import com.ndobaak.backend.common.enums.PaymentType;
 import com.ndobaak.backend.common.enums.ScheduleFrequency;
@@ -72,7 +73,7 @@ class PaymentControllerTest {
                 .amount(new BigDecimal("300000"))
                 .status(status)
                 .paymentType(PaymentType.INTEGRAL)
-                .operator(MobileMoneyOperator.MTN_MOMO)
+                .operator(PaymentChannel.MTN_MOMO)
                 .createdAt(LocalDateTime.of(2026, 3, 18, 10, 0))
                 .build();
     }
