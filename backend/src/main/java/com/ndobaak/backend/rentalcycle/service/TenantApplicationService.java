@@ -145,7 +145,7 @@ public class TenantApplicationService {
         application.setDecidedById(adminId);
         application.setDecisionComment(decision.comment());
 
-        if ("APPROVED".equals(decision.decision())) {
+        if (decision.status() == com.ndobaak.backend.common.enums.DocumentStatus.APPROVED) {
             application.setStatus(ApplicationStatus.APPROVED);
             booking.setStatus(BookingStatus.APPLICATION_APPROVED);
         } else {

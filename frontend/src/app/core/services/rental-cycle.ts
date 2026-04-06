@@ -46,7 +46,7 @@ export interface TenantApplicationResponse {
 }
 
 export interface ValidationDecisionRequest {
-  decision: 'APPROVED' | 'REJECTED';
+  status: 'APPROVED' | 'REJECTED';
   comment?: string;
 }
 
