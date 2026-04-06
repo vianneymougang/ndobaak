@@ -26,7 +26,11 @@ public class UserMapper {
                     .fieldOfStudy(student.getFieldOfStudy())
                     .yearOfStudy(student.getYearOfStudy());
         } else if (user instanceof Landlord landlord) {
-            builder.verified(landlord.getIdCardNumber() != null);
+            builder.verified(landlord.getIdCardNumber() != null)
+                    .idCardNumber(landlord.getIdCardNumber())
+                    .taxId(landlord.getTaxId())
+                    .mobileMoneyPhone(landlord.getMobileMoneyPhone())
+                    .notchPayAccountId(landlord.getNotchPayAccountId());
         }
 
         return builder.build();
