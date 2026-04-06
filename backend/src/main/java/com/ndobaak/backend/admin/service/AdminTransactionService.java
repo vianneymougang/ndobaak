@@ -94,7 +94,7 @@ public class AdminTransactionService {
                 .status(payment.getStatus())
                 .payerName(payment.getPayerName())
                 .phoneNumber(payment.getPhoneNumber())
-                .operator(payment.getMobileMoneyOperator())
+                .operator(payment.getChannel())
                 .providerName(payment.getProviderName())
                 .transactionId(payment.getTransactionId())
                 .createdAt(payment.getCreatedAt())

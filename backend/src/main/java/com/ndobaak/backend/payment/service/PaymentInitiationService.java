@@ -6,6 +6,7 @@ import com.ndobaak.backend.booking.entity.Booking;
 import com.ndobaak.backend.booking.repository.BookingRepository;
 import com.ndobaak.backend.common.enums.BookingStatus;
 import com.ndobaak.backend.common.enums.InstallmentStatus;
+import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.common.enums.PaymentMethod;
 import com.ndobaak.backend.common.enums.PaymentStatus;
 import com.ndobaak.backend.common.enums.PaymentType;
@@ -100,7 +101,7 @@ public class PaymentInitiationService {
                 .amount(firstBlockAmount)
                 .commission(commission)
                 .paymentMethod(PaymentMethod.MOBILE_MONEY)
-                .mobileMoneyOperator(request.getOperator())
+                .channel(PaymentChannel.valueOf(request.getOperator().name()))
                 .paymentType(paymentType)
                 .transactionId(reference)
                 .status(PaymentStatus.PENDING)
@@ -172,7 +173,7 @@ public class PaymentInitiationService {
                 .amount(installment.getAmount())
                 .commission(commission)
                 .paymentMethod(PaymentMethod.MOBILE_MONEY)
-                .mobileMoneyOperator(request.getOperator())
+                .channel(PaymentChannel.valueOf(request.getOperator().name()))
                 .paymentType(PaymentType.INSTALLMENT)
                 .transactionId(reference)
                 .status(PaymentStatus.PENDING)

@@ -34,7 +34,7 @@ public class PaymentMapper {
                 .status(payment.getStatus())
                 .paymentType(payment.getPaymentType())
                 .paymentMethod(payment.getPaymentMethod())
-                .operator(payment.getMobileMoneyOperator())
+                .operator(payment.getChannel())
                 .transactionId(payment.getTransactionId())
                 .providerName(payment.getProviderName())
                 .paidAt(payment.getPaidAt())
@@ -105,7 +105,7 @@ public class PaymentMapper {
                 .commission(payment.getCommission())
                 .totalCharged(payment.getAmount().add(payment.getCommission()))
                 .paymentMethod(payment.getPaymentMethod())
-                .operator(payment.getMobileMoneyOperator())
+                .operator(payment.getChannel())
                 .status(payment.getStatus())
                 .paymentType(payment.getPaymentType())
                 .build();
