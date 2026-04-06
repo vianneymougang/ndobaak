@@ -56,6 +56,13 @@ export class BookingCard {
       CANCELLED: 'danger',
       COMPLETED: 'info',
       EXPIRED: 'secondary',
+      APPLICATION_PENDING: 'warn',
+      APPLICATION_APPROVED: 'success',
+      APPLICATION_REJECTED: 'danger',
+      LEASE_GENERATED: 'info',
+      LEASE_SIGNED: 'success',
+      PAYMENT_HELD: 'info',
+      KEYS_HANDED_OVER: 'success',
     };
     return map[this.booking().status];
   });
@@ -68,6 +75,13 @@ export class BookingCard {
       CANCELLED: 'Annulée',
       COMPLETED: 'Terminée',
       EXPIRED: 'Expirée',
+      APPLICATION_PENDING: 'Dossier en cours',
+      APPLICATION_APPROVED: 'Dossier validé',
+      APPLICATION_REJECTED: 'Dossier rejeté',
+      LEASE_GENERATED: 'Contrat généré',
+      LEASE_SIGNED: 'Contrat signé',
+      PAYMENT_HELD: 'Paiement en attente',
+      KEYS_HANDED_OVER: 'Clés remises',
     };
     return map[this.booking().status];
   });
