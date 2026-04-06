@@ -1,0 +1,12 @@
+<div class="error-state" role="alert">
+  <i [class]="icon()" class="error-icon" aria-hidden="true"></i>
+  <span class="error-message">{{ message() }}</span>
+  <p-button
+    [label]="retryLabel()"
+    icon="pi pi-refresh"
+    severity="secondary"
+    [outlined]="true"
+    size="small"
+    (click)="retry.emit()"
+  />
+</div>

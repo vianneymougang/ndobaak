@@ -1,104 +1,82 @@
 <div class="dashboard-page">
-  <div class="page-header">
-    <h1 class="page-title">Tableau de bord</h1>
+  <div class="page-header fade-slide-up">
+    <h1 class="page-title">Centre de commande</h1>
+    <p class="page-subtitle">Vue d'ensemble de la plateforme Ndobaâk</p>
   </div>
 
-  @if (error()) {
-    <p-message severity="error" text="Impossible de charger les statistiques. Vérifiez votre connexion et réessayez." [closable]="false" />
-  }
+  <section class="section section--health" aria-label="Santé plateforme">
+    <app-platform-health
+      [score]="healthScore()"
+      [status]="healthStatus()"
+      [pendingCount]="pendingListings().length"
+      [anomalyCount]="anomalies().length"
+      [failedCount]="failedTransactionCount()"
+      [loading]="loadingStats() || loadingListings() || loadingAnomalies()"
+      [error]="errorStats() && errorListings() && errorAnomalies()"
+      (retry)="loadStats(); loadListings(); loadAnomalies()"
+    />
+  </section>
 
-  <div class="kpi-grid">
-    @if (loading()) {
-      @for (i of [1,2,3,4,5,6]; track i) {
-        <div class="kpi-card">
-          <p-skeleton height="1rem" width="60%" styleClass="mb-3" />
-          <p-skeleton height="2.5rem" width="40%" styleClass="mb-2" />
-          <p-skeleton height="0.75rem" width="80%" />
-        </div>
-      }
-    } @else if (stats(); as s) {
-      <div class="kpi-card">
-        <div class="kpi-icon kpi-icon--users"><i class="pi pi-users"></i></div>
-        <div class="kpi-value">{{ s.totalUsers | number }}</div>
-        <div class="kpi-label">Utilisateurs</div>
-        <div class="kpi-sub">+{{ s.newUsersThisMonth }} ce mois</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon kpi-icon--listing"><i class="pi pi-home"></i></div>
-        <div class="kpi-value">{{ s.publishedListings | number }}</div>
-        <div class="kpi-label">Annonces publiées</div>
-        <div class="kpi-sub">{{ s.pendingListings }} en attente</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon kpi-icon--booking"><i class="pi pi-calendar"></i></div>
-        <div class="kpi-value">{{ s.confirmedBookings | number }}</div>
-        <div class="kpi-label">Réservations confirmées</div>
-        <div class="kpi-sub">+{{ s.newBookingsThisMonth }} ce mois</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon kpi-icon--revenue"><i class="pi pi-wallet"></i></div>
-        <div class="kpi-value">{{ s.totalRevenue | number }} FCFA</div>
-        <div class="kpi-label">Revenus totaux</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon kpi-icon--sub"><i class="pi pi-star"></i></div>
-        <div class="kpi-value">{{ s.activeSubscriptions | number }}</div>
-        <div class="kpi-label">Abonnements actifs</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon kpi-icon--landlord"><i class="pi pi-building"></i></div>
-        <div class="kpi-value">{{ s.totalLandlords | number }}</div>
-        <div class="kpi-label">Propriétaires</div>
-        <div class="kpi-sub">{{ s.totalStudents }} étudiants</div>
-      </div>
-    }
+  <section class="section section--metrics" aria-label="Métriques clés">
+    <app-command-metrics
+      [stats]="stats()"
+      [userDelta]="userDelta()"
+      [bookingDelta]="bookingDelta()"
+      [revenueDelta]="revenueDelta()"
+      [loading]="loadingStats()"
+      [error]="errorStats()"
+      (retry)="loadStats()"
+    />
+  </section>
+
+  <section class="section section--attention" aria-label="Nécessite votre attention">
+    <app-attention-panel
+      [pendingListings]="urgentListings()"
+      [pendingReviews]="pendingReviews()"
+      [anomalies]="anomalies()"
+      [loadingListings]="loadingListings()"
+      [loadingReviews]="loadingReviews()"
+      [loadingAnomalies]="loadingAnomalies()"
+      [errorListings]="errorListings()"
+      [errorReviews]="errorReviews()"
+      [errorAnomalies]="errorAnomalies()"
+      [actionLoading]="actionLoading()"
+      (validateListing)="onValidateListing($event)"
+      (rejectListing)="onRejectListing($event)"
+      (approveReview)="onApproveReview($event)"
+      (rejectReview)="onRejectReview($event)"
+      (retryListings)="loadListings()"
+      (retryReviews)="loadReviews()"
+      (retryAnomalies)="loadAnomalies()"
+    />
+  </section>
+
+  <div class="grid-2col">
+    <section class="section section--charts" aria-label="Graphiques">
+      <app-admin-charts
+        [stats]="stats()"
+        [loading]="loadingStats()"
+        [error]="errorStats()"
+        (retry)="loadStats()"
+      />
+    </section>
+
+    <section class="section section--insights" aria-label="Insights">
+      <app-admin-insights
+        [insights]="insights()"
+        [loading]="loadingStats() || loadingListings() || loadingAnomalies()"
+        [error]="errorStats()"
+        (retry)="loadStats()"
+      />
+    </section>
   </div>
 
-  <div class="charts-grid">
-    <div class="chart-card">
-      <h2 class="chart-title">Réservations mensuelles</h2>
-      @if (loading()) {
-        <p-skeleton height="220px" />
-      } @else if (bookingsChartData()) {
-        <p-chart type="line" [data]="bookingsChartData()!" [options]="chartOptions" height="220px" />
-      } @else {
-        <p class="chart-empty">Aucune donnée disponible</p>
-      }
-    </div>
-    <div class="chart-card">
-      <h2 class="chart-title">Revenus mensuels (FCFA)</h2>
-      @if (loading()) {
-        <p-skeleton height="220px" />
-      } @else if (revenueChartData()) {
-        <p-chart type="bar" [data]="revenueChartData()!" [options]="chartOptions" height="220px" />
-      } @else {
-        <p class="chart-empty">Aucune donnée disponible</p>
-      }
-    </div>
-  </div>
-
-  <div class="quick-actions">
-    <h2 class="section-title">Actions rapides</h2>
-    <div class="actions-grid">
-      <a routerLink="/admin/listings" class="action-card">
-        <i class="pi pi-check-circle action-icon"></i>
-        <span class="action-label">Annonces en attente</span>
-        @if (stats()?.pendingListings) {
-          <p-tag [value]="'' + stats()!.pendingListings" severity="warn" />
-        }
-      </a>
-      <a routerLink="/admin/users" class="action-card">
-        <i class="pi pi-user-edit action-icon"></i>
-        <span class="action-label">Gérer les utilisateurs</span>
-      </a>
-      <a routerLink="/admin/reviews" class="action-card">
-        <i class="pi pi-star action-icon"></i>
-        <span class="action-label">Avis à modérer</span>
-      </a>
-      <a routerLink="/admin/transactions" class="action-card">
-        <i class="pi pi-exclamation-triangle action-icon"></i>
-        <span class="action-label">Anomalies de paiement</span>
-      </a>
-    </div>
-  </div>
+  <section class="section section--transactions" aria-label="Transactions récentes">
+    <app-transaction-feed
+      [transactions]="recentTransactions()"
+      [loading]="loadingTransactions()"
+      [error]="errorTransactions()"
+      (retry)="loadTransactions()"
+    />
+  </section>
 </div>

@@ -146,8 +146,12 @@ export class Register implements OnInit {
 
   private onSuccess(): void {
     this.loading.set(false);
-    this.authService.loadCurrentUser().subscribe();
-    this.router.navigate(['/']);
+    const role = this.authService.userRole();
+    if (role === 'LANDLORD') {
+      this.router.navigate(['/landlord']);
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
   protected onGoogleLogin(): void {

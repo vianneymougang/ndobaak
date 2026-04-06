@@ -44,6 +44,7 @@ app:
     secret: ${JWT_SECRET:ndobaak-dev-secret-key-change-in-production-2026}
     expiration-ms: 86400000 # 24h
     refresh-expiration-ms: 604800000 # 7 jours
+    secure-cookies: false
 
   storage:
     endpoint: ${APP_STORAGE_ENDPOINT:http://localhost:9000}

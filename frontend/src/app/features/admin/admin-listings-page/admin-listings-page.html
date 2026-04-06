@@ -1,0 +1,183 @@
+<div class="listings-page">
+  <div class="page-header">
+    <h1 class="page-title">Annonces</h1>
+    <p class="page-subtitle">Toutes les annonces de la plateforme</p>
+  </div>
+
+  @if (stats(); as s) {
+    <div class="kpi-strip fade-slide-up">
+      <div class="kpi-card">
+        <span class="kpi-value">{{ s.publishedListings }}</span>
+        <span class="kpi-label">Publiées</span>
+      </div>
+      <div class="kpi-card" [class.kpi-card--alert]="s.pendingListings > 0">
+        <span class="kpi-value">{{ s.pendingListings }}</span>
+        <span class="kpi-label">En attente</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-value">{{ s.totalListings - s.publishedListings - s.pendingListings }}</span>
+        <span class="kpi-label">Refusées</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-value">{{ s.totalListings }}</span>
+        <span class="kpi-label">Total</span>
+      </div>
+    </div>
+  }
+
+  <div class="filters-bar">
+    <p-iconfield>
+      <p-inputicon styleClass="pi pi-search" />
+      <input
+        type="text"
+        pInputText
+        placeholder="Rechercher une annonce..."
+        [ngModel]="search()"
+        (ngModelChange)="onSearch($event)"
+      />
+    </p-iconfield>
+    <p-selectbutton
+      [options]="statusOptions"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="onStatusChange($event)"
+      optionLabel="label"
+      optionValue="value"
+      size="small"
+    />
+  </div>
+
+  @if (error()) {
+    <app-admin-error-state
+      message="Impossible de charger les annonces."
+      (retry)="retryLoad()"
+    />
+  } @else {
+    <div class="table-section desktop-only">
+      <p-table
+        [value]="listings()"
+        [loading]="loading()"
+        [lazy]="true"
+        [rows]="pageSize"
+        [totalRecords]="totalElements()"
+        dataKey="id"
+        [pt]="{ root: { style: 'border-radius: 12px; overflow: hidden;' } }"
+      >
+        <ng-template #header>
+          <tr>
+            <th>Annonce</th>
+            <th>Propriétaire</th>
+            <th>Prix</th>
+            <th>Statut</th>
+            <th>Date</th>
+            <th style="width: 4rem;"></th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-listing>
+          <tr>
+            <td>
+              <div class="listing-cell">
+                @if (listing.photos.length > 0) {
+                  <img
+                    [src]="listing.photos[0].thumbnailUrl ?? listing.photos[0].url"
+                    [alt]="listing.title"
+                    class="listing-thumb"
+                    loading="lazy"
+                  />
+                }
+                <span class="listing-title">{{ listing.title }}</span>
+              </div>
+            </td>
+            <td class="text-cell">{{ listing.landlord.firstName }} {{ listing.landlord.lastName }}</td>
+            <td class="price-cell">{{ formatXAF(listing.monthlyPrice) }}</td>
+            <td>
+              <p-tag [value]="statusLabel(listing.status)" [severity]="statusSeverity(listing.status)" />
+            </td>
+            <td class="date-cell">{{ listing.createdAt | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <p-button
+                icon="pi pi-eye"
+                severity="secondary"
+                [text]="true"
+                [rounded]="true"
+                size="small"
+                aria-label="Voir le détail"
+                (click)="openDetail(listing)"
+              />
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="6">
+              <app-admin-empty-state
+                icon="pi pi-home"
+                title="Aucune annonce trouvée"
+                subtitle="Modifiez vos filtres ou votre recherche."
+              />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <div class="cards-section mobile-only">
+      @if (loading()) {
+        @for (i of [1,2,3]; track i) {
+          <p-skeleton width="100%" height="6rem" borderRadius="12px" />
+        }
+      } @else if (listings().length === 0) {
+        <app-admin-empty-state
+          icon="pi pi-home"
+          title="Aucune annonce trouvée"
+          subtitle="Modifiez vos filtres."
+        />
+      } @else {
+        @for (listing of listings(); track listing.id; let i = $index) {
+          <div
+            class="listing-card fade-slide-up"
+            (click)="openDetail(listing)"
+            role="button"
+            tabindex="0"
+            [style.animation-delay]="i * 0.04 + 's'"
+          >
+            @if (listing.photos.length > 0) {
+              <img
+                [src]="listing.photos[0].thumbnailUrl ?? listing.photos[0].url"
+                [alt]="listing.title"
+                class="listing-card-photo"
+                loading="lazy"
+              />
+            }
+            <div class="listing-card-info">
+              <span class="listing-card-title">{{ listing.title }}</span>
+              <div class="listing-card-row">
+                <span class="listing-card-price">{{ formatXAF(listing.monthlyPrice) }}</span>
+                <p-tag [value]="statusLabel(listing.status)" [severity]="statusSeverity(listing.status)" />
+              </div>
+              <span class="listing-card-meta">
+                {{ listing.landlord.firstName }} {{ listing.landlord.lastName }} · {{ listing.createdAt | date:'dd/MM/yyyy' }}
+              </span>
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    @if (totalElements() > pageSize) {
+      <p-paginator
+        [rows]="pageSize"
+        [totalRecords]="totalElements()"
+        [first]="page() * pageSize"
+        (onPageChange)="onPageChange($event)"
+      />
+    }
+  }
+</div>
+
+<app-listing-detail-drawer
+  [listingId]="selectedListingId()"
+  [showActions]="true"
+  (validated)="onListingChanged()"
+  (rejected)="onListingChanged()"
+  (closed)="onDrawerClosed()"
+/>

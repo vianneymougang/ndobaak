@@ -2,7 +2,7 @@ package com.ndobaak.backend.payment.entity;
 
 import com.ndobaak.backend.booking.entity.Booking;
 import com.ndobaak.backend.common.entity.BaseEntity;
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
+import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.common.enums.PaymentMethod;
 import com.ndobaak.backend.common.enums.PaymentStatus;
 import com.ndobaak.backend.common.enums.PaymentType;
@@ -50,8 +50,8 @@ public class Payment extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "operator", columnDefinition = "mobile_money_operator")
-    private MobileMoneyOperator mobileMoneyOperator;
+    @Column(name = "channel", columnDefinition = "payment_channel", length = 20)
+    private PaymentChannel channel;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_type", length = 50)

@@ -1,0 +1,172 @@
+@reference "../../../../tailwind.css";
+
+.community-page {
+  @apply flex flex-col;
+  gap: 1.5rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page-header {
+  @apply flex flex-col;
+  gap: 0.25rem;
+}
+
+.page-title {
+  font-family: var(--font-urbanist);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--color-ndb-ink);
+  margin: 0;
+  letter-spacing: -0.01em;
+
+  @media (min-width: 1024px) {
+    font-size: 1.75rem;
+  }
+}
+
+.page-subtitle {
+  font-family: var(--font-lato);
+  font-size: 0.875rem;
+  color: var(--color-ndb-muted);
+  margin: 0;
+}
+
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.kpi-card {
+  @apply flex flex-col items-center justify-center;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  text-align: center;
+  gap: 0.125rem;
+}
+
+.kpi-value {
+  font-family: var(--font-urbanist);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--color-ndb-ink);
+}
+
+.kpi-label {
+  font-family: var(--font-lato);
+  font-size: 0.75rem;
+  color: var(--color-ndb-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kpi-delta {
+  font-family: var(--font-lato);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-ndb-success);
+}
+
+.filters-bar {
+  @apply flex items-center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 639px) {
+    @apply flex-col items-stretch;
+  }
+}
+
+.desktop-only {
+  display: none;
+
+  @media (min-width: 1024px) {
+    display: block;
+  }
+}
+
+.mobile-only {
+  @apply flex flex-col;
+  gap: 0.75rem;
+
+  @media (min-width: 1024px) {
+    display: none;
+  }
+}
+
+.user-cell {
+  @apply flex items-center;
+  gap: 0.75rem;
+}
+
+.user-cell-text {
+  @apply flex flex-col;
+}
+
+.user-name {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--color-ndb-ink);
+}
+
+.user-email {
+  font-family: var(--font-lato);
+  font-size: 0.75rem;
+  color: var(--color-ndb-muted);
+}
+
+.date-cell {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-ink);
+}
+
+.activity-cell {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-muted);
+}
+
+.user-card {
+  @apply flex items-center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+}
+
+.user-card-info {
+  @apply flex flex-col;
+  gap: 0.125rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.user-card-name {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--color-ndb-ink);
+}
+
+.user-card-email {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-card-tags {
+  @apply flex flex-wrap;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+}

@@ -1,0 +1,28 @@
+@reference "../../../../../tailwind.css";
+
+.empty-state {
+  @apply flex flex-col items-center justify-center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  color: var(--color-ndb-forest-light);
+  margin-bottom: 1rem;
+}
+
+.empty-title {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--color-ndb-ink);
+  margin: 0 0 0.25rem;
+}
+
+.empty-subtitle {
+  font-family: var(--font-lato);
+  font-size: 0.875rem;
+  color: var(--color-ndb-muted);
+  margin: 0 0 1rem;
+}

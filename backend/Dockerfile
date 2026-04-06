@@ -3,7 +3,7 @@ WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 COPY src/ src/
-RUN mvn package -DskipTests && \
+RUN mvn package -Dmaven.test.skip=true && \
     java -Djarmode=tools -jar target/*.jar extract --layers --launcher --destination extracted
 
 FROM eclipse-temurin:21-jre-alpine AS runner

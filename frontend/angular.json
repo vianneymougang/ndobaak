@@ -85,7 +85,8 @@
           },
           "defaultConfiguration": "development",
           "options": {
-            "proxyConfig": "proxy.conf.json"
+            "proxyConfig": "proxy.conf.json",
+            "allowedHosts": ["chief-spaniel-smoothly.ngrok-free.app"]
           }
         },
         "test": {

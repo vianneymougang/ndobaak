@@ -1,0 +1,73 @@
+@reference "../../../../../tailwind.css";
+
+.tab-content {
+  @apply flex flex-col;
+  gap: 0.75rem;
+}
+
+.moderation-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.card-body {
+  @apply flex items-center justify-between;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  gap: 1rem;
+
+  @media (max-width: 639px) {
+    @apply flex-col items-start;
+    gap: 0.5rem;
+  }
+}
+
+.card-info {
+  @apply flex flex-col;
+  gap: 0.125rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.card-title {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--color-ndb-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-meta {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-muted);
+}
+
+.card-right {
+  @apply flex items-center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.card-price {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--color-ndb-gold);
+  white-space: nowrap;
+}
+
+.card-actions {
+  @apply flex justify-end;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-ndb-ink) 6%, transparent);
+
+  @media (max-width: 639px) {
+    @apply justify-stretch;
+  }
+}

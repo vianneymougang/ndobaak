@@ -55,6 +55,14 @@ public class AdminController {
         this.adminTransactionService = adminTransactionService;
     }
 
+    @GetMapping("/listings")
+    public ResponseEntity<Page<ListingResponse>> listListings(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String search,
+            Pageable pageable) {
+        return ResponseEntity.ok(adminListingService.listAllListings(status, search, pageable));
+    }
+
     @GetMapping("/listings/pending")
     public ResponseEntity<List<ListingResponse>> getPendingListings() {
         return ResponseEntity.ok(adminListingService.getPendingListings());

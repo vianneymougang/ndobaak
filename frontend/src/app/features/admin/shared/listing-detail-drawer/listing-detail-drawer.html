@@ -1,0 +1,232 @@
+<p-drawer
+  [visible]="visible()"
+  (visibleChange)="!$event && onHide()"
+  position="right"
+  [modal]="true"
+  [dismissible]="true"
+  [showCloseIcon]="false"
+  styleClass="listing-drawer"
+  [pt]="{ root: { style: 'width: min(540px, 100vw)' } }"
+>
+  <ng-template #header>
+    <div class="drawer-header">
+      <h2 class="drawer-title">Détail de l'annonce</h2>
+      <p-button
+        icon="pi pi-times"
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        size="small"
+        aria-label="Fermer"
+        (click)="onHide()"
+      />
+    </div>
+  </ng-template>
+
+  @if (loading()) {
+    <div class="drawer-body">
+      <p-skeleton width="100%" height="220px" borderRadius="12px" />
+      <p-skeleton width="70%" height="1.5rem" styleClass="mt-4" />
+      <p-skeleton width="40%" height="1rem" styleClass="mt-2" />
+      <div class="info-grid mt-4">
+        @for (i of [1,2,3,4]; track i) {
+          <div class="info-cell">
+            <p-skeleton width="60%" height="0.75rem" />
+            <p-skeleton width="80%" height="1rem" styleClass="mt-1" />
+          </div>
+        }
+      </div>
+    </div>
+  } @else if (error()) {
+    <div class="drawer-body drawer-body--centered">
+      <app-admin-error-state
+        message="Impossible de charger cette annonce."
+        (retry)="retryLoad()"
+      />
+    </div>
+  } @else if (listing(); as l) {
+    <div class="drawer-body">
+      @if (l.photos.length > 0) {
+        <p-galleria
+          [value]="l.photos"
+          [numVisible]="4"
+          [showThumbnails]="l.photos.length > 1"
+          [showIndicators]="l.photos.length > 1"
+          [circular]="true"
+          [activeIndex]="activePhotoIndex()"
+          (activeIndexChange)="activePhotoIndex.set($event)"
+          [pt]="{
+            root: { style: 'border-radius: 12px; overflow: hidden;' },
+            thumbnails: { style: 'padding: 0.5rem 0;' }
+          }"
+        >
+          <ng-template #item let-item>
+            <img
+              [src]="item.mediumUrl ?? item.url"
+              [alt]="l.title"
+              class="gallery-image"
+            />
+          </ng-template>
+          <ng-template #thumbnail let-item>
+            <img
+              [src]="item.thumbnailUrl ?? item.url"
+              [alt]="l.title"
+              class="gallery-thumb"
+            />
+          </ng-template>
+        </p-galleria>
+      }
+
+      <div class="listing-header fade-slide-up">
+        <div class="listing-title-row">
+          <h3 class="listing-title">{{ l.title }}</h3>
+          <p-tag [value]="statusLabel()" [severity]="statusSeverity()" />
+        </div>
+        <p class="listing-price">{{ formatXAF(l.monthlyPrice) }}<span class="per-month"> / mois</span></p>
+        @if (l.location) {
+          <p class="listing-address">
+            <i class="pi pi-map-marker" aria-hidden="true"></i>
+            {{ l.location.address }}
+            @if (l.location.neighborhood) {
+              · {{ l.location.neighborhood }}
+            }
+          </p>
+        }
+      </div>
+
+      <div class="info-grid">
+        <div class="info-cell">
+          <span class="info-label">Type</span>
+          <span class="info-value">{{ roomTypeLabel() }}</span>
+        </div>
+        <div class="info-cell">
+          <span class="info-label">Chambres dispo.</span>
+          <span class="info-value">{{ l.availableRooms }}</span>
+        </div>
+        <div class="info-cell">
+          <span class="info-label">Soumis le</span>
+          <span class="info-value">{{ l.createdAt | date:'dd/MM/yyyy' }}</span>
+        </div>
+        @if (l.availableDate) {
+          <div class="info-cell">
+            <span class="info-label">Disponible dès</span>
+            <span class="info-value">{{ l.availableDate | date:'dd/MM/yyyy' }}</span>
+          </div>
+        }
+      </div>
+
+      @if (l.description) {
+        <div class="section">
+          <h4 class="section-label">Description</h4>
+          <p class="description-text">{{ l.description }}</p>
+        </div>
+      }
+
+      @if (l.amenities.length > 0) {
+        <div class="section">
+          <h4 class="section-label">Équipements</h4>
+          <div class="amenities-list">
+            @for (amenity of l.amenities; track amenity.id) {
+              <p-chip [label]="amenity.name" [icon]="amenity.icon" />
+            }
+          </div>
+        </div>
+      }
+
+      <div class="section landlord-section">
+        <h4 class="section-label">Propriétaire</h4>
+        <div class="landlord-info">
+          <div class="landlord-avatar">
+            {{ l.landlord.firstName[0] }}{{ l.landlord.lastName[0] }}
+          </div>
+          <div>
+            <span class="landlord-name">{{ l.landlord.firstName }} {{ l.landlord.lastName }}</span>
+            @if (l.landlord.email) {
+              <span class="landlord-contact">{{ l.landlord.email }}</span>
+            }
+            @if (l.landlord.phone) {
+              <span class="landlord-contact">{{ l.landlord.phone }}</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (l.rejectionReason) {
+        <div class="rejection-banner">
+          <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+          <div>
+            <span class="rejection-label">Motif de refus</span>
+            <span class="rejection-reason">{{ l.rejectionReason }}</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (showActions() && isPending()) {
+      <div class="drawer-footer">
+        <p-button
+          label="Rejeter"
+          icon="pi pi-times"
+          severity="danger"
+          [outlined]="true"
+          [loading]="actionLoading()"
+          (click)="openRejectDialog()"
+          styleClass="hover-lift"
+        />
+        <p-button
+          label="Approuver"
+          icon="pi pi-check"
+          severity="success"
+          [loading]="actionLoading()"
+          (click)="validate()"
+          styleClass="hover-lift"
+        />
+      </div>
+    }
+  }
+</p-drawer>
+
+<p-dialog
+  header="Refuser l'annonce"
+  [visible]="rejectDialogVisible()"
+  (visibleChange)="rejectDialogVisible.set($event)"
+  [modal]="true"
+  [style]="{ width: 'min(480px, 90vw)' }"
+  [draggable]="false"
+>
+  <form [formGroup]="rejectForm" class="reject-form" (ngSubmit)="submitReject()">
+    <div class="field-wrap">
+      <p-floatlabel>
+        <p-select
+          inputId="drawerMotif"
+          formControlName="motif"
+          [options]="motifOptions"
+          optionLabel="label"
+          optionValue="value"
+          [fluid]="true"
+          [invalid]="rejectForm.controls.motif.invalid && rejectForm.controls.motif.touched"
+        />
+        <label for="drawerMotif">Motif de refus</label>
+      </p-floatlabel>
+      @if (rejectForm.controls.motif.invalid && rejectForm.controls.motif.touched) {
+        <small class="field-error">Le motif est obligatoire.</small>
+      }
+    </div>
+    <div class="field-wrap">
+      <p-floatlabel>
+        <textarea
+          pTextarea
+          id="drawerAdditionalReason"
+          formControlName="additionalReason"
+          rows="4"
+          style="width: 100%;"
+        ></textarea>
+        <label for="drawerAdditionalReason">Précisions (facultatif)</label>
+      </p-floatlabel>
+    </div>
+  </form>
+  <ng-template #footer>
+    <p-button label="Annuler" severity="secondary" (click)="rejectDialogVisible.set(false)" />
+    <p-button label="Confirmer le refus" severity="danger" [loading]="actionLoading()" (click)="submitReject()" />
+  </ng-template>
+</p-dialog>

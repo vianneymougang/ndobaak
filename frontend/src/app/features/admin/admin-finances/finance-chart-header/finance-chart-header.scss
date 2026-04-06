@@ -1,0 +1,64 @@
+@reference "../../../../../tailwind.css";
+
+.chart-header {
+  @apply flex flex-col;
+  gap: 1.25rem;
+}
+
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.kpi-card {
+  @apply flex flex-col;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  gap: 0.25rem;
+}
+
+.kpi-label {
+  font-family: var(--font-lato);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-ndb-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kpi-value {
+  font-family: var(--font-urbanist);
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--color-ndb-ink);
+
+  &--gold {
+    color: var(--color-ndb-gold);
+  }
+}
+
+.chart-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  padding: 1.25rem;
+
+  @media (max-width: 639px) {
+    padding: 1rem;
+  }
+}
+
+.chart-title {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--color-ndb-ink);
+  margin: 0 0 0.75rem;
+}

@@ -1,7 +1,7 @@
 package com.ndobaak.backend.admin.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
+import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.common.enums.PaymentStatus;
 import com.ndobaak.backend.common.enums.PaymentType;
 import lombok.Builder;
@@ -20,7 +20,7 @@ public class AdminTransactionResponse {
     private PaymentStatus status;
     private String payerName;
     private String phoneNumber;
-    private MobileMoneyOperator operator;
+    private PaymentChannel operator;
     private String providerName;
     private String transactionId;
     private LocalDateTime createdAt;

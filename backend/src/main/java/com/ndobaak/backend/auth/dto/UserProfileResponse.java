@@ -24,4 +24,10 @@ public class UserProfileResponse {
     private Integer yearOfStudy;
 
     private Boolean verified;
+
+    // Landlord fields
+    private String idCardNumber;
+    private String taxId;
+    private String mobileMoneyPhone;
+    private String notchPayAccountId;
 }

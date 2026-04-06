@@ -1,0 +1,127 @@
+@reference "../../../../../tailwind.css";
+
+:host {
+  display: block;
+}
+
+.insights-panel {
+  @apply flex flex-col;
+  padding: 1.25rem;
+  border-radius: 16px;
+  background: white;
+  box-shadow: var(--shadow-card);
+  height: 100%;
+}
+
+.insights-list {
+  @apply flex flex-col;
+  gap: 0.5rem;
+}
+
+.insight-card {
+  @apply flex items-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border-left: 3px solid transparent;
+  background: var(--color-ndb-cream);
+  transition: background 0.15s ease;
+
+  &--success {
+    border-left-color: var(--color-ndb-success);
+  }
+
+  &--warning {
+    border-left-color: var(--color-ndb-warning);
+  }
+
+  &--error {
+    border-left-color: var(--color-ndb-error);
+  }
+
+  &--info {
+    border-left-color: var(--color-ndb-info);
+  }
+}
+
+.insight-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  i {
+    font-size: 0.875rem;
+  }
+
+  .insight-card--success & {
+    background: var(--color-ndb-green-bg);
+    i { color: var(--color-ndb-success); }
+  }
+
+  .insight-card--warning & {
+    background: var(--color-ndb-warn-bg);
+    i { color: var(--color-ndb-warning); }
+  }
+
+  .insight-card--error & {
+    background: var(--color-ndb-error-bg);
+    i { color: var(--color-ndb-error); }
+  }
+
+  .insight-card--info & {
+    background: color-mix(in srgb, var(--color-ndb-info) 12%, transparent);
+    i { color: var(--color-ndb-info); }
+  }
+}
+
+.insight-text {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-body);
+  line-height: 1.5;
+  margin: 0;
+  padding-top: 0.1875rem;
+}
+
+.insight-skeleton {
+  @apply flex items-center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+}
+
+.insights-error {
+  @apply flex items-center justify-center flex-wrap;
+  gap: 0.75rem;
+  padding: 1.5rem;
+
+  i {
+    color: var(--color-ndb-error);
+  }
+
+  span {
+    font-family: var(--font-lato);
+    font-size: 0.8125rem;
+    color: var(--color-ndb-body);
+  }
+}
+
+.insights-empty {
+  @apply flex flex-col items-center justify-center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  color: var(--color-ndb-muted);
+
+  i {
+    font-size: 1.5rem;
+  }
+
+  p {
+    font-family: var(--font-lato);
+    font-size: 0.8125rem;
+    margin: 0;
+  }
+}

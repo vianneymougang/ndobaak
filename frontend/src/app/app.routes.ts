@@ -51,47 +51,40 @@ export const routes: Routes = [
           import('./features/admin/admin-dashboard/admin-dashboard').then((m) => m.AdminDashboard),
       },
       {
+        path: 'moderation',
+        title: 'Modération — Admin',
+        loadComponent: () =>
+          import('./features/admin/admin-moderation/admin-moderation').then(
+            (m) => m.AdminModeration,
+          ),
+      },
+      {
         path: 'listings',
         title: 'Annonces — Admin',
         loadComponent: () =>
-          import('./features/admin/admin-listings/admin-listings').then((m) => m.AdminListings),
-      },
-      {
-        path: 'listings/:id',
-        title: 'Annonce — Admin',
-        loadComponent: () =>
-          import('./features/admin/admin-listing-detail/admin-listing-detail').then(
-            (m) => m.AdminListingDetail,
+          import('./features/admin/admin-listings-page/admin-listings-page').then(
+            (m) => m.AdminListingsPage,
           ),
       },
       {
-        path: 'users',
-        title: 'Utilisateurs — Admin',
+        path: 'community',
+        title: 'Communauté — Admin',
         loadComponent: () =>
-          import('./features/admin/admin-users/admin-users').then((m) => m.AdminUsers),
-      },
-      {
-        path: 'users/:id',
-        title: 'Profil utilisateur — Admin',
-        loadComponent: () =>
-          import('./features/admin/admin-user-detail/admin-user-detail').then(
-            (m) => m.AdminUserDetail,
+          import('./features/admin/admin-community/admin-community').then(
+            (m) => m.AdminCommunity,
           ),
       },
       {
-        path: 'reviews',
-        title: 'Avis — Admin',
+        path: 'finances',
+        title: 'Finances — Admin',
         loadComponent: () =>
-          import('./features/admin/admin-reviews/admin-reviews').then((m) => m.AdminReviews),
+          import('./features/admin/admin-finances/admin-finances').then((m) => m.AdminFinances),
       },
-      {
-        path: 'transactions',
-        title: 'Transactions — Admin',
-        loadComponent: () =>
-          import('./features/admin/admin-transactions/admin-transactions').then(
-            (m) => m.AdminTransactions,
-          ),
-      },
+      { path: 'users', redirectTo: 'community', pathMatch: 'full' },
+      { path: 'users/:id', redirectTo: 'community', pathMatch: 'full' },
+      { path: 'reviews', redirectTo: 'moderation', pathMatch: 'full' },
+      { path: 'transactions', redirectTo: 'finances', pathMatch: 'full' },
+      { path: 'listings/:id', redirectTo: 'listings', pathMatch: 'full' },
     ],
   },
   {

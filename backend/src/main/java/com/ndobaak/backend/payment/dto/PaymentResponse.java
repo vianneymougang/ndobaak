@@ -1,7 +1,7 @@
 package com.ndobaak.backend.payment.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
+import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.common.enums.PaymentMethod;
 import com.ndobaak.backend.common.enums.PaymentStatus;
 import com.ndobaak.backend.common.enums.PaymentType;
@@ -26,7 +26,7 @@ public class PaymentResponse {
     private PaymentStatus status;
     private PaymentType paymentType;
     private PaymentMethod paymentMethod;
-    private MobileMoneyOperator operator;
+    private PaymentChannel operator;
     private String transactionId;
     private String authorizationUrl;
     private String providerName;

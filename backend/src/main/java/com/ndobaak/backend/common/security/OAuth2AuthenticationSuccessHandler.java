@@ -27,11 +27,14 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtProperties jwtProperties;
 
     public OAuth2AuthenticationSuccessHandler(UserRepository userRepository,
-                                               JwtTokenProvider jwtTokenProvider) {
+                                               JwtTokenProvider jwtTokenProvider,
+                                               JwtProperties jwtProperties) {
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.jwtProperties = jwtProperties;
     }
 
     @Override
@@ -48,6 +51,12 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 user.getId(), email, user.getRole().name());
         String refreshToken = jwtTokenProvider.generateRefreshToken(
                 user.getId(), email);
+
+        boolean secure = jwtProperties.isSecureCookies();
+        CookieUtils.addAccessCookie(response, accessToken,
+                jwtProperties.getExpirationMs() / 1000, secure);
+        CookieUtils.addRefreshCookie(response, refreshToken,
+                jwtProperties.getRefreshExpirationMs() / 1000, secure);
 
         String redirectUrl = frontendUrl + "/auth/oauth2/callback"
                 + "?token=" + URLEncoder.encode(accessToken, StandardCharsets.UTF_8)

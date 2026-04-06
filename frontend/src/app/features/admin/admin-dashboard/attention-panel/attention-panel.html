@@ -1,0 +1,227 @@
+<div class="attention-panel">
+  <div class="panel-header">
+    <h2 class="panel-title">
+      <i class="pi pi-bell" aria-hidden="true"></i>
+      Nécessite votre attention
+    </h2>
+  </div>
+
+  @if (hasAnyContent()) {
+    <div class="panel-empty">
+      <i class="pi pi-check-circle empty-icon" aria-hidden="true"></i>
+      <p class="empty-title">Tout est à jour</p>
+      <p class="empty-sub">Aucune action en attente !</p>
+    </div>
+  }
+
+  @if (loadingListings()) {
+    <div class="queue-section">
+      <p-skeleton width="40%" height="1rem" />
+      @for (i of [1,2]; track i) {
+        <div class="queue-item-skeleton">
+          <p-skeleton width="100%" height="4rem" borderRadius="12px" />
+        </div>
+      }
+    </div>
+  } @else if (errorListings()) {
+    <div class="queue-section queue-section--error">
+      <span class="error-text">Impossible de charger les annonces en attente.</span>
+      <p-button
+        label="Réessayer"
+        icon="pi pi-refresh"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (click)="retryListings.emit()"
+      />
+    </div>
+  } @else if (pendingListings().length > 0) {
+    <div class="queue-section">
+      <app-section-header
+        title="Annonces en attente"
+        [count]="pendingListings().length"
+        viewAllLink="/admin/moderation"
+      />
+      @for (listing of pendingListings(); track listing.id; let i = $index) {
+        <div
+          class="queue-item fade-slide-in hover-lift-sm"
+          [style.animation-delay]="i * 0.05 + 's'"
+        >
+          <div class="queue-item-body">
+            <div class="queue-item-info">
+              <span class="queue-item-title">{{ listing.title }}</span>
+              <span class="queue-item-meta">
+                {{ listing.landlord.firstName }} {{ listing.landlord.lastName }} · {{ listing.createdAt | relativeTime }}
+              </span>
+            </div>
+            @if (listing.waitingDays && listing.waitingDays >= 2) {
+              <p-tag
+                [value]="listing.waitingDays + 'j'"
+                severity="warn"
+                [pt]="{ root: { style: 'font-size: 0.625rem; padding: 0.125rem 0.375rem; font-family: var(--font-urbanist); font-weight: 700;' } }"
+              />
+            }
+            <span class="queue-item-price">{{ formatXAF(listing.monthlyPrice) }}</span>
+          </div>
+          <div class="queue-item-actions">
+            <p-button
+              icon="pi pi-check"
+              severity="success"
+              size="small"
+              [rounded]="true"
+              [outlined]="true"
+              aria-label="Valider cette annonce"
+              [loading]="isLoading('listing-' + listing.id)"
+              (click)="validateListing.emit(listing)"
+            />
+            <p-button
+              icon="pi pi-times"
+              severity="danger"
+              size="small"
+              [rounded]="true"
+              [outlined]="true"
+              aria-label="Rejeter cette annonce"
+              [loading]="isLoading('listing-reject-' + listing.id)"
+              (click)="rejectListing.emit(listing)"
+            />
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (loadingAnomalies()) {
+    <div class="queue-section">
+      <p-skeleton width="40%" height="1rem" />
+      <div class="queue-item-skeleton">
+        <p-skeleton width="100%" height="3.5rem" borderRadius="12px" />
+      </div>
+    </div>
+  } @else if (errorAnomalies()) {
+    <div class="queue-section queue-section--error">
+      <span class="error-text">Impossible de charger les anomalies.</span>
+      <p-button
+        label="Réessayer"
+        icon="pi pi-refresh"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (click)="retryAnomalies.emit()"
+      />
+    </div>
+  } @else if (anomalies().length > 0) {
+    <div class="queue-section">
+      <app-section-header
+        title="Anomalies paiement"
+        [count]="anomalies().length"
+        viewAllLink="/admin/finances"
+      />
+      @for (tx of anomalies(); track tx.id; let i = $index) {
+        <a
+          routerLink="/admin/finances"
+          class="queue-item queue-item--anomaly fade-slide-in hover-lift-sm"
+          [style.animation-delay]="i * 0.05 + 's'"
+        >
+          <div class="queue-item-body">
+            <div class="queue-item-info">
+              <span class="queue-item-title">{{ tx.payerName ?? 'Inconnu' }}</span>
+              <span class="queue-item-meta">{{ tx.anomalyReason }}</span>
+            </div>
+            <p-tag
+              [value]="tx.status"
+              [severity]="tx.status === 'FAILED' ? 'danger' : 'warn'"
+              [pt]="{ root: { style: 'font-size: 0.625rem; padding: 0.125rem 0.375rem;' } }"
+            />
+            <span class="queue-item-price">{{ formatXAF(tx.amount) }}</span>
+          </div>
+          <div class="queue-item-operator">
+            {{ formatOperator(tx.operator) }} · {{ tx.createdAt | relativeTime }}
+          </div>
+        </a>
+      }
+    </div>
+  }
+
+  @if (loadingReviews()) {
+    <div class="queue-section">
+      <p-skeleton width="40%" height="1rem" />
+      <div class="queue-item-skeleton">
+        <p-skeleton width="100%" height="4rem" borderRadius="12px" />
+      </div>
+    </div>
+  } @else if (errorReviews()) {
+    <div class="queue-section queue-section--error">
+      <span class="error-text">Impossible de charger les avis.</span>
+      <p-button
+        label="Réessayer"
+        icon="pi pi-refresh"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (click)="retryReviews.emit()"
+      />
+    </div>
+  } @else if (pendingReviews().length > 0) {
+    <div class="queue-section">
+      <app-section-header
+        title="Avis signalés"
+        [count]="pendingReviews().length"
+        viewAllLink="/admin/moderation"
+      />
+      @for (review of pendingReviews(); track review.id; let i = $index) {
+        <div
+          class="queue-item fade-slide-in hover-lift-sm"
+          [style.animation-delay]="i * 0.05 + 's'"
+        >
+          <div class="queue-item-body">
+            <div class="queue-item-info">
+              <div class="review-stars">
+                @for (star of getStarArray(review.rating); track $index) {
+                  <i
+                    class="pi"
+                    [class.pi-star-fill]="star === 1"
+                    [class.pi-star]="star === 0"
+                    aria-hidden="true"
+                  ></i>
+                }
+                @if (review.reportCount > 1) {
+                  <p-tag
+                    [value]="review.reportCount + ' signalements'"
+                    severity="danger"
+                    [pt]="{ root: { style: 'font-size: 0.5625rem; padding: 0.0625rem 0.3125rem; margin-left: 0.375rem;' } }"
+                  />
+                }
+              </div>
+              <span class="queue-item-title">{{ review.comment ?? 'Aucun commentaire' }}</span>
+              <span class="queue-item-meta">
+                {{ review.studentName }} · {{ review.listingTitle }} · {{ review.createdAt | relativeTime }}
+              </span>
+            </div>
+          </div>
+          <div class="queue-item-actions">
+            <p-button
+              icon="pi pi-check"
+              severity="success"
+              size="small"
+              [rounded]="true"
+              [outlined]="true"
+              aria-label="Approuver cet avis"
+              [loading]="isLoading('review-' + review.id)"
+              (click)="approveReview.emit(review)"
+            />
+            <p-button
+              icon="pi pi-times"
+              severity="danger"
+              size="small"
+              [rounded]="true"
+              [outlined]="true"
+              aria-label="Rejeter cet avis"
+              [loading]="isLoading('review-reject-' + review.id)"
+              (click)="rejectReview.emit(review)"
+            />
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

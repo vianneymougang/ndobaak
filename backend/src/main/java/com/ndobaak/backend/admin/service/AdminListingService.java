@@ -14,6 +14,9 @@ import com.ndobaak.backend.listing.repository.PhotoRepository;
 import com.ndobaak.backend.notification.service.NotificationDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +39,28 @@ public class AdminListingService {
         this.photoRepository = photoRepository;
         this.listingMapper = listingMapper;
         this.notificationDispatcher = notificationDispatcher;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ListingResponse> listAllListings(String status, String search, Pageable pageable) {
+        Specification<Listing> spec = Specification.where(null);
+
+        if (status != null && !status.isBlank()) {
+            ListingStatus listingStatus = ListingStatus.valueOf(status);
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), listingStatus));
+        }
+
+        if (search != null && !search.isBlank()) {
+            String pattern = "%" + search.toLowerCase() + "%";
+            spec = spec.and((root, query, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("title")), pattern),
+                    cb.like(cb.lower(root.join("landlord").get("firstName")), pattern),
+                    cb.like(cb.lower(root.join("landlord").get("lastName")), pattern)
+            ));
+        }
+
+        return listingRepository.findAll(spec, pageable)
+                .map(l -> listingMapper.toResponse(l, false));
     }
 
     public List<ListingResponse> getPendingListings() {

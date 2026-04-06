@@ -1,0 +1,214 @@
+@reference "../../../../tailwind.css";
+
+.finances-page {
+  @apply flex flex-col;
+  gap: 1.5rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page-header {
+  @apply flex flex-col;
+  gap: 0.25rem;
+}
+
+.page-title {
+  font-family: var(--font-urbanist);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--color-ndb-ink);
+  margin: 0;
+  letter-spacing: -0.01em;
+
+  @media (min-width: 1024px) {
+    font-size: 1.75rem;
+  }
+}
+
+.page-subtitle {
+  font-family: var(--font-lato);
+  font-size: 0.875rem;
+  color: var(--color-ndb-muted);
+  margin: 0;
+}
+
+.section {
+  @apply flex flex-col;
+  gap: 0.75rem;
+}
+
+.section-title {
+  @apply flex items-center;
+  gap: 0.5rem;
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-ndb-ink);
+  margin: 0;
+
+  .pi {
+    color: var(--color-ndb-error);
+  }
+}
+
+.anomaly-count {
+  font-family: var(--font-urbanist);
+  font-weight: 800;
+  font-size: 0.75rem;
+  color: white;
+  background: var(--color-ndb-error);
+  border-radius: 50%;
+  width: 1.25rem;
+  height: 1.25rem;
+  @apply flex items-center justify-center;
+}
+
+.anomalies-list {
+  @apply flex flex-col;
+  gap: 0.5rem;
+}
+
+.anomaly-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  border-left: 3px solid var(--color-ndb-error);
+  overflow: hidden;
+}
+
+.anomaly-body {
+  @apply flex items-center justify-between;
+  padding: 0.875rem 1.25rem 0.375rem;
+  gap: 1rem;
+
+  @media (max-width: 639px) {
+    @apply flex-col items-start;
+    gap: 0.5rem;
+  }
+}
+
+.anomaly-info {
+  @apply flex flex-col;
+  gap: 0.125rem;
+}
+
+.anomaly-payer {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--color-ndb-ink);
+}
+
+.anomaly-reason {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-muted);
+}
+
+.anomaly-right {
+  @apply flex items-center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.anomaly-amount {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--color-ndb-gold);
+}
+
+.anomaly-footer {
+  padding: 0.25rem 1.25rem 0.75rem;
+  font-family: var(--font-lato);
+  font-size: 0.75rem;
+  color: var(--color-ndb-muted);
+}
+
+.filters-bar {
+  @apply flex items-center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.desktop-only {
+  display: none;
+
+  @media (min-width: 1024px) {
+    display: block;
+  }
+}
+
+.mobile-only {
+  @apply flex flex-col;
+  gap: 0.75rem;
+
+  @media (min-width: 1024px) {
+    display: none;
+  }
+}
+
+.date-cell {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-muted);
+}
+
+.text-cell {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-ink);
+}
+
+.amount-cell {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--color-ndb-gold);
+}
+
+.anomaly-row {
+  background: color-mix(in srgb, var(--color-ndb-error) 4%, transparent);
+}
+
+.tx-card {
+  @apply flex flex-col;
+  gap: 0.25rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+
+  &--anomaly {
+    border-left: 3px solid var(--color-ndb-error);
+  }
+}
+
+.tx-card-top {
+  @apply flex items-center justify-between;
+}
+
+.tx-card-amount {
+  font-family: var(--font-urbanist);
+  font-weight: 800;
+  font-size: 1.125rem;
+  color: var(--color-ndb-ink);
+}
+
+.tx-card-payer {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-muted);
+}
+
+.tx-card-bottom {
+  @apply flex items-center justify-between;
+  margin-top: 0.25rem;
+}
+
+.tx-card-date {
+  font-family: var(--font-lato);
+  font-size: 0.75rem;
+  color: var(--color-ndb-muted);
+}

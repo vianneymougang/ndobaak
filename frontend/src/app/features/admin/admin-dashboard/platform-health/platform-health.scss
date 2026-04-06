@@ -1,0 +1,221 @@
+@reference "../../../../../tailwind.css";
+
+:host {
+  display: block;
+}
+
+.health-strip {
+  @apply flex items-center flex-wrap;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 16px;
+  background: white;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-ndb-border);
+  transition: border-color 0.2s ease;
+
+  &--good {
+    border-color: color-mix(in srgb, var(--color-ndb-success) 30%, transparent);
+    background: linear-gradient(135deg, white 0%, color-mix(in srgb, var(--color-ndb-success) 4%, white) 100%);
+  }
+
+  &--warning {
+    border-color: color-mix(in srgb, var(--color-ndb-warning) 30%, transparent);
+    background: linear-gradient(135deg, white 0%, color-mix(in srgb, var(--color-ndb-warning) 4%, white) 100%);
+  }
+
+  &--critical {
+    border-color: color-mix(in srgb, var(--color-ndb-error) 30%, transparent);
+    background: linear-gradient(135deg, white 0%, color-mix(in srgb, var(--color-ndb-error) 4%, white) 100%);
+  }
+
+  &--skeleton {
+    gap: 1.25rem;
+  }
+
+  &--error {
+    gap: 1rem;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+}
+
+.health-gauge {
+  position: relative;
+  width: 5.5rem;
+  height: 5.5rem;
+  flex-shrink: 0;
+}
+
+.gauge-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.gauge-bg {
+  stroke: var(--color-ndb-cream-dark);
+}
+
+.gauge-fill {
+  transition: stroke 0.3s ease;
+
+  &--animated {
+    animation: gauge-stroke 1s ease-out 0.3s both;
+    stroke-dashoffset: var(--gauge-circumference);
+  }
+
+  .health-strip--good & {
+    stroke: var(--color-ndb-success);
+  }
+
+  .health-strip--warning & {
+    stroke: var(--color-ndb-warning);
+  }
+
+  .health-strip--critical & {
+    stroke: var(--color-ndb-error);
+  }
+}
+
+@keyframes gauge-stroke {
+  to {
+    stroke-dashoffset: var(--gauge-target);
+  }
+}
+
+.gauge-score {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-urbanist);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--color-ndb-ink);
+}
+
+.health-info {
+  @apply flex flex-col;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 120px;
+}
+
+.health-status {
+  @apply flex items-center;
+  gap: 0.5rem;
+
+  i {
+    font-size: 1.125rem;
+  }
+
+  .health-strip--good & i {
+    color: var(--color-ndb-success);
+  }
+
+  .health-strip--warning & i {
+    color: var(--color-ndb-warning);
+  }
+
+  .health-strip--critical & i {
+    color: var(--color-ndb-error);
+  }
+}
+
+.status-label {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  color: var(--color-ndb-ink);
+}
+
+.health-description {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-muted);
+  margin: 0;
+}
+
+.health-indicators {
+  @apply flex items-center;
+  gap: 0.75rem;
+  margin-left: auto;
+
+  @media (max-width: 639px) {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+.indicator {
+  @apply flex flex-col items-center;
+  gap: 0.125rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 12px;
+  background: var(--color-ndb-cream-dark);
+  min-width: 4.5rem;
+  transition: background 0.2s ease;
+
+  &--active {
+    background: var(--color-ndb-warn-bg);
+  }
+
+  &--anomaly.indicator--active {
+    background: var(--color-ndb-error-bg);
+  }
+
+  &--failed.indicator--active {
+    background: var(--color-ndb-error-bg);
+  }
+}
+
+.indicator-value {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--color-ndb-ink);
+  line-height: 1.2;
+}
+
+.indicator-label {
+  font-family: var(--font-lato);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--color-ndb-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.health-gauge-skeleton {
+  flex-shrink: 0;
+}
+
+.health-details-skeleton {
+  @apply flex flex-col;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.health-indicators-skeleton {
+  @apply flex;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.error-icon {
+  font-size: 1.5rem;
+  color: var(--color-ndb-error);
+}
+
+.error-content {
+  @apply flex flex-col items-center;
+  gap: 0.75rem;
+}
+
+.error-text {
+  font-family: var(--font-lato);
+  font-size: 0.875rem;
+  color: var(--color-ndb-body);
+  margin: 0;
+}

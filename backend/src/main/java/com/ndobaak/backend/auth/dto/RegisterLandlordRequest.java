@@ -2,6 +2,7 @@ package com.ndobaak.backend.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,4 +36,8 @@ public class RegisterLandlordRequest {
 
     @Size(max = 200)
     private String taxId;
+
+    @NotBlank
+    @Pattern(regexp = "^\\+237[26][0-9]{8}$", message = "Numéro Mobile Money invalide (format attendu : +237XXXXXXXXX)")
+    private String mobileMoneyPhone;
 }

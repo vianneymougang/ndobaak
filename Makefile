@@ -23,10 +23,10 @@ dev-ps:
 	docker compose ps
 
 infra:
-	docker compose up postgres mailtrap minio -d
+	docker compose up postgres mailpit minio -d
 
 infra-down:
-	docker compose stop postgres mailtrap minio
+	docker compose stop postgres mailpit minio
 
 backend:
 	cd backend && doppler run -- ./mvnw spring-boot:run
