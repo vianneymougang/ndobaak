@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +37,21 @@ public class TenantApplicationService {
     private final BookingRepository bookingRepository;
     private final StorageService storageService;
     private final RentalCycleMapper mapper;
+
+    public TenantApplicationResponse getApplication(Long bookingId, Long userId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Réservation introuvable"));
+
+        boolean isStudent = booking.getStudent().getId().equals(userId);
+        boolean isLandlord = booking.getListing().getLandlord().getId().equals(userId);
+        if (!isStudent && !isLandlord) {
+            throw new AccessDeniedException("Accès non autorisé à cette réservation");
+        }
+
+        TenantApplication application = applicationRepository.findByBookingId(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Dossier locataire introuvable"));
+        return mapper.toResponse(application);
+    }
 
     @Transactional
     public TenantApplicationResponse createApplication(Long bookingId, TenantApplicationRequest request, Long studentId) {
@@ -82,19 +98,26 @@ public class TenantApplicationService {
         TenantApplication application = applicationRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Dossier locataire introuvable"));
 
+        if (application.getStatus() != ApplicationStatus.INCOMPLETE) {
+            throw new IllegalStateException("Le dossier ne peut plus être modifié");
+        }
+
+        String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "document";
+        String contentType = file.getContentType() != null ? file.getContentType() : "application/octet-stream";
+
         try {
             String storageKey = storageService.upload(
                     "tenant-documents",
-                    file.getOriginalFilename(),
+                    originalFilename,
                     file.getInputStream(),
                     file.getSize(),
-                    file.getContentType()
+                    contentType
             );
 
             TenantDocument document = new TenantDocument();
             document.setApplication(application);
             document.setType(type);
-            document.setFileName(file.getOriginalFilename());
+            document.setFileName(originalFilename);
             document.setStorageUrl(storageKey);
 
             document = documentRepository.save(document);
@@ -115,6 +138,11 @@ public class TenantApplicationService {
 
         TenantApplication application = applicationRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Dossier locataire introuvable"));
+
+        Set<ApplicationStatus> submittableStatuses = Set.of(ApplicationStatus.INCOMPLETE, ApplicationStatus.REJECTED);
+        if (!submittableStatuses.contains(application.getStatus())) {
+            throw new IllegalStateException("Ce dossier ne peut pas être soumis dans son état actuel");
+        }
 
         boolean hasIdCard = application.getDocuments().stream()
                 .anyMatch(doc -> doc.getType() == TenantDocumentType.ID_CARD);
@@ -141,6 +169,11 @@ public class TenantApplicationService {
 
         TenantApplication application = applicationRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Dossier locataire introuvable"));
+
+        Set<ApplicationStatus> validatableStatuses = Set.of(ApplicationStatus.SUBMITTED, ApplicationStatus.UNDER_REVIEW);
+        if (!validatableStatuses.contains(application.getStatus())) {
+            throw new IllegalStateException("Ce dossier ne peut pas être validé dans son état actuel");
+        }
 
         application.setDecidedAt(LocalDateTime.now());
         application.setDecidedById(adminId);
