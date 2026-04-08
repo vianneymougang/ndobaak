@@ -269,6 +269,28 @@
           </div>
         </div>
 
+        @if (selectedRole() === 'LANDLORD') {
+          <div class="field-wrap">
+            <p-floatlabel>
+              <input
+                pInputText
+                id="mobileMoneyPhone"
+                formControlName="mobileMoneyPhone"
+                type="tel"
+                inputmode="numeric"
+                placeholder="+237XXXXXXXXX"
+                class="w-full"
+                [invalid]="form.controls.mobileMoneyPhone.invalid && form.controls.mobileMoneyPhone.touched"
+              />
+              <label for="mobileMoneyPhone">Numéro Mobile Money</label>
+            </p-floatlabel>
+            <small class="field-hint">Numéro MTN ou Orange Money pour recevoir vos paiements (ex : +237690000000)</small>
+            @if (form.controls.mobileMoneyPhone.invalid && form.controls.mobileMoneyPhone.touched) {
+              <small class="field-error">Format invalide. Utilisez le format +237XXXXXXXXX (MTN ou Orange).</small>
+            }
+          </div>
+        }
+
         <p-button
           type="submit"
           label="S'inscrire"
