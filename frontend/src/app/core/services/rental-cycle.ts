@@ -31,7 +31,7 @@ export interface TenantDocumentResponse {
   type: string;
   fileName: string;
   storageUrl: string;
-  uploadedAt: string;
+  createdAt: string;
 }
 
 export interface TenantApplicationResponse {
@@ -50,12 +50,65 @@ export interface ValidationDecisionRequest {
   comment?: string;
 }
 
+export interface LandlordDocumentResponse {
+  id: number;
+  landlordId: number;
+  type: string;
+  fileName: string;
+  storageUrl: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  validatedById?: number;
+  validatedAt?: string;
+  rejectionComment?: string;
+  createdAt: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class RentalCycleService {
   private http = inject(HttpClient);
   private apiUrl = environment.apiUrl;
+
+  // ========== Landlord Documents ==========
+  getLandlordDocuments(landlordId: number): Observable<LandlordDocumentResponse[]> {
+    return this.http.get<LandlordDocumentResponse[]>(
+      `${this.apiUrl}/landlords/${landlordId}/documents`,
+    );
+  }
+
+  uploadLandlordDocument(
+    landlordId: number,
+    file: File,
+    type: string,
+  ): Observable<LandlordDocumentResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', type);
+
+    return this.http.post<LandlordDocumentResponse>(
+      `${this.apiUrl}/landlords/${landlordId}/documents`,
+      formData,
+    );
+  }
+
+  validateLandlordDocument(
+    landlordId: number,
+    docId: number,
+    decision: ValidationDecisionRequest,
+  ): Observable<LandlordDocumentResponse> {
+    return this.http.patch<LandlordDocumentResponse>(
+      `${this.apiUrl}/admin/landlords/${landlordId}/documents/${docId}/validate`,
+      decision,
+    );
+  }
+
+  // ========== Tenant Application ==========
+  getApplication(bookingId: number): Observable<TenantApplicationResponse> {
+    return this.http.get<TenantApplicationResponse>(
+      `${this.apiUrl}/bookings/${bookingId}/application`,
+    );
+  }
 
   createApplication(
     bookingId: number,
@@ -90,7 +143,7 @@ export class RentalCycleService {
     decision: ValidationDecisionRequest,
   ): Observable<TenantApplicationResponse> {
     return this.http.patch<TenantApplicationResponse>(
-      `${this.apiUrl}/bookings/${bookingId}/application/validate`,
+      `${this.apiUrl}/admin/bookings/${bookingId}/application/validate`,
       decision,
     );
   }
