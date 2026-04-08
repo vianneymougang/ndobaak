@@ -9,6 +9,6 @@ public record TenantDocumentResponse(
         TenantDocumentType type,
         String fileName,
         String storageUrl,
-        LocalDateTime uploadedAt
+        LocalDateTime createdAt
 ) {
 }

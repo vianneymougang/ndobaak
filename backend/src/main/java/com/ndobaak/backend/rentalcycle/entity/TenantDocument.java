@@ -17,7 +17,7 @@ public class TenantDocument extends BaseEntity {
     private TenantApplication application;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false, length = 30)
+    @Column(name = "type", nullable = false, columnDefinition = "tenant_document_type")
     private TenantDocumentType type;
 
     @Column(name = "file_name", nullable = false)

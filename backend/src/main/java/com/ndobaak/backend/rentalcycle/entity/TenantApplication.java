@@ -22,7 +22,7 @@ public class TenantApplication extends BaseEntity {
     private Booking booking;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 30)
+    @Column(name = "status", nullable = false, columnDefinition = "application_status")
     private ApplicationStatus status;
 
     @Column(name = "decided_at")
