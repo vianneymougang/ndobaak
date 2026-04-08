@@ -5,6 +5,8 @@ import com.ndobaak.backend.common.enums.TenantDocumentType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 @Getter
 @Setter
@@ -17,6 +19,7 @@ public class TenantDocument extends BaseEntity {
     private TenantApplication application;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "type", nullable = false, columnDefinition = "tenant_document_type")
     private TenantDocumentType type;
 

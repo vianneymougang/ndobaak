@@ -14,6 +14,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.LocalDateTime;
 
@@ -28,6 +30,7 @@ public class LandlordDocument extends BaseEntity {
     private Landlord landlord;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "type", nullable = false, columnDefinition = "landlord_document_type")
     private LandlordDocumentType type;
 
@@ -38,6 +41,7 @@ public class LandlordDocument extends BaseEntity {
     private String storageUrl;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "status", nullable = false, columnDefinition = "document_status")
     private DocumentStatus status;
 
