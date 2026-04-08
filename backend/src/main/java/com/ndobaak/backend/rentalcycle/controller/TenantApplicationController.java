@@ -1,10 +1,8 @@
 package com.ndobaak.backend.rentalcycle.controller;
 
-import com.ndobaak.backend.auth.entity.User;
 import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.common.enums.TenantDocumentType;
 import com.ndobaak.backend.rentalcycle.dto.request.TenantApplicationRequest;
-import com.ndobaak.backend.rentalcycle.dto.request.ValidationDecisionRequest;
 import com.ndobaak.backend.rentalcycle.dto.response.TenantApplicationResponse;
 import com.ndobaak.backend.rentalcycle.dto.response.TenantDocumentResponse;
 import com.ndobaak.backend.rentalcycle.service.TenantApplicationService;
@@ -29,10 +27,16 @@ public class TenantApplicationController {
     public ResponseEntity<TenantApplicationResponse> createApplication(
             @PathVariable Long id,
             @Valid @RequestBody TenantApplicationRequest request) {
-        
-        User currentUser = authService.getAuthenticatedUser();
-        TenantApplicationResponse response = applicationService.createApplication(id, request, currentUser.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        Long studentId = authService.getAuthenticatedUser().getId();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(applicationService.createApplication(id, request, studentId));
+    }
+
+    @GetMapping("/{id}/application")
+    @PreAuthorize("hasAnyRole('STUDENT', 'LANDLORD', 'ADMIN')")
+    public ResponseEntity<TenantApplicationResponse> getApplication(@PathVariable Long id) {
+        Long userId = authService.getAuthenticatedUser().getId();
+        return ResponseEntity.ok(applicationService.getApplication(id, userId));
     }
 
     @PostMapping("/{id}/application/documents")
@@ -41,28 +45,15 @@ public class TenantApplicationController {
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file,
             @RequestParam("type") TenantDocumentType type) {
-        
-        User currentUser = authService.getAuthenticatedUser();
-        TenantDocumentResponse response = applicationService.uploadDocument(id, file, type, currentUser.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        Long studentId = authService.getAuthenticatedUser().getId();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(applicationService.uploadDocument(id, file, type, studentId));
     }
 
     @PostMapping("/{id}/application/submit")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<TenantApplicationResponse> submitApplication(@PathVariable Long id) {
-        User currentUser = authService.getAuthenticatedUser();
-        TenantApplicationResponse response = applicationService.submitApplication(id, currentUser.getId());
-        return ResponseEntity.ok(response);
-    }
-
-    @PatchMapping("/{id}/application/validate")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<TenantApplicationResponse> validateApplication(
-            @PathVariable Long id,
-            @Valid @RequestBody ValidationDecisionRequest decision) {
-        
-        User currentUser = authService.getAuthenticatedUser();
-        TenantApplicationResponse response = applicationService.validateApplication(id, decision, currentUser.getId());
-        return ResponseEntity.ok(response);
+        Long studentId = authService.getAuthenticatedUser().getId();
+        return ResponseEntity.ok(applicationService.submitApplication(id, studentId));
     }
 }
