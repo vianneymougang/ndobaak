@@ -1,0 +1,112 @@
+<div class="landlord-documents">
+  <p-toast />
+
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="eyebrow-tag">
+      <i class="pi pi-shield-check"></i>
+      <span>Vérification propriétaire</span>
+    </div>
+    <h1 class="hero-title">Documents légaux</h1>
+    <p class="hero-subtitle">
+      Téléchargez vos documents pour valider votre compte et publier vos annonces
+    </p>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-state">
+      <p-progressSpinner styleClass="w-12 h-12" strokeWidth="3" />
+      <p class="loading-text">Chargement de vos documents...</p>
+    </div>
+  }
+
+  <!-- Document Grid -->
+  @if (!loading()) {
+    <div class="document-grid">
+      @for (docType of documentTypes; track docType.value) {
+        <div class="document-card-shell">
+          <div class="document-card-core">
+            <!-- Header -->
+            <div class="card-header">
+              <div class="icon-wrapper">
+                <i class="pi {{ docType.icon }}"></i>
+              </div>
+              <h3 class="card-title">{{ docType.label }}</h3>
+            </div>
+
+            <!-- Upload Zone -->
+            @if (getDocumentsByType(docType.value).length === 0) {
+              <div
+                class="upload-zone"
+                [class.drag-active]="dragActive()"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave()"
+                (drop)="onDrop($event, docType.value)"
+              >
+                <input
+                  type="file"
+                  [id]="'file-' + docType.value"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  (change)="onFileSelect($event, docType.value)"
+                  class="file-input"
+                />
+                <label [for]="'file-' + docType.value" class="upload-label">
+                  <div class="upload-icon-circle">
+                    <i class="pi pi-cloud-upload"></i>
+                  </div>
+                  <p class="upload-text">
+                    Glissez votre fichier ici<br />
+                    <span class="upload-subtext">ou cliquez pour parcourir</span>
+                  </p>
+                  <p class="upload-hint">PDF, JPG ou PNG · Max 10 Mo</p>
+                </label>
+              </div>
+            }
+
+            <!-- Document List -->
+            @if (getDocumentsByType(docType.value).length > 0) {
+              <div class="document-list">
+                @for (doc of getDocumentsByType(docType.value); track doc.id) {
+                  <div class="document-item">
+                    <div class="doc-info">
+                      <i class="pi pi-file-pdf doc-icon"></i>
+                      <div class="doc-details">
+                        <p class="doc-name">{{ doc.fileName }}</p>
+                        <p class="doc-date">
+                          Envoyé le {{ doc.createdAt | date: 'dd/MM/yyyy à HH:mm' }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="doc-status">
+                      <span class="status-badge" [ngClass]="getStatusClass(doc.status)">
+                        {{ getStatusLabel(doc.status) }}
+                      </span>
+                    </div>
+                  </div>
+
+                  @if (doc.status === 'REJECTED' && doc.rejectionComment) {
+                    <div class="rejection-notice">
+                      <i class="pi pi-info-circle"></i>
+                      <p>{{ doc.rejectionComment }}</p>
+                    </div>
+                  }
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Upload Progress Overlay -->
+  @if (uploading()) {
+    <div class="upload-overlay">
+      <div class="upload-modal">
+        <p-progressSpinner styleClass="w-16 h-16" strokeWidth="3" />
+        <p class="upload-modal-text">Envoi en cours...</p>
+      </div>
+    </div>
+  }
+</div>

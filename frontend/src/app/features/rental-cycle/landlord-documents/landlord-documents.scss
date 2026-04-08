@@ -1,0 +1,397 @@
+.landlord-documents {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+
+  @media (min-width: 768px) {
+    padding: 5rem 2rem;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   HERO SECTION — Editorial Luxury
+   ══════════════════════════════════════════════ */
+.hero-section {
+  margin-bottom: 4rem;
+  animation: fadeSlideUp 800ms cubic-bezier(0.32, 0.72, 0, 1) backwards;
+}
+
+.eyebrow-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-ndb-forest-pale);
+  color: var(--color-ndb-forest);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1.5rem;
+
+  i {
+    font-size: 0.875rem;
+  }
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--color-ndb-ink);
+  margin: 0 0 1rem;
+  letter-spacing: -0.02em;
+
+  @media (min-width: 768px) {
+    font-size: 4rem;
+  }
+}
+
+.hero-subtitle {
+  font-size: 1.125rem;
+  color: var(--color-ndb-muted);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════════════════════
+   DOCUMENT GRID — Asymmetric Bento
+   ══════════════════════════════════════════════ */
+.document-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   DOUBLE-BEZEL CARD ARCHITECTURE
+   ══════════════════════════════════════════════ */
+.document-card-shell {
+  background: rgba(27, 67, 50, 0.03);
+  border: 1px solid rgba(27, 67, 50, 0.08);
+  border-radius: 2rem;
+  padding: 0.5rem;
+  transition: all 700ms cubic-bezier(0.32, 0.72, 0, 1);
+  animation: fadeSlideUp 800ms cubic-bezier(0.32, 0.72, 0, 1) backwards;
+
+  &:nth-child(1) { animation-delay: 100ms; }
+  &:nth-child(2) { animation-delay: 200ms; }
+  &:nth-child(3) { animation-delay: 300ms; }
+  &:nth-child(4) { animation-delay: 400ms; }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(27, 67, 50, 0.12);
+  }
+}
+
+.document-card-core {
+  background: white;
+  border-radius: calc(2rem - 0.5rem);
+  padding: 2rem;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+/* ══════════════════════════════════════════════
+   CARD HEADER
+   ══════════════════════════════════════════════ */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.icon-wrapper {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, var(--color-ndb-forest), var(--color-ndb-forest-mid));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 14px rgba(27, 67, 50, 0.25);
+}
+
+.card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-ndb-ink);
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════
+   UPLOAD ZONE — Haptic Micro-Aesthetics
+   ══════════════════════════════════════════════ */
+.upload-zone {
+  position: relative;
+  border: 2px dashed var(--color-ndb-border);
+  border-radius: 1.5rem;
+  padding: 3rem 2rem;
+  text-align: center;
+  transition: all 500ms cubic-bezier(0.32, 0.72, 0, 1);
+  background: var(--color-ndb-cream);
+
+  &:hover,
+  &.drag-active {
+    border-color: var(--color-ndb-gold);
+    background: rgba(212, 160, 23, 0.05);
+    transform: scale(1.02);
+  }
+}
+
+.file-input {
+  display: none;
+}
+
+.upload-label {
+  cursor: pointer;
+  display: block;
+}
+
+.upload-icon-circle {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-ndb-gold), var(--color-ndb-gold-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  box-shadow: 0 8px 24px rgba(212, 160, 23, 0.35);
+  transition: all 500ms cubic-bezier(0.32, 0.72, 0, 1);
+
+  .upload-zone:hover & {
+    transform: translateY(-4px) scale(1.1);
+    box-shadow: 0 12px 32px rgba(212, 160, 23, 0.45);
+  }
+}
+
+.upload-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-ndb-ink);
+  margin: 0 0 0.5rem;
+}
+
+.upload-subtext {
+  font-weight: 400;
+  color: var(--color-ndb-muted);
+}
+
+.upload-hint {
+  font-size: 0.875rem;
+  color: var(--color-ndb-muted);
+  margin: 0.5rem 0 0;
+}
+
+/* ══════════════════════════════════════════════
+   DOCUMENT LIST
+   ══════════════════════════════════════════════ */
+.document-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.document-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: var(--color-ndb-cream);
+  border-radius: 1rem;
+  border: 1px solid var(--color-ndb-border);
+  transition: all 400ms cubic-bezier(0.32, 0.72, 0, 1);
+
+  &:hover {
+    background: white;
+    box-shadow: 0 4px 12px rgba(27, 67, 50, 0.08);
+  }
+}
+
+.doc-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.doc-icon {
+  font-size: 1.5rem;
+  color: var(--color-ndb-error);
+  flex-shrink: 0;
+}
+
+.doc-details {
+  min-width: 0;
+}
+
+.doc-name {
+  font-weight: 600;
+  color: var(--color-ndb-ink);
+  margin: 0 0 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-date {
+  font-size: 0.875rem;
+  color: var(--color-ndb-muted);
+  margin: 0;
+}
+
+.doc-status {
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════
+   STATUS BADGES — Nested Island Architecture
+   ══════════════════════════════════════════════ */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  transition: all 400ms cubic-bezier(0.32, 0.72, 0, 1);
+
+  &.status-pending {
+    background: var(--color-ndb-warn-bg);
+    color: #92400E;
+  }
+
+  &.status-approved {
+    background: var(--color-ndb-green-bg);
+    color: var(--color-ndb-forest);
+  }
+
+  &.status-rejected {
+    background: var(--color-ndb-error-bg);
+    color: var(--color-ndb-error-dark);
+  }
+}
+
+/* ══════════════════════════════════════════════
+   REJECTION NOTICE
+   ══════════════════════════════════════════════ */
+.rejection-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  background: var(--color-ndb-error-bg);
+  border-left: 3px solid var(--color-ndb-error);
+  border-radius: 0.75rem;
+
+  i {
+    color: var(--color-ndb-error);
+    font-size: 1.125rem;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+  }
+
+  p {
+    color: var(--color-ndb-error-dark);
+    font-size: 0.875rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   LOADING & OVERLAY STATES
+   ══════════════════════════════════════════════ */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem;
+  gap: 1.5rem;
+}
+
+.loading-text {
+  font-size: 1rem;
+  color: var(--color-ndb-muted);
+  margin: 0;
+}
+
+.upload-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 300ms ease;
+}
+
+.upload-modal {
+  background: white;
+  padding: 3rem;
+  border-radius: 2rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  animation: scaleIn 400ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.upload-modal-text {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-ndb-ink);
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════
+   ANIMATIONS — Fluid Dynamics
+   ══════════════════════════════════════════════ */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

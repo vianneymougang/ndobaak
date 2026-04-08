@@ -154,6 +154,14 @@ export const routes: Routes = [
             (m) => m.NotificationPreferences,
           ),
       },
+      {
+        path: 'documents',
+        title: 'Mes documents',
+        loadComponent: () =>
+          import('./features/rental-cycle/landlord-documents/landlord-documents').then(
+            (m) => m.LandlordDocuments,
+          ),
+      },
     ],
   },
   {
