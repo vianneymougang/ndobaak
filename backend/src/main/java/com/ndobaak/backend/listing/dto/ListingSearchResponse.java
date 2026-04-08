@@ -20,7 +20,6 @@ public class ListingSearchResponse {
     private RoomType roomType;
     private String neighborhood;
     private Double distanceToCampus;
-    private Double distanceFromUser;
     private Double avgRating;
     private Integer reviewCount;
     private List<String> amenities;

@@ -54,7 +54,6 @@ class GeoServiceTest {
         assertThat(r.thumbnailUrl()).isEqualTo("https://cdn.example.com/photos/thumb.webp");
         assertThat(r.monthlyPrice()).isEqualByComparingTo(new BigDecimal("35000"));
         assertThat(r.roomType()).isEqualTo(RoomType.STUDIO);
-        assertThat(r.distanceFromUser()).isNotNull().isLessThan(1.0);
         assertThat(r.verified()).isTrue();
     }
 

@@ -12,7 +12,6 @@ public record NearbyListingResponse(
         RoomType roomType,
         String neighborhood,
         Double distanceToCampus,
-        Double distanceFromUser,
         Double latitude,
         Double longitude,
         Double avgRating,
