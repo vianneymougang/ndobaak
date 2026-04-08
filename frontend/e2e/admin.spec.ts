@@ -1,13 +1,21 @@
 import { test } from '@playwright/test';
+import { execSync } from 'child_process';
 import { loginAsAdmin } from './helpers';
 import { AdminListingsPage } from './pages/admin-listings.page';
 import { AdminUsersPage } from './pages/admin-users.page';
 import { AdminReviewsPage } from './pages/admin-reviews.page';
 
+function resetPendingListing() {
+  try {
+    execSync(`docker exec ndobaak-db psql -U ndobaak -d ndobaak_dev -c "UPDATE listing SET status = 'PENDING_REVIEW' WHERE id = 6;"`, { stdio: 'pipe' });
+  } catch {}
+}
+
 test.describe('Admin — Listing Validation', () => {
   let adminListings: AdminListingsPage;
 
   test.beforeEach(async ({ page }) => {
+    resetPendingListing();
     await loginAsAdmin(page);
     adminListings = new AdminListingsPage(page);
     await adminListings.goto();
@@ -34,6 +42,7 @@ test.describe('Admin — Listing Rejection', () => {
   let adminListings: AdminListingsPage;
 
   test.beforeEach(async ({ page }) => {
+    resetPendingListing();
     await loginAsAdmin(page);
     adminListings = new AdminListingsPage(page);
     await adminListings.goto();
