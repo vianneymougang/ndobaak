@@ -1,16 +1,17 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RentalCycleService, LandlordDocumentResponse } from '../../../core/services/rental-cycle';
 import { AuthService } from '../../../core/services/auth';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
   selector: 'app-landlord-documents',
   standalone: true,
-  imports: [CommonModule, ToastModule, ButtonModule, ProgressSpinnerModule],
+  imports: [CommonModule, ToastModule, ButtonModule, SkeletonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [MessageService],
   templateUrl: './landlord-documents.html',
   styleUrl: './landlord-documents.scss',
@@ -22,8 +23,8 @@ export class LandlordDocuments implements OnInit {
 
   documents = signal<LandlordDocumentResponse[]>([]);
   loading = signal(false);
-  uploading = signal(false);
-  dragActive = signal(false);
+  uploadingType = signal<string | null>(null);
+  dragActiveType = signal<string | null>(null);
 
   readonly documentTypes = [
     { value: 'ID_CARD', label: 'Carte d\'identité nationale', icon: 'pi-id-card' },
@@ -57,18 +58,18 @@ export class LandlordDocuments implements OnInit {
     });
   }
 
-  onDragOver(event: DragEvent) {
+  onDragOver(event: DragEvent, type: string) {
     event.preventDefault();
-    this.dragActive.set(true);
+    this.dragActiveType.set(type);
   }
 
   onDragLeave() {
-    this.dragActive.set(false);
+    this.dragActiveType.set(null);
   }
 
   onDrop(event: DragEvent, type: string) {
     event.preventDefault();
-    this.dragActive.set(false);
+    this.dragActiveType.set(null);
 
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
@@ -80,6 +81,7 @@ export class LandlordDocuments implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.uploadFile(input.files[0], type);
+      input.value = '';
     }
   }
 
@@ -96,42 +98,56 @@ export class LandlordDocuments implements OnInit {
       return;
     }
 
-    this.uploading.set(true);
+    this.uploadingType.set(type);
     this.rentalCycleService.uploadLandlordDocument(user.id, file, type).subscribe({
       next: (doc) => {
-        this.documents.update((docs) => [...docs, doc]);
+        this.documents.update((docs) => {
+          const others = docs.filter(d => d.id !== doc.id);
+          return [...others, doc];
+        });
         this.messageService.add({
           severity: 'success',
           summary: 'Document envoyé',
-          detail: 'Votre document est en cours de validation',
+          detail: 'Votre document est en cours de validation par notre équipe',
+          life: 5000,
         });
-        this.uploading.set(false);
+        this.uploadingType.set(null);
       },
       error: (err) => {
-        console.error('Upload error:', err);
-        const errorMessage = err.error?.message || err.message || 'Veuillez réessayer';
+        const detail = err.error?.message ?? 'Une erreur est survenue. Veuillez réessayer.';
         this.messageService.add({
           severity: 'error',
           summary: 'Échec de l\'envoi',
-          detail: errorMessage,
+          detail,
           life: 6000,
         });
-        this.uploading.set(false);
+        this.uploadingType.set(null);
       },
     });
   }
 
-  getDocumentsByType(type: string): LandlordDocumentResponse[] {
-    return this.documents().filter((doc) => doc.type === type);
+  openDocument(url: string) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  getLatestDocumentByType(type: string): LandlordDocumentResponse | null {
+    const docs = this.documents().filter(d => d.type === type);
+    if (docs.length === 0) return null;
+    return docs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+  }
+
+  canReupload(type: string): boolean {
+    const doc = this.getLatestDocumentByType(type);
+    return doc === null || doc.status === 'REJECTED';
   }
 
   getStatusLabel(status: string): string {
     const labels: Record<string, string> = {
-      PENDING: 'En attente',
+      PENDING: 'En attente de validation',
       APPROVED: 'Validé',
       REJECTED: 'Refusé',
     };
-    return labels[status] || status;
+    return labels[status] ?? status;
   }
 
   getStatusClass(status: string): string {
@@ -140,6 +156,13 @@ export class LandlordDocuments implements OnInit {
       APPROVED: 'status-approved',
       REJECTED: 'status-rejected',
     };
-    return classes[status] || '';
+    return classes[status] ?? '';
+  }
+
+  getFileIcon(fileName: string): string {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    if (ext === 'pdf') return 'pi-file-pdf';
+    if (['jpg', 'jpeg', 'png', 'webp'].includes(ext ?? '')) return 'pi-image';
+    return 'pi-file';
   }
 }

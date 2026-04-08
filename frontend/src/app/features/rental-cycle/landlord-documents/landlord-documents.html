@@ -15,9 +15,18 @@
 
   <!-- Loading State -->
   @if (loading()) {
-    <div class="loading-state">
-      <p-progressSpinner styleClass="w-12 h-12" strokeWidth="3" />
-      <p class="loading-text">Chargement de vos documents...</p>
+    <div class="document-grid">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="document-card-shell">
+          <div class="document-card-core">
+            <div class="card-header">
+              <p-skeleton width="2.5rem" height="2.5rem" borderRadius="12px" />
+              <p-skeleton width="60%" height="1.25rem" />
+            </div>
+            <p-skeleton width="100%" height="7rem" borderRadius="12px" />
+          </div>
+        </div>
+      }
     </div>
   }
 
@@ -25,6 +34,9 @@
   @if (!loading()) {
     <div class="document-grid">
       @for (docType of documentTypes; track docType.value) {
+        @let latest = getLatestDocumentByType(docType.value);
+        @let isUploading = uploadingType() === docType.value;
+
         <div class="document-card-shell">
           <div class="document-card-core">
             <!-- Header -->
@@ -35,12 +47,52 @@
               <h3 class="card-title">{{ docType.label }}</h3>
             </div>
 
-            <!-- Upload Zone -->
-            @if (getDocumentsByType(docType.value).length === 0) {
+            <!-- Document présent -->
+            @if (latest) {
+              <div class="document-item">
+                <div class="doc-info">
+                  <i class="pi {{ getFileIcon(latest.fileName) }} doc-icon"></i>
+                  <div class="doc-details">
+                    <p class="doc-name">{{ latest.fileName }}</p>
+                    <p class="doc-date">Envoyé le {{ latest.createdAt | date: 'dd/MM/yyyy' }}</p>
+                  </div>
+                </div>
+
+                <div class="doc-actions-row">
+                  <span [class]="'status-badge ' + getStatusClass(latest.status)">
+                    <i class="pi" [class.pi-clock]="latest.status === 'PENDING'"
+                       [class.pi-check-circle]="latest.status === 'APPROVED'"
+                       [class.pi-times-circle]="latest.status === 'REJECTED'"></i>
+                    {{ getStatusLabel(latest.status) }}
+                  </span>
+
+                  <button
+                    type="button"
+                    class="btn-view"
+                    (click)="openDocument(latest.storageUrl)"
+                    [attr.aria-label]="'Consulter ' + latest.fileName"
+                  >
+                    <i class="pi pi-eye"></i>
+                    <span>Consulter</span>
+                  </button>
+                </div>
+
+                @if (latest.status === 'REJECTED' && latest.rejectionComment) {
+                  <div class="rejection-notice">
+                    <i class="pi pi-info-circle"></i>
+                    <p>{{ latest.rejectionComment }}</p>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Zone d'upload (visible si pas de doc ou dernier doc rejeté) -->
+            @if (canReupload(docType.value)) {
               <div
                 class="upload-zone"
-                [class.drag-active]="dragActive()"
-                (dragover)="onDragOver($event)"
+                [class.drag-active]="dragActiveType() === docType.value"
+                [class.uploading]="isUploading"
+                (dragover)="onDragOver($event, docType.value)"
                 (dragleave)="onDragLeave()"
                 (drop)="onDrop($event, docType.value)"
               >
@@ -48,65 +100,37 @@
                   type="file"
                   [id]="'file-' + docType.value"
                   accept=".pdf,.jpg,.jpeg,.png"
+                  [disabled]="isUploading"
                   (change)="onFileSelect($event, docType.value)"
                   class="file-input"
                 />
-                <label [for]="'file-' + docType.value" class="upload-label">
-                  <div class="upload-icon-circle">
-                    <i class="pi pi-cloud-upload"></i>
+                @if (isUploading) {
+                  <div class="upload-progress-state">
+                    <i class="pi pi-spin pi-spinner upload-spinner-icon"></i>
+                    <p class="upload-progress-text">Envoi en cours...</p>
                   </div>
-                  <p class="upload-text">
-                    Glissez votre fichier ici<br />
-                    <span class="upload-subtext">ou cliquez pour parcourir</span>
-                  </p>
-                  <p class="upload-hint">PDF, JPG ou PNG · Max 10 Mo</p>
-                </label>
-              </div>
-            }
-
-            <!-- Document List -->
-            @if (getDocumentsByType(docType.value).length > 0) {
-              <div class="document-list">
-                @for (doc of getDocumentsByType(docType.value); track doc.id) {
-                  <div class="document-item">
-                    <div class="doc-info">
-                      <i class="pi pi-file-pdf doc-icon"></i>
-                      <div class="doc-details">
-                        <p class="doc-name">{{ doc.fileName }}</p>
-                        <p class="doc-date">
-                          Envoyé le {{ doc.createdAt | date: 'dd/MM/yyyy à HH:mm' }}
-                        </p>
-                      </div>
+                } @else {
+                  <label [for]="'file-' + docType.value" class="upload-label">
+                    <div class="upload-icon-circle" [class.replace-mode]="latest !== null">
+                      <i class="pi" [class.pi-cloud-upload]="latest === null" [class.pi-refresh]="latest !== null"></i>
                     </div>
-                    <div class="doc-status">
-                      <span class="status-badge" [ngClass]="getStatusClass(doc.status)">
-                        {{ getStatusLabel(doc.status) }}
-                      </span>
-                    </div>
-                  </div>
-
-                  @if (doc.status === 'REJECTED' && doc.rejectionComment) {
-                    <div class="rejection-notice">
-                      <i class="pi pi-info-circle"></i>
-                      <p>{{ doc.rejectionComment }}</p>
-                    </div>
-                  }
+                    <p class="upload-text">
+                      @if (latest !== null) {
+                        Remplacer le document<br />
+                        <span class="upload-subtext">ou glissez un nouveau fichier</span>
+                      } @else {
+                        Glissez votre fichier ici<br />
+                        <span class="upload-subtext">ou cliquez pour parcourir</span>
+                      }
+                    </p>
+                    <p class="upload-hint">PDF, JPG ou PNG · Max 10 Mo</p>
+                  </label>
                 }
               </div>
             }
           </div>
         </div>
       }
-    </div>
-  }
-
-  <!-- Upload Progress Overlay -->
-  @if (uploading()) {
-    <div class="upload-overlay">
-      <div class="upload-modal">
-        <p-progressSpinner styleClass="w-16 h-16" strokeWidth="3" />
-        <p class="upload-modal-text">Envoi en cours...</p>
-      </div>
     </div>
   }
 </div>
