@@ -40,19 +40,22 @@ public class LandlordDocumentService {
         Landlord landlord = (Landlord) userRepository.findById(landlordId)
                 .orElseThrow(() -> new ResourceNotFoundException("Propriétaire non trouvé"));
 
+        String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "document";
+        String contentType = file.getContentType() != null ? file.getContentType() : "application/octet-stream";
+
         try {
             String storageUrl = storageService.upload(
                     "landlord-documents",
-                    file.getOriginalFilename(),
+                    originalFilename,
                     file.getInputStream(),
                     file.getSize(),
-                    file.getContentType()
+                    contentType
             );
 
             LandlordDocument document = new LandlordDocument();
             document.setLandlord(landlord);
             document.setType(type);
-            document.setFileName(file.getOriginalFilename());
+            document.setFileName(originalFilename);
             document.setStorageUrl(storageUrl);
             document.setStatus(DocumentStatus.PENDING);
 
