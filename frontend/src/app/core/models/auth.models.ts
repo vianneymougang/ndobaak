@@ -17,6 +17,7 @@ export interface RegisterLandlordRequest {
   password: string;
   idCardNumber?: string;
   taxId?: string;
+  mobileMoneyPhone: string;
 }
 
 export interface LoginRequest {

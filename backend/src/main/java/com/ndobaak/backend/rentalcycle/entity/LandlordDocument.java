@@ -12,10 +12,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.LocalDateTime;
 
@@ -23,8 +23,6 @@ import java.time.LocalDateTime;
 @Table(name = "landlord_document")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class LandlordDocument extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,7 +30,8 @@ public class LandlordDocument extends BaseEntity {
     private Landlord landlord;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false, length = 30)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(name = "type", nullable = false, columnDefinition = "landlord_document_type")
     private LandlordDocumentType type;
 
     @Column(name = "file_name", nullable = false)
@@ -42,7 +41,8 @@ public class LandlordDocument extends BaseEntity {
     private String storageUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(name = "status", nullable = false, columnDefinition = "document_status")
     private DocumentStatus status;
 
     @Column(name = "validated_by_id")

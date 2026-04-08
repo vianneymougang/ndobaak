@@ -20,12 +20,16 @@ export class LoginPage {
   }
 
   async goto() {
+    await this.page.context().clearCookies();
     await this.page.goto('/login');
+    await this.page.waitForLoadState('networkidle');
   }
 
   async login(email: string, password: string) {
     await this.emailInput.waitFor({ state: 'visible', timeout: 5_000 });
+    await this.emailInput.click();
     await this.emailInput.fill(email);
+    await this.passwordInput.click();
     await this.passwordInput.fill(password);
     await this.submitButton.click();
   }
@@ -35,8 +39,7 @@ export class LoginPage {
   }
 
   async expectLoginSuccess() {
-    await this.page.waitForURL('/', { timeout: 10_000 });
-    await expect(this.page).toHaveURL('/');
+    await this.page.waitForURL(/\/(landlord|admin)?$|\/(landlord|admin)\//, { timeout: 10_000 });
   }
 
   async expectErrorBanner() {

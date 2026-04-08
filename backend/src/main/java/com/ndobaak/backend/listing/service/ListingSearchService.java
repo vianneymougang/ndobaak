@@ -258,13 +258,6 @@ public class ListingSearchService {
             }
         }
 
-        Double distanceFromUser = null;
-        if (request.getUserLat() != null && request.getUserLng() != null
-                && latitude != null && longitude != null) {
-            distanceFromUser = GeoUtils.roundDistance(
-                    GeoUtils.haversineDistance(request.getUserLat(), request.getUserLng(), latitude, longitude));
-        }
-
         double[] ratingData = ratingsMap.getOrDefault(listing.getId(), null);
         Double avgRating = ratingData != null ? ratingData[0] : null;
         Integer reviewCount = ratingData != null ? (int) ratingData[1] : 0;
@@ -281,7 +274,6 @@ public class ListingSearchService {
                 .roomType(listing.getRoomType())
                 .neighborhood(neighborhood)
                 .distanceToCampus(distanceToCampus)
-                .distanceFromUser(distanceFromUser)
                 .avgRating(avgRating)
                 .reviewCount(reviewCount)
                 .amenities(amenityNames)

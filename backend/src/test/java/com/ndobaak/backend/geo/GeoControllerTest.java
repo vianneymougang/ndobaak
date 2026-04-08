@@ -46,7 +46,7 @@ class GeoControllerTest {
         NearbyListingResponse response = new NearbyListingResponse(
                 1L, "Studio Eyang", "https://cdn.example.com/thumb.webp",
                 new BigDecimal("35000"), RoomType.STUDIO, "Eyang",
-                0.15, 0.12, 3.8855, 11.3922, 4.5, 10, true
+                0.15, 3.8855, 11.3922, 4.5, 10, true
         );
         when(geoService.findNearby(eq(3.8845), eq(11.3912), eq(2.0)))
                 .thenReturn(List.of(response));
@@ -58,7 +58,6 @@ class GeoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].title").value("Studio Eyang"))
-                .andExpect(jsonPath("$[0].distanceFromUser").value(0.12))
                 .andExpect(jsonPath("$[0].verified").value(true));
     }
 

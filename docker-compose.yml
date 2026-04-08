@@ -85,6 +85,10 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-dev-placeholder}
       JWT_SECRET: ${JWT_SECRET:-ndobaak-dev-secret-key-change-in-production-2026}
       APP_STORAGE_ENDPOINT: http://minio:9000
+      APP_STORAGE_ACCESS_KEY: ndobaak
+      APP_STORAGE_SECRET_KEY: ndobaak_minio_2026
+      APP_STORAGE_BUCKET: ndobaak-media
+      APP_STORAGE_PUBLIC_URL: http://localhost:9000/ndobaak-media
       PAYMENT_GATEWAY: ${PAYMENT_GATEWAY:-mock}
       NOTCHPAY_PUBLIC_KEY: ${NOTCHPAY_PUBLIC_KEY:-}
       NOTCHPAY_WEBHOOK_HASH: ${NOTCHPAY_WEBHOOK_HASH:-}

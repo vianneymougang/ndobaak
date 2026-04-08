@@ -154,6 +154,14 @@ export const routes: Routes = [
             (m) => m.NotificationPreferences,
           ),
       },
+      {
+        path: 'documents',
+        title: 'Mes documents',
+        loadComponent: () =>
+          import('./features/rental-cycle/landlord-documents/landlord-documents').then(
+            (m) => m.LandlordDocuments,
+          ),
+      },
     ],
   },
   {
@@ -185,6 +193,15 @@ export const routes: Routes = [
         canActivate: [authGuard, roleGuard('STUDENT')],
         loadComponent: () =>
           import('./features/booking/my-bookings/my-bookings').then((m) => m.MyBookings),
+      },
+      {
+        path: 'bookings/:bookingId/application',
+        title: 'Dossier locataire',
+        canActivate: [authGuard, roleGuard('STUDENT')],
+        loadComponent: () =>
+          import('./features/rental-cycle/tenant-application/tenant-application').then(
+            (m) => m.TenantApplication,
+          ),
       },
       {
         path: 'notifications',

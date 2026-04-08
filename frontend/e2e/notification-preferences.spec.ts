@@ -8,7 +8,7 @@ test.describe('Notification Preferences — Student', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsStudent(page);
     prefsPage = new NotificationPreferencesPage(page);
-    await prefsPage.goto();
+    await prefsPage.goto('student');
   });
 
   test('should load the notification preferences page', async () => {
@@ -41,7 +41,7 @@ test.describe('Notification Preferences — Landlord', () => {
   test.beforeEach(async ({ page }) => {
     await loginAsLandlord(page);
     prefsPage = new NotificationPreferencesPage(page);
-    await prefsPage.goto();
+    await prefsPage.goto('landlord');
   });
 
   test('should load preferences page for landlord', async () => {
