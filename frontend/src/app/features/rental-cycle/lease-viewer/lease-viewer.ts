@@ -47,7 +47,7 @@ export class LeaseViewer implements OnInit {
   paymentInProgress = signal(false);
   errorMessage = signal<string | null>(null);
 
-  currentUser = this.authService.currentUser;
+  currentUser = this.authService.user;
 
   canSignAsLandlord = computed(() => {
     const l = this.lease();
