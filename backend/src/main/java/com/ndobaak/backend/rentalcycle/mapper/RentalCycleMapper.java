@@ -3,10 +3,12 @@ package com.ndobaak.backend.rentalcycle.mapper;
 import com.ndobaak.backend.media.service.StorageService;
 import com.ndobaak.backend.rentalcycle.dto.response.GuarantorResponse;
 import com.ndobaak.backend.rentalcycle.dto.response.LandlordDocumentResponse;
+import com.ndobaak.backend.rentalcycle.dto.response.LeaseContractResponse;
 import com.ndobaak.backend.rentalcycle.dto.response.TenantApplicationResponse;
 import com.ndobaak.backend.rentalcycle.dto.response.TenantDocumentResponse;
 import com.ndobaak.backend.rentalcycle.entity.Guarantor;
 import com.ndobaak.backend.rentalcycle.entity.LandlordDocument;
+import com.ndobaak.backend.rentalcycle.entity.LeaseContract;
 import com.ndobaak.backend.rentalcycle.entity.TenantApplication;
 import com.ndobaak.backend.rentalcycle.entity.TenantDocument;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +57,27 @@ public class RentalCycleMapper {
                 document.getValidatedAt(),
                 document.getRejectionComment(),
                 document.getCreatedAt()
+        );
+    }
+
+    public LeaseContractResponse toResponse(LeaseContract lease) {
+        return new LeaseContractResponse(
+                lease.getId(),
+                lease.getBooking().getId(),
+                lease.getStartDate(),
+                lease.getEndDate(),
+                lease.getMonthlyRent(),
+                lease.getSecurityDeposit(),
+                lease.getAgencyFee(),
+                lease.getSpecialClauses(),
+                lease.getPdfUrl() != null ? storageService.resolvePublicUrl(lease.getPdfUrl()) : null,
+                lease.getStatus(),
+                lease.getLandlordSignedAt(),
+                lease.getTenantSignedAt(),
+                lease.getTaxRegistrationDate(),
+                lease.getTaxReference(),
+                lease.getGeneratedById(),
+                lease.getCreatedAt()
         );
     }
 

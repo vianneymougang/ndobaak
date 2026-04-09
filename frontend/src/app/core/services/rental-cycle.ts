@@ -63,6 +63,40 @@ export interface LandlordDocumentResponse {
   createdAt: string;
 }
 
+export type LeaseStatus =
+  | 'DRAFT'
+  | 'AWAITING_LANDLORD_SIGNATURE'
+  | 'AWAITING_TENANT_SIGNATURE'
+  | 'FULLY_SIGNED'
+  | 'TAX_REGISTERED'
+  | 'TERMINATED';
+
+export interface LeaseContractResponse {
+  id: number;
+  bookingId: number;
+  startDate: string;
+  endDate: string;
+  monthlyRent: number;
+  securityDeposit: number;
+  agencyFee: number;
+  specialClauses?: string;
+  pdfUrl?: string;
+  status: LeaseStatus;
+  landlordSignedAt?: string;
+  tenantSignedAt?: string;
+  taxRegistrationDate?: string;
+  taxReference?: string;
+  generatedById: number;
+  createdAt: string;
+}
+
+export interface GenerateLeaseRequest {
+  startDate: string;
+  endDate: string;
+  securityDeposit: number;
+  specialClauses?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -145,6 +179,38 @@ export class RentalCycleService {
     return this.http.patch<TenantApplicationResponse>(
       `${this.apiUrl}/admin/bookings/${bookingId}/application/validate`,
       decision,
+    );
+  }
+
+  // ========== Lease Contract ==========
+  getLease(bookingId: number): Observable<LeaseContractResponse> {
+    return this.http.get<LeaseContractResponse>(
+      `${this.apiUrl}/bookings/${bookingId}/lease`,
+    );
+  }
+
+  getLeasePdfUrl(bookingId: number): string {
+    return `${this.apiUrl}/bookings/${bookingId}/lease/pdf`;
+  }
+
+  signLease(bookingId: number): Observable<LeaseContractResponse> {
+    return this.http.post<LeaseContractResponse>(
+      `${this.apiUrl}/bookings/${bookingId}/lease/sign`,
+      {},
+    );
+  }
+
+  generateLease(bookingId: number, request: GenerateLeaseRequest): Observable<LeaseContractResponse> {
+    return this.http.post<LeaseContractResponse>(
+      `${this.apiUrl}/admin/bookings/${bookingId}/lease`,
+      request,
+    );
+  }
+
+  initiatePayment(bookingId: number): Observable<{ authorizationUrl: string; reference: string }> {
+    return this.http.post<{ authorizationUrl: string; reference: string }>(
+      `${this.apiUrl}/bookings/${bookingId}/payment/initiate`,
+      {},
     );
   }
 }

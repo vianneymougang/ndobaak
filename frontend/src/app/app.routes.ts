@@ -204,6 +204,15 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'bookings/:bookingId/lease',
+        title: 'Contrat de bail',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/rental-cycle/lease-viewer/lease-viewer').then(
+            (m) => m.LeaseViewer,
+          ),
+      },
+      {
         path: 'notifications',
         title: 'Notifications',
         canActivate: [authGuard],

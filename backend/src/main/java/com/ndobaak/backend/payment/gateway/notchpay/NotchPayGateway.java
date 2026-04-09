@@ -106,6 +106,42 @@ public class NotchPayGateway implements PaymentGateway {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public PaymentInitiationResult initiateRedirectPayment(String reference, BigDecimal amount, String currency,
+                                                            String payerName, String payerEmail,
+                                                            String description, String callbackUrl) {
+        log.info("Initiating NotchPay redirect payment: reference={}, amount={} {}", reference, amount, currency);
+
+        Map<String, Object> body = Map.of(
+                "amount", amount.intValue(),
+                "currency", currency,
+                "customer", Map.of(
+                        "name", payerName,
+                        "email", payerEmail
+                ),
+                "description", description,
+                "reference", reference,
+                "callback", callbackUrl
+        );
+
+        Map<String, Object> response = restClient.post()
+                .uri("/payments")
+                .body(body)
+                .retrieve()
+                .body(Map.class);
+
+        Map<String, Object> transaction = (Map<String, Object>) response.get("transaction");
+        String providerRef = transaction != null ? (String) transaction.get("reference") : null;
+        String authUrl = transaction != null ? (String) transaction.get("authorization_url") : null;
+        String status = transaction != null ? (String) transaction.get("status") : "pending";
+
+        log.info("NotchPay redirect payment initialized: providerRef={}, authUrl={}",
+                providerRef, authUrl != null ? "[present]" : "[absent]");
+
+        return new PaymentInitiationResult(providerRef, authUrl, status);
+    }
+
+    @Override
     public void triggerCharge(String providerReference, PaymentGatewayRequest request) {
         Map<String, Object> chargeBody = Map.of(
                 "channel", mapOperatorToChannel(request.operator()),
