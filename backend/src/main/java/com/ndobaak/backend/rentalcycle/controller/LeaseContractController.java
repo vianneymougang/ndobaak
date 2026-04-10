@@ -23,14 +23,14 @@ public class LeaseContractController {
     @PreAuthorize("hasAnyRole('STUDENT', 'LANDLORD', 'ADMIN')")
     public ResponseEntity<LeaseContractResponse> getLease(@PathVariable Long id) {
         User user = authService.getAuthenticatedUser();
-        return ResponseEntity.ok(leaseContractService.getLease(id, user.getId()));
+        return ResponseEntity.ok(leaseContractService.getLease(id, user.getId(), user.getRole()));
     }
 
     @GetMapping("/{id}/lease/pdf")
     @PreAuthorize("hasAnyRole('STUDENT', 'LANDLORD', 'ADMIN')")
     public ResponseEntity<byte[]> getLeasePdf(@PathVariable Long id) {
         User user = authService.getAuthenticatedUser();
-        byte[] pdfBytes = leaseContractService.getLeasePdf(id, user.getId());
+        byte[] pdfBytes = leaseContractService.getLeasePdf(id, user.getId(), user.getRole());
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)

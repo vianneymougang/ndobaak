@@ -2,11 +2,10 @@ package com.ndobaak.backend.rentalcycle.service;
 
 import com.lowagie.text.pdf.BaseFont;
 import com.ndobaak.backend.rentalcycle.dto.LeaseContractPdfData;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
@@ -17,16 +16,8 @@ public class ContractPdfGenerator {
 
     private final TemplateEngine templateEngine;
 
-    public ContractPdfGenerator() {
-        ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
-        resolver.setTemplateMode(TemplateMode.XML);
-        resolver.setPrefix("templates/");
-        resolver.setSuffix(".html");
-        resolver.setCharacterEncoding("UTF-8");
-        resolver.setCacheable(false);
-
-        this.templateEngine = new TemplateEngine();
-        this.templateEngine.setTemplateResolver(resolver);
+    public ContractPdfGenerator(@Qualifier("pdfTemplateEngine") TemplateEngine templateEngine) {
+        this.templateEngine = templateEngine;
     }
 
     public byte[] generate(LeaseContractPdfData data) {

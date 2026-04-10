@@ -105,9 +105,11 @@ public class LeaseContractService {
         return mapper.toResponse(lease);
     }
 
-    public LeaseContractResponse getLease(Long bookingId, Long userId) {
+    public LeaseContractResponse getLease(Long bookingId, Long userId, UserRole role) {
         Booking booking = findBooking(bookingId);
-        validateAccess(booking, userId);
+        if (role != UserRole.ADMIN) {
+            validateAccess(booking, userId);
+        }
 
         LeaseContract lease = leaseContractRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -116,9 +118,11 @@ public class LeaseContractService {
         return mapper.toResponse(lease);
     }
 
-    public byte[] getLeasePdf(Long bookingId, Long userId) {
+    public byte[] getLeasePdf(Long bookingId, Long userId, UserRole role) {
         Booking booking = findBooking(bookingId);
-        validateAccess(booking, userId);
+        if (role != UserRole.ADMIN) {
+            validateAccess(booking, userId);
+        }
 
         LeaseContract lease = leaseContractRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException(
