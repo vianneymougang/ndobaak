@@ -99,6 +99,8 @@ public class PaymentWebhookService {
         switch (eventType) {
             case "payment.complete" -> handlePaymentComplete(payment);
             case "payment.failed" -> handlePaymentFailed(payment);
+            case "payment.expired" -> handlePaymentExpired(payment);
+            case "payment.canceled" -> handlePaymentCanceled(payment);
             default -> log.warn("Unhandled webhook event type: {}", eventType);
         }
     }
@@ -206,6 +208,34 @@ public class PaymentWebhookService {
             paymentRepository.save(nextPayment);
         }
         return true;
+    }
+
+    private void handlePaymentExpired(Payment payment) {
+        payment.setStatus(PaymentStatus.FAILED);
+        paymentRepository.save(payment);
+
+        if (payment.getPaymentType() == PaymentType.SUBSCRIPTION || payment.getBooking() == null) {
+            subscriptionService.onSubscriptionPaymentFailed(payment.getId());
+            log.warn("Subscription payment expired: reference={}", payment.getTransactionId());
+            return;
+        }
+
+        notificationService.sendPaymentFailedNotification(payment, payment.getBooking());
+        log.warn("Payment expired: reference={}", payment.getTransactionId());
+    }
+
+    private void handlePaymentCanceled(Payment payment) {
+        payment.setStatus(PaymentStatus.CANCELED);
+        paymentRepository.save(payment);
+
+        if (payment.getPaymentType() == PaymentType.SUBSCRIPTION || payment.getBooking() == null) {
+            subscriptionService.onSubscriptionPaymentFailed(payment.getId());
+            log.warn("Subscription payment canceled: reference={}", payment.getTransactionId());
+            return;
+        }
+
+        notificationService.sendPaymentFailedNotification(payment, payment.getBooking());
+        log.warn("Payment canceled: reference={}", payment.getTransactionId());
     }
 
     private void handlePaymentFailed(Payment payment) {

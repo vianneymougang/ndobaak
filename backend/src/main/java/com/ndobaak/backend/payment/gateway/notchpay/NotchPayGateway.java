@@ -11,14 +11,21 @@ import com.ndobaak.backend.payment.gateway.WebhookEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
+
+import java.net.http.HttpClient;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HexFormat;
 import java.util.Map;
@@ -37,8 +44,15 @@ public class NotchPayGateway implements PaymentGateway {
     public NotchPayGateway(NotchPayProperties properties, ObjectMapper objectMapper) {
         this.properties = properties;
         this.objectMapper = objectMapper;
+        HttpClient httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+        JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
+        requestFactory.setReadTimeout(Duration.ofSeconds(30));
+
         this.restClient = RestClient.builder()
                 .baseUrl(properties.getBaseUrl())
+                .requestFactory(requestFactory)
                 .defaultHeader("Authorization", properties.getPublicKey())
                 .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .build();
@@ -56,9 +70,13 @@ public class NotchPayGateway implements PaymentGateway {
 
     @Override
     public boolean isAvailable() {
+        if (properties.getPublicKey() == null || properties.getPublicKey().isBlank()) {
+            log.warn("NotchPay gateway disabled: public key not configured");
+            return false;
+        }
         try {
             restClient.get()
-                    .uri("/payments")
+                    .uri("/")
                     .retrieve()
                     .toBodilessEntity();
             return true;
@@ -90,11 +108,7 @@ public class NotchPayGateway implements PaymentGateway {
                 "locked_channel", mapOperatorToChannel(request.operator())
         );
 
-        Map<String, Object> response = restClient.post()
-                .uri("/payments")
-                .body(body)
-                .retrieve()
-                .body(Map.class);
+        Map<String, Object> response = executePost("/payments", body);
 
         Map<String, Object> transaction = (Map<String, Object>) response.get("transaction");
         String providerRef = transaction != null ? (String) transaction.get("reference") : null;
@@ -121,18 +135,16 @@ public class NotchPayGateway implements PaymentGateway {
                 ),
                 "description", description,
                 "reference", reference,
-                "callback", callbackUrl
+                "callback", callbackUrl,
+                "locked_currency", "XAF",
+                "locked_country", "CM"
         );
 
-        Map<String, Object> response = restClient.post()
-                .uri("/payments")
-                .body(body)
-                .retrieve()
-                .body(Map.class);
+        Map<String, Object> response = executePost("/payments", body);
 
         Map<String, Object> transaction = (Map<String, Object>) response.get("transaction");
         String providerRef = transaction != null ? (String) transaction.get("reference") : null;
-        String authUrl = transaction != null ? (String) transaction.get("authorization_url") : null;
+        String authUrl = (String) response.get("authorization_url");
         String status = transaction != null ? (String) transaction.get("status") : "pending";
 
         log.info("NotchPay redirect payment initialized: providerRef={}, authUrl={}",
@@ -142,17 +154,29 @@ public class NotchPayGateway implements PaymentGateway {
     }
 
     @Override
+    public void cancelPayment(String providerReference) {
+        try {
+            restClient.delete()
+                    .uri("/payments/{reference}", providerReference)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, (req, res) ->
+                            log.warn("NotchPay cancel returned error status: {}", res.getStatusCode()))
+                    .toBodilessEntity();
+            log.info("NotchPay payment cancelled: providerRef={}", providerReference);
+        } catch (Exception e) {
+            log.warn("NotchPay cancel failed (non-critical): providerRef={}, error={}", providerReference, e.getMessage());
+        }
+    }
+
+    @Override
     public void triggerCharge(String providerReference, PaymentGatewayRequest request) {
+        String phone = request.phoneNumber().startsWith("+") ? request.phoneNumber() : "+" + request.phoneNumber();
         Map<String, Object> chargeBody = Map.of(
                 "channel", mapOperatorToChannel(request.operator()),
-                "data", Map.of("phone", request.phoneNumber())
+                "data", Map.of("phone", phone)
         );
-        restClient.post()
-                .uri("/payments/{reference}", providerReference)
-                .body(chargeBody)
-                .retrieve()
-                .toBodilessEntity();
-        log.info("NotchPay USSD push triggered: providerRef={}, phone={}", providerReference, request.phoneNumber());
+        executePost("/payments/" + providerReference, chargeBody);
+        log.info("NotchPay charge triggered: providerRef={}, phone={}", providerReference, phone);
     }
 
     @Override
@@ -160,10 +184,7 @@ public class NotchPayGateway implements PaymentGateway {
     public PaymentVerificationResult verifyPayment(String reference) {
         log.info("Verifying NotchPay payment: reference={}", reference);
 
-        Map<String, Object> response = restClient.get()
-                .uri("/payments/{reference}", reference)
-                .retrieve()
-                .body(Map.class);
+        Map<String, Object> response = executeGet("/payments/{reference}", reference);
 
         Map<String, Object> transaction = (Map<String, Object>) response.get("transaction");
         String status = (String) transaction.get("status");
@@ -189,7 +210,9 @@ public class NotchPayGateway implements PaymentGateway {
             mac.init(secretKey);
             byte[] hmacBytes = mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
             String computed = HexFormat.of().formatHex(hmacBytes);
-            return computed.equalsIgnoreCase(signature);
+            return MessageDigest.isEqual(
+                    computed.toLowerCase().getBytes(StandardCharsets.UTF_8),
+                    signature.toLowerCase().getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             log.error("Webhook signature verification failed", e);
             return false;
@@ -222,10 +245,54 @@ public class NotchPayGateway implements PaymentGateway {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> executePost(String uri, Map<String, Object> body) {
+        try {
+            return restClient.post()
+                    .uri(uri)
+                    .body(body)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                        log.error("NotchPay 4xx error: status={}, uri={}", res.getStatusCode(), uri);
+                        throw new RuntimeException("NotchPay client error: " + res.getStatusCode());
+                    })
+                    .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                        log.error("NotchPay 5xx error: status={}, uri={}", res.getStatusCode(), uri);
+                        throw new RuntimeException("NotchPay server error: " + res.getStatusCode());
+                    })
+                    .body(Map.class);
+        } catch (RestClientResponseException e) {
+            log.error("NotchPay request failed: uri={}, status={}, body={}", uri, e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Erreur de communication avec le service de paiement.", e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> executeGet(String uri, Object... uriVars) {
+        try {
+            return restClient.get()
+                    .uri(uri, uriVars)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                        log.error("NotchPay 4xx error: status={}, uri={}", res.getStatusCode(), uri);
+                        throw new RuntimeException("NotchPay client error: " + res.getStatusCode());
+                    })
+                    .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                        log.error("NotchPay 5xx error: status={}, uri={}", res.getStatusCode(), uri);
+                        throw new RuntimeException("NotchPay server error: " + res.getStatusCode());
+                    })
+                    .body(Map.class);
+        } catch (RestClientResponseException e) {
+            log.error("NotchPay request failed: uri={}, status={}, body={}", uri, e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Erreur de communication avec le service de paiement.", e);
+        }
+    }
+
     private String mapOperatorToChannel(MobileMoneyOperator operator) {
         return switch (operator) {
             case MTN_MOMO -> "cm.mtn";
             case ORANGE_MONEY -> "cm.orange";
         };
     }
+
 }

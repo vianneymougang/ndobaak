@@ -20,6 +20,8 @@ public interface PaymentGateway {
 
     void triggerCharge(String providerReference, PaymentGatewayRequest request);
 
+    void cancelPayment(String providerReference);
+
     PaymentVerificationResult verifyPayment(String reference);
 
     boolean verifyWebhookSignature(String payload, String signature);

@@ -71,6 +71,11 @@ public class MockPaymentGateway implements PaymentGateway {
     }
 
     @Override
+    public void cancelPayment(String providerReference) {
+        log.info("[MOCK] cancelPayment no-op: providerRef={}", providerReference);
+    }
+
+    @Override
     public PaymentVerificationResult verifyPayment(String reference) {
         PaymentGatewayRequest original = pendingPayments.get(reference);
 

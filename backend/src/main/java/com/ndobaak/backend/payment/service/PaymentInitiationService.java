@@ -141,7 +141,11 @@ public class PaymentInitiationService {
         payment.setProviderReference(result.providerReference());
         paymentRepository.save(payment);
 
-        gateway.triggerCharge(result.providerReference(), gatewayRequest);
+        try {
+            gateway.triggerCharge(result.providerReference(), gatewayRequest);
+        } catch (Exception e) {
+            log.warn("USSD push failed (non-fatal): reference={}, error={}", reference, e.getMessage());
+        }
 
         log.info("Payment initiated: reference={}, provider={}, amount={} XAF, split={}",
                 reference, gateway.getProviderName(), totalCharged, isSplit);
@@ -224,6 +228,13 @@ public class PaymentInitiationService {
         if (booking.getStatus() != BookingStatus.LEASE_SIGNED) {
             throw new BusinessException(
                 "Le paiement n'est possible qu'après signature du contrat par les deux parties.");
+        }
+
+        boolean hasActivePayment = paymentRepository.findByBookingId(bookingId).stream()
+                .anyMatch(p -> p.getStatus() == PaymentStatus.PENDING
+                        || p.getStatus() == PaymentStatus.PROCESSING);
+        if (hasActivePayment) {
+            throw new BusinessException("Un paiement est déjà en cours pour cette réservation.");
         }
 
         String reference = "NDK-" + bookingId + "-" + System.currentTimeMillis();
