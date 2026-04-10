@@ -52,10 +52,10 @@ public class Subscription {
     @Column(nullable = false, columnDefinition = "subscription_status")
     private SubscriptionStatus status;
 
-    @Column(name = "start_date", nullable = false)
+    @Column(name = "start_date")
     private LocalDate startDate;
 
-    @Column(name = "end_date", nullable = false)
+    @Column(name = "end_date")
     private LocalDate endDate;
 
     @Column(nullable = false, precision = 10, scale = 0)

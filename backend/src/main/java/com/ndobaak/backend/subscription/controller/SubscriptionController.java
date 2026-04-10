@@ -6,6 +6,7 @@ import com.ndobaak.backend.subscription.service.SubscriptionService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -41,6 +42,12 @@ public class SubscriptionController {
     @PutMapping("/renew")
     public ResponseEntity<SubscriptionResponse> renew(@Valid @RequestBody SubscribeRequest request) {
         return ResponseEntity.ok(subscriptionService.renew(request));
+    }
+
+    @DeleteMapping("/pending")
+    public ResponseEntity<Void> cancelPendingSubscription() {
+        subscriptionService.cancelPendingSubscription();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/cancel-auto-renew")
