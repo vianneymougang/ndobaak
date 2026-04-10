@@ -1,0 +1,120 @@
+<p-toast />
+
+<div class="lease-page">
+  @if (loading()) {
+    <div class="lease-skeleton">
+      <p-skeleton height="2rem" styleClass="mb-4" />
+      <p-skeleton height="1.5rem" width="60%" styleClass="mb-6" />
+      <p-skeleton height="8rem" styleClass="mb-4" />
+      <p-skeleton height="6rem" styleClass="mb-4" />
+      <p-skeleton height="3rem" width="40%" />
+    </div>
+  } @else if (errorMessage()) {
+    <div class="lease-error">
+      <p-message severity="error" [text]="errorMessage()!" styleClass="mb-4" />
+      <p-button label="Réessayer" icon="pi pi-refresh" severity="secondary" (onClick)="retryLoad()" />
+    </div>
+  } @else if (lease()) {
+    <div class="lease-header">
+      <button class="back-btn" (click)="goBack()" type="button" aria-label="Retour">
+        <i class="pi pi-arrow-left"></i>
+        <span>Retour</span>
+      </button>
+      <div class="lease-title-row">
+        <h1 class="lease-title">Contrat de bail</h1>
+        <p-tag [value]="statusLabel()" [severity]="statusSeverity()" />
+      </div>
+      <p class="lease-ref">Réservation #{{ lease()!.bookingId }}</p>
+    </div>
+
+    <div class="lease-content">
+      <p-card styleClass="lease-card">
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Date d'entrée</span>
+            <span class="info-value">{{ lease()!.startDate | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Date de fin</span>
+            <span class="info-value">{{ lease()!.endDate | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Loyer mensuel</span>
+            <span class="info-value amount">{{ lease()!.monthlyRent | number:'1.0-0' }} FCFA</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Caution</span>
+            <span class="info-value amount">{{ lease()!.securityDeposit | number:'1.0-0' }} FCFA</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Honoraires agence</span>
+            <span class="info-value amount">{{ lease()!.agencyFee | number:'1.0-0' }} FCFA</span>
+          </div>
+        </div>
+
+        @if (lease()!.specialClauses) {
+          <p-divider />
+          <div class="special-clauses">
+            <span class="info-label">Clauses particulières</span>
+            <p class="clauses-text">{{ lease()!.specialClauses }}</p>
+          </div>
+        }
+      </p-card>
+
+      <p-card styleClass="lease-card signatures-card">
+        <h3 class="signatures-title">Signatures</h3>
+        <div class="signatures-grid">
+          <div class="signature-item" [class.signed]="!!lease()!.landlordSignedAt">
+            <i [class]="lease()!.landlordSignedAt ? 'pi pi-check-circle signed-icon' : 'pi pi-clock pending-icon'"></i>
+            <div class="signature-info">
+              <span class="signature-role">Propriétaire</span>
+              @if (lease()!.landlordSignedAt) {
+                <span class="signature-date">Signé le {{ lease()!.landlordSignedAt | date:'dd/MM/yyyy à HH:mm' }}</span>
+              } @else {
+                <span class="signature-pending">En attente de signature</span>
+              }
+            </div>
+          </div>
+          <div class="signature-item" [class.signed]="!!lease()!.tenantSignedAt">
+            <i [class]="lease()!.tenantSignedAt ? 'pi pi-check-circle signed-icon' : 'pi pi-clock pending-icon'"></i>
+            <div class="signature-info">
+              <span class="signature-role">Locataire</span>
+              @if (lease()!.tenantSignedAt) {
+                <span class="signature-date">Signé le {{ lease()!.tenantSignedAt | date:'dd/MM/yyyy à HH:mm' }}</span>
+              } @else {
+                <span class="signature-pending">En attente de signature</span>
+              }
+            </div>
+          </div>
+        </div>
+      </p-card>
+
+      <div class="lease-actions">
+        @if (lease()!.pdfUrl) {
+          <p-button
+            label="Voir le contrat PDF"
+            icon="pi pi-file-pdf"
+            severity="secondary"
+            (onClick)="openPdf()"
+          />
+        }
+        @if (canSignAsLandlord() || canSignAsStudent()) {
+          <p-button
+            label="Signer le contrat"
+            icon="pi pi-pen-to-square"
+            [loading]="signingInProgress()"
+            (onClick)="sign()"
+          />
+        }
+        @if (canPay()) {
+          <p-button
+            label="Procéder au paiement"
+            icon="pi pi-credit-card"
+            [loading]="paymentInProgress()"
+            (onClick)="proceedToPayment()"
+          />
+        }
+      </div>
+    </div>
+  }
+</div>

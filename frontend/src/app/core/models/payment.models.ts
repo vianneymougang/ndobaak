@@ -1,4 +1,4 @@
-export type PaymentStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
+export type PaymentStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELED' | 'EXPIRED' | 'REFUNDED';
 
 export type PaymentMethod = 'MOBILE_MONEY' | 'BANK_TRANSFER';
 

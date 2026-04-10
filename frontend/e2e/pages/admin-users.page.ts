@@ -5,24 +5,16 @@ export class AdminUsersPage {
   readonly heading: Locator;
   readonly usersTable: Locator;
   readonly searchInput: Locator;
-  readonly deactivateButton: Locator;
-  readonly reactivateButton: Locator;
-  readonly confirmDialog: Locator;
-  readonly confirmButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByRole('heading', { name: /utilisateurs/i });
-    this.usersTable = page.locator('p-table, .p-datatable');
+    this.heading = page.getByRole('heading', { name: /communauté/i });
+    this.usersTable = page.locator('table, p-table, .p-datatable');
     this.searchInput = page.getByPlaceholder(/rechercher/i).first();
-    this.deactivateButton = page.getByRole('button', { name: /désactiver/i }).first();
-    this.reactivateButton = page.getByRole('button', { name: /réactiver/i }).first();
-    this.confirmDialog = page.locator('p-confirmdialog, .p-confirmdialog');
-    this.confirmButton = page.getByRole('button', { name: /oui|confirmer/i }).last();
   }
 
   async goto() {
-    await this.page.goto('/admin/users');
+    await this.page.goto('/admin/community');
     await this.page.waitForLoadState('networkidle');
   }
 
@@ -31,7 +23,8 @@ export class AdminUsersPage {
   }
 
   async expectTableVisible() {
-    await expect(this.usersTable).toBeVisible({ timeout: 10_000 });
+    // Community page uses a custom list with user rows
+    await expect(this.page.getByText('mbarga@test.ndobaak.com').first()).toBeVisible({ timeout: 10_000 });
   }
 
   async searchUser(query: string) {
@@ -40,7 +33,7 @@ export class AdminUsersPage {
   }
 
   async expectRowsVisible() {
-    const rows = this.page.locator('tr.p-row, tbody tr').first();
+    const rows = this.page.locator('table tbody tr, .user-row').first();
     await expect(rows).toBeVisible({ timeout: 10_000 });
   }
 }

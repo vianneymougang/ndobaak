@@ -17,6 +17,7 @@ export interface RegisterLandlordRequest {
   password: string;
   idCardNumber?: string;
   taxId?: string;
+  mobileMoneyPhone: string;
 }
 
 export interface LoginRequest {
@@ -44,6 +45,5 @@ export interface UserProfile {
   matricule?: string;
   fieldOfStudy?: string;
   yearOfStudy?: number;
-  idCardNumber?: string;
-  taxId?: string;
+  verified?: boolean;
 }

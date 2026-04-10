@@ -2,6 +2,7 @@ package com.ndobaak.backend.config;
 
 import com.ndobaak.backend.auth.service.CustomOAuth2UserService;
 import com.ndobaak.backend.common.security.JwtAuthenticationFilter;
+import com.ndobaak.backend.common.security.RateLimitFilter;
 import com.ndobaak.backend.common.security.OAuthOriginCaptureFilter;
 import com.ndobaak.backend.common.security.OAuth2AuthenticationFailureHandler;
 import com.ndobaak.backend.common.security.OAuth2AuthenticationSuccessHandler;
@@ -29,15 +30,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RateLimitFilter rateLimitFilter;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+                          RateLimitFilter rateLimitFilter,
                           CustomOAuth2UserService customOAuth2UserService,
                           OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
                           OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.rateLimitFilter = rateLimitFilter;
         this.customOAuth2UserService = customOAuth2UserService;
         this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
         this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
@@ -49,7 +53,7 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/swagger-ui/**",
@@ -68,7 +72,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/listings/{id}/rating-stats").permitAll()
                 .requestMatchers("/media/**").permitAll()
                 .requestMatchers("/payments/webhook/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                 .anyRequest().authenticated()
             )
             .exceptionHandling(exceptions -> exceptions
@@ -79,6 +83,7 @@ public class SecurityConfig {
                 .successHandler(oAuth2AuthenticationSuccessHandler)
                 .failureHandler(oAuth2AuthenticationFailureHandler))
             .addFilterBefore(new OAuthOriginCaptureFilter(), OAuth2AuthorizationRequestRedirectFilter.class)
+            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

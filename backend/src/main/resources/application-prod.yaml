@@ -28,6 +28,7 @@ app:
     secret: ${JWT_SECRET}
     expiration-ms: 3600000
     refresh-expiration-ms: 604800000
+    secure-cookies: true
 
   storage:
     endpoint: https://s3.amazonaws.com

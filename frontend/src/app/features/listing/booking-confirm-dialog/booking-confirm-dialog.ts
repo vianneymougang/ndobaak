@@ -1,6 +1,7 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  DestroyRef,
   inject,
   signal,
   computed,
@@ -8,6 +9,7 @@ import {
   output,
   model,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -28,6 +30,7 @@ import { BookingService } from '../../../core/services/booking';
 export class BookingConfirmDialog {
   private bookingService = inject(BookingService);
   private messageService = inject(MessageService);
+  private destroyRef = inject(DestroyRef);
 
   visible = model<boolean>(false);
   listing = input.required<ListingResponse>();
@@ -79,6 +82,7 @@ export class BookingConfirmDialog {
         startDate: this.toIsoDate(this.startDate()),
         endDate: this.toIsoDate(this.endDate()),
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (booking) => {
           this.submitting.set(false);

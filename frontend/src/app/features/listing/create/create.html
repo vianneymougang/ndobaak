@@ -1,12 +1,17 @@
 <div class="create-listing-page">
-  <h1>Creer une annonce</h1>
+  <div class="page-hero">
+    <div class="page-hero-text">
+      <h1>Publier une annonce</h1>
+      <p>Renseignez les informations de votre logement en quelques étapes.</p>
+    </div>
+  </div>
 
   <p-stepper [(value)]="activeStep" class="w-full">
     <p-step-list>
       <p-step [value]="1">Informations</p-step>
       <p-step [value]="2">Photos</p-step>
       <p-step [value]="3">Localisation</p-step>
-      <p-step [value]="4">Recapitulatif</p-step>
+      <p-step [value]="4">Récapitulatif</p-step>
     </p-step-list>
 
     <p-step-panels>
@@ -14,29 +19,49 @@
       <p-step-panel [value]="1">
         <ng-template #content let-activateCallback="activateCallback">
           <div class="step-content">
+            <div class="step-intro">
+              <h2>Décrivez votre logement</h2>
+              <p>Un titre accrocheur et une description détaillée augmentent vos chances de trouver un locataire.</p>
+            </div>
+
             <form [formGroup]="infoForm" class="info-form">
               <div class="form-grid">
-                <div class="field full-width">
+                <div class="field-wrap full-width">
                   <p-floatlabel variant="on">
-                    <input pInputText id="title" formControlName="title" class="w-full" />
+                    <input
+                      pInputText
+                      id="title"
+                      formControlName="title"
+                      class="w-full"
+                      [invalid]="infoForm.get('title')!.invalid && infoForm.get('title')!.touched"
+                    />
                     <label for="title">Titre de l'annonce</label>
                   </p-floatlabel>
-                  <small class="char-counter" [class.error]="titleLength() > 0 && titleLength() < 10">
-                    {{ titleLength() }}/10 caracteres min.
-                  </small>
+                  <small
+                    class="char-counter"
+                    [class.error]="titleLength() > 0 && titleLength() < 10"
+                  >{{ titleLength() }}/10 caractères min.</small>
                 </div>
 
-                <div class="field full-width">
+                <div class="field-wrap full-width">
                   <p-floatlabel variant="on">
-                    <textarea pTextarea id="description" formControlName="description" [rows]="5" class="w-full"></textarea>
-                    <label for="description">Description detaillee</label>
+                    <textarea
+                      pTextarea
+                      id="description"
+                      formControlName="description"
+                      [rows]="5"
+                      class="w-full"
+                      [invalid]="infoForm.get('description')!.invalid && infoForm.get('description')!.touched"
+                    ></textarea>
+                    <label for="description">Description détaillée</label>
                   </p-floatlabel>
-                  <small class="char-counter" [class.error]="descriptionLength() > 0 && descriptionLength() < 50">
-                    {{ descriptionLength() }}/50 caracteres min.
-                  </small>
+                  <small
+                    class="char-counter"
+                    [class.error]="descriptionLength() > 0 && descriptionLength() < 50"
+                  >{{ descriptionLength() }}/50 caractères min.</small>
                 </div>
 
-                <div class="field">
+                <div class="field-wrap">
                   <p-floatlabel variant="on">
                     <p-select
                       id="roomType"
@@ -45,12 +70,13 @@
                       optionLabel="label"
                       optionValue="value"
                       class="w-full"
+                      [invalid]="infoForm.get('roomType')!.invalid && infoForm.get('roomType')!.touched"
                     />
                     <label for="roomType">Type de logement</label>
                   </p-floatlabel>
                 </div>
 
-                <div class="field">
+                <div class="field-wrap">
                   <p-floatlabel variant="on">
                     <p-inputnumber
                       id="monthlyPrice"
@@ -59,12 +85,13 @@
                       [useGrouping]="true"
                       suffix=" FCFA"
                       class="w-full"
+                      [invalid]="infoForm.get('monthlyPrice')!.invalid && infoForm.get('monthlyPrice')!.touched"
                     />
                     <label for="monthlyPrice">Loyer mensuel</label>
                   </p-floatlabel>
                 </div>
 
-                <div class="field">
+                <div class="field-wrap">
                   <p-floatlabel variant="on">
                     <p-inputnumber
                       id="availableRooms"
@@ -77,7 +104,7 @@
                   </p-floatlabel>
                 </div>
 
-                <div class="field">
+                <div class="field-wrap">
                   <p-floatlabel variant="on">
                     <p-datepicker
                       id="availableDate"
@@ -85,13 +112,16 @@
                       dateFormat="dd/mm/yy"
                       class="w-full"
                     />
-                    <label for="availableDate">Date de disponibilite</label>
+                    <label for="availableDate">Disponible à partir du <span class="optional-hint">(facultatif)</span></label>
                   </p-floatlabel>
                 </div>
               </div>
 
               <div class="amenities-section">
-                <h3>Equipements</h3>
+                <div class="amenities-header">
+                  <h3>Équipements</h3>
+                  <span class="amenities-count">{{ selectedAmenityLabels().length }} sélectionné(s)</span>
+                </div>
                 <div class="amenities-grid">
                   @for (amenity of amenities(); track amenity.name; let i = $index) {
                     <div
@@ -107,17 +137,21 @@
                     >
                       <i [class]="amenity.icon"></i>
                       <span>{{ amenity.label }}</span>
+                      @if (amenity.selected) {
+                        <i class="pi pi-check amenity-check"></i>
+                      }
                     </div>
                   }
                 </div>
               </div>
             </form>
           </div>
+
           <div class="step-actions">
             <span></span>
             <div class="actions-right">
               <p-button
-                label="Sauvegarder le brouillon"
+                label="Sauvegarder"
                 icon="pi pi-save"
                 severity="secondary"
                 [loading]="saving()"
@@ -127,7 +161,8 @@
                 label="Suivant"
                 icon="pi pi-arrow-right"
                 iconPos="right"
-                (onClick)="saveDraft(); activateCallback(2)"
+                [loading]="saving()"
+                (onClick)="saveDraft(activateCallback.bind(this, 2))"
               />
             </div>
           </div>
@@ -138,61 +173,87 @@
       <p-step-panel [value]="2">
         <ng-template #content let-activateCallback="activateCallback">
           <div class="step-content">
-            <div class="photos-section">
-              <div class="photos-header">
-                <h3>Photos du logement</h3>
-                <p>Minimum 3, maximum 10 photos. La premiere photo sera la couverture.</p>
-              </div>
+            <div class="step-intro">
+              <h2>Photos du logement</h2>
+              <p>Ajoutez entre 3 et 10 photos. La première photo sera affichée en couverture.</p>
+            </div>
 
-              @if (!listing()) {
-                  <p-message severity="warn">Sauvegardez d'abord le brouillon (etape 1) avant d'ajouter des photos.</p-message>
-              } @else {
-                <div class="upload-zone">
-                  <label for="photo-upload" class="upload-area" (dragover)="$event.preventDefault()" (drop)="$event.preventDefault()">
-                    <i class="pi pi-cloud-upload"></i>
-                    <span>Cliquez ou deposez vos photos ici</span>
-                    <small>JPG, PNG, WebP — max 5 Mo par photo</small>
-                    <input
-                      id="photo-upload"
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      (change)="onFileSelect($event)"
-                      [disabled]="totalPhotoCount() >= 10 || uploadingPhotos()"
-                      hidden
-                    />
-                  </label>
-                </div>
+            @if (!listing()) {
+              <div class="photos-draft-notice">
+                <i class="pi pi-info-circle"></i>
+                <span>Sauvegardez d'abord le brouillon (étape 1) avant d'ajouter des photos.</span>
+                <p-button
+                  label="Retour à l'étape 1"
+                  severity="secondary"
+                  size="small"
+                  (onClick)="activateCallback(1)"
+                />
+              </div>
+            } @else {
+              <div class="photos-section">
+                <label
+                  for="photo-upload"
+                  class="upload-area"
+                  [class.upload-area-disabled]="totalPhotoCount() >= 10 || uploadingPhotos()"
+                  (dragover)="$event.preventDefault()"
+                  (drop)="$event.preventDefault()"
+                >
+                  <i class="pi pi-cloud-upload upload-icon"></i>
+                  <span class="upload-title">Cliquez ou déposez vos photos ici</span>
+                  <small>JPG, PNG, WebP — max 5 Mo par photo</small>
+                  <input
+                    id="photo-upload"
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                    multiple
+                    (change)="onFileSelect($event)"
+                    [disabled]="totalPhotoCount() >= 10 || uploadingPhotos()"
+                    hidden
+                  />
+                </label>
 
                 @if (uploadingPhotos()) {
                   <div class="uploading-indicator">
+                    <div class="uploading-label">
+                      <i class="pi pi-spin pi-spinner"></i>
+                      <span>Upload {{ uploadProgress() }}/{{ uploadTotal() }} en cours...</span>
+                    </div>
                     <p-progressBar
                       [value]="uploadTotal() > 0 ? (uploadProgress() / uploadTotal()) * 100 : 0"
                       [showValue]="false"
-                      [style]="{ height: '6px' }"
+                      [style]="{ height: '4px' }"
                     />
-                    <span>Upload {{ uploadProgress() }}/{{ uploadTotal() }}...</span>
                   </div>
                 }
 
-                <div class="photos-counter">
+                <div class="photos-status">
                   <p-tag
                     [value]="photoCount() + '/10 photos'"
                     [severity]="photoCount() < 3 ? 'danger' : 'success'"
                   />
                   @if (photoCount() < 3) {
-                    <small class="photo-warning">Encore {{ 3 - photoCount() }} photo(s) requise(s)</small>
+                    <span class="photo-warning">
+                      <i class="pi pi-exclamation-triangle"></i>
+                      Encore {{ 3 - photoCount() }} photo(s) requise(s)
+                    </span>
                   }
                 </div>
 
                 <div class="photos-grid">
                   @for (photo of photos(); track photo.id; let i = $index) {
-                    <div class="photo-card">
+                    <div class="photo-card" [class.photo-card-cover]="i === 0">
                       <img [src]="photo.thumbnailUrl || photo.url" [alt]="'Photo ' + (i + 1)" />
                       @if (i === 0) {
-                        <p-tag value="Couverture" severity="info" class="cover-badge" />
+                        <div class="cover-badge">
+                          <i class="pi pi-star-fill"></i>
+                          <span>Couverture</span>
+                        </div>
                       }
-                      <button class="remove-btn" (click)="removePhoto(photo)" aria-label="Supprimer la photo">
+                      <button
+                        class="remove-btn"
+                        (click)="removePhoto(photo)"
+                        aria-label="Supprimer la photo"
+                      >
                         <i class="pi pi-times"></i>
                       </button>
                     </div>
@@ -201,17 +262,18 @@
                     <div class="photo-card photo-card-pending">
                       <img [src]="pending.localUrl" alt="Upload en cours" />
                       <div class="pending-overlay">
-                        <p-progressSpinner [style]="{ width: '24px', height: '24px' }" />
+                        <p-progressSpinner [style]="{ width: '28px', height: '28px' }" />
                       </div>
                     </div>
                   }
                 </div>
-              }
-            </div>
+              </div>
+            }
           </div>
+
           <div class="step-actions">
             <p-button
-              label="Precedent"
+              label="Précédent"
               icon="pi pi-arrow-left"
               severity="secondary"
               (onClick)="activateCallback(1)"
@@ -230,49 +292,70 @@
       <p-step-panel [value]="3">
         <ng-template #content let-activateCallback="activateCallback">
           <div class="step-content">
-            <div class="location-section">
-              <form [formGroup]="locationForm" class="location-form">
-                <div class="form-grid">
-                  <div class="field full-width">
-                    <p-floatlabel variant="on">
-                      <input pInputText id="address" formControlName="address" class="w-full" />
-                      <label for="address">Adresse</label>
-                    </p-floatlabel>
-                  </div>
-
-                  <div class="field">
-                    <p-floatlabel variant="on">
-                      <input pInputText id="neighborhood" formControlName="neighborhood" class="w-full" />
-                      <label for="neighborhood">Quartier</label>
-                    </p-floatlabel>
-                  </div>
-
-                  <div class="field">
-                    <p-floatlabel variant="on">
-                      <input pInputText id="city" formControlName="city" class="w-full" />
-                      <label for="city">Ville</label>
-                    </p-floatlabel>
-                  </div>
-                </div>
-
-                <div class="map-info">
-                  <p><i class="pi pi-info-circle"></i> Cliquez sur la carte ou deplacez le marqueur pour definir l'emplacement exact.</p>
-                  <p-tag [value]="distanceToCampus() + ' km du campus'" severity="info" />
-                </div>
-
-                <div id="location-map" class="map-container" (click)="initMap()"></div>
-                @if (!map) {
-                  <div class="map-placeholder" (click)="initMap()">
-                    <i class="pi pi-map"></i>
-                    <span>Cliquez pour charger la carte</span>
-                  </div>
-                }
-              </form>
+            <div class="step-intro">
+              <h2>Localisation</h2>
+              <p>Indiquez l'adresse exacte et positionnez le marqueur sur la carte.</p>
             </div>
+
+            <form [formGroup]="locationForm" class="location-form">
+              <div class="form-grid">
+                <div class="field-wrap full-width">
+                  <p-floatlabel variant="on">
+                    <input
+                      pInputText
+                      id="address"
+                      formControlName="address"
+                      class="w-full"
+                      [invalid]="locationForm.get('address')!.invalid && locationForm.get('address')!.touched"
+                    />
+                    <label for="address">Adresse complète</label>
+                  </p-floatlabel>
+                </div>
+
+                <div class="field-wrap">
+                  <p-floatlabel variant="on">
+                    <input pInputText id="neighborhood" formControlName="neighborhood" class="w-full" />
+                    <label for="neighborhood">Quartier <span class="optional-hint">(facultatif)</span></label>
+                  </p-floatlabel>
+                </div>
+
+                <div class="field-wrap">
+                  <p-floatlabel variant="on">
+                    <input pInputText id="city" formControlName="city" class="w-full" />
+                    <label for="city">Ville</label>
+                  </p-floatlabel>
+                </div>
+              </div>
+
+              <div class="map-info">
+                <div class="map-info-text">
+                  <i class="pi pi-info-circle"></i>
+                  <span>Cliquez sur la carte ou déplacez le marqueur pour définir l'emplacement exact.</span>
+                </div>
+                <p-tag
+                  [value]="distanceToCampus() + ' km du campus IUSJC'"
+                  severity="info"
+                  icon="pi pi-map-marker"
+                />
+              </div>
+
+              <div
+                id="location-map"
+                class="map-container"
+                (click)="initMap()"
+              ></div>
+              @if (!map) {
+                <div class="map-placeholder" (click)="initMap()" role="button" tabindex="0" aria-label="Charger la carte">
+                  <i class="pi pi-map"></i>
+                  <span>Cliquez pour charger la carte</span>
+                </div>
+              }
+            </form>
           </div>
+
           <div class="step-actions">
             <p-button
-              label="Precedent"
+              label="Précédent"
               icon="pi pi-arrow-left"
               severity="secondary"
               (onClick)="activateCallback(2)"
@@ -281,7 +364,8 @@
               label="Suivant"
               icon="pi pi-arrow-right"
               iconPos="right"
-              (onClick)="saveDraft(); activateCallback(4)"
+              [loading]="saving()"
+              (onClick)="saveDraft(activateCallback.bind(this, 4))"
             />
           </div>
         </ng-template>
@@ -291,90 +375,101 @@
       <p-step-panel [value]="4">
         <ng-template #content let-activateCallback="activateCallback">
           <div class="step-content">
-            <div class="summary-section">
-              <h3>Recapitulatif de l'annonce</h3>
+            <div class="step-intro">
+              <h2>Vérifiez votre annonce</h2>
+              <p>Relisez les informations avant de soumettre pour validation.</p>
+            </div>
 
-              <div class="summary-card">
-                <div class="summary-group">
-                  <h4>Informations generales</h4>
-                  <div class="summary-row">
-                    <span class="label">Titre</span>
-                    <span class="value">{{ infoForm.get('title')?.value || '—' }}</span>
-                  </div>
-                  <div class="summary-row">
-                    <span class="label">Type</span>
-                    <span class="value">{{ roomTypeLabel(infoForm.get('roomType')?.value ?? null) }}</span>
-                  </div>
-                  <div class="summary-row">
-                    <span class="label">Loyer</span>
-                    <span class="value price">{{ formatPrice(infoForm.get('monthlyPrice')?.value ?? null) }}/mois</span>
-                  </div>
-                  <div class="summary-row">
-                    <span class="label">Chambres</span>
-                    <span class="value">{{ infoForm.get('availableRooms')?.value }}</span>
+            <div class="summary-layout">
+              @if (photos().length > 0) {
+                <div class="summary-cover">
+                  <img
+                    [src]="photos()[0].url || photos()[0].thumbnailUrl"
+                    alt="Photo de couverture"
+                  />
+                  <div class="summary-cover-overlay">
+                    <p-tag value="Couverture" severity="contrast" icon="pi pi-star-fill" />
+                    <p-tag [value]="photoCount() + ' photos'" severity="secondary" icon="pi pi-images" />
                   </div>
                 </div>
+              }
 
-                <div class="summary-group">
-                  <h4>Description</h4>
-                  <p class="description-preview">{{ infoForm.get('description')?.value || 'Aucune description' }}</p>
-                </div>
-
-                <div class="summary-group">
-                  <h4>Photos</h4>
-                  <div class="summary-photos">
-                    @for (photo of photos(); track photo.id) {
-                      <img [src]="photo.thumbnailUrl || photo.url" alt="Photo" class="summary-thumb" />
-                    }
-                    @if (photos().length === 0) {
-                      <span class="no-data">Aucune photo</span>
-                    }
+              <div class="summary-body">
+                <div class="summary-card">
+                  <div class="summary-group">
+                    <h4>Informations générales</h4>
+                    <div class="summary-row">
+                      <span class="label">Titre</span>
+                      <span class="value">{{ infoForm.get('title')?.value || '—' }}</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="label">Type</span>
+                      <span class="value">{{ roomTypeLabel(infoForm.get('roomType')?.value ?? null) }}</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="label">Loyer mensuel</span>
+                      <span class="value price">{{ formatPrice(infoForm.get('monthlyPrice')?.value ?? null) }}</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="label">Chambres disponibles</span>
+                      <span class="value">{{ infoForm.get('availableRooms')?.value }}</span>
+                    </div>
                   </div>
-                  @if (photoCount() < 3) {
-                    <p-message severity="warn">Minimum 3 photos requises pour soumettre.</p-message>
+
+                  <div class="summary-group">
+                    <h4>Description</h4>
+                    <p class="description-preview">{{ infoForm.get('description')?.value || 'Aucune description' }}</p>
+                  </div>
+
+                  <div class="summary-group">
+                    <h4>Localisation</h4>
+                    <div class="summary-row">
+                      <span class="label">Adresse</span>
+                      <span class="value">{{ locationForm.get('address')?.value || '—' }}</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="label">Quartier</span>
+                      <span class="value">{{ locationForm.get('neighborhood')?.value || '—' }}</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="label">Distance campus</span>
+                      <span class="value">{{ distanceToCampus() }} km</span>
+                    </div>
+                  </div>
+
+                  @if (selectedAmenityLabels().length > 0) {
+                    <div class="summary-group">
+                      <h4>Équipements</h4>
+                      <div class="amenity-tags">
+                        @for (label of selectedAmenityLabels(); track label) {
+                          <p-tag [value]="label" severity="secondary" />
+                        }
+                      </div>
+                    </div>
                   }
-                </div>
 
-                <div class="summary-group">
-                  <h4>Localisation</h4>
-                  <div class="summary-row">
-                    <span class="label">Adresse</span>
-                    <span class="value">{{ locationForm.get('address')?.value || '—' }}</span>
-                  </div>
-                  <div class="summary-row">
-                    <span class="label">Quartier</span>
-                    <span class="value">{{ locationForm.get('neighborhood')?.value || '—' }}</span>
-                  </div>
-                  <div class="summary-row">
-                    <span class="label">Distance campus</span>
-                    <span class="value">{{ distanceToCampus() }} km</span>
-                  </div>
-                </div>
-
-                <div class="summary-group">
-                  <h4>Equipements</h4>
-                  <div class="amenity-tags">
-                    @for (label of selectedAmenityLabels(); track label) {
-                      <p-tag [value]="label" severity="info" />
-                    }
-                    @if (selectedAmenityLabels().length === 0) {
-                      <span class="no-data">Aucun equipement selectionne</span>
-                    }
-                  </div>
+                  @if (photoCount() < 3) {
+                    <div class="summary-group">
+                      <p-message severity="warn" icon="pi pi-exclamation-triangle">
+                        Minimum 3 photos requises pour soumettre l'annonce.
+                      </p-message>
+                    </div>
+                  }
                 </div>
               </div>
             </div>
           </div>
+
           <div class="step-actions">
             <p-button
-              label="Precedent"
+              label="Précédent"
               icon="pi pi-arrow-left"
               severity="secondary"
               (onClick)="activateCallback(3)"
             />
             <div class="actions-right">
               <p-button
-                label="Sauvegarder le brouillon"
+                label="Sauvegarder"
                 icon="pi pi-save"
                 severity="secondary"
                 [loading]="saving()"

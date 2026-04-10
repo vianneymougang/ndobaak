@@ -19,7 +19,12 @@ export interface BookingStudentSummary {
   profilePhotoUrl: string | null;
 }
 
-export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'PAID' | 'CANCELLED' | 'EXPIRED' | 'COMPLETED';
+export type BookingStatus =
+  | 'PENDING' | 'CONFIRMED' | 'PAID' | 'CANCELLED' | 'EXPIRED' | 'COMPLETED'
+  | 'APPLICATION_PENDING' | 'APPLICATION_APPROVED' | 'APPLICATION_REJECTED'
+  | 'LEASE_GENERATED' | 'LEASE_SIGNED'
+  | 'PAYMENT_HELD'
+  | 'KEYS_HANDED_OVER';
 
 export interface BookingResponse {
   id: number;

@@ -5,7 +5,9 @@ import {
   signal,
   computed,
   OnInit,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -16,7 +18,6 @@ import { DividerModule } from 'primeng/divider';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageModule } from 'primeng/message';
 import { NgmMotionDirective } from '@scripttype/ng-motion';
-import { MessageService } from 'primeng/api';
 import { BookingService } from '../../../core/services/booking';
 import { PaymentService } from '../../../core/services/payment';
 import { BookingResponse } from '../../../core/models/booking.models';
@@ -46,7 +47,7 @@ export class PaymentForm implements OnInit {
   private fb = inject(FormBuilder);
   private bookingService = inject(BookingService);
   private paymentService = inject(PaymentService);
-  private messageService = inject(MessageService);
+  private destroyRef = inject(DestroyRef);
 
   protected booking = signal<BookingResponse | null>(null);
   protected loading = signal(true);
@@ -97,18 +98,14 @@ export class PaymentForm implements OnInit {
 
   ngOnInit(): void {
     const bookingId = Number(this.route.snapshot.paramMap.get('bookingId'));
-    this.bookingService.getBookingById(bookingId).subscribe({
+    this.bookingService.getBookingById(bookingId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (booking) => {
         this.booking.set(booking);
         this.loading.set(false);
       },
       error: () => {
         this.loading.set(false);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erreur',
-          detail: 'Impossible de charger les détails de la réservation.',
-        });
+        this.apiError.set('Impossible de charger les détails de la réservation. Veuillez réessayer.');
       },
     });
   }
@@ -133,23 +130,19 @@ export class PaymentForm implements OnInit {
         operator: operator!,
         phoneNumber: `237${phoneNumber}`,
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (payment) => {
           this.submitting.set(false);
           this.router.navigate(['/bookings', booking.id, 'pay', 'processing'], {
-            queryParams: { paymentId: payment.id },
+            queryParams: { paymentId: payment.id, operator: operator },
           });
         },
         error: (err) => {
           this.submitting.set(false);
-          const message =
-            err?.error?.message ?? 'Impossible d\'initier le paiement. Veuillez réessayer.';
-          this.apiError.set(message);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erreur de paiement',
-            detail: message,
-          });
+          this.apiError.set(
+            err?.error?.message ?? 'Impossible d\'initier le paiement. Veuillez réessayer.'
+          );
         },
       });
   }

@@ -27,12 +27,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     private final AdminListingService adminListingService;
@@ -51,6 +53,14 @@ public class AdminController {
         this.adminReviewService = adminReviewService;
         this.adminStatisticsService = adminStatisticsService;
         this.adminTransactionService = adminTransactionService;
+    }
+
+    @GetMapping("/listings")
+    public ResponseEntity<Page<ListingResponse>> listListings(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String search,
+            Pageable pageable) {
+        return ResponseEntity.ok(adminListingService.listAllListings(status, search, pageable));
     }
 
     @GetMapping("/listings/pending")

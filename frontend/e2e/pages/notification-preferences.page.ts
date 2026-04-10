@@ -17,8 +17,9 @@ export class NotificationPreferencesPage {
     this.skeletons = page.locator('p-skeleton');
   }
 
-  async goto() {
-    await this.page.goto('/profile/notification-preferences');
+  async goto(role: 'student' | 'landlord' = 'student') {
+    const path = role === 'landlord' ? '/landlord/profile/notifications' : '/profile/notifications';
+    await this.page.goto(path);
     await this.page.waitForLoadState('networkidle');
   }
 

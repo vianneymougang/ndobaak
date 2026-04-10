@@ -7,7 +7,10 @@ import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.payment.entity.Payment;
 import com.ndobaak.backend.payment.repository.PaymentRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,10 +32,22 @@ public class AdminTransactionService {
     public Page<AdminTransactionResponse> listTransactions(String statusFilter,
                                                             String typeFilter,
                                                             Pageable pageable) {
-        PaymentStatus status = parseEnum(statusFilter, PaymentStatus.class);
-        PaymentType type = parseEnum(typeFilter, PaymentType.class);
+        Specification<Payment> spec = Specification.where(null);
 
-        return paymentRepository.findAllFiltered(status, type, pageable)
+        PaymentStatus status = parseEnum(statusFilter, PaymentStatus.class);
+        if (status != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), status));
+        }
+
+        PaymentType type = parseEnum(typeFilter, PaymentType.class);
+        if (type != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("paymentType"), type));
+        }
+
+        Pageable sorted = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        return paymentRepository.findAll(spec, sorted)
                 .map(p -> toResponse(p, detectAnomaly(p)));
     }
 
@@ -79,7 +94,7 @@ public class AdminTransactionService {
                 .status(payment.getStatus())
                 .payerName(payment.getPayerName())
                 .phoneNumber(payment.getPhoneNumber())
-                .operator(payment.getMobileMoneyOperator())
+                .operator(payment.getChannel())
                 .providerName(payment.getProviderName())
                 .transactionId(payment.getTransactionId())
                 .createdAt(payment.getCreatedAt())

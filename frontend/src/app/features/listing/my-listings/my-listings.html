@@ -1,7 +1,7 @@
 <div class="my-listings-page">
   <div class="page-header">
     <h1>Mes annonces</h1>
-    <a routerLink="/listings/create" class="btn-create">
+    <a routerLink="/landlord/listings/create" class="btn-create">
       <i class="pi pi-plus" aria-hidden="true"></i>
       <span>Nouvelle annonce</span>
     </a>
@@ -16,7 +16,7 @@
       <i class="pi pi-home"></i>
       <h3>Aucune annonce</h3>
       <p>Creez votre premiere annonce pour commencer a louer.</p>
-      <a routerLink="/listings/create">
+      <a routerLink="/landlord/listings/create">
         <p-button label="Creer une annonce" icon="pi pi-plus" severity="primary" />
       </a>
     </div>
@@ -46,8 +46,13 @@
 
           <div class="listing-actions">
             <a [routerLink]="['/listings', listing.id]">
-              <p-button icon="pi pi-eye" [text]="true" severity="secondary" />
+              <p-button icon="pi pi-eye" [text]="true" severity="secondary" pTooltip="Voir" tooltipPosition="top" />
             </a>
+            @if (listing.status === 'DRAFT' || listing.status === 'REJECTED') {
+              <a [routerLink]="['/landlord/listings', listing.id, 'edit']">
+                <p-button icon="pi pi-pencil" [text]="true" severity="secondary" pTooltip="Modifier" tooltipPosition="top" />
+              </a>
+            }
             @if (listing.status === 'DRAFT') {
               <p-button
                 label="Soumettre"

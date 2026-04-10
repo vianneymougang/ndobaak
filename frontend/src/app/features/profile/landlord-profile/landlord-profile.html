@@ -192,7 +192,6 @@
         <div class="verification-info">
           @if (isVerified()) {
             <span class="verification-status verification-status--ok">Identité vérifiée</span>
-            <span class="verification-detail">CNI : {{ maskedIdCard() }}</span>
           } @else {
             <span class="verification-status verification-status--pending">Vérification en cours</span>
             <span class="verification-detail">Votre dossier est en cours d'examen (24-48h ouvrables)</span>

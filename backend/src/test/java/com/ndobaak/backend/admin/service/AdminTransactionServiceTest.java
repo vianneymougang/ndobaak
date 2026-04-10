@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -47,11 +48,12 @@ class AdminTransactionServiceTest {
         return payment;
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void listTransactionsShouldReturnPagedResultsWithNoFilters() {
         Pageable pageable = PageRequest.of(0, 20);
         Payment p = buildPayment(1L, BigDecimal.valueOf(10_000), PaymentStatus.COMPLETED, PaymentType.INTEGRAL);
-        when(paymentRepository.findAllFiltered(null, null, pageable))
+        when(paymentRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(p)));
 
         Page<AdminTransactionResponse> result = adminTransactionService.listTransactions(null, null, pageable);
@@ -60,11 +62,12 @@ class AdminTransactionServiceTest {
         assertThat(result.getContent().get(0).getId()).isEqualTo(1L);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void listTransactionsShouldApplyStatusFilter() {
         Pageable pageable = PageRequest.of(0, 20);
         Payment p = buildPayment(2L, BigDecimal.valueOf(20_000), PaymentStatus.FAILED, PaymentType.INTEGRAL);
-        when(paymentRepository.findAllFiltered(eq(PaymentStatus.FAILED), eq(null), eq(pageable)))
+        when(paymentRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(p)));
 
         Page<AdminTransactionResponse> result = adminTransactionService.listTransactions("FAILED", null, pageable);
@@ -73,11 +76,12 @@ class AdminTransactionServiceTest {
         assertThat(result.getContent().get(0).getStatus()).isEqualTo(PaymentStatus.FAILED);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void listTransactionsShouldApplyTypeFilter() {
         Pageable pageable = PageRequest.of(0, 20);
         Payment p = buildPayment(3L, BigDecimal.valueOf(5_000), PaymentStatus.COMPLETED, PaymentType.SUBSCRIPTION);
-        when(paymentRepository.findAllFiltered(eq(null), eq(PaymentType.SUBSCRIPTION), eq(pageable)))
+        when(paymentRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(p)));
 
         Page<AdminTransactionResponse> result = adminTransactionService.listTransactions(null, "SUBSCRIPTION", pageable);
@@ -86,10 +90,11 @@ class AdminTransactionServiceTest {
         assertThat(result.getContent().get(0).getPaymentType()).isEqualTo(PaymentType.SUBSCRIPTION);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void listTransactionsShouldIgnoreInvalidFilterValues() {
         Pageable pageable = PageRequest.of(0, 20);
-        when(paymentRepository.findAllFiltered(null, null, pageable))
+        when(paymentRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(Page.empty());
 
         Page<AdminTransactionResponse> result = adminTransactionService.listTransactions("INVALID_STATUS", "UNKNOWN_TYPE", pageable);

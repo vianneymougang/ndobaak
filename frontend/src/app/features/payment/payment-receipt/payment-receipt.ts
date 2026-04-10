@@ -5,7 +5,9 @@ import {
   signal,
   computed,
   OnInit,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
@@ -26,6 +28,7 @@ export class PaymentReceipt implements OnInit {
   private route = inject(ActivatedRoute);
   private paymentService = inject(PaymentService);
   private messageService = inject(MessageService);
+  private destroyRef = inject(DestroyRef);
 
   protected receipt = signal<ReceiptResponse | null>(null);
   protected loading = signal(true);
@@ -75,7 +78,7 @@ export class PaymentReceipt implements OnInit {
 
   ngOnInit(): void {
     const paymentId = Number(this.route.snapshot.paramMap.get('paymentId'));
-    this.paymentService.getReceipt(paymentId).subscribe({
+    this.paymentService.getReceipt(paymentId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (receipt) => {
         this.receipt.set(receipt);
         this.loading.set(false);

@@ -1,45 +1,84 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, OnInit, DestroyRef, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { RouterOutlet } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin } from 'rxjs';
 import { ToastModule } from 'primeng/toast';
-import { AvatarModule } from 'primeng/avatar';
-import { BadgeModule } from 'primeng/badge';
-import { MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MessageService, ConfirmationService } from 'primeng/api';
+import {
+  DashboardShell,
+  ShellMenuItem,
+  ShellBottomTabItem,
+  ShellMoreItem,
+} from '../../../shared/components/dashboard-shell/dashboard-shell';
 import { AuthService } from '../../../core/services/auth';
+import { AdminService } from '../../../core/services/admin';
 
 @Component({
   selector: 'app-admin-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, ButtonModule, ToastModule, AvatarModule, BadgeModule],
-  providers: [MessageService],
+  imports: [RouterOutlet, ToastModule, ConfirmDialogModule, DashboardShell],
+  providers: [MessageService, ConfirmationService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.scss',
 })
-export class AdminLayout {
+export class AdminLayout implements OnInit {
   private authService = inject(AuthService);
+  private adminService = inject(AdminService);
+  private destroyRef = inject(DestroyRef);
+  private platformId = inject(PLATFORM_ID);
 
-  protected user = this.authService.user;
-  protected sidebarOpen = signal(true);
+  protected userName = computed(() => this.authService.user()?.firstName ?? '');
 
-  protected userInitials = computed(() => {
-    const u = this.user();
-    if (!u) return 'A';
-    return (u.firstName?.charAt(0) ?? '') + (u.lastName?.charAt(0) ?? '');
-  });
+  protected pendingListingsCount = signal(0);
+  protected pendingReviewsCount = signal(0);
+  protected anomaliesCount = signal(0);
 
-  protected toggleSidebar(): void {
-    this.sidebarOpen.update((v) => !v);
-  }
+  protected totalModerationCount = computed(
+    () => this.pendingListingsCount() + this.pendingReviewsCount() + this.anomaliesCount(),
+  );
 
-  protected logout(): void {
-    this.authService.logout();
-  }
+  protected menuItems = computed<ShellMenuItem[]>(() => [
+    { label: 'Tableau de bord', icon: 'pi-th-large', route: '/admin/dashboard' },
+    { label: 'Modération', icon: 'pi-bell', route: '/admin/moderation', badge: this.totalModerationCount() },
+    { label: 'Annonces', icon: 'pi-home', route: '/admin/listings' },
+    { label: 'Communauté', icon: 'pi-users', route: '/admin/community' },
+    { label: 'Finances', icon: 'pi-wallet', route: '/admin/finances' },
+  ]);
 
-  protected navLinks = [
-    { path: '/admin/dashboard', icon: 'pi pi-chart-bar', label: 'Tableau de bord' },
-    { path: '/admin/listings', icon: 'pi pi-home', label: 'Annonces' },
-    { path: '/admin/users', icon: 'pi pi-users', label: 'Utilisateurs' },
-    { path: '/admin/reviews', icon: 'pi pi-star', label: 'Avis' },
-    { path: '/admin/transactions', icon: 'pi pi-credit-card', label: 'Transactions' },
+  protected bottomTabItems = computed<ShellBottomTabItem[]>(() => [
+    { label: 'Accueil', icon: 'pi-th-large', route: '/admin/dashboard' },
+    { label: 'Modération', icon: 'pi-bell', route: '/admin/moderation', badge: this.totalModerationCount() },
+    { label: 'Annonces', icon: 'pi-home', route: '/admin/listings' },
+    { label: 'Communauté', icon: 'pi-users', route: '/admin/community' },
+    { label: 'Finances', icon: 'pi-wallet', route: '/admin/finances' },
+  ]);
+
+  protected moreItems: ShellMoreItem[] = [
+    { label: 'Retour au site', icon: 'pi-arrow-left', route: '/' },
+    { label: 'Déconnexion', icon: 'pi-sign-out', action: 'logout' },
   ];
+
+  ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadBadgeCounts();
+    }
+  }
+
+  private loadBadgeCounts(): void {
+    forkJoin({
+      listings: this.adminService.getPendingListings(),
+      reviews: this.adminService.getReviews('pending', 0, 1),
+      anomalies: this.adminService.getAnomalies(),
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ listings, reviews, anomalies }) => {
+          this.pendingListingsCount.set(listings.length);
+          this.pendingReviewsCount.set(reviews.totalElements);
+          this.anomaliesCount.set(anomalies.length);
+        },
+      });
+  }
 }

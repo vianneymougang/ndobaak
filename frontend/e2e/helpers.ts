@@ -1,4 +1,6 @@
-import { Page, expect, request as apiRequest } from '@playwright/test';
+import { Page } from '@playwright/test';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export const TEST_STUDENT = {
   email: 'essono@test.ndobaak.com',
@@ -13,47 +15,34 @@ export const TEST_LANDLORD = {
 };
 
 export const TEST_ADMIN = {
-  email: 'admin@test.ndobaak.com',
-  password: 'ndobaak123',
+  email: 'admin@ndobaak.com',
+  password: 'Admin@ndobaak2026',
   firstName: 'Admin',
 };
 
-const API_URL = 'http://localhost:8080/api/v1';
+const AUTH_DIR = path.join(__dirname, '.auth');
 
-async function getAuthToken(email: string, password: string): Promise<{ accessToken: string; refreshToken: string }> {
-  const context = await apiRequest.newContext();
-  const response = await context.post(`${API_URL}/auth/login`, {
-    data: { email, password },
-  });
-  if (!response.ok()) {
-    throw new Error(`Login failed: ${response.status()} ${await response.text()}`);
+async function loadStorageState(page: Page, role: 'student' | 'landlord' | 'admin') {
+  const stateFile = path.join(AUTH_DIR, `${role}.json`);
+  if (!fs.existsSync(stateFile)) {
+    throw new Error(`Storage state not found: ${stateFile}. Run globalSetup first.`);
   }
-  const body = await response.json();
-  await context.dispose();
-  return { accessToken: body.accessToken, refreshToken: body.refreshToken };
+  const state = JSON.parse(fs.readFileSync(stateFile, 'utf-8'));
+  if (state.cookies?.length) {
+    await page.context().addCookies(state.cookies);
+  }
+  await page.goto('/');
+  await page.waitForLoadState('networkidle');
 }
 
 export async function loginAsStudent(page: Page) {
-  const tokens = await getAuthToken(TEST_STUDENT.email, TEST_STUDENT.password);
-  await injectAuth(page, tokens);
+  await loadStorageState(page, 'student');
 }
 
 export async function loginAsLandlord(page: Page) {
-  const tokens = await getAuthToken(TEST_LANDLORD.email, TEST_LANDLORD.password);
-  await injectAuth(page, tokens);
+  await loadStorageState(page, 'landlord');
 }
 
 export async function loginAsAdmin(page: Page) {
-  const tokens = await getAuthToken(TEST_ADMIN.email, TEST_ADMIN.password);
-  await injectAuth(page, tokens);
-}
-
-async function injectAuth(page: Page, tokens: { accessToken: string; refreshToken: string }) {
-  await page.goto('/');
-  await page.evaluate(({ accessToken, refreshToken }) => {
-    localStorage.setItem('access_token', accessToken);
-    localStorage.setItem('refresh_token', refreshToken);
-  }, tokens);
-  await page.reload();
-  await page.waitForLoadState('networkidle');
+  await loadStorageState(page, 'admin');
 }

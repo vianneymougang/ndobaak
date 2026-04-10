@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -74,6 +75,7 @@ export class Register implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
 
   protected countries = COUNTRIES;
   protected selectedCountry = signal<Country>(COUNTRIES[0]);
@@ -90,6 +92,7 @@ export class Register implements OnInit {
       localPhone: ['', [Validators.required, Validators.pattern(/^\d{7,12}$/)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]],
+      mobileMoneyPhone: ['', [Validators.pattern(/^\+237[26][0-9]{8}$/)]],
     },
     { validators: passwordsMatchValidator },
   );
@@ -104,6 +107,13 @@ export class Register implements OnInit {
   protected onRoleChange(role: string): void {
     if (this.selectedRole() !== role) {
       this.selectedRole.set(role);
+      const mmControl = this.form.controls.mobileMoneyPhone;
+      if (role === 'LANDLORD') {
+        mmControl.addValidators(Validators.required);
+      } else {
+        mmControl.removeValidators(Validators.required);
+      }
+      mmControl.updateValueAndValidity();
     }
   }
 
@@ -120,16 +130,16 @@ export class Register implements OnInit {
 
     this.loading.set(true);
     this.errorMessage.set(null);
-    const { firstName, lastName, email, localPhone, password } = this.form.getRawValue();
+    const { firstName, lastName, email, localPhone, password, mobileMoneyPhone } = this.form.getRawValue();
     const phone = this.selectedCountry().dialCode + localPhone;
 
     if (this.selectedRole() === 'STUDENT') {
-      this.authService.registerStudent({ firstName, lastName, email, phone, password }).subscribe({
+      this.authService.registerStudent({ firstName, lastName, email, phone, password }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: () => this.onSuccess(),
         error: (err) => this.onError(err),
       });
     } else {
-      this.authService.registerLandlord({ firstName, lastName, email, phone, password }).subscribe({
+      this.authService.registerLandlord({ firstName, lastName, email, phone, password, mobileMoneyPhone }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: () => this.onSuccess(),
         error: (err) => this.onError(err),
       });
@@ -144,8 +154,12 @@ export class Register implements OnInit {
 
   private onSuccess(): void {
     this.loading.set(false);
-    this.authService.loadCurrentUser().subscribe();
-    this.router.navigate(['/']);
+    const role = this.authService.userRole();
+    if (role === 'LANDLORD') {
+      this.router.navigate(['/landlord']);
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
   protected onGoogleLogin(): void {

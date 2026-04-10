@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Contrat de bail</title>
+    <style type="text/css">
+        @font-face {
+            font-family: 'DejaVuSans';
+            src: url('classpath:/fonts/DejaVuSans.ttf');
+        }
+        body {
+            font-family: 'DejaVuSans', Arial, sans-serif;
+            font-size: 11pt;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+        }
+        .page {
+            margin: 2cm 2.5cm;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+        .header h1 {
+            font-size: 18pt;
+            color: #2c3e50;
+            margin: 0 0 6px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .header .subtitle {
+            font-size: 10pt;
+            color: #666;
+            margin: 0;
+        }
+        .ref-block {
+            background-color: #f4f6f9;
+            border-left: 4px solid #3498db;
+            padding: 10px 14px;
+            margin-bottom: 20px;
+            font-size: 10pt;
+        }
+        .ref-block .ref-label {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .section-title {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #2c3e50;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 4px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .two-col {
+            width: 100%;
+        }
+        .two-col td {
+            vertical-align: top;
+            padding: 0 8px 0 0;
+            width: 50%;
+        }
+        .info-row {
+            margin-bottom: 6px;
+            font-size: 10.5pt;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .amounts-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+        .amounts-table th {
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 7px 10px;
+            text-align: left;
+            font-size: 10pt;
+        }
+        .amounts-table td {
+            padding: 7px 10px;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 10.5pt;
+        }
+        .amounts-table tr:nth-child(even) td {
+            background-color: #f9f9f9;
+        }
+        .amounts-table .amount-value {
+            font-weight: bold;
+            text-align: right;
+        }
+        .clause-block {
+            background-color: #fafafa;
+            border: 1px solid #e0e0e0;
+            padding: 10px 14px;
+            font-size: 10pt;
+            margin-top: 6px;
+        }
+        .signatures-block {
+            margin-top: 30px;
+            width: 100%;
+        }
+        .signatures-block td {
+            width: 50%;
+            vertical-align: top;
+            padding: 0 12px;
+        }
+        .signature-box {
+            border: 1px solid #bdc3c7;
+            padding: 14px;
+            min-height: 80px;
+        }
+        .signature-title {
+            font-weight: bold;
+            font-size: 11pt;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        .signature-name {
+            font-size: 10pt;
+            color: #555;
+            margin-bottom: 30px;
+        }
+        .signature-line {
+            border-top: 1px solid #aaa;
+            margin-top: 20px;
+            padding-top: 4px;
+            font-size: 9pt;
+            color: #888;
+        }
+        .footer {
+            margin-top: 30px;
+            border-top: 1px solid #bdc3c7;
+            padding-top: 10px;
+            text-align: center;
+            font-size: 8.5pt;
+            color: #888;
+        }
+        .notice-box {
+            background-color: #eaf4fb;
+            border: 1px solid #aed6f1;
+            padding: 10px 14px;
+            font-size: 10pt;
+            margin: 12px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <div class="header">
+        <h1>Contrat de Bail</h1>
+        <p class="subtitle">Établi par <span th:text="${contract.agencyName}">TANK'IMMO SAS</span> — Agence immobilière agréée</p>
+    </div>
+
+    <div class="ref-block">
+        <span class="ref-label">Référence :</span> <span th:text="${contract.bookingReference}">NDK-000</span>
+        &#160;&#160;|&#160;&#160;
+        <span class="ref-label">Date de génération :</span> <span th:text="${contract.generationDate}">01/01/2026</span>
+    </div>
+
+    <div class="notice-box">
+        Ce contrat de bail est établi en vertu de la législation camerounaise applicable à la location immobilière.
+        Il engage les deux parties dès sa signature et vaut preuve d'occupation légale du logement.
+    </div>
+
+    <!-- Parties -->
+    <div class="section-title">Article 1 — Parties au contrat</div>
+    <table class="two-col">
+        <tbody>
+            <tr>
+                <td>
+                    <div class="info-row"><span class="info-label">Bailleur (Propriétaire)</span></div>
+                    <div class="info-row">
+                        <span class="info-label">Nom :</span>
+                        <span th:text="${contract.landlordLastName + ' ' + contract.landlordFirstName}">NOM Prénom</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">N° CNI :</span>
+                        <span th:text="${contract.landlordIdCardNumber}">000000000</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="info-row"><span class="info-label">Preneur (Locataire)</span></div>
+                    <div class="info-row">
+                        <span class="info-label">Nom :</span>
+                        <span th:text="${contract.tenantLastName + ' ' + contract.tenantFirstName}">NOM Prénom</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Matricule :</span>
+                        <span th:text="${contract.tenantMatricule}">—</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Filière :</span>
+                        <span th:text="${contract.tenantFieldOfStudy}">—</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Garant -->
+    <div class="section-title">Article 2 — Garant</div>
+    <div th:if="${contract.guarantorLastName != null and !contract.guarantorLastName.isEmpty()}">
+        <table class="two-col">
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="info-row">
+                            <span class="info-label">Nom :</span>
+                            <span th:text="${contract.guarantorLastName + ' ' + contract.guarantorFirstName}">NOM Prénom</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">N° CNI :</span>
+                            <span th:text="${contract.guarantorIdCard}">—</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="info-row">
+                            <span class="info-label">Téléphone :</span>
+                            <span th:text="${contract.guarantorPhone}">—</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Lien avec le locataire :</span>
+                            <span th:text="${contract.guarantorRelationship}">—</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div th:if="${contract.guarantorLastName == null or contract.guarantorLastName.isEmpty()}">
+        <div class="info-row" style="color: #888; font-style: italic;">Aucun garant renseigné.</div>
+    </div>
+
+    <!-- Bien loué -->
+    <div class="section-title">Article 3 — Désignation du bien</div>
+    <div class="info-row">
+        <span class="info-label">Adresse :</span>
+        <span th:text="${contract.propertyAddress}">Adresse du bien</span>,
+        <span th:text="${contract.propertyCity}">Yaoundé</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">Description :</span>
+        <span th:text="${contract.propertyDescription}">—</span>
+    </div>
+    <div th:if="${contract.amenities != null and !contract.amenities.isEmpty()}">
+        <div class="info-row">
+            <span class="info-label">Équipements :</span>
+            <span th:text="${contract.amenities}">—</span>
+        </div>
+    </div>
+
+    <!-- Durée -->
+    <div class="section-title">Article 4 — Durée du bail</div>
+    <table class="two-col">
+        <tbody>
+            <tr>
+                <td>
+                    <div class="info-row">
+                        <span class="info-label">Date d'entrée :</span>
+                        <span th:text="${contract.startDate}">01/01/2026</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="info-row">
+                        <span class="info-label">Date de fin :</span>
+                        <span th:text="${contract.endDate}">31/12/2026</span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Conditions financières -->
+    <div class="section-title">Article 5 — Conditions financières</div>
+    <table class="amounts-table">
+        <thead>
+            <tr>
+                <th>Désignation</th>
+                <th style="text-align: right;">Montant (FCFA)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Loyer mensuel</td>
+                <td class="amount-value" th:text="${contract.formattedMonthlyRent}">0</td>
+            </tr>
+            <tr>
+                <td>Caution (dépôt de garantie)</td>
+                <td class="amount-value" th:text="${contract.formattedSecurityDeposit}">0</td>
+            </tr>
+            <tr>
+                <td>Honoraires d'agence (TANK'IMMO SAS)</td>
+                <td class="amount-value" th:text="${contract.formattedAgencyFee}">0</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Clauses particulières -->
+    <div class="section-title">Article 6 — Clauses particulières</div>
+    <div th:if="${contract.specialClauses != null and !contract.specialClauses.isEmpty()}">
+        <div class="clause-block" th:text="${contract.specialClauses}">Clauses particulières</div>
+    </div>
+    <div th:if="${contract.specialClauses == null or contract.specialClauses.isEmpty()}">
+        <div class="clause-block" style="color: #888; font-style: italic;">
+            Néant — aucune clause particulière n'a été ajoutée à ce contrat.
+        </div>
+    </div>
+
+    <!-- Obligations -->
+    <div class="section-title">Article 7 — Obligations des parties</div>
+    <div class="info-row">
+        <span class="info-label">Le bailleur s'engage à :</span> maintenir le logement en bon état d'habitabilité,
+        garantir la jouissance paisible du bien, et effectuer les réparations locatives non imputables au locataire.
+    </div>
+    <div class="info-row" style="margin-top: 6px;">
+        <span class="info-label">Le locataire s'engage à :</span> payer le loyer aux dates convenues,
+        utiliser les lieux en bon père de famille, et restituer le bien en bon état à l'échéance du bail.
+    </div>
+
+    <!-- Signatures -->
+    <div class="section-title">Article 8 — Signatures</div>
+    <table class="signatures-block">
+        <tbody>
+            <tr>
+                <td>
+                    <div class="signature-box">
+                        <div class="signature-title">Le Bailleur</div>
+                        <div class="signature-name" th:text="${contract.landlordLastName + ' ' + contract.landlordFirstName}">NOM Prénom</div>
+                        <div class="signature-line">Signature et date</div>
+                    </div>
+                </td>
+                <td>
+                    <div class="signature-box">
+                        <div class="signature-title">Le Locataire</div>
+                        <div class="signature-name" th:text="${contract.tenantLastName + ' ' + contract.tenantFirstName}">NOM Prénom</div>
+                        <div class="signature-line">Signature et date</div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p th:text="${contract.agencyName + ' — ' + contract.agencyAddress}">TANK'IMMO SAS</p>
+        <p>Agence immobilière agréée — Activités encadrées par TANK'IMMO SAS</p>
+        <p>Document généré via la plateforme Ndobaâk — Réf. <span th:text="${contract.bookingReference}">NDK-000</span></p>
+    </div>
+
+</div>
+</body>
+</html>

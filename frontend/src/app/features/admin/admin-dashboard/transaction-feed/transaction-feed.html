@@ -1,0 +1,86 @@
+<div class="feed-panel">
+  <app-section-header
+    title="Transactions récentes"
+    viewAllLink="/admin/finances"
+  />
+
+  @if (loading()) {
+    <div class="feed-list">
+      @for (i of [1,2,3,4,5]; track i) {
+        <div class="feed-item-skeleton">
+          <p-skeleton width="2rem" height="2rem" borderRadius="10px" />
+          <div class="feed-item-skeleton-text">
+            <p-skeleton width="60%" height="0.75rem" />
+            <p-skeleton width="40%" height="0.625rem" />
+          </div>
+          <p-skeleton width="4rem" height="0.875rem" />
+        </div>
+      }
+    </div>
+  } @else if (error()) {
+    <div class="feed-error">
+      <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+      <span>Impossible de charger les transactions.</span>
+      <p-button
+        label="Réessayer"
+        icon="pi pi-refresh"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (click)="retry.emit()"
+      />
+    </div>
+  } @else if (transactions().length === 0) {
+    <div class="feed-empty">
+      <i class="pi pi-wallet" aria-hidden="true"></i>
+      <p>Aucune transaction récente</p>
+    </div>
+  } @else {
+    <div class="feed-list">
+      @for (tx of transactions(); track tx.id; let i = $index) {
+        <a
+          routerLink="/admin/finances"
+          class="feed-item fade-slide-up hover-lift-sm"
+          [class.feed-item--anomaly]="tx.anomaly"
+          [style.animation-delay]="i * 0.04 + 's'"
+        >
+          <div class="feed-item-icon" [class.feed-item-icon--anomaly]="tx.anomaly">
+            <i
+              class="pi"
+              [class.pi-wallet]="tx.paymentType === 'BOOKING'"
+              [class.pi-star]="tx.paymentType === 'SUBSCRIPTION'"
+              aria-hidden="true"
+            ></i>
+          </div>
+
+          <div class="feed-item-info">
+            <span class="feed-item-name">{{ tx.payerName ?? 'Inconnu' }}</span>
+            <span class="feed-item-meta">
+              {{ typeLabel(tx.paymentType) }}
+              @if (formatOperator(tx.operator)) {
+                · {{ formatOperator(tx.operator) }}
+              }
+              · {{ tx.createdAt | relativeTime }}
+            </span>
+          </div>
+
+          <div class="feed-item-right">
+            <span class="feed-item-amount">{{ formatXAF(tx.amount) }}</span>
+            <p-tag
+              [value]="statusLabel(tx.status)"
+              [severity]="statusSeverity(tx.status)"
+              [pt]="{ root: { style: 'font-size: 0.5625rem; padding: 0.0625rem 0.3125rem; font-weight: 600;' } }"
+            />
+          </div>
+
+          @if (tx.anomaly) {
+            <i
+              class="pi pi-exclamation-triangle feed-item-anomaly-badge"
+              aria-label="Anomalie détectée"
+            ></i>
+          }
+        </a>
+      }
+    </div>
+  }
+</div>

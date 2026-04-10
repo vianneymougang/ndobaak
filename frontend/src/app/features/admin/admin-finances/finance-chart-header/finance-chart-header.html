@@ -1,0 +1,46 @@
+@if (loading()) {
+  <div class="chart-header">
+    <div class="kpi-strip">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="kpi-card">
+          <p-skeleton width="40%" height="0.625rem" />
+          <p-skeleton width="60%" height="1.5rem" styleClass="mt-1" />
+        </div>
+      }
+    </div>
+    <p-skeleton width="100%" height="220px" borderRadius="12px" />
+  </div>
+} @else if (stats(); as s) {
+  <div class="chart-header fade-slide-up">
+    <div class="kpi-strip">
+      <div class="kpi-card">
+        <span class="kpi-label">Revenus totaux</span>
+        <span class="kpi-value kpi-value--gold">{{ formatXAF(s.totalRevenue) }}</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Revenus du mois</span>
+        <span class="kpi-value">{{ formatXAF(monthlyRevenue()) }}</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Transactions ce mois</span>
+        <span class="kpi-value">{{ transactionsThisMonth() }}</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Réservations</span>
+        <span class="kpi-value">{{ s.confirmedBookings }} / {{ s.totalBookings }}</span>
+      </div>
+    </div>
+
+    @if (chartData()) {
+      <div class="chart-container">
+        <h3 class="chart-title">Revenus mensuels</h3>
+        <p-chart
+          type="bar"
+          [data]="chartData()"
+          [options]="chartOptions()"
+          [pt]="{ root: { style: 'height: 220px;' } }"
+        />
+      </div>
+    }
+  </div>
+}

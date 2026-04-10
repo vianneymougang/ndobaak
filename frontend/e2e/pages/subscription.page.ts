@@ -4,25 +4,23 @@ export class SubscriptionPage {
   readonly page: Page;
   readonly heading: Locator;
   readonly subscribeButton: Locator;
-  readonly activeStatusBadge: Locator;
-  readonly cancelButton: Locator;
   readonly momoDialog: Locator;
+  readonly operatorSelect: Locator;
   readonly phoneInput: Locator;
   readonly confirmPayButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByRole('heading', { name: /abonnement/i });
-    this.subscribeButton = page.getByRole('button', { name: /s'abonner|souscrire/i }).first();
-    this.activeStatusBadge = page.locator('.subscription-active, [data-status="ACTIVE"]');
-    this.cancelButton = page.getByRole('button', { name: /annuler|résilier/i }).first();
-    this.momoDialog = page.locator('p-dialog, .p-dialog');
-    this.phoneInput = page.getByPlaceholder(/6[0-9]{8}/);
-    this.confirmPayButton = page.getByRole('button', { name: /payer|confirmer/i }).last();
+    this.heading = page.locator('h1, h2').filter({ hasText: /abonnement/i }).first();
+    this.subscribeButton = page.getByRole('button', { name: /s'abonner/i }).first();
+    this.momoDialog = page.locator('p-dialog .p-dialog-content, .p-dialog-content');
+    this.operatorSelect = page.locator('p-select, p-dropdown').first();
+    this.phoneInput = page.locator('input[placeholder*="6XX"], input[type="tel"]').first();
+    this.confirmPayButton = page.getByRole('button', { name: /s'abonner/i }).last();
   }
 
   async goto() {
-    await this.page.goto('/subscription');
+    await this.page.goto('/landlord/subscription');
     await this.page.waitForLoadState('networkidle');
   }
 

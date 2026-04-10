@@ -5,7 +5,9 @@ import {
   signal,
   OnInit,
   OnDestroy,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ButtonModule } from 'primeng/button';
@@ -25,9 +27,11 @@ export class PaymentProcessing implements OnInit, OnDestroy {
   private router = inject(Router);
   private paymentService = inject(PaymentService);
   private messageService = inject(MessageService);
+  private destroyRef = inject(DestroyRef);
 
   protected timedOut = signal(false);
   protected elapsedSeconds = signal(0);
+  protected operatorLabel = signal('Mobile Money');
 
   private paymentId = 0;
   private bookingId = '';
@@ -35,9 +39,16 @@ export class PaymentProcessing implements OnInit, OnDestroy {
   private timeoutTimer: ReturnType<typeof setTimeout> | null = null;
   private tickTimer: ReturnType<typeof setInterval> | null = null;
 
+  private static readonly OPERATOR_LABELS: Record<string, string> = {
+    MTN_MOMO: 'MTN Mobile Money',
+    ORANGE_MONEY: 'Orange Money',
+  };
+
   ngOnInit(): void {
     this.paymentId = Number(this.route.snapshot.queryParamMap.get('paymentId'));
     this.bookingId = this.route.snapshot.paramMap.get('bookingId') ?? '';
+    const operator = this.route.snapshot.queryParamMap.get('operator') ?? '';
+    this.operatorLabel.set(PaymentProcessing.OPERATOR_LABELS[operator] ?? 'Mobile Money');
 
     this.startPolling();
     this.startTimeout();
@@ -71,7 +82,7 @@ export class PaymentProcessing implements OnInit, OnDestroy {
   }
 
   private checkStatus(): void {
-    this.paymentService.getPaymentsByBooking(Number(this.bookingId)).subscribe({
+    this.paymentService.getPaymentsByBooking(Number(this.bookingId)).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (payments) => {
         const payment = payments.find((p) => p.id === this.paymentId);
         if (!payment) return;
@@ -79,12 +90,21 @@ export class PaymentProcessing implements OnInit, OnDestroy {
         if (payment.status === 'COMPLETED') {
           this.clearTimers();
           this.router.navigate(['/payments', this.paymentId, 'success']);
-        } else if (payment.status === 'FAILED') {
+        } else if (payment.status === 'FAILED' || payment.status === 'CANCELED') {
           this.clearTimers();
-          this.router.navigate(['/payments', this.paymentId, 'failure']);
+          this.router.navigate(['/payments', this.paymentId, 'failure'], {
+            queryParams: { reason: payment.status, bookingId: this.bookingId },
+          });
         }
       },
-      error: () => {},
+      error: () => {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Connexion instable',
+          detail: 'Vérification du paiement en attente. Nouvelle tentative dans quelques secondes.',
+          life: 3000,
+        });
+      },
     });
   }
 

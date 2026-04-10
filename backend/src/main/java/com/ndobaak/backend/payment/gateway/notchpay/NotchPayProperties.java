@@ -15,4 +15,5 @@ public class NotchPayProperties {
     private String publicKey;
     private String webhookHash;
     private String callbackUrl;
+    private String privateKey;
 }

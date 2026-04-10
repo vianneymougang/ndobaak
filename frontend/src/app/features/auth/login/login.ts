@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AutoFocusModule } from 'primeng/autofocus';
@@ -30,6 +31,7 @@ export class Login implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
 
   protected activeTab = signal<string>('email');
   protected loading = signal(false);
@@ -70,7 +72,7 @@ export class Login implements OnInit {
     this.errorMessage.set(null);
     const { email, password } = this.emailForm.getRawValue();
 
-    this.authService.login({ email, password }).subscribe({
+    this.authService.login({ email, password }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.onSuccess(),
       error: (err) => this.onError(err),
     });
@@ -87,7 +89,7 @@ export class Login implements OnInit {
     this.errorMessage.set(null);
     const { phone, password } = this.phoneForm.getRawValue();
 
-    this.authService.login({ phone, password }).subscribe({
+    this.authService.login({ phone, password }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.onSuccess(),
       error: (err) => this.onError(err),
     });
@@ -95,8 +97,14 @@ export class Login implements OnInit {
 
   private onSuccess(): void {
     this.loading.set(false);
-    this.authService.loadCurrentUser().subscribe();
-    this.router.navigate(['/']);
+    const role = this.authService.userRole();
+    if (role === 'ADMIN') {
+      this.router.navigate(['/admin']);
+    } else if (role === 'LANDLORD') {
+      this.router.navigate(['/landlord']);
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
   protected onGoogleLogin(): void {

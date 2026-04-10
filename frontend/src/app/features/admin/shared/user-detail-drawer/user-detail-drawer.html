@@ -1,0 +1,180 @@
+<p-drawer
+  [visible]="visible()"
+  (visibleChange)="!$event && onHide()"
+  position="right"
+  [modal]="true"
+  [dismissible]="true"
+  [showCloseIcon]="false"
+  styleClass="user-drawer"
+  [pt]="{ root: { style: 'width: min(540px, 100vw)' } }"
+>
+  <ng-template #header>
+    <div class="drawer-header">
+      <h2 class="drawer-title">Profil utilisateur</h2>
+      <p-button
+        icon="pi pi-times"
+        severity="secondary"
+        [text]="true"
+        [rounded]="true"
+        size="small"
+        aria-label="Fermer"
+        (click)="onHide()"
+      />
+    </div>
+  </ng-template>
+
+  @if (loading()) {
+    <div class="drawer-body">
+      <div class="user-hero">
+        <p-skeleton shape="circle" size="64px" />
+        <div class="hero-text">
+          <p-skeleton width="180px" height="1.25rem" />
+          <p-skeleton width="140px" height="0.875rem" styleClass="mt-2" />
+        </div>
+      </div>
+      <div class="stats-grid">
+        @for (i of [1,2,3,4]; track i) {
+          <div class="stat-cell">
+            <p-skeleton width="50%" height="0.625rem" />
+            <p-skeleton width="70%" height="1.25rem" styleClass="mt-1" />
+          </div>
+        }
+      </div>
+    </div>
+  } @else if (error()) {
+    <div class="drawer-body drawer-body--centered">
+      <app-admin-error-state
+        message="Impossible de charger ce profil."
+        (retry)="retryLoad()"
+      />
+    </div>
+  } @else if (user(); as u) {
+    <div class="drawer-body">
+      <div class="user-hero fade-slide-up">
+        <div class="user-avatar">{{ u.firstName[0] }}{{ u.lastName[0] }}</div>
+        <div class="hero-text">
+          <h3 class="user-name">{{ u.firstName }} {{ u.lastName }}</h3>
+          <p class="user-email">{{ u.email }}</p>
+          <div class="user-tags">
+            <p-tag [value]="roleLabel()" [severity]="roleSeverity()" />
+            <p-tag [value]="statusLabel()" [severity]="statusSeverity()" />
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        @if (u.role === 'LANDLORD') {
+          <div class="stat-cell">
+            <span class="stat-label">Annonces actives</span>
+            <span class="stat-value">{{ u.activeListingCount ?? 0 }}</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-label">Annonces totales</span>
+            <span class="stat-value">{{ u.listingCount ?? 0 }}</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-label">Revenus totaux</span>
+            <span class="stat-value stat-value--gold">{{ formatXAF(u.totalRevenue ?? 0) }}</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-label">Avis reçus</span>
+            <span class="stat-value">{{ u.reviewCount ?? 0 }}</span>
+          </div>
+        }
+        @if (u.role === 'STUDENT') {
+          <div class="stat-cell">
+            <span class="stat-label">Réservations</span>
+            <span class="stat-value">{{ u.bookingCount ?? 0 }}</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-label">Confirmées</span>
+            <span class="stat-value">{{ u.completedBookingCount ?? 0 }}</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-label">Avis rédigés</span>
+            <span class="stat-value">{{ u.reviewCount ?? 0 }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="info-section">
+        <h4 class="section-label">Informations</h4>
+        <div class="info-rows">
+          <div class="info-row">
+            <i class="pi pi-phone" aria-hidden="true"></i>
+            <span>{{ u.phone ?? 'Non renseigné' }}</span>
+          </div>
+          <div class="info-row">
+            <i class="pi pi-calendar" aria-hidden="true"></i>
+            <span>Inscrit le {{ u.registrationDate | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+      </div>
+
+      @if (u.deactivated && u.deactivationReason) {
+        <div class="deactivation-banner">
+          <i class="pi pi-ban" aria-hidden="true"></i>
+          <div>
+            <span class="deactivation-label">Motif de désactivation</span>
+            <span class="deactivation-reason">{{ u.deactivationReason }}</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="drawer-footer">
+      @if (u.deactivated) {
+        <p-button
+          label="Réactiver le compte"
+          icon="pi pi-undo"
+          severity="success"
+          [loading]="actionLoading()"
+          (click)="reactivate()"
+          styleClass="hover-lift"
+        />
+      } @else if (u.role !== 'ADMIN') {
+        <p-button
+          label="Désactiver le compte"
+          icon="pi pi-ban"
+          severity="danger"
+          [outlined]="true"
+          [loading]="actionLoading()"
+          (click)="openDeactivateDialog()"
+          styleClass="hover-lift"
+        />
+      }
+    </div>
+  }
+</p-drawer>
+
+<p-dialog
+  header="Désactiver le compte"
+  [visible]="deactivateDialogVisible()"
+  (visibleChange)="deactivateDialogVisible.set($event)"
+  [modal]="true"
+  [style]="{ width: 'min(480px, 90vw)' }"
+  [draggable]="false"
+>
+  <form [formGroup]="deactivateForm" class="deactivate-form" (ngSubmit)="submitDeactivate()">
+    <div class="field-wrap">
+      <p-floatlabel>
+        <textarea
+          pTextarea
+          id="deactivateReason"
+          formControlName="reason"
+          rows="4"
+          style="width: 100%;"
+          [invalid]="deactivateForm.controls.reason.invalid && deactivateForm.controls.reason.touched"
+        ></textarea>
+        <label for="deactivateReason">Motif de désactivation</label>
+      </p-floatlabel>
+      @if (deactivateForm.controls.reason.invalid && deactivateForm.controls.reason.touched) {
+        <small class="field-error">Le motif est obligatoire (min. 10 caractères).</small>
+      }
+    </div>
+  </form>
+  <ng-template #footer>
+    <p-button label="Annuler" severity="secondary" (click)="deactivateDialogVisible.set(false)" />
+    <p-button label="Désactiver" severity="danger" [loading]="actionLoading()" (click)="submitDeactivate()" />
+  </ng-template>
+</p-dialog>

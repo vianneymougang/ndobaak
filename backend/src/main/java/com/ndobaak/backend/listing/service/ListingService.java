@@ -10,6 +10,8 @@ import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.listing.dto.CreateListingRequest;
 import com.ndobaak.backend.listing.dto.ListingResponse;
 import com.ndobaak.backend.listing.dto.LocationRequest;
+import com.ndobaak.backend.listing.dto.UpdateListingRequest;
+import com.ndobaak.backend.listing.dto.UpdateLocationRequest;
 import com.ndobaak.backend.listing.entity.Amenity;
 import com.ndobaak.backend.listing.entity.Listing;
 import com.ndobaak.backend.listing.entity.Location;
@@ -20,6 +22,7 @@ import com.ndobaak.backend.listing.repository.ListingRepository;
 import com.ndobaak.backend.listing.repository.PhotoRepository;
 import com.ndobaak.backend.media.service.ImageProcessingService;
 import com.ndobaak.backend.media.service.StorageService;
+import com.ndobaak.backend.subscription.service.SubscriptionService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,14 +31,24 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ListingService {
 
     private static final double MAX_CAMPUS_DISTANCE_KM = 10.0;
     private static final String WEBP_CONTENT_TYPE = "image/webp";
+    private static final long MAX_UPLOAD_SIZE = 10 * 1024 * 1024;
+    private static final Set<String> ALLOWED_MIME_TYPES = Set.of("image/jpeg", "image/jpg", "image/png", "image/webp");
+
+    private static final byte[] JPEG_MAGIC = {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF};
+    private static final byte[] PNG_MAGIC = {(byte) 0x89, 0x50, 0x4E, 0x47};
+    private static final byte[] RIFF_MAGIC = {0x52, 0x49, 0x46, 0x46};
+    private static final byte[] WEBP_MAGIC = {0x57, 0x45, 0x42, 0x50};
 
     private final ListingRepository listingRepository;
     private final AmenityRepository amenityRepository;
@@ -44,13 +57,13 @@ public class ListingService {
     private final ImageProcessingService imageProcessingService;
     private final AuthService authService;
     private final ListingMapper listingMapper;
-    private final com.ndobaak.backend.subscription.service.SubscriptionService subscriptionService;
+    private final SubscriptionService subscriptionService;
 
     public ListingService(ListingRepository listingRepository, AmenityRepository amenityRepository,
                           PhotoRepository photoRepository, StorageService storageService,
                           ImageProcessingService imageProcessingService, AuthService authService,
                           ListingMapper listingMapper,
-                          com.ndobaak.backend.subscription.service.SubscriptionService subscriptionService) {
+                          SubscriptionService subscriptionService) {
         this.listingRepository = listingRepository;
         this.amenityRepository = amenityRepository;
         this.photoRepository = photoRepository;
@@ -66,14 +79,14 @@ public class ListingService {
         User landlord = authService.getAuthenticatedUser();
 
         if (!subscriptionService.hasActiveSubscription(landlord.getId())) {
-            throw new com.ndobaak.backend.common.exception.BusinessException(
+            throw new BusinessException(
                     "Vous devez souscrire à un abonnement pour publier des annonces.");
         }
 
         long currentListingCount = listingRepository.countByLandlordId(landlord.getId());
         int maxListings = subscriptionService.getMaxListings(landlord.getId());
         if (currentListingCount >= maxListings) {
-            throw new com.ndobaak.backend.common.exception.BusinessException(
+            throw new BusinessException(
                     "Vous avez atteint la limite de " + maxListings
                             + " annonces autorisées par votre abonnement.");
         }
@@ -103,7 +116,7 @@ public class ListingService {
     }
 
     @Transactional
-    public ListingResponse updateListing(Long listingId, CreateListingRequest request) {
+    public ListingResponse updateListing(Long listingId, UpdateListingRequest request) {
         Listing listing = getOwnedListing(listingId);
 
         if (request.getTitle() != null) listing.setTitle(request.getTitle());
@@ -117,7 +130,7 @@ public class ListingService {
             if (listing.getLocation() != null) {
                 updateLocation(listing.getLocation(), request.getLocation());
             } else {
-                listing.setLocation(buildLocation(request.getLocation()));
+                listing.setLocation(buildLocationFromUpdate(request.getLocation()));
             }
         }
 
@@ -132,6 +145,7 @@ public class ListingService {
 
     @Transactional
     public synchronized ListingResponse uploadPhoto(Long listingId, MultipartFile file) throws IOException {
+        validateUploadedFile(file);
         Listing listing = getOwnedListing(listingId);
 
         int photoCount = photoRepository.countByListingId(listingId);
@@ -302,12 +316,73 @@ public class ListingService {
         if (request.getLongitude() != null) location.setLongitude(request.getLongitude());
         if (request.getNeighborhood() != null) location.setNeighborhood(request.getNeighborhood());
         if (request.getCity() != null) location.setCity(request.getCity());
+        recalculateDistance(location);
+    }
 
+    private void updateLocation(Location location, UpdateLocationRequest request) {
+        if (request.getAddress() != null) location.setAddress(request.getAddress());
+        if (request.getLatitude() != null) location.setLatitude(request.getLatitude());
+        if (request.getLongitude() != null) location.setLongitude(request.getLongitude());
+        if (request.getNeighborhood() != null) location.setNeighborhood(request.getNeighborhood());
+        if (request.getCity() != null) location.setCity(request.getCity());
+        recalculateDistance(location);
+    }
+
+    private Location buildLocationFromUpdate(UpdateLocationRequest request) {
+        Location location = Location.builder()
+                .address(request.getAddress())
+                .latitude(request.getLatitude())
+                .longitude(request.getLongitude())
+                .neighborhood(request.getNeighborhood())
+                .city(request.getCity())
+                .build();
+        recalculateDistance(location);
+        return location;
+    }
+
+    private void recalculateDistance(Location location) {
         if (location.getLatitude() != null && location.getLongitude() != null) {
             double distance = GeoUtils.haversineDistance(
                     location.getLatitude(), location.getLongitude(),
                     GeoUtils.CAMPUS_LAT, GeoUtils.CAMPUS_LNG);
             location.setDistanceToCampus(GeoUtils.roundDistance(distance));
+        }
+    }
+
+    private void validateUploadedFile(MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new BusinessException("Le fichier est vide.");
+        }
+        if (file.getSize() > MAX_UPLOAD_SIZE) {
+            throw new BusinessException("Le fichier dépasse la taille maximale de 10 Mo.");
+        }
+        String contentType = file.getContentType();
+        if (contentType == null || !ALLOWED_MIME_TYPES.contains(contentType)) {
+            throw new BusinessException("Format de fichier non accepté. Formats autorisés : JPEG, PNG, WebP.");
+        }
+        validateMagicBytes(file.getInputStream());
+    }
+
+    private void validateMagicBytes(InputStream inputStream) throws IOException {
+        byte[] header = new byte[12];
+        int bytesRead = inputStream.read(header);
+        if (bytesRead < 4) {
+            throw new BusinessException("Format de fichier non accepté. Formats autorisés : JPEG, PNG, WebP.");
+        }
+
+        boolean isJpeg = bytesRead >= 3
+                && header[0] == JPEG_MAGIC[0] && header[1] == JPEG_MAGIC[1] && header[2] == JPEG_MAGIC[2];
+        boolean isPng = bytesRead >= 4
+                && header[0] == PNG_MAGIC[0] && header[1] == PNG_MAGIC[1]
+                && header[2] == PNG_MAGIC[2] && header[3] == PNG_MAGIC[3];
+        boolean isWebp = bytesRead >= 12
+                && header[0] == RIFF_MAGIC[0] && header[1] == RIFF_MAGIC[1]
+                && header[2] == RIFF_MAGIC[2] && header[3] == RIFF_MAGIC[3]
+                && header[8] == WEBP_MAGIC[0] && header[9] == WEBP_MAGIC[1]
+                && header[10] == WEBP_MAGIC[2] && header[11] == WEBP_MAGIC[3];
+
+        if (!isJpeg && !isPng && !isWebp) {
+            throw new BusinessException("Format de fichier non accepté. Formats autorisés : JPEG, PNG, WebP.");
         }
     }
 }

@@ -1,0 +1,292 @@
+<div class="tenant-application">
+  <p-toast />
+
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <button pButton icon="pi pi-arrow-left" [text]="true" (click)="goBack()" class="back-button">
+      Retour
+    </button>
+    <div class="eyebrow-tag">
+      <i class="pi pi-file-check"></i>
+      <span>Constitution du dossier</span>
+    </div>
+    <h1 class="hero-title">Dossier locataire</h1>
+    <p class="hero-subtitle">
+      Complétez votre dossier pour candidater à cette réservation
+    </p>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-state">
+      <p-progressSpinner styleClass="w-12 h-12" strokeWidth="3" />
+      <p class="loading-text">Chargement de votre dossier...</p>
+    </div>
+  }
+
+  <!-- Step 1: Guarantor Form -->
+  @if (!loading() && currentStep() === 'form') {
+    <div class="form-section">
+      <div class="section-card-shell">
+        <div class="section-card-core">
+          <div class="section-header">
+            <div class="step-badge">Étape 1/3</div>
+            <h2 class="section-title">Informations du garant</h2>
+            <p class="section-subtitle">
+              Un garant est requis pour valider votre candidature
+            </p>
+          </div>
+
+          <form [formGroup]="applicationForm" (ngSubmit)="onSubmitApplication()">
+            <div formArrayName="guarantors" class="guarantors-list">
+              @for (guarantor of guarantors.controls; track $index) {
+                <div [formGroupName]="$index" class="guarantor-card">
+                  <div class="guarantor-header">
+                    <h3 class="guarantor-title">
+                      <i class="pi pi-user"></i>
+                      Garant {{ $index + 1 }}
+                    </h3>
+                    @if (guarantors.length > 1) {
+                      <button
+                        type="button"
+                        pButton
+                        icon="pi pi-trash"
+                        [text]="true"
+                        severity="danger"
+                        (click)="removeGuarantor($index)"
+                      ></button>
+                    }
+                  </div>
+
+                  <div class="form-grid">
+                    <div class="form-field">
+                      <label class="field-label">Nom *</label>
+                      <input
+                        pInputText
+                        formControlName="lastName"
+                        placeholder="Nom de famille"
+                        class="field-input"
+                      />
+                    </div>
+
+                    <div class="form-field">
+                      <label class="field-label">Prénom *</label>
+                      <input
+                        pInputText
+                        formControlName="firstName"
+                        placeholder="Prénom"
+                        class="field-input"
+                      />
+                    </div>
+
+                    <div class="form-field">
+                      <label class="field-label">Numéro CNI *</label>
+                      <input
+                        pInputText
+                        formControlName="idCardNumber"
+                        placeholder="Ex: 123456789"
+                        class="field-input"
+                      />
+                    </div>
+
+                    <div class="form-field">
+                      <label class="field-label">Téléphone *</label>
+                      <input
+                        pInputText
+                        formControlName="phone"
+                        placeholder="+237XXXXXXXXX"
+                        class="field-input"
+                      />
+                    </div>
+
+                    <div class="form-field full-width">
+                      <label class="field-label">Adresse complète *</label>
+                      <input
+                        pInputText
+                        formControlName="address"
+                        placeholder="Adresse du garant"
+                        class="field-input"
+                      />
+                    </div>
+
+                    <div class="form-field full-width">
+                      <label class="field-label">Lien avec le locataire *</label>
+                      <input
+                        pInputText
+                        formControlName="relationshipToTenant"
+                        placeholder="Ex: Parent, Tuteur, Employeur"
+                        class="field-input"
+                      />
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="form-actions">
+              <button
+                type="button"
+                pButton
+                label="Ajouter un garant"
+                icon="pi pi-plus"
+                [outlined]="true"
+                (click)="addGuarantor()"
+              ></button>
+              <button
+                type="submit"
+                pButton
+                label="Continuer"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                [loading]="submitting()"
+                class="primary-button"
+              ></button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Step 2: Document Upload -->
+  @if (!loading() && currentStep() === 'documents') {
+    <div class="documents-section">
+      <div class="section-card-shell">
+        <div class="section-card-core">
+          <div class="section-header">
+            <div class="step-badge">Étape 2/3</div>
+            <h2 class="section-title">Documents requis</h2>
+            <p class="section-subtitle">
+              Uploadez vos documents pour compléter votre dossier
+            </p>
+          </div>
+
+          <div class="documents-grid">
+            @for (docType of documentTypes; track docType.value) {
+              <div class="doc-upload-card">
+                <div class="doc-header">
+                  <div class="doc-icon-wrapper">
+                    <i class="pi {{ docType.icon }}"></i>
+                  </div>
+                  <div class="doc-info">
+                    <h3 class="doc-title">{{ docType.label }}</h3>
+                    @if (docType.required) {
+                      <span class="required-badge">Obligatoire</span>
+                    } @else {
+                      <span class="optional-badge">Optionnel</span>
+                    }
+                  </div>
+                </div>
+
+                @if (!hasDocument(docType.value)) {
+                  <div class="doc-upload-zone">
+                    <input
+                      type="file"
+                      [id]="'doc-' + docType.value"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      (change)="onFileSelect($event, docType.value)"
+                      class="file-input"
+                    />
+                    <label [for]="'doc-' + docType.value" class="upload-label">
+                      <i class="pi pi-cloud-upload upload-icon"></i>
+                      <span class="upload-text">Choisir un fichier</span>
+                    </label>
+                  </div>
+                } @else {
+                  <div class="doc-uploaded">
+                    <i class="pi pi-check-circle"></i>
+                    <span>Document uploadé</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="submit-section">
+            <p class="submit-hint">
+              <i class="pi pi-info-circle"></i>
+              Assurez-vous d'avoir uploadé au minimum votre CNI et votre carte étudiant
+            </p>
+            <button
+              pButton
+              label="Soumettre pour validation"
+              icon="pi pi-send"
+              iconPos="right"
+              [loading]="submitting()"
+              (click)="onSubmitForValidation()"
+              class="primary-button"
+            ></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Step 3: Submitted / Status -->
+  @if (!loading() && currentStep() === 'submitted' && application()) {
+    <div class="status-section">
+      <div class="status-card-shell">
+        <div class="status-card-core">
+          <div class="status-icon-wrapper">
+            @if (application()!.status === 'APPROVED') {
+              <i class="pi pi-check-circle status-icon-success"></i>
+            } @else if (application()!.status === 'REJECTED') {
+              <i class="pi pi-times-circle status-icon-error"></i>
+            } @else {
+              <i class="pi pi-clock status-icon-pending"></i>
+            }
+          </div>
+
+          <h2 class="status-title">
+            @if (application()!.status === 'APPROVED') {
+              Dossier approuvé !
+            } @else if (application()!.status === 'REJECTED') {
+              Dossier refusé
+            } @else {
+              Dossier en cours de validation
+            }
+          </h2>
+
+          <div class="status-badge-wrapper">
+            <span class="status-badge" [ngClass]="getStatusClass(application()!.status)">
+              {{ getStatusLabel(application()!.status) }}
+            </span>
+          </div>
+
+          @if (application()!.decisionComment) {
+            <div class="decision-comment">
+              <i class="pi pi-comment"></i>
+              <p>{{ application()!.decisionComment }}</p>
+            </div>
+          }
+
+          @if (application()!.status === 'APPROVED') {
+            <p class="status-message">
+              Félicitations ! Votre dossier a été validé. Vous pouvez maintenant procéder au paiement.
+            </p>
+          } @else if (application()!.status === 'REJECTED') {
+            <p class="status-message">
+              Votre dossier a été refusé. Veuillez corriger les éléments mentionnés et resoumettre.
+            </p>
+          } @else {
+            <p class="status-message">
+              Votre dossier est en cours de validation par notre équipe. Vous recevrez une notification dès qu'une décision sera prise.
+            </p>
+          }
+
+          <button pButton label="Retour aux réservations" [outlined]="true" (click)="goBack()"></button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Upload Progress Overlay -->
+  @if (uploading()) {
+    <div class="upload-overlay">
+      <div class="upload-modal">
+        <p-progressSpinner styleClass="w-16 h-16" strokeWidth="3" />
+        <p class="upload-modal-text">Envoi en cours...</p>
+      </div>
+    </div>
+  }
+</div>

@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -25,6 +26,7 @@ export class ResetPassword implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
 
   protected loading = signal(false);
   protected success = signal(false);
@@ -61,7 +63,7 @@ export class ResetPassword implements OnInit {
     this.errorMessage.set(null);
 
     const { newPassword } = this.form.getRawValue();
-    this.authService.resetPassword(t, newPassword).subscribe({
+    this.authService.resetPassword(t, newPassword).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.loading.set(false);
         this.success.set(true);

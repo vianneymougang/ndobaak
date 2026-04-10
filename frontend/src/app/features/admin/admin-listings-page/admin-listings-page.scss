@@ -1,0 +1,193 @@
+@reference "../../../../tailwind.css";
+
+.listings-page {
+  @apply flex flex-col;
+  gap: 1.5rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page-header {
+  @apply flex flex-col;
+  gap: 0.25rem;
+}
+
+.page-title {
+  font-family: var(--font-urbanist);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--color-ndb-ink);
+  margin: 0;
+  letter-spacing: -0.01em;
+
+  @media (min-width: 1024px) {
+    font-size: 1.75rem;
+  }
+}
+
+.page-subtitle {
+  font-family: var(--font-lato);
+  font-size: 0.875rem;
+  color: var(--color-ndb-muted);
+  margin: 0;
+}
+
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.kpi-card {
+  @apply flex flex-col items-center justify-center;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  text-align: center;
+  gap: 0.125rem;
+
+  &--alert {
+    background: color-mix(in srgb, var(--color-ndb-gold) 8%, white);
+    border: 1px solid color-mix(in srgb, var(--color-ndb-gold) 20%, transparent);
+  }
+}
+
+.kpi-value {
+  font-family: var(--font-urbanist);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--color-ndb-ink);
+}
+
+.kpi-label {
+  font-family: var(--font-lato);
+  font-size: 0.75rem;
+  color: var(--color-ndb-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.filters-bar {
+  @apply flex items-center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 639px) {
+    @apply flex-col items-stretch;
+  }
+}
+
+.desktop-only {
+  display: none;
+
+  @media (min-width: 1024px) {
+    display: block;
+  }
+}
+
+.mobile-only {
+  @apply flex flex-col;
+  gap: 0.75rem;
+
+  @media (min-width: 1024px) {
+    display: none;
+  }
+}
+
+.listing-cell {
+  @apply flex items-center;
+  gap: 0.75rem;
+}
+
+.listing-thumb {
+  width: 48px;
+  height: 36px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.listing-title {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--color-ndb-ink);
+}
+
+.text-cell {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-ink);
+}
+
+.price-cell {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--color-ndb-gold);
+}
+
+.date-cell {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-muted);
+}
+
+.listing-card {
+  @apply flex;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+}
+
+.listing-card-photo {
+  width: 80px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.listing-card-info {
+  @apply flex flex-col;
+  gap: 0.25rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.listing-card-title {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--color-ndb-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.listing-card-row {
+  @apply flex items-center;
+  gap: 0.5rem;
+}
+
+.listing-card-price {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--color-ndb-gold);
+}
+
+.listing-card-meta {
+  font-family: var(--font-lato);
+  font-size: 0.75rem;
+  color: var(--color-ndb-muted);
+}

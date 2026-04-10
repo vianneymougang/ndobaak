@@ -14,7 +14,15 @@ export type NotificationType =
   | 'SUBSCRIPTION_EXPIRED'
   | 'ACCOUNT_DEACTIVATED'
   | 'USER_VERIFIED'
-  | 'USER_REJECTED';
+  | 'USER_REJECTED'
+  | 'LANDLORD_DOCUMENT_APPROVED'
+  | 'LANDLORD_DOCUMENT_REJECTED'
+  | 'APPLICATION_APPROVED'
+  | 'APPLICATION_REJECTED'
+  | 'LEASE_READY'
+  | 'LEASE_SIGNED'
+  | 'KEYS_HANDED_OVER'
+  | 'TRANSFER_FAILED';
 
 export interface NotificationResponse {
   id: number;
@@ -64,6 +72,14 @@ export const NOTIFICATION_LABELS: Record<NotificationType, string> = {
   ACCOUNT_DEACTIVATED: 'Compte désactivé',
   USER_VERIFIED: 'Compte vérifié',
   USER_REJECTED: 'Compte refusé',
+  LANDLORD_DOCUMENT_APPROVED: 'Document propriétaire approuvé',
+  LANDLORD_DOCUMENT_REJECTED: 'Document propriétaire refusé',
+  APPLICATION_APPROVED: 'Dossier locataire approuvé',
+  APPLICATION_REJECTED: 'Dossier locataire refusé',
+  LEASE_READY: 'Contrat de bail disponible',
+  LEASE_SIGNED: 'Contrat de bail signé',
+  KEYS_HANDED_OVER: 'Remise des clés confirmée',
+  TRANSFER_FAILED: 'Échec du virement propriétaire',
 };
 
 export const PREFERENCE_GROUPS: PreferenceGroup[] = [
@@ -83,6 +99,21 @@ export const PREFERENCE_GROUPS: PreferenceGroup[] = [
     label: 'Annonces',
     icon: 'pi-home',
     types: ['LISTING_APPROVED', 'LISTING_REJECTED', 'REVIEW_POSTED', 'REVIEW_FLAGGED'],
+    preferences: [],
+  },
+  {
+    label: 'Cycle locatif',
+    icon: 'pi-file-edit',
+    types: [
+      'LANDLORD_DOCUMENT_APPROVED',
+      'LANDLORD_DOCUMENT_REJECTED',
+      'APPLICATION_APPROVED',
+      'APPLICATION_REJECTED',
+      'LEASE_READY',
+      'LEASE_SIGNED',
+      'KEYS_HANDED_OVER',
+      'TRANSFER_FAILED',
+    ],
     preferences: [],
   },
   {

@@ -5,6 +5,7 @@ import com.ndobaak.backend.payment.entity.Payment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PaymentRepository extends JpaRepository<Payment, Long> {
+public interface PaymentRepository extends JpaRepository<Payment, Long>, JpaSpecificationExecutor<Payment> {
 
     List<Payment> findByBookingId(Long bookingId);
 
@@ -30,11 +31,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.booking.listing.landlord.id = :landlordId AND p.status = :status")
     BigDecimal sumAmountByLandlordIdAndStatus(@Param("landlordId") Long landlordId, @Param("status") PaymentStatus status);
 
-    @Query("SELECT p FROM Payment p WHERE " +
-           "(:status IS NULL OR p.status = :status) AND " +
-           "(:type IS NULL OR p.paymentType = :type) " +
-           "ORDER BY p.createdAt DESC")
-    Page<Payment> findAllFiltered(@Param("status") PaymentStatus status, @Param("type") com.ndobaak.backend.common.enums.PaymentType type, Pageable pageable);
 
     @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.status = :status")
     BigDecimal sumAmountByStatus(@Param("status") PaymentStatus status);

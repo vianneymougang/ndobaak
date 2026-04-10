@@ -68,7 +68,7 @@ public class ListingController {
         request.setUserLat(userLat);
         request.setUserLng(userLng);
         request.setPage(page);
-        request.setSize(size);
+        request.setSize(Math.min(size, 50));
 
         return ResponseEntity.ok(listingSearchService.search(request));
     }
@@ -80,7 +80,7 @@ public class ListingController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ListingResponse> updateListing(@PathVariable Long id,
-                                                         @Valid @RequestBody CreateListingRequest request) {
+                                                         @Valid @RequestBody UpdateListingRequest request) {
         return ResponseEntity.ok(listingService.updateListing(id, request));
     }
 

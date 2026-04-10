@@ -1,0 +1,176 @@
+<div class="finances-page">
+  <div class="page-header">
+    <h1 class="page-title">Finances</h1>
+    <p class="page-subtitle">Vue financière de la plateforme</p>
+  </div>
+
+  @if (errorStats()) {
+    <app-admin-error-state
+      message="Impossible de charger les statistiques financières."
+      (retry)="retryStats()"
+    />
+  } @else {
+    <app-finance-chart-header [stats]="stats()" [loading]="loadingStats()" />
+  }
+
+  @if (loadingAnomalies()) {
+    <div class="section">
+      <p-skeleton width="30%" height="1rem" />
+      <p-skeleton width="100%" height="4rem" borderRadius="12px" styleClass="mt-2" />
+    </div>
+  } @else if (errorAnomalies()) {
+    <app-admin-error-state
+      message="Impossible de charger les anomalies."
+      (retry)="retryAnomalies()"
+    />
+  } @else if (anomalies().length > 0) {
+    <div class="section">
+      <h2 class="section-title">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        Anomalies détectées
+        <span class="anomaly-count">{{ anomalies().length }}</span>
+      </h2>
+      <div class="anomalies-list">
+        @for (tx of anomalies(); track tx.id; let i = $index) {
+          <div
+            class="anomaly-card fade-slide-in"
+            [style.animation-delay]="i * 0.05 + 's'"
+          >
+            <div class="anomaly-body">
+              <div class="anomaly-info">
+                <span class="anomaly-payer">{{ tx.payerName ?? 'Inconnu' }}</span>
+                <span class="anomaly-reason">{{ tx.anomalyReason }}</span>
+              </div>
+              <div class="anomaly-right">
+                <p-tag [value]="statusLabel(tx.status)" [severity]="statusSeverity(tx.status)" />
+                <span class="anomaly-amount">{{ formatXAF(tx.amount) }}</span>
+              </div>
+            </div>
+            <div class="anomaly-footer">
+              {{ formatOperator(tx.operator) }} · {{ tx.createdAt | relativeTime }}
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="section">
+    <h2 class="section-title">Transactions</h2>
+
+    <div class="filters-bar">
+      <p-select
+        [options]="statusOptions"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="onStatusFilterChange($event)"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Statut"
+        [showClear]="false"
+        size="small"
+      />
+      <p-select
+        [options]="typeOptions"
+        [ngModel]="typeFilter()"
+        (ngModelChange)="onTypeFilterChange($event)"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Type"
+        [showClear]="false"
+        size="small"
+      />
+    </div>
+
+    @if (errorTransactions()) {
+      <app-admin-error-state
+        message="Impossible de charger les transactions."
+        (retry)="retryTransactions()"
+      />
+    } @else {
+      <div class="table-section desktop-only">
+        <p-table
+          [value]="transactions()"
+          [loading]="loadingTransactions()"
+          [lazy]="true"
+          [rows]="pageSize"
+          [totalRecords]="totalTransactions()"
+          dataKey="id"
+          [pt]="{ root: { style: 'border-radius: 12px; overflow: hidden;' } }"
+        >
+          <ng-template #header>
+            <tr>
+              <th>Date</th>
+              <th>Payeur</th>
+              <th>Montant</th>
+              <th>Type</th>
+              <th>Statut</th>
+              <th>Opérateur</th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-tx>
+            <tr [class.anomaly-row]="tx.anomaly">
+              <td class="date-cell">{{ tx.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="text-cell">{{ tx.payerName ?? '—' }}</td>
+              <td class="amount-cell">{{ formatXAF(tx.amount) }}</td>
+              <td><p-tag [value]="typeLabel(tx.paymentType)" [severity]="typeSeverity(tx.paymentType)" /></td>
+              <td><p-tag [value]="statusLabel(tx.status)" [severity]="statusSeverity(tx.status)" /></td>
+              <td class="text-cell">{{ formatOperator(tx.operator) }}</td>
+            </tr>
+          </ng-template>
+          <ng-template #emptymessage>
+            <tr>
+              <td colspan="6">
+                <app-admin-empty-state
+                  icon="pi pi-wallet"
+                  title="Aucune transaction"
+                  subtitle="Les transactions apparaîtront ici."
+                />
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <div class="cards-section mobile-only">
+        @if (loadingTransactions()) {
+          @for (i of [1,2,3]; track i) {
+            <p-skeleton width="100%" height="5rem" borderRadius="12px" />
+          }
+        } @else if (transactions().length === 0) {
+          <app-admin-empty-state
+            icon="pi pi-wallet"
+            title="Aucune transaction"
+            subtitle="Les transactions apparaîtront ici."
+          />
+        } @else {
+          @for (tx of transactions(); track tx.id; let i = $index) {
+            <div
+              class="tx-card fade-slide-up"
+              [class.tx-card--anomaly]="tx.anomaly"
+              [style.animation-delay]="i * 0.04 + 's'"
+            >
+              <div class="tx-card-top">
+                <span class="tx-card-amount">{{ formatXAF(tx.amount) }}</span>
+                <p-tag [value]="statusLabel(tx.status)" [severity]="statusSeverity(tx.status)" />
+              </div>
+              <span class="tx-card-payer">{{ tx.payerName ?? '—' }} · {{ formatOperator(tx.operator) }}</span>
+              <div class="tx-card-bottom">
+                <span class="tx-card-date">{{ tx.createdAt | relativeTime }}</span>
+                <p-tag [value]="typeLabel(tx.paymentType)" [severity]="typeSeverity(tx.paymentType)" />
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      @if (totalTransactions() > pageSize) {
+        <p-paginator
+          [rows]="pageSize"
+          [totalRecords]="totalTransactions()"
+          [first]="page() * pageSize"
+          (onPageChange)="onPageChange($event)"
+        />
+      }
+    }
+  </div>
+</div>

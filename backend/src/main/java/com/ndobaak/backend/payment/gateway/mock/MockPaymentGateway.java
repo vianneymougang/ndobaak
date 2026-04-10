@@ -53,8 +53,26 @@ public class MockPaymentGateway implements PaymentGateway {
     }
 
     @Override
+    public PaymentInitiationResult initiateRedirectPayment(String reference, BigDecimal amount, String currency,
+                                                            String payerName, String payerEmail,
+                                                            String description, String callbackUrl) {
+        String mockProviderRef = "mock_redirect_" + UUID.randomUUID().toString().substring(0, 8);
+        String mockAuthUrl = callbackUrl + "?mock_ref=" + mockProviderRef + "&description=" + description;
+
+        log.info("[MOCK] Redirect payment initiated: reference={}, amount={} {}, auth_url=[mock]",
+                reference, amount, currency);
+
+        return new PaymentInitiationResult(mockProviderRef, mockAuthUrl, "pending");
+    }
+
+    @Override
     public void triggerCharge(String providerReference, PaymentGatewayRequest request) {
         log.info("[MOCK] triggerCharge no-op: providerRef={}", providerReference);
+    }
+
+    @Override
+    public void cancelPayment(String providerReference) {
+        log.info("[MOCK] cancelPayment no-op: providerRef={}", providerReference);
     }
 
     @Override

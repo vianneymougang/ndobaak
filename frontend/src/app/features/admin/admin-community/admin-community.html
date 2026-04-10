@@ -1,0 +1,199 @@
+<div class="community-page">
+  <div class="page-header">
+    <h1 class="page-title">Communauté</h1>
+    <p class="page-subtitle">Gestion des utilisateurs de la plateforme</p>
+  </div>
+
+  @if (loadingStats()) {
+    <div class="kpi-strip">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="kpi-card">
+          <p-skeleton width="3rem" height="1.75rem" />
+          <p-skeleton width="6rem" height="0.75rem" styleClass="mt-1" />
+        </div>
+      }
+    </div>
+  } @else if (errorStats()) {
+    <app-admin-error-state
+      message="Impossible de charger les statistiques."
+      (retry)="retryStats()"
+    />
+  } @else if (stats(); as s) {
+    <div class="kpi-strip fade-slide-up">
+      <div class="kpi-card">
+        <span class="kpi-value">{{ s.totalUsers }}</span>
+        <span class="kpi-label">Total utilisateurs</span>
+        @if (s.newUsersThisMonth > 0) {
+          <span class="kpi-delta">+{{ s.newUsersThisMonth }} ce mois</span>
+        }
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-value">{{ s.totalStudents }}</span>
+        <span class="kpi-label">Étudiants</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-value">{{ s.totalLandlords }}</span>
+        <span class="kpi-label">Propriétaires</span>
+      </div>
+    </div>
+  }
+
+  <div class="filters-bar">
+    <p-iconfield>
+      <p-inputicon styleClass="pi pi-search" />
+      <input
+        type="text"
+        pInputText
+        placeholder="Rechercher un utilisateur..."
+        [ngModel]="search()"
+        (ngModelChange)="onSearch($event)"
+      />
+    </p-iconfield>
+    <p-selectbutton
+      [options]="roleOptions"
+      [ngModel]="roleFilter()"
+      (ngModelChange)="onRoleChange($event)"
+      optionLabel="label"
+      optionValue="value"
+      size="small"
+    />
+  </div>
+
+  @if (error()) {
+    <app-admin-error-state
+      message="Impossible de charger les utilisateurs."
+      (retry)="retryLoad()"
+    />
+  } @else {
+    <div class="table-section desktop-only">
+      <p-table
+        [value]="users()"
+        [loading]="loading() && users().length === 0"
+        [lazy]="true"
+        [rows]="pageSize"
+        [totalRecords]="totalElements()"
+        dataKey="id"
+        [pt]="{ root: { style: 'border-radius: 12px; overflow: hidden;' } }"
+      >
+        <ng-template #header>
+          <tr>
+            <th>Utilisateur</th>
+            <th>Rôle</th>
+            <th>Statut</th>
+            <th>Inscrit le</th>
+            <th>Activité</th>
+            <th style="width: 4rem;"></th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-user>
+          <tr>
+            <td>
+              <div class="user-cell">
+                <p-avatar
+                  [label]="user.firstName[0] + user.lastName[0]"
+                  shape="circle"
+                  [pt]="{ root: { style: 'background: var(--color-ndb-forest); color: white; font-family: var(--font-urbanist); font-weight: 700; font-size: 0.75rem;' } }"
+                />
+                <div class="user-cell-text">
+                  <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
+                  <span class="user-email">{{ user.email }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <p-tag [value]="roleLabel(user.role)" [severity]="roleSeverity(user.role)" />
+            </td>
+            <td>
+              <p-tag [value]="statusLabel(user)" [severity]="statusSeverity(user)" />
+            </td>
+            <td class="date-cell">{{ user.registrationDate | date:'dd/MM/yyyy' }}</td>
+            <td class="activity-cell">
+              @if (user.role === 'LANDLORD') {
+                {{ user.listingCount ?? 0 }} annonce{{ (user.listingCount ?? 0) > 1 ? 's' : '' }}
+              } @else {
+                {{ user.bookingCount ?? 0 }} réservation{{ (user.bookingCount ?? 0) > 1 ? 's' : '' }}
+              }
+            </td>
+            <td>
+              <p-button
+                icon="pi pi-eye"
+                severity="secondary"
+                [text]="true"
+                [rounded]="true"
+                size="small"
+                aria-label="Voir le profil"
+                (click)="openUserDetail(user)"
+              />
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="6">
+              <app-admin-empty-state
+                icon="pi pi-users"
+                title="Aucun utilisateur trouvé"
+                subtitle="Modifiez vos filtres ou votre recherche."
+              />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <div class="cards-section mobile-only">
+      @if (loading()) {
+        @for (i of [1,2,3,4]; track i) {
+          <p-skeleton width="100%" height="5rem" borderRadius="12px" />
+        }
+      } @else if (users().length === 0) {
+        <app-admin-empty-state
+          icon="pi pi-users"
+          title="Aucun utilisateur trouvé"
+          subtitle="Modifiez vos filtres."
+        />
+      } @else {
+        @for (user of users(); track user.id; let i = $index) {
+          <div
+            class="user-card fade-slide-up"
+            [style.animation-delay]="i * 0.04 + 's'"
+            (click)="openUserDetail(user)"
+            role="button"
+            tabindex="0"
+          >
+            <p-avatar
+              [label]="user.firstName[0] + user.lastName[0]"
+              shape="circle"
+              size="large"
+              [pt]="{ root: { style: 'background: var(--color-ndb-forest); color: white; font-family: var(--font-urbanist); font-weight: 700;' } }"
+            />
+            <div class="user-card-info">
+              <span class="user-card-name">{{ user.firstName }} {{ user.lastName }}</span>
+              <span class="user-card-email">{{ user.email }}</span>
+              <div class="user-card-tags">
+                <p-tag [value]="roleLabel(user.role)" [severity]="roleSeverity(user.role)" />
+                <p-tag [value]="statusLabel(user)" [severity]="statusSeverity(user)" />
+              </div>
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    @if (totalElements() > pageSize) {
+      <p-paginator
+        [rows]="pageSize"
+        [totalRecords]="totalElements()"
+        [first]="page() * pageSize"
+        (onPageChange)="onPageChange($event)"
+      />
+    }
+  }
+</div>
+
+<app-user-detail-drawer
+  [userId]="selectedUserId()"
+  (deactivated)="onUserChanged()"
+  (reactivated)="onUserChanged()"
+  (closed)="onDrawerClosed()"
+/>

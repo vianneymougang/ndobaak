@@ -41,9 +41,8 @@ test.describe('Landlord Bookings', () => {
 
   test.beforeEach(async ({ page }) => {
     await loginAsLandlord(page);
-    navbar = new NavbarPage(page);
     bookings = new LandlordBookingsPage(page);
-    await navbar.goToLandlordBookings();
+    await bookings.goto();
   });
 
   test('should display landlord bookings page', async () => {

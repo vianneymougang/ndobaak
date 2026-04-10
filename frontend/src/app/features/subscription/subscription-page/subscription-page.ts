@@ -5,6 +5,7 @@ import {
   signal,
   computed,
   OnInit,
+  OnDestroy,
   DestroyRef,
 } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
@@ -46,7 +47,7 @@ import { MobileMoneyOperator } from '../../../core/models/payment.models';
   templateUrl: './subscription-page.html',
   styleUrl: './subscription-page.scss',
 })
-export class SubscriptionPage implements OnInit {
+export class SubscriptionPage implements OnInit, OnDestroy {
   private subscriptionService = inject(SubscriptionService);
   private messageService = inject(MessageService);
   private destroyRef = inject(DestroyRef);
@@ -56,6 +57,8 @@ export class SubscriptionPage implements OnInit {
   protected loading = signal(true);
   protected submitting = signal(false);
   protected cancellingAutoRenew = signal(false);
+  protected cancellingPending = signal(false);
+  private pollInterval: ReturnType<typeof setInterval> | null = null;
   protected isRenewal = signal(false);
   protected dialogVisible = false;
 
@@ -97,6 +100,10 @@ export class SubscriptionPage implements OnInit {
     this.loadSubscription();
   }
 
+  ngOnDestroy(): void {
+    this.stopPolling();
+  }
+
   protected loadSubscription(): void {
     this.loading.set(true);
     this.subscriptionService
@@ -106,11 +113,51 @@ export class SubscriptionPage implements OnInit {
         next: (sub) => {
           this.subscription.set(sub);
           this.loading.set(false);
+          if (sub?.status === 'PENDING_PAYMENT') {
+            this.startPolling();
+          } else {
+            this.stopPolling();
+          }
         },
         error: () => {
           this.subscription.set(null);
           this.loading.set(false);
+          this.stopPolling();
         },
+      });
+  }
+
+  private startPolling(): void {
+    if (this.pollInterval) return;
+    this.pollInterval = setInterval(() => this.pollSubscription(), 5000);
+  }
+
+  private stopPolling(): void {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+      this.pollInterval = null;
+    }
+  }
+
+  private pollSubscription(): void {
+    this.subscriptionService
+      .getMySubscription()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (sub) => {
+          this.subscription.set(sub);
+          if (sub?.status !== 'PENDING_PAYMENT') {
+            this.stopPolling();
+            if (sub?.status === 'ACTIVE') {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Abonnement activé',
+                detail: 'Votre abonnement est maintenant actif. Bonne publication !',
+              });
+            }
+          }
+        },
+        error: () => this.stopPolling(),
       });
   }
 
@@ -146,6 +193,7 @@ export class SubscriptionPage implements OnInit {
         this.submitting.set(false);
         this.dialogVisible = false;
         this.subscription.set(sub);
+        this.startPolling();
         this.messageService.add({
           severity: 'success',
           summary: 'Demande envoyée',
@@ -161,6 +209,32 @@ export class SubscriptionPage implements OnInit {
         });
       },
     });
+  }
+
+  protected cancelPendingSubscriptionAction(): void {
+    this.cancellingPending.set(true);
+    this.subscriptionService
+      .cancelPendingSubscription()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.cancellingPending.set(false);
+          this.subscription.set(null);
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Paiement annulé',
+            detail: 'Vous pouvez relancer un abonnement avec le bon numéro.',
+          });
+        },
+        error: (err) => {
+          this.cancellingPending.set(false);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erreur',
+            detail: err?.error?.message ?? 'Impossible d\'annuler le paiement. Réessayez.',
+          });
+        },
+      });
   }
 
   protected cancelAutoRenewAction(): void {

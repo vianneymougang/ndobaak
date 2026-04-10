@@ -1,0 +1,235 @@
+@reference "../../../../../tailwind.css";
+
+.drawer-header {
+  @apply flex items-center justify-between;
+  width: 100%;
+}
+
+.drawer-title {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--color-ndb-ink);
+  margin: 0;
+}
+
+.drawer-body {
+  @apply flex flex-col;
+  gap: 1.25rem;
+  padding: 0 0.5rem;
+
+  &--centered {
+    @apply items-center justify-center;
+    min-height: 200px;
+  }
+}
+
+.gallery-image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.gallery-thumb {
+  width: 56px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.listing-header {
+  @apply flex flex-col;
+  gap: 0.25rem;
+}
+
+.listing-title-row {
+  @apply flex items-start justify-between;
+  gap: 0.75rem;
+}
+
+.listing-title {
+  font-family: var(--font-urbanist);
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--color-ndb-ink);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.listing-price {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--color-ndb-gold);
+  margin: 0;
+
+  .per-month {
+    font-weight: 400;
+    font-size: 0.8125rem;
+    color: var(--color-ndb-muted);
+  }
+}
+
+.listing-address {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-muted);
+  margin: 0;
+
+  .pi-map-marker {
+    font-size: 0.75rem;
+    margin-right: 0.25rem;
+  }
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.info-cell {
+  @apply flex flex-col;
+  gap: 0.125rem;
+}
+
+.info-label {
+  font-family: var(--font-lato);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-ndb-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.info-value {
+  font-family: var(--font-lato);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-ndb-ink);
+}
+
+.section {
+  @apply flex flex-col;
+  gap: 0.5rem;
+}
+
+.section-label {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--color-ndb-ink);
+  margin: 0;
+}
+
+.description-text {
+  font-family: var(--font-lato);
+  font-size: 0.875rem;
+  color: var(--color-ndb-ink);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.amenities-list {
+  @apply flex flex-wrap;
+  gap: 0.5rem;
+}
+
+.landlord-section {
+  padding: 1rem;
+  background: var(--color-ndb-cream);
+  border-radius: 12px;
+}
+
+.landlord-info {
+  @apply flex items-center;
+  gap: 0.75rem;
+}
+
+.landlord-avatar {
+  @apply flex items-center justify-center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-ndb-forest);
+  color: white;
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.landlord-name {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--color-ndb-ink);
+  display: block;
+}
+
+.landlord-contact {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-muted);
+  display: block;
+}
+
+.rejection-banner {
+  @apply flex items-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--color-ndb-error) 8%, transparent);
+  border-radius: 12px;
+  border-left: 3px solid var(--color-ndb-error);
+
+  .pi-exclamation-triangle {
+    color: var(--color-ndb-error);
+    font-size: 1rem;
+    margin-top: 0.125rem;
+  }
+}
+
+.rejection-label {
+  font-family: var(--font-urbanist);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  color: var(--color-ndb-error);
+  display: block;
+  margin-bottom: 0.125rem;
+}
+
+.rejection-reason {
+  font-family: var(--font-lato);
+  font-size: 0.8125rem;
+  color: var(--color-ndb-ink);
+  line-height: 1.5;
+}
+
+.drawer-footer {
+  @apply flex justify-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-ndb-ink) 8%, transparent);
+  position: sticky;
+  bottom: 0;
+  background: white;
+}
+
+.reject-form {
+  @apply flex flex-col;
+  gap: 1.75rem;
+  padding-top: 0.75rem;
+}
+
+.field-wrap {
+  @apply flex flex-col;
+  gap: 0.25rem;
+}
+
+.field-error {
+  font-family: var(--font-lato);
+  font-size: 0.75rem;
+  color: var(--color-ndb-error);
+}

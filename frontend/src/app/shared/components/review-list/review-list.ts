@@ -1,12 +1,14 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  DestroyRef,
   input,
   signal,
   computed,
   inject,
   OnInit,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
@@ -45,6 +47,7 @@ export class ReviewList implements OnInit {
   listingId = input.required<number>();
 
   private reviewService = inject(ReviewService);
+  private destroyRef = inject(DestroyRef);
 
   protected reviews = signal<ReviewResponse[]>([]);
   protected ratingStats = signal<RatingStatsResponse | null>(null);
@@ -122,7 +125,7 @@ export class ReviewList implements OnInit {
   }
 
   private loadRatingStats(): void {
-    this.reviewService.getRatingStats(this.listingId()).subscribe({
+    this.reviewService.getRatingStats(this.listingId()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (stats) => this.ratingStats.set(stats),
     });
   }
@@ -131,6 +134,7 @@ export class ReviewList implements OnInit {
     this.loading.set(true);
     this.reviewService
       .getReviewsByListing(this.listingId(), this.page(), this.pageSize, this.selectedSort())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           this.reviews.set(response.content);

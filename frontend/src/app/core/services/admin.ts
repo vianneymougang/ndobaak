@@ -47,6 +47,18 @@ export class AdminService {
     return this.http.put<void>(`${this.apiUrl}/admin/users/${id}/reactivate`, null);
   }
 
+  getListings(
+    status?: string,
+    search?: string,
+    page = 0,
+    size = 20,
+  ): Observable<AdminPage<ListingResponse>> {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (status) params = params.set('status', status);
+    if (search) params = params.set('search', search);
+    return this.http.get<AdminPage<ListingResponse>>(`${this.apiUrl}/admin/listings`, { params });
+  }
+
   getPendingListings(): Observable<ListingResponse[]> {
     return this.http.get<ListingResponse[]>(`${this.apiUrl}/admin/listings/pending`);
   }

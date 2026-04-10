@@ -1,11 +1,13 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  DestroyRef,
   input,
   output,
   signal,
   inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RatingModule } from 'primeng/rating';
 import { TextareaModule } from 'primeng/textarea';
@@ -35,6 +37,7 @@ export class ReviewForm {
   private fb = inject(FormBuilder);
   private reviewService = inject(ReviewService);
   private messageService = inject(MessageService);
+  private destroyRef = inject(DestroyRef);
 
   protected submitting = signal(false);
   protected selectedPhotos = signal<File[]>([]);
@@ -94,7 +97,7 @@ export class ReviewForm {
 
     const photos = this.selectedPhotos().length > 0 ? this.selectedPhotos() : undefined;
 
-    this.reviewService.createReview(request, photos).subscribe({
+    this.reviewService.createReview(request, photos).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (review) => {
         this.submitting.set(false);
         this.messageService.add({

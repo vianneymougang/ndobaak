@@ -9,7 +9,9 @@ import {
   computed,
   effect,
   PLATFORM_ID,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GalleriaModule } from 'primeng/galleria';
@@ -54,6 +56,7 @@ export class Detail implements OnInit {
   private listingService = inject(ListingService);
   protected authService = inject(AuthService);
   private platformId = inject(PLATFORM_ID);
+  private destroyRef = inject(DestroyRef);
 
   protected detailMap = viewChild<ElementRef>('detailMap');
   private L: typeof LeafletNS | null = null;
@@ -97,7 +100,9 @@ export class Detail implements OnInit {
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.listingService.getListingById(id).subscribe({
+    this.listingService.getListingById(id).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (listing) => {
         this.listing.set(listing);
         this.loading.set(false);

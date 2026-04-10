@@ -78,13 +78,7 @@ export class LandlordProfile implements OnInit {
     return `${u.firstName} ${u.lastName}`;
   });
 
-  protected isVerified = computed(() => !!this.user()?.idCardNumber);
-
-  protected maskedIdCard = computed(() => {
-    const id = this.user()?.idCardNumber;
-    if (!id || id.length < 4) return '';
-    return '····' + id.slice(-4);
-  });
+  protected isVerified = computed(() => !!this.user()?.verified);
 
   protected registrationDateFormatted = computed(() => {
     const date = this.user()?.registrationDate;

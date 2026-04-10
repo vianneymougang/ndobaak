@@ -5,7 +5,9 @@ import {
   signal,
   computed,
   OnInit,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -52,6 +54,7 @@ export class InstallmentTracker implements OnInit {
   private paymentService = inject(PaymentService);
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
+  private destroyRef = inject(DestroyRef);
 
   protected schedule = signal<PaymentScheduleResponse | null>(null);
   protected loading = signal(true);
@@ -115,7 +118,7 @@ export class InstallmentTracker implements OnInit {
 
   ngOnInit(): void {
     const bookingId = Number(this.route.snapshot.paramMap.get('bookingId'));
-    this.paymentService.getPaymentSchedule(bookingId).subscribe({
+    this.paymentService.getPaymentSchedule(bookingId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (schedule) => {
         this.schedule.set(schedule);
         this.loading.set(false);
@@ -160,6 +163,7 @@ export class InstallmentTracker implements OnInit {
     const { operator, phoneNumber } = this.payForm.getRawValue();
     this.paymentService
       .payInstallment(installmentId, { operator: operator!, phoneNumber: `237${phoneNumber}` })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.submitting.set(false);
@@ -170,7 +174,7 @@ export class InstallmentTracker implements OnInit {
             detail: 'Confirmez le paiement sur votre téléphone.',
           });
           const bookingId = Number(this.route.snapshot.paramMap.get('bookingId'));
-          this.paymentService.getPaymentSchedule(bookingId).subscribe({
+          this.paymentService.getPaymentSchedule(bookingId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
             next: (schedule) => this.schedule.set(schedule),
           });
         },
