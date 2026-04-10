@@ -154,12 +154,23 @@
         <p class="pending-desc">
           Vérifiez votre téléphone pour confirmer le paiement Mobile Money.
         </p>
-        <p-button
-          label="Actualiser"
-          icon="pi pi-refresh"
-          severity="secondary"
-          (onClick)="loadSubscription()"
-        />
+        <div class="pending-actions">
+          <p-button
+            label="Actualiser"
+            icon="pi pi-refresh"
+            severity="secondary"
+            (onClick)="loadSubscription()"
+          />
+          <p-button
+            label="Annuler le paiement"
+            icon="pi pi-times"
+            severity="danger"
+            [text]="true"
+            [loading]="cancellingPending()"
+            [disabled]="cancellingPending()"
+            (onClick)="cancelPendingSubscriptionAction()"
+          />
+        </div>
       </div>
 
     } @else if (sub.status === 'EXPIRED' || sub.status === 'CANCELLED') {

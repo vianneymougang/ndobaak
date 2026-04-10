@@ -3,8 +3,10 @@ package com.ndobaak.backend.media.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
@@ -56,6 +58,14 @@ public class StorageService {
         s3Client.putObject(request, RequestBody.fromInputStream(inputStream, contentLength));
 
         return key;
+    }
+
+    public byte[] download(String key) {
+        String resolved = stripToKey(key);
+        return s3Client.getObject(
+                GetObjectRequest.builder().bucket(bucket).key(resolved).build(),
+                ResponseTransformer.toBytes()
+        ).asByteArray();
     }
 
     public void delete(String key) {

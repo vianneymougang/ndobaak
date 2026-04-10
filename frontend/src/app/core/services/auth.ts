@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap, catchError, switchMap } from 'rxjs';
+import { Observable, tap, catchError, switchMap, finalize } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   AuthResponse,
@@ -20,10 +20,12 @@ export class AuthService {
   private apiUrl = environment.apiUrl;
 
   private currentUser = signal<UserProfile | null>(null);
+  private initialized = signal(false);
 
   readonly user = this.currentUser.asReadonly();
   readonly isAuthenticated = computed(() => !!this.currentUser());
   readonly userRole = computed(() => this.currentUser()?.role ?? null);
+  readonly authReady = this.initialized.asReadonly();
 
   registerStudent(request: RegisterStudentRequest): Observable<UserProfile> {
     return this.http
@@ -45,9 +47,13 @@ export class AuthService {
 
   loadCurrentUser(): Observable<UserProfile> {
     return this.http.get<UserProfile>(`${this.apiUrl}/auth/me`, { withCredentials: true }).pipe(
-      tap((user) => this.currentUser.set(user)),
+      tap((user) => {
+        this.currentUser.set(user);
+        this.initialized.set(true);
+      }),
       catchError((err) => {
         this.currentUser.set(null);
+        this.initialized.set(true);
         throw err;
       }),
     );
@@ -66,15 +72,12 @@ export class AuthService {
   }
 
   logout(): void {
-    this.http.post(`${this.apiUrl}/auth/logout`, {}, { withCredentials: true }).subscribe({
-      complete: () => {
+    this.http
+      .post(`${this.apiUrl}/auth/logout`, {}, { withCredentials: true })
+      .pipe(finalize(() => {
         this.currentUser.set(null);
         this.router.navigate(['/']);
-      },
-      error: () => {
-        this.currentUser.set(null);
-        this.router.navigate(['/']);
-      },
-    });
+      }))
+      .subscribe();
   }
 }

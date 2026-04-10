@@ -31,8 +31,6 @@ export class ListingCard {
   });
 
   protected distanceLabel = computed(() => {
-    const fromUser = this.listing().distanceFromUser;
-    if (fromUser != null) return fromUser.toFixed(1) + ' km de vous';
     const d = this.listing().distanceToCampus;
     return d != null ? d.toFixed(1) + " km de l'IUSJC" : '';
   });

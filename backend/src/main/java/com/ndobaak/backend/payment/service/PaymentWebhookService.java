@@ -1,6 +1,8 @@
 package com.ndobaak.backend.payment.service;
 
 import com.ndobaak.backend.booking.entity.Booking;
+import com.ndobaak.backend.booking.repository.BookingRepository;
+import com.ndobaak.backend.common.enums.BookingStatus;
 import com.ndobaak.backend.common.enums.InstallmentStatus;
 import com.ndobaak.backend.common.enums.MobileMoneyOperator;
 import com.ndobaak.backend.common.enums.PaymentMethod;
@@ -42,6 +44,7 @@ public class PaymentWebhookService {
     private final PaymentRepository paymentRepository;
     private final PaymentScheduleRepository scheduleRepository;
     private final InstallmentRepository installmentRepository;
+    private final BookingRepository bookingRepository;
     private final PaymentGatewayRouter gatewayRouter;
     private final PaymentProperties paymentProperties;
     private final SubscriptionService subscriptionService;
@@ -50,6 +53,7 @@ public class PaymentWebhookService {
     public PaymentWebhookService(PaymentRepository paymentRepository,
                                  PaymentScheduleRepository scheduleRepository,
                                  InstallmentRepository installmentRepository,
+                                 BookingRepository bookingRepository,
                                  PaymentGatewayRouter gatewayRouter,
                                  PaymentProperties paymentProperties,
                                  SubscriptionService subscriptionService,
@@ -57,6 +61,7 @@ public class PaymentWebhookService {
         this.paymentRepository = paymentRepository;
         this.scheduleRepository = scheduleRepository;
         this.installmentRepository = installmentRepository;
+        this.bookingRepository = bookingRepository;
         this.gatewayRouter = gatewayRouter;
         this.paymentProperties = paymentProperties;
         this.subscriptionService = subscriptionService;
@@ -94,6 +99,8 @@ public class PaymentWebhookService {
         switch (eventType) {
             case "payment.complete" -> handlePaymentComplete(payment);
             case "payment.failed" -> handlePaymentFailed(payment);
+            case "payment.expired" -> handlePaymentExpired(payment);
+            case "payment.canceled" -> handlePaymentCanceled(payment);
             default -> log.warn("Unhandled webhook event type: {}", eventType);
         }
     }
@@ -112,6 +119,15 @@ public class PaymentWebhookService {
         updateInstallmentStatus(payment);
 
         Booking booking = payment.getBooking();
+
+        if (booking.getStatus() == BookingStatus.LEASE_SIGNED) {
+            booking.setStatus(BookingStatus.PAYMENT_HELD);
+            bookingRepository.save(booking);
+            log.info("Rental cycle payment held: bookingId={}, reference={}", booking.getId(),
+                    payment.getTransactionId());
+            return;
+        }
+
         boolean nextBlockTriggered = scheduleRepository.findByBookingId(booking.getId())
                 .filter(s -> s.getFrequency() == ScheduleFrequency.BLOCK)
                 .map(s -> triggerNextBlock(payment, s))
@@ -192,6 +208,34 @@ public class PaymentWebhookService {
             paymentRepository.save(nextPayment);
         }
         return true;
+    }
+
+    private void handlePaymentExpired(Payment payment) {
+        payment.setStatus(PaymentStatus.FAILED);
+        paymentRepository.save(payment);
+
+        if (payment.getPaymentType() == PaymentType.SUBSCRIPTION || payment.getBooking() == null) {
+            subscriptionService.onSubscriptionPaymentFailed(payment.getId());
+            log.warn("Subscription payment expired: reference={}", payment.getTransactionId());
+            return;
+        }
+
+        notificationService.sendPaymentFailedNotification(payment, payment.getBooking());
+        log.warn("Payment expired: reference={}", payment.getTransactionId());
+    }
+
+    private void handlePaymentCanceled(Payment payment) {
+        payment.setStatus(PaymentStatus.CANCELED);
+        paymentRepository.save(payment);
+
+        if (payment.getPaymentType() == PaymentType.SUBSCRIPTION || payment.getBooking() == null) {
+            subscriptionService.onSubscriptionPaymentFailed(payment.getId());
+            log.warn("Subscription payment canceled: reference={}", payment.getTransactionId());
+            return;
+        }
+
+        notificationService.sendPaymentFailedNotification(payment, payment.getBooking());
+        log.warn("Payment canceled: reference={}", payment.getTransactionId());
     }
 
     private void handlePaymentFailed(Payment payment) {

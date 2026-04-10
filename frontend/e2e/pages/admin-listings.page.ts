@@ -3,26 +3,20 @@ import { type Page, type Locator, expect } from '@playwright/test';
 export class AdminListingsPage {
   readonly page: Page;
   readonly heading: Locator;
-  readonly listingsTable: Locator;
   readonly pendingTab: Locator;
   readonly approveButton: Locator;
   readonly rejectButton: Locator;
   readonly rejectionDialog: Locator;
-  readonly rejectionMotifSelect: Locator;
   readonly confirmRejectButton: Locator;
-  readonly successToast: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.heading = page.getByRole('heading', { name: /annonces/i });
-    this.listingsTable = page.locator('p-table, .p-datatable');
-    this.pendingTab = page.getByRole('tab', { name: /en attente/i });
-    this.approveButton = page.getByRole('button', { name: /approuver|valider/i }).first();
-    this.rejectButton = page.getByRole('button', { name: /rejeter/i }).first();
-    this.rejectionDialog = page.locator('p-dialog, .p-dialog');
-    this.rejectionMotifSelect = page.locator('p-select, p-dropdown').first();
-    this.confirmRejectButton = page.getByRole('button', { name: /confirmer|rejeter/i }).last();
-    this.successToast = page.locator('.p-toast-message-success');
+    this.pendingTab = page.getByRole('button', { name: /en attente/i });
+    this.approveButton = page.locator('button').filter({ hasText: /approuver/i });
+    this.rejectButton = page.locator('button').filter({ hasText: /rejeter/i });
+    this.rejectionDialog = page.locator('.p-dialog').filter({ hasText: /refuser/i });
+    this.confirmRejectButton = page.locator('button').filter({ hasText: /confirmer le refus/i });
   }
 
   async goto() {
@@ -35,7 +29,7 @@ export class AdminListingsPage {
   }
 
   async expectTableVisible() {
-    await expect(this.listingsTable).toBeVisible({ timeout: 10_000 });
+    await expect(this.page.locator('text=Jean-Baptiste Mbarga').first()).toBeVisible({ timeout: 10_000 });
   }
 
   async clickPendingTab() {
@@ -43,21 +37,40 @@ export class AdminListingsPage {
     await this.page.waitForLoadState('networkidle');
   }
 
+  async openFirstListingDrawer() {
+    await this.page.locator('button.p-button-icon-only').first().click();
+    await this.page.waitForTimeout(500);
+  }
+
   async approveFirstListing() {
+    await this.openFirstListingDrawer();
+    await expect(this.approveButton).toBeVisible({ timeout: 5_000 });
     await this.approveButton.click();
-    await this.page.waitForResponse((r) => r.url().includes('/listings/') && r.request().method() === 'POST');
+    await this.page.waitForTimeout(1_000);
+    await this.page.waitForLoadState('networkidle');
   }
 
   async openRejectDialogForFirstListing() {
+    await this.openFirstListingDrawer();
+    await expect(this.rejectButton).toBeVisible({ timeout: 5_000 });
     await this.rejectButton.click();
     await expect(this.rejectionDialog).toBeVisible({ timeout: 5_000 });
   }
 
   async confirmRejection() {
+    // Select first motif option in PrimeNG select
+    await this.page.locator('p-select[formcontrolname="motif"]').click();
+    await this.page.waitForTimeout(300);
+    await this.page.locator('.p-select-option').first().click();
     await this.confirmRejectButton.click();
+    await this.page.waitForTimeout(1_000);
+    await this.page.waitForLoadState('networkidle');
   }
 
   async expectSuccessToast() {
-    await expect(this.successToast).toBeVisible({ timeout: 10_000 });
+    // Drawer stays open after action — badge changes to Publiée or Refusée
+    await expect(
+      this.page.getByText(/publiée|refusée/i).first()
+    ).toBeVisible({ timeout: 10_000 });
   }
 }

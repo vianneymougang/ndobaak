@@ -33,21 +33,37 @@
   max-width: 340px;
 }
 
+.failure-icon--canceled {
+  background: color-mix(in srgb, var(--color-ndb-muted) 12%, transparent);
+
+  i { color: var(--color-ndb-muted); }
+}
+
+.failure-icon--expired {
+  background: color-mix(in srgb, var(--color-ndb-gold) 12%, transparent);
+
+  i { color: var(--color-ndb-gold); }
+}
+
 .failure-tips {
   @apply w-full p-4 rounded-xl text-left;
   background: color-mix(in srgb, var(--color-ndb-gold) 6%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-ndb-gold) 20%, transparent);
 }
 
-.tips-title {
-  @apply text-sm font-semibold m-0 mb-2;
-  font-family: var(--font-urbanist);
-  color: var(--color-ndb-navy);
-}
-
 .tips-list {
-  @apply text-sm m-0 pl-5 flex flex-col gap-1;
+  @apply text-sm m-0 p-0 flex flex-col gap-2;
+  list-style: none;
   color: var(--color-ndb-body);
+
+  li {
+    @apply flex items-start gap-2;
+
+    i {
+      @apply text-xs mt-0.5 shrink-0;
+      color: var(--color-ndb-primary);
+    }
+  }
 }
 
 .failure-actions {

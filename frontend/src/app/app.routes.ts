@@ -154,6 +154,24 @@ export const routes: Routes = [
             (m) => m.NotificationPreferences,
           ),
       },
+      {
+        path: 'documents',
+        title: 'Mes documents',
+        loadComponent: () =>
+          import('./features/rental-cycle/landlord-documents/landlord-documents').then(
+            (m) => m.LandlordDocuments,
+          ),
+      },
+      {
+        path: 'listings/create',
+        title: 'Publier une annonce',
+        loadComponent: () => import('./features/listing/create/create').then((m) => m.Create),
+      },
+      {
+        path: 'listings/:id/edit',
+        title: 'Modifier l\'annonce',
+        loadComponent: () => import('./features/listing/create/create').then((m) => m.Create),
+      },
     ],
   },
   {
@@ -170,12 +188,6 @@ export const routes: Routes = [
         loadComponent: () => import('./features/search/search').then((m) => m.Search),
       },
       {
-        path: 'listings/create',
-        title: 'Publier une annonce',
-        canActivate: [authGuard, roleGuard('LANDLORD')],
-        loadComponent: () => import('./features/listing/create/create').then((m) => m.Create),
-      },
-      {
         path: 'listings/:id',
         loadComponent: () => import('./features/listing/detail/detail').then((m) => m.Detail),
       },
@@ -185,6 +197,24 @@ export const routes: Routes = [
         canActivate: [authGuard, roleGuard('STUDENT')],
         loadComponent: () =>
           import('./features/booking/my-bookings/my-bookings').then((m) => m.MyBookings),
+      },
+      {
+        path: 'bookings/:bookingId/application',
+        title: 'Dossier locataire',
+        canActivate: [authGuard, roleGuard('STUDENT')],
+        loadComponent: () =>
+          import('./features/rental-cycle/tenant-application/tenant-application').then(
+            (m) => m.TenantApplication,
+          ),
+      },
+      {
+        path: 'bookings/:bookingId/lease',
+        title: 'Contrat de bail',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/rental-cycle/lease-viewer/lease-viewer').then(
+            (m) => m.LeaseViewer,
+          ),
       },
       {
         path: 'notifications',

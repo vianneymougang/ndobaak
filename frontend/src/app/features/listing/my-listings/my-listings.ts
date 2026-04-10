@@ -4,12 +4,13 @@ import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TooltipModule } from 'primeng/tooltip';
 import { ListingService } from '../../../core/services/listing';
 import { ListingResponse, ListingStatus } from '../../../core/models/listing.models';
 
 @Component({
   selector: 'app-my-listings',
-  imports: [RouterLink, ButtonModule, TagModule, ProgressSpinnerModule],
+  imports: [RouterLink, ButtonModule, TagModule, ProgressSpinnerModule, TooltipModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './my-listings.html',
   styleUrl: './my-listings.scss',

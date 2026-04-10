@@ -76,19 +76,13 @@ public class GeoService {
         Double longitude = row[8] != null ? ((Number) row[8]).doubleValue() : null;
         boolean verified = row[9] != null && (Boolean) row[9];
 
-        Double distanceFromUser = null;
-        if (latitude != null && longitude != null) {
-            distanceFromUser = GeoUtils.roundDistance(
-                    GeoUtils.haversineDistance(userLat, userLng, latitude, longitude));
-        }
-
         double[] ratingData = ratingsMap.get(id);
         Double avgRating = ratingData != null ? Math.round(ratingData[0] * 10.0) / 10.0 : null;
         Integer reviewCount = ratingData != null ? (int) ratingData[1] : 0;
 
         return new NearbyListingResponse(
                 id, title, thumbnailUrl, monthlyPrice, roomType, neighborhood,
-                distanceToCampus, distanceFromUser, latitude, longitude,
+                distanceToCampus, latitude, longitude,
                 avgRating, reviewCount, verified
         );
     }

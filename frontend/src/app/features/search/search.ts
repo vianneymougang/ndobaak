@@ -263,7 +263,6 @@ export class Search implements OnInit {
       roomType: n.roomType,
       neighborhood: n.neighborhood,
       distanceToCampus: n.distanceToCampus,
-      distanceFromUser: n.distanceFromUser,
       avgRating: n.avgRating,
       reviewCount: n.reviewCount,
       amenities: [],

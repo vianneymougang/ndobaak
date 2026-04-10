@@ -15,6 +15,7 @@ import com.ndobaak.backend.common.exception.ForbiddenException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.payment.dto.InitiatePaymentRequest;
 import com.ndobaak.backend.payment.dto.PayInstallmentRequest;
+import com.ndobaak.backend.payment.dto.PaymentInitiationResponse;
 import com.ndobaak.backend.payment.dto.PaymentResponse;
 import com.ndobaak.backend.payment.entity.Installment;
 import com.ndobaak.backend.payment.entity.Payment;
@@ -140,7 +141,11 @@ public class PaymentInitiationService {
         payment.setProviderReference(result.providerReference());
         paymentRepository.save(payment);
 
-        gateway.triggerCharge(result.providerReference(), gatewayRequest);
+        try {
+            gateway.triggerCharge(result.providerReference(), gatewayRequest);
+        } catch (Exception e) {
+            log.warn("USSD push failed (non-fatal): reference={}, error={}", reference, e.getMessage());
+        }
 
         log.info("Payment initiated: reference={}, provider={}, amount={} XAF, split={}",
                 reference, gateway.getProviderName(), totalCharged, isSplit);
@@ -210,6 +215,66 @@ public class PaymentInitiationService {
         PaymentResponse response = paymentMapper.toResponse(payment);
         response.setAuthorizationUrl(result.authorizationUrl());
         return response;
+    }
+
+    @Transactional
+    public PaymentInitiationResponse initiateBookingPayment(Long bookingId, Long studentId) {
+        Booking booking = findBookingById(bookingId);
+
+        if (!booking.getStudent().getId().equals(studentId)) {
+            throw new ForbiddenException("Vous n'êtes pas autorisé à initier le paiement pour cette réservation.");
+        }
+
+        if (booking.getStatus() != BookingStatus.LEASE_SIGNED) {
+            throw new BusinessException(
+                "Le paiement n'est possible qu'après signature du contrat par les deux parties.");
+        }
+
+        boolean hasActivePayment = paymentRepository.findByBookingId(bookingId).stream()
+                .anyMatch(p -> p.getStatus() == PaymentStatus.PENDING
+                        || p.getStatus() == PaymentStatus.PROCESSING);
+        if (hasActivePayment) {
+            throw new BusinessException("Un paiement est déjà en cours pour cette réservation.");
+        }
+
+        String reference = "NDK-" + bookingId + "-" + System.currentTimeMillis();
+        String payerName = booking.getStudent().getFirstName() + " " + booking.getStudent().getLastName();
+        String description = "Réservation Ndobaâk #" + bookingId;
+
+        Payment payment = Payment.builder()
+                .booking(booking)
+                .amount(booking.getTotalAmount())
+                .commission(BigDecimal.ZERO)
+                .paymentMethod(PaymentMethod.MOBILE_MONEY)
+                .paymentType(PaymentType.INTEGRAL)
+                .transactionId(reference)
+                .status(PaymentStatus.PENDING)
+                .payerName(payerName)
+                .build();
+        payment = paymentRepository.save(payment);
+
+        PaymentGateway gateway = gatewayRouter.resolveGatewayByProvider(
+                paymentProperties.getPrimaryGateway());
+
+        PaymentInitiationResult result = gateway.initiateRedirectPayment(
+                reference,
+                booking.getTotalAmount(),
+                "XAF",
+                payerName,
+                booking.getStudent().getEmail(),
+                description,
+                paymentProperties.getFrontendCallbackUrl()
+        );
+
+        payment.setStatus(PaymentStatus.PROCESSING);
+        payment.setProviderName(gateway.getProviderName());
+        payment.setProviderReference(result.providerReference());
+        paymentRepository.save(payment);
+
+        log.info("Rental cycle payment initiated: bookingId={}, reference={}, provider={}",
+                bookingId, reference, gateway.getProviderName());
+
+        return new PaymentInitiationResponse(result.authorizationUrl(), reference);
     }
 
     private Booking findBookingById(Long bookingId) {

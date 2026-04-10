@@ -2,6 +2,7 @@ package com.ndobaak.backend.payment.service;
 
 import com.ndobaak.backend.payment.dto.InitiatePaymentRequest;
 import com.ndobaak.backend.payment.dto.PayInstallmentRequest;
+import com.ndobaak.backend.payment.dto.PaymentInitiationResponse;
 import com.ndobaak.backend.payment.dto.PaymentResponse;
 import com.ndobaak.backend.payment.dto.PaymentScheduleResponse;
 import com.ndobaak.backend.payment.dto.ReceiptResponse;
@@ -55,5 +56,9 @@ public class PaymentService {
 
     public PaymentScheduleResponse getPaymentSchedule(Long bookingId) {
         return scheduleService.getPaymentSchedule(bookingId);
+    }
+
+    public PaymentInitiationResponse initiateBookingPayment(Long bookingId, Long studentId) {
+        return initiationService.initiateBookingPayment(bookingId, studentId);
     }
 }
