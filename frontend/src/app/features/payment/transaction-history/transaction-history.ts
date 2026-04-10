@@ -52,6 +52,8 @@ export class TransactionHistory {
     PROCESSING: 'En cours',
     COMPLETED: 'Terminé',
     FAILED: 'Échoué',
+    CANCELED: 'Annulé',
+    EXPIRED: 'Expiré',
     REFUNDED: 'Remboursé',
   };
 
@@ -63,6 +65,8 @@ export class TransactionHistory {
     PROCESSING: 'info',
     COMPLETED: 'success',
     FAILED: 'danger',
+    CANCELED: 'secondary',
+    EXPIRED: 'secondary',
     REFUNDED: 'secondary',
   };
 

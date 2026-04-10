@@ -18,7 +18,6 @@ import { DividerModule } from 'primeng/divider';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageModule } from 'primeng/message';
 import { NgmMotionDirective } from '@scripttype/ng-motion';
-import { MessageService } from 'primeng/api';
 import { BookingService } from '../../../core/services/booking';
 import { PaymentService } from '../../../core/services/payment';
 import { BookingResponse } from '../../../core/models/booking.models';
@@ -48,7 +47,6 @@ export class PaymentForm implements OnInit {
   private fb = inject(FormBuilder);
   private bookingService = inject(BookingService);
   private paymentService = inject(PaymentService);
-  private messageService = inject(MessageService);
   private destroyRef = inject(DestroyRef);
 
   protected booking = signal<BookingResponse | null>(null);
@@ -107,11 +105,7 @@ export class PaymentForm implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erreur',
-          detail: 'Impossible de charger les détails de la réservation.',
-        });
+        this.apiError.set('Impossible de charger les détails de la réservation. Veuillez réessayer.');
       },
     });
   }
@@ -141,19 +135,14 @@ export class PaymentForm implements OnInit {
         next: (payment) => {
           this.submitting.set(false);
           this.router.navigate(['/bookings', booking.id, 'pay', 'processing'], {
-            queryParams: { paymentId: payment.id },
+            queryParams: { paymentId: payment.id, operator: operator },
           });
         },
         error: (err) => {
           this.submitting.set(false);
-          const message =
-            err?.error?.message ?? 'Impossible d\'initier le paiement. Veuillez réessayer.';
-          this.apiError.set(message);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erreur de paiement',
-            detail: message,
-          });
+          this.apiError.set(
+            err?.error?.message ?? 'Impossible d\'initier le paiement. Veuillez réessayer.'
+          );
         },
       });
   }
