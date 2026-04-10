@@ -241,7 +241,7 @@ class ListingSearchServiceTest {
     }
 
     @Test
-    void searchWithUserCoordsShouldComputeDistanceFromUser() {
+    void searchShouldReturnDistanceToCampus() {
         Listing listing = buildPublishedListing(1L, "Studio Eyang", new BigDecimal("35000"), RoomType.STUDIO);
         listing.setLocation(Location.builder()
                 .address("Eyang").latitude(3.849).longitude(11.503).distanceToCampus(0.15).build());
@@ -251,23 +251,17 @@ class ListingSearchServiceTest {
                 .thenReturn(Collections.emptyList());
 
         ListingSearchRequest request = new ListingSearchRequest();
-        request.setUserLat(3.850);
-        request.setUserLng(11.504);
         request.setPage(0);
         request.setSize(10);
 
         SearchPageResponse<ListingSearchResponse> result = searchService.search(request);
 
-        assertThat(result.getContent().get(0).getDistanceFromUser()).isNotNull();
-        assertThat(result.getContent().get(0).getDistanceFromUser()).isLessThan(1.0);
         assertThat(result.getContent().get(0).getDistanceToCampus()).isEqualTo(0.15);
     }
 
     @Test
-    void searchWithoutUserCoordsShouldLeaveDistanceFromUserNull() {
+    void searchWithoutLocationShouldLeaveDistanceToCampusNull() {
         Listing listing = buildPublishedListing(1L, "Studio", new BigDecimal("35000"), RoomType.STUDIO);
-        listing.setLocation(Location.builder()
-                .address("Eyang").latitude(3.849).longitude(11.503).distanceToCampus(0.15).build());
 
         when(listingRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(listing)));
         when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
@@ -279,28 +273,25 @@ class ListingSearchServiceTest {
 
         SearchPageResponse<ListingSearchResponse> result = searchService.search(request);
 
-        assertThat(result.getContent().get(0).getDistanceFromUser()).isNull();
-        assertThat(result.getContent().get(0).getDistanceToCampus()).isEqualTo(0.15);
+        assertThat(result.getContent().get(0).getDistanceToCampus()).isNull();
     }
 
     @Test
-    void maxDistanceFilterShouldUseDistanceFromUserWhenCoordsProvided() {
-        Listing nearUser = buildPublishedListing(1L, "Near user", new BigDecimal("35000"), RoomType.STUDIO);
-        nearUser.setLocation(Location.builder()
-                .address("A").latitude(3.849).longitude(11.503).distanceToCampus(5.0).build());
+    void maxDistanceFilterShouldUseDistanceToCampus() {
+        Listing nearCampus = buildPublishedListing(1L, "Near campus", new BigDecimal("35000"), RoomType.STUDIO);
+        nearCampus.setLocation(Location.builder()
+                .address("A").latitude(3.849).longitude(11.503).distanceToCampus(0.8).build());
 
-        Listing farFromUser = buildPublishedListing(2L, "Far from user", new BigDecimal("30000"), RoomType.APARTMENT);
-        farFromUser.setLocation(Location.builder()
-                .address("B").latitude(4.000).longitude(11.600).distanceToCampus(0.5).build());
+        Listing farFromCampus = buildPublishedListing(2L, "Far from campus", new BigDecimal("30000"), RoomType.APARTMENT);
+        farFromCampus.setLocation(Location.builder()
+                .address("B").latitude(4.000).longitude(11.600).distanceToCampus(5.0).build());
 
         when(listingRepository.findAll(any(Specification.class), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of(nearUser, farFromUser)));
+                .thenReturn(new PageImpl<>(List.of(nearCampus, farFromCampus)));
         when(reviewRepository.findAverageRatingsByListingIds(anyList(), any(ReviewStatus.class)))
                 .thenReturn(Collections.emptyList());
 
         ListingSearchRequest request = new ListingSearchRequest();
-        request.setUserLat(3.850);
-        request.setUserLng(11.504);
         request.setMaxDistance(2.0);
         request.setPage(0);
         request.setSize(10);
@@ -308,7 +299,7 @@ class ListingSearchServiceTest {
         SearchPageResponse<ListingSearchResponse> result = searchService.search(request);
 
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0).getTitle()).isEqualTo("Near user");
+        assertThat(result.getContent().get(0).getTitle()).isEqualTo("Near campus");
     }
 
     private Listing buildPublishedListing(Long id, String title, BigDecimal price, RoomType roomType) {

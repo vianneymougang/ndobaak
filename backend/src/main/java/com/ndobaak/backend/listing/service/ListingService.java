@@ -43,7 +43,7 @@ public class ListingService {
     private static final double MAX_CAMPUS_DISTANCE_KM = 10.0;
     private static final String WEBP_CONTENT_TYPE = "image/webp";
     private static final long MAX_UPLOAD_SIZE = 10 * 1024 * 1024;
-    private static final Set<String> ALLOWED_MIME_TYPES = Set.of("image/jpeg", "image/png", "image/webp");
+    private static final Set<String> ALLOWED_MIME_TYPES = Set.of("image/jpeg", "image/jpg", "image/png", "image/webp");
 
     private static final byte[] JPEG_MAGIC = {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF};
     private static final byte[] PNG_MAGIC = {(byte) 0x89, 0x50, 0x4E, 0x47};
