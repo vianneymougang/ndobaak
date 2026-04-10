@@ -162,6 +162,16 @@ export const routes: Routes = [
             (m) => m.LandlordDocuments,
           ),
       },
+      {
+        path: 'listings/create',
+        title: 'Publier une annonce',
+        loadComponent: () => import('./features/listing/create/create').then((m) => m.Create),
+      },
+      {
+        path: 'listings/:id/edit',
+        title: 'Modifier l\'annonce',
+        loadComponent: () => import('./features/listing/create/create').then((m) => m.Create),
+      },
     ],
   },
   {
@@ -176,12 +186,6 @@ export const routes: Routes = [
         path: 'search',
         title: 'Rechercher',
         loadComponent: () => import('./features/search/search').then((m) => m.Search),
-      },
-      {
-        path: 'listings/create',
-        title: 'Publier une annonce',
-        canActivate: [authGuard, roleGuard('LANDLORD')],
-        loadComponent: () => import('./features/listing/create/create').then((m) => m.Create),
       },
       {
         path: 'listings/:id',
