@@ -4,7 +4,7 @@ export type PaymentMethod = 'MOBILE_MONEY' | 'BANK_TRANSFER';
 
 export type PaymentType = 'INTEGRAL' | 'INSTALLMENT';
 
-export type MobileMoneyOperator = 'MTN_MOMO' | 'ORANGE_MONEY';
+export type PaymentChannel = 'MTN_MOMO' | 'ORANGE_MONEY' | 'CARD' | 'USSD' | 'QR_CODE';
 
 export type ScheduleFrequency = 'MONTHLY' | 'QUARTERLY' | 'BLOCK';
 
@@ -12,12 +12,12 @@ export type InstallmentStatus = 'PENDING' | 'PAID' | 'OVERDUE' | 'CANCELLED';
 
 export interface InitiatePaymentRequest {
   bookingId: number;
-  operator: MobileMoneyOperator;
+  operator: PaymentChannel;
   phoneNumber: string;
 }
 
 export interface PayInstallmentRequest {
-  operator: MobileMoneyOperator;
+  operator: PaymentChannel;
   phoneNumber: string;
 }
 
@@ -30,7 +30,7 @@ export interface PaymentResponse {
   status: PaymentStatus;
   paymentType: PaymentType;
   paymentMethod: PaymentMethod;
-  operator: MobileMoneyOperator;
+  operator: PaymentChannel;
   transactionId: string;
   authorizationUrl?: string;
   providerName: string;
@@ -51,7 +51,7 @@ export interface ReceiptResponse {
   commission: number;
   totalCharged: number;
   paymentMethod: PaymentMethod;
-  operator: MobileMoneyOperator;
+  operator: PaymentChannel;
   status: PaymentStatus;
   paymentType: PaymentType;
 }

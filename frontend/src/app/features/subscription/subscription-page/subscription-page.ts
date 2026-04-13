@@ -24,7 +24,7 @@ import { MessageService } from 'primeng/api';
 import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { SubscriptionService } from '../../../core/services/subscription';
 import { Subscription, SubscriptionStatus } from '../../../core/models/subscription.models';
-import { MobileMoneyOperator } from '../../../core/models/payment.models';
+import { PaymentChannel } from '../../../core/models/payment.models';
 
 @Component({
   selector: 'app-subscription-page',
@@ -62,13 +62,13 @@ export class SubscriptionPage implements OnInit, OnDestroy {
   protected isRenewal = signal(false);
   protected dialogVisible = false;
 
-  protected readonly operatorOptions: { label: string; value: MobileMoneyOperator }[] = [
+  protected readonly operatorOptions: { label: string; value: PaymentChannel }[] = [
     { label: 'MTN Mobile Money', value: 'MTN_MOMO' },
     { label: 'Orange Money', value: 'ORANGE_MONEY' },
   ];
 
   protected form = this.fb.nonNullable.group({
-    operator: [null as MobileMoneyOperator | null, Validators.required],
+    operator: [null as PaymentChannel | null, Validators.required],
     phoneNumber: ['', [Validators.required, Validators.pattern(/^6[0-9]{8}$/)]],
   });
 

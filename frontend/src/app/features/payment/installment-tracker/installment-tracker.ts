@@ -25,7 +25,7 @@ import { PaymentService } from '../../../core/services/payment';
 import {
   InstallmentResponse,
   InstallmentStatus,
-  MobileMoneyOperator,
+  PaymentChannel,
   PaymentScheduleResponse,
 } from '../../../core/models/payment.models';
 
@@ -62,13 +62,13 @@ export class InstallmentTracker implements OnInit {
   protected payingInstallmentId = signal<number | null>(null);
   protected submitting = signal(false);
 
-  protected readonly operatorOptions: { label: string; value: MobileMoneyOperator }[] = [
+  protected readonly operatorOptions: { label: string; value: PaymentChannel }[] = [
     { label: 'MTN Mobile Money', value: 'MTN_MOMO' },
     { label: 'Orange Money', value: 'ORANGE_MONEY' },
   ];
 
   protected payForm = this.fb.nonNullable.group({
-    operator: [null as MobileMoneyOperator | null, Validators.required],
+    operator: [null as PaymentChannel | null, Validators.required],
     phoneNumber: ['', [Validators.required, Validators.pattern(/^6[0-9]{8}$/)]],
   });
 
