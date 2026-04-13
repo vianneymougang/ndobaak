@@ -102,7 +102,7 @@ public class PaymentInitiationService {
                 .amount(firstBlockAmount)
                 .commission(commission)
                 .paymentMethod(PaymentMethod.MOBILE_MONEY)
-                .channel(PaymentChannel.valueOf(request.getOperator().name()))
+                .channel(request.getOperator())
                 .paymentType(paymentType)
                 .transactionId(reference)
                 .status(PaymentStatus.PENDING)
@@ -178,7 +178,7 @@ public class PaymentInitiationService {
                 .amount(installment.getAmount())
                 .commission(commission)
                 .paymentMethod(PaymentMethod.MOBILE_MONEY)
-                .channel(PaymentChannel.valueOf(request.getOperator().name()))
+                .channel(request.getOperator())
                 .paymentType(PaymentType.INSTALLMENT)
                 .transactionId(reference)
                 .status(PaymentStatus.PENDING)
@@ -191,7 +191,7 @@ public class PaymentInitiationService {
         installmentRepository.save(installment);
 
         PaymentGateway gateway = gatewayRouter.resolveGateway(request.getOperator());
-        BigDecimal totalCharged = installment.getAmount().add(commission);
+        BigDecimal totalCharged = installment.getAmount();
 
         PaymentGatewayRequest gatewayRequest = new PaymentGatewayRequest(
                 reference,
@@ -241,10 +241,14 @@ public class PaymentInitiationService {
         String payerName = booking.getStudent().getFirstName() + " " + booking.getStudent().getLastName();
         String description = "Réservation Ndobaâk #" + bookingId;
 
+        BigDecimal commission = booking.getTotalAmount()
+                .multiply(paymentProperties.getCommissionRate())
+                .setScale(0, RoundingMode.CEILING);
+
         Payment payment = Payment.builder()
                 .booking(booking)
                 .amount(booking.getTotalAmount())
-                .commission(BigDecimal.ZERO)
+                .commission(commission)
                 .paymentMethod(PaymentMethod.MOBILE_MONEY)
                 .paymentType(PaymentType.INTEGRAL)
                 .transactionId(reference)

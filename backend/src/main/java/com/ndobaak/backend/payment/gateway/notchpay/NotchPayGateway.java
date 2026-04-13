@@ -2,7 +2,7 @@ package com.ndobaak.backend.payment.gateway.notchpay;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
+import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.payment.gateway.PaymentGateway;
 import com.ndobaak.backend.payment.gateway.PaymentGatewayRequest;
 import com.ndobaak.backend.payment.gateway.PaymentInitiationResult;
@@ -64,8 +64,8 @@ public class NotchPayGateway implements PaymentGateway {
     }
 
     @Override
-    public boolean supports(MobileMoneyOperator operator) {
-        return operator == MobileMoneyOperator.MTN_MOMO || operator == MobileMoneyOperator.ORANGE_MONEY;
+    public boolean supports(PaymentChannel channel) {
+        return channel == PaymentChannel.MTN_MOMO || channel == PaymentChannel.ORANGE_MONEY;
     }
 
     @Override
@@ -105,7 +105,7 @@ public class NotchPayGateway implements PaymentGateway {
                 "callback", request.callbackUrl(),
                 "locked_currency", "XAF",
                 "locked_country", "CM",
-                "locked_channel", mapOperatorToChannel(request.operator())
+                "locked_channel", mapChannelToNotchPay(request.operator())
         );
 
         Map<String, Object> response = executePost("/payments", body);
@@ -172,7 +172,7 @@ public class NotchPayGateway implements PaymentGateway {
     public void triggerCharge(String providerReference, PaymentGatewayRequest request) {
         String phone = request.phoneNumber().startsWith("+") ? request.phoneNumber() : "+" + request.phoneNumber();
         Map<String, Object> chargeBody = Map.of(
-                "channel", mapOperatorToChannel(request.operator()),
+                "channel", mapChannelToNotchPay(request.operator()),
                 "data", Map.of("phone", phone)
         );
         executePost("/payments/" + providerReference, chargeBody);
@@ -288,10 +288,13 @@ public class NotchPayGateway implements PaymentGateway {
         }
     }
 
-    private String mapOperatorToChannel(MobileMoneyOperator operator) {
-        return switch (operator) {
+    private String mapChannelToNotchPay(PaymentChannel channel) {
+        return switch (channel) {
             case MTN_MOMO -> "cm.mtn";
             case ORANGE_MONEY -> "cm.orange";
+            case CARD -> "card";
+            case USSD -> "cm.mtn.ussd";
+            case QR_CODE -> "qr";
         };
     }
 

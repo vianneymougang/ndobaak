@@ -70,12 +70,20 @@
     }
 
     <div class="card-actions">
-      @if (canPay()) {
+      @if (canApply()) {
         <p-button
-          label="Payer"
-          icon="pi pi-wallet"
+          label="Constituer mon dossier"
+          icon="pi pi-file-edit"
           size="small"
-          [routerLink]="['/bookings', booking().id, 'pay']"
+          [routerLink]="['/bookings', booking().id, 'application']"
+        />
+      }
+      @if (canViewLease()) {
+        <p-button
+          label="Voir le contrat"
+          icon="pi pi-file-pdf"
+          size="small"
+          [routerLink]="['/bookings', booking().id, 'lease']"
         />
       }
       @if (canConfirmOrReject()) {

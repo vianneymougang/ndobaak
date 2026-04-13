@@ -1,4 +1,4 @@
-import type { MobileMoneyOperator } from './payment.models';
+import type { PaymentChannel } from './payment.models';
 
 export type SubscriptionStatus = 'ACTIVE' | 'EXPIRED' | 'CANCELLED' | 'PENDING_PAYMENT';
 
@@ -15,7 +15,7 @@ export interface Subscription {
 }
 
 export interface SubscribeRequest {
-  operator: MobileMoneyOperator;
+  operator: PaymentChannel;
   phoneNumber: string;
 }
 
