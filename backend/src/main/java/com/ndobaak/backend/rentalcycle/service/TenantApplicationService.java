@@ -5,9 +5,12 @@ import com.ndobaak.backend.booking.repository.BookingRepository;
 import com.ndobaak.backend.common.enums.ApplicationStatus;
 import com.ndobaak.backend.common.enums.BookingStatus;
 import com.ndobaak.backend.common.enums.DocumentStatus;
+import com.ndobaak.backend.common.enums.NotificationType;
 import com.ndobaak.backend.common.enums.TenantDocumentType;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
+import com.ndobaak.backend.common.util.FileValidator;
 import com.ndobaak.backend.media.service.StorageService;
+import com.ndobaak.backend.notification.service.NotificationDispatcher;
 import com.ndobaak.backend.rentalcycle.dto.request.GuarantorRequest;
 import com.ndobaak.backend.rentalcycle.dto.request.TenantApplicationRequest;
 import com.ndobaak.backend.rentalcycle.dto.request.ValidationDecisionRequest;
@@ -25,7 +28,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -36,6 +41,7 @@ public class TenantApplicationService {
     private final TenantDocumentRepository documentRepository;
     private final BookingRepository bookingRepository;
     private final StorageService storageService;
+    private final NotificationDispatcher notificationDispatcher;
     private final RentalCycleMapper mapper;
 
     public TenantApplicationResponse getApplication(Long bookingId, Long userId) {
@@ -106,6 +112,7 @@ public class TenantApplicationService {
         String contentType = file.getContentType() != null ? file.getContentType() : "application/octet-stream";
 
         try {
+            FileValidator.validateDocumentFile(file);
             String storageKey = storageService.upload(
                     "tenant-documents",
                     originalFilename,
@@ -122,7 +129,7 @@ public class TenantApplicationService {
 
             document = documentRepository.save(document);
             return mapper.toResponse(document);
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException("Erreur lors de l'upload du document", e);
         }
     }
@@ -189,6 +196,35 @@ public class TenantApplicationService {
 
         applicationRepository.save(application);
         bookingRepository.save(booking);
+
+        Long studentId = booking.getStudent().getId();
+        NotificationType notificationType = decision.status() == DocumentStatus.APPROVED
+                ? NotificationType.APPLICATION_APPROVED
+                : NotificationType.APPLICATION_REJECTED;
+
+        String title = decision.status() == DocumentStatus.APPROVED
+                ? "Dossier locataire approuvé"
+                : "Dossier locataire refusé";
+
+        String body = decision.status() == DocumentStatus.APPROVED
+                ? "Votre dossier de location pour \"" + booking.getListing().getTitle() + "\" a été approuvé. Le contrat de bail va être généré."
+                : "Votre dossier de location pour \"" + booking.getListing().getTitle() + "\" a été refusé." +
+                  (decision.comment() != null && !decision.comment().isBlank()
+                          ? " Motif : " + decision.comment() : "");
+
+        notificationDispatcher.dispatch(
+                studentId,
+                notificationType,
+                title,
+                body,
+                booking.getId(),
+                "BOOKING",
+                Map.<String, Object>of(
+                        "bookingId", booking.getId().toString(),
+                        "listingTitle", booking.getListing().getTitle()
+                ),
+                Map.of()
+        );
 
         return mapper.toResponse(application);
     }
