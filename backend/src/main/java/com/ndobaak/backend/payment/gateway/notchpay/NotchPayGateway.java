@@ -288,6 +288,66 @@ public class NotchPayGateway implements PaymentGateway {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public TransferResponse initiateTransfer(TransferRequest request) {
+        log.info("Initiating NotchPay transfer: recipient={}, amount={} {}",
+                request.recipientPhone(), request.amount(), request.currency());
+
+        Map<String, Object> body = Map.of(
+                "amount", request.amount().intValue(),
+                "currency", request.currency(),
+                "recipient", Map.of(
+                        "name", request.recipientName(),
+                        "phone", request.recipientPhone()
+                ),
+                "description", request.description()
+        );
+
+        if (properties.getPrivateKey() == null || properties.getPrivateKey().isBlank()) {
+            throw new RuntimeException("NotchPay private key non configurée — virement impossible.");
+        }
+
+        try {
+            HttpClient httpClient = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(10))
+                    .build();
+            JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
+            requestFactory.setReadTimeout(Duration.ofSeconds(30));
+
+            RestClient transferClient = RestClient.builder()
+                    .baseUrl(properties.getBaseUrl())
+                    .requestFactory(requestFactory)
+                    .defaultHeader("Authorization", properties.getPublicKey())
+                    .defaultHeader("X-Grant", properties.getPrivateKey())
+                    .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                    .build();
+
+            Map<String, Object> response = transferClient.post()
+                    .uri("/transfers")
+                    .body(body)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                        log.error("NotchPay transfer 4xx: status={}", res.getStatusCode());
+                        throw new RuntimeException("NotchPay transfer client error: " + res.getStatusCode());
+                    })
+                    .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                        log.error("NotchPay transfer 5xx: status={}", res.getStatusCode());
+                        throw new RuntimeException("NotchPay transfer server error: " + res.getStatusCode());
+                    })
+                    .body(Map.class);
+
+            Map<String, Object> transfer = (Map<String, Object>) response.get("transfer");
+            String reference = transfer != null ? (String) transfer.get("reference") : null;
+            String status = transfer != null ? (String) transfer.get("status") : "pending";
+
+            log.info("NotchPay transfer initiated: reference={}, status={}", reference, status);
+            return new TransferResponse(reference, status, true);
+        } catch (RestClientResponseException e) {
+            log.error("NotchPay transfer failed: status={}, body={}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Erreur lors du virement NotchPay: " + e.getResponseBodyAsString(), e);
+        }
+    }
+
     private String mapChannelToNotchPay(PaymentChannel channel) {
         return switch (channel) {
             case MTN_MOMO -> "cm.mtn";

@@ -90,6 +90,78 @@ export interface LeaseContractResponse {
   createdAt: string;
 }
 
+export type InspectionType = 'MOVE_IN' | 'MOVE_OUT';
+export type InspectionStatus = 'IN_PROGRESS' | 'COMPLETED' | 'LANDLORD_SIGNED' | 'FULLY_SIGNED';
+export type ElementCondition = 'GOOD' | 'NORMAL_WEAR' | 'DAMAGED' | 'MISSING';
+
+export interface InspectionRequest {
+  type: InspectionType;
+  conductedAt: string;
+  observations?: string;
+}
+
+export interface InspectionItemRequest {
+  location: string;
+  element: string;
+  condition: ElementCondition;
+  observations?: string;
+}
+
+export interface KeyHandoverRequest {
+  handoverDate: string;
+  observations?: string;
+}
+
+export interface InspectionItemResponse {
+  id: number;
+  location: string;
+  element: string;
+  condition: ElementCondition;
+  observations?: string;
+  createdAt: string;
+}
+
+export interface InspectionPhotoResponse {
+  id: number;
+  inspectionId: number;
+  itemId?: number;
+  storageUrl: string;
+  caption?: string;
+  createdAt: string;
+}
+
+export interface PropertyInspectionResponse {
+  id: number;
+  bookingId: number;
+  type: InspectionType;
+  conductedAt: string;
+  agentId: number;
+  status: InspectionStatus;
+  landlordSigned: boolean;
+  tenantSigned: boolean;
+  landlordSignedAt?: string;
+  tenantSignedAt?: string;
+  observations?: string;
+  items: InspectionItemResponse[];
+  photos: InspectionPhotoResponse[];
+  createdAt: string;
+}
+
+export interface KeyHandoverResponse {
+  id: number;
+  bookingId: number;
+  moveInInspectionId: number;
+  handoverDate: string;
+  landlordConfirmed: boolean;
+  tenantConfirmed: boolean;
+  landlordConfirmedAt?: string;
+  tenantConfirmedAt?: string;
+  transferInitiated: boolean;
+  transferDate?: string;
+  observations?: string;
+  createdAt: string;
+}
+
 export interface GenerateLeaseRequest {
   startDate: string;
   endDate: string;
@@ -210,6 +282,79 @@ export class RentalCycleService {
   initiatePayment(bookingId: number): Observable<{ authorizationUrl: string; reference: string }> {
     return this.http.post<{ authorizationUrl: string; reference: string }>(
       `${this.apiUrl}/bookings/${bookingId}/payment/initiate`,
+      {},
+    );
+  }
+
+  // ========== Property Inspection ==========
+  getInspections(bookingId: number): Observable<PropertyInspectionResponse[]> {
+    return this.http.get<PropertyInspectionResponse[]>(
+      `${this.apiUrl}/bookings/${bookingId}/inspection`,
+    );
+  }
+
+  getInspection(bookingId: number, inspId: number): Observable<PropertyInspectionResponse> {
+    return this.http.get<PropertyInspectionResponse>(
+      `${this.apiUrl}/bookings/${bookingId}/inspection/${inspId}`,
+    );
+  }
+
+  createInspection(bookingId: number, request: InspectionRequest): Observable<PropertyInspectionResponse> {
+    return this.http.post<PropertyInspectionResponse>(
+      `${this.apiUrl}/bookings/${bookingId}/inspection`,
+      request,
+    );
+  }
+
+  addInspectionItem(
+    bookingId: number,
+    inspId: number,
+    request: InspectionItemRequest,
+  ): Observable<InspectionItemResponse> {
+    return this.http.post<InspectionItemResponse>(
+      `${this.apiUrl}/bookings/${bookingId}/inspection/${inspId}/items`,
+      request,
+    );
+  }
+
+  uploadInspectionPhoto(
+    bookingId: number,
+    inspId: number,
+    file: File,
+    itemId?: number,
+  ): Observable<InspectionPhotoResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const url = itemId
+      ? `${this.apiUrl}/bookings/${bookingId}/inspection/${inspId}/photos?itemId=${itemId}`
+      : `${this.apiUrl}/bookings/${bookingId}/inspection/${inspId}/photos`;
+    return this.http.post<InspectionPhotoResponse>(url, formData);
+  }
+
+  signInspection(bookingId: number, inspId: number): Observable<PropertyInspectionResponse> {
+    return this.http.post<PropertyInspectionResponse>(
+      `${this.apiUrl}/bookings/${bookingId}/inspection/${inspId}/sign`,
+      {},
+    );
+  }
+
+  // ========== Key Handover ==========
+  getKeyHandover(bookingId: number): Observable<KeyHandoverResponse> {
+    return this.http.get<KeyHandoverResponse>(
+      `${this.apiUrl}/bookings/${bookingId}/key-handover`,
+    );
+  }
+
+  createKeyHandover(bookingId: number, request: KeyHandoverRequest): Observable<KeyHandoverResponse> {
+    return this.http.post<KeyHandoverResponse>(
+      `${this.apiUrl}/bookings/${bookingId}/key-handover`,
+      request,
+    );
+  }
+
+  confirmKeyHandover(bookingId: number): Observable<KeyHandoverResponse> {
+    return this.http.post<KeyHandoverResponse>(
+      `${this.apiUrl}/bookings/${bookingId}/key-handover/confirm`,
       {},
     );
   }
