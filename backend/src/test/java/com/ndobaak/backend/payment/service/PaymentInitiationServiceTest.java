@@ -5,7 +5,7 @@ import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.booking.entity.Booking;
 import com.ndobaak.backend.booking.repository.BookingRepository;
 import com.ndobaak.backend.common.enums.BookingStatus;
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
+import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.common.enums.InstallmentStatus;
 import com.ndobaak.backend.common.enums.PaymentStatus;
 import com.ndobaak.backend.common.enums.PaymentType;
@@ -119,7 +119,7 @@ class PaymentInitiationServiceTest {
 
         InitiatePaymentRequest request = new InitiatePaymentRequest();
         request.setBookingId(1L);
-        request.setOperator(MobileMoneyOperator.MTN_MOMO);
+        request.setOperator(PaymentChannel.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
 
         PaymentResponse response = service.initiatePayment(request);
@@ -156,7 +156,7 @@ class PaymentInitiationServiceTest {
 
         InitiatePaymentRequest request = new InitiatePaymentRequest();
         request.setBookingId(1L);
-        request.setOperator(MobileMoneyOperator.ORANGE_MONEY);
+        request.setOperator(PaymentChannel.ORANGE_MONEY);
         request.setPhoneNumber("+237690000000");
 
         service.initiatePayment(request);
@@ -260,7 +260,7 @@ class PaymentInitiationServiceTest {
         when(paymentMapper.toResponse(any())).thenReturn(dummyResponse);
 
         PayInstallmentRequest request = new PayInstallmentRequest();
-        request.setOperator(MobileMoneyOperator.MTN_MOMO);
+        request.setOperator(PaymentChannel.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
 
         service.payInstallment(1L, request);
@@ -281,7 +281,7 @@ class PaymentInitiationServiceTest {
         when(installmentRepository.findById(1L)).thenReturn(Optional.of(installment));
 
         PayInstallmentRequest request = new PayInstallmentRequest();
-        request.setOperator(MobileMoneyOperator.MTN_MOMO);
+        request.setOperator(PaymentChannel.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
 
         assertThatThrownBy(() -> service.payInstallment(1L, request))
