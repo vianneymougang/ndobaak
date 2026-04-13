@@ -10,207 +10,330 @@
             font-family: 'DejaVuSans';
             src: url('classpath:/fonts/DejaVuSans.ttf');
         }
+        * {
+            box-sizing: border-box;
+        }
         body {
             font-family: 'DejaVuSans', Arial, sans-serif;
-            font-size: 11pt;
-            color: #1a1a1a;
+            font-size: 10.5pt;
+            color: #1a1a2e;
             margin: 0;
             padding: 0;
+            line-height: 1.5;
         }
         .page {
-            margin: 2cm 2.5cm;
+            margin: 1.8cm 2.2cm;
         }
+
+        /* ── Header ── */
         .header {
-            text-align: center;
-            border-bottom: 2px solid #2c3e50;
-            padding-bottom: 16px;
-            margin-bottom: 24px;
+            border-bottom: 3px solid #1a1a2e;
+            padding-bottom: 14px;
+            margin-bottom: 20px;
         }
-        .header h1 {
-            font-size: 18pt;
-            color: #2c3e50;
-            margin: 0 0 6px 0;
+        .header-top {
+            width: 100%;
+        }
+        .header-top td {
+            vertical-align: middle;
+        }
+        .header-logo-cell {
+            width: 60%;
+        }
+        .header-meta-cell {
+            width: 40%;
+            text-align: right;
+        }
+        .header-title {
+            font-size: 20pt;
+            font-weight: bold;
+            color: #1a1a2e;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            margin: 0 0 2px 0;
         }
-        .header .subtitle {
-            font-size: 10pt;
-            color: #666;
+        .header-subtitle {
+            font-size: 9pt;
+            color: #6c6c8a;
             margin: 0;
         }
-        .ref-block {
-            background-color: #f4f6f9;
-            border-left: 4px solid #3498db;
-            padding: 10px 14px;
-            margin-bottom: 20px;
-            font-size: 10pt;
+        .header-ref {
+            font-size: 9pt;
+            color: #555;
+            margin-bottom: 3px;
         }
-        .ref-block .ref-label {
-            font-weight: bold;
-            color: #2c3e50;
+        .header-ref strong {
+            color: #1a1a2e;
         }
+
+        /* ── Legal notice ── */
+        .legal-notice {
+            background-color: #f0f4ff;
+            border-left: 4px solid #4a69bd;
+            padding: 9px 14px;
+            margin-bottom: 18px;
+            font-size: 9.5pt;
+            color: #333;
+            font-style: italic;
+        }
+
+        /* ── Section titles ── */
         .section-title {
-            font-size: 12pt;
+            font-size: 10pt;
             font-weight: bold;
-            color: #2c3e50;
-            border-bottom: 1px solid #bdc3c7;
-            padding-bottom: 4px;
-            margin-top: 20px;
+            color: #fff;
+            background-color: #1a1a2e;
+            padding: 5px 10px;
+            margin-top: 18px;
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
+        /* ── Two-column layout ── */
         .two-col {
             width: 100%;
+            border-collapse: collapse;
         }
         .two-col td {
             vertical-align: top;
-            padding: 0 8px 0 0;
             width: 50%;
+            padding: 0 10px 0 0;
+        }
+        .two-col td:last-child {
+            padding-right: 0;
+            padding-left: 10px;
+            border-left: 1px solid #e0e0e0;
+        }
+
+        /* ── Party box ── */
+        .party-box {
+            background-color: #fafafa;
+            border: 1px solid #e4e4e4;
+            padding: 10px 12px;
+        }
+        .party-role {
+            font-size: 9pt;
+            font-weight: bold;
+            color: #4a69bd;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #e4e4e4;
+            padding-bottom: 4px;
         }
         .info-row {
-            margin-bottom: 6px;
-            font-size: 10.5pt;
+            margin-bottom: 4px;
+            font-size: 10pt;
         }
         .info-label {
             font-weight: bold;
             color: #555;
         }
+
+        /* ── Financial table ── */
         .amounts-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 8px;
         }
         .amounts-table th {
-            background-color: #2c3e50;
+            background-color: #1a1a2e;
             color: #fff;
-            padding: 7px 10px;
+            padding: 7px 12px;
             text-align: left;
-            font-size: 10pt;
+            font-size: 9.5pt;
         }
         .amounts-table td {
-            padding: 7px 10px;
+            padding: 7px 12px;
             border-bottom: 1px solid #ecf0f1;
-            font-size: 10.5pt;
+            font-size: 10pt;
         }
         .amounts-table tr:nth-child(even) td {
-            background-color: #f9f9f9;
+            background-color: #f7f8fc;
         }
         .amounts-table .amount-value {
             font-weight: bold;
             text-align: right;
         }
+        .amounts-table .total-row td {
+            background-color: #eef2ff;
+            font-weight: bold;
+            border-top: 2px solid #4a69bd;
+        }
+        .amounts-table .total-row .amount-value {
+            color: #1a1a2e;
+            font-size: 11pt;
+        }
+
+        /* ── Clause block ── */
         .clause-block {
             background-color: #fafafa;
             border: 1px solid #e0e0e0;
             padding: 10px 14px;
             font-size: 10pt;
-            margin-top: 6px;
         }
-        .signatures-block {
-            margin-top: 30px;
+        .clause-empty {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* ── Obligations ── */
+        .obligation-item {
+            margin-bottom: 8px;
+            font-size: 10pt;
+        }
+
+        /* ── Signatures ── */
+        .signatures-table {
             width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
         }
-        .signatures-block td {
+        .signatures-table td {
             width: 50%;
             vertical-align: top;
-            padding: 0 12px;
+            padding: 0 10px 0 0;
+        }
+        .signatures-table td:last-child {
+            padding-right: 0;
+            padding-left: 10px;
         }
         .signature-box {
-            border: 1px solid #bdc3c7;
+            border: 1px solid #c0c0d0;
             padding: 14px;
-            min-height: 80px;
+            min-height: 90px;
         }
-        .signature-title {
+        .signature-role {
+            font-size: 9pt;
             font-weight: bold;
-            font-size: 11pt;
-            color: #2c3e50;
+            color: #4a69bd;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             margin-bottom: 4px;
         }
         .signature-name {
             font-size: 10pt;
-            color: #555;
+            color: #333;
+            margin-bottom: 6px;
+        }
+        .signature-contact {
+            font-size: 9pt;
+            color: #777;
             margin-bottom: 30px;
         }
         .signature-line {
-            border-top: 1px solid #aaa;
-            margin-top: 20px;
+            border-top: 1px solid #bbb;
+            margin-top: 10px;
             padding-top: 4px;
-            font-size: 9pt;
-            color: #888;
-        }
-        .footer {
-            margin-top: 30px;
-            border-top: 1px solid #bdc3c7;
-            padding-top: 10px;
-            text-align: center;
             font-size: 8.5pt;
-            color: #888;
+            color: #999;
         }
-        .notice-box {
-            background-color: #eaf4fb;
-            border: 1px solid #aed6f1;
-            padding: 10px 14px;
+
+        /* ── Guarantor absent ── */
+        .guarantor-absent {
+            color: #999;
+            font-style: italic;
             font-size: 10pt;
-            margin: 12px 0;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            margin-top: 24px;
+            border-top: 1px solid #c0c0d0;
+            padding-top: 8px;
+            text-align: center;
+            font-size: 8pt;
+            color: #999;
+        }
+        .footer p {
+            margin: 2px 0;
         }
     </style>
 </head>
 <body>
 <div class="page">
 
+    <!-- ══ HEADER ══ -->
     <div class="header">
-        <h1>Contrat de Bail</h1>
-        <p class="subtitle">Établi par <span th:text="${contract.agencyName}">TANK'IMMO SAS</span> — Agence immobilière agréée</p>
+        <table class="header-top">
+            <tbody>
+                <tr>
+                    <td class="header-logo-cell">
+                        <div class="header-title">Contrat de Bail</div>
+                        <p class="header-subtitle">
+                            Établi par <span th:text="${contract.agencyName}">TANK'IMMO SAS</span> — Agence immobilière agréée
+                        </p>
+                    </td>
+                    <td class="header-meta-cell">
+                        <div class="header-ref">
+                            <strong>Référence :</strong>
+                            <span th:text="${contract.bookingReference}">NDK-000</span>
+                        </div>
+                        <div class="header-ref">
+                            <strong>Date :</strong>
+                            <span th:text="${contract.generationDate}">01/01/2026</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <div class="ref-block">
-        <span class="ref-label">Référence :</span> <span th:text="${contract.bookingReference}">NDK-000</span>
-        &#160;&#160;|&#160;&#160;
-        <span class="ref-label">Date de génération :</span> <span th:text="${contract.generationDate}">01/01/2026</span>
+    <!-- ══ NOTICE ══ -->
+    <div class="legal-notice">
+        Ce contrat de bail est établi conformément à la législation camerounaise applicable à la location immobilière.
+        Il engage définitivement les deux parties à compter de sa double signature et constitue un titre d'occupation légale du logement.
     </div>
 
-    <div class="notice-box">
-        Ce contrat de bail est établi en vertu de la législation camerounaise applicable à la location immobilière.
-        Il engage les deux parties dès sa signature et vaut preuve d'occupation légale du logement.
-    </div>
-
-    <!-- Parties -->
+    <!-- ══ ARTICLE 1 — PARTIES ══ -->
     <div class="section-title">Article 1 — Parties au contrat</div>
     <table class="two-col">
         <tbody>
             <tr>
                 <td>
-                    <div class="info-row"><span class="info-label">Bailleur (Propriétaire)</span></div>
-                    <div class="info-row">
-                        <span class="info-label">Nom :</span>
-                        <span th:text="${contract.landlordLastName + ' ' + contract.landlordFirstName}">NOM Prénom</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">N° CNI :</span>
-                        <span th:text="${contract.landlordIdCardNumber}">000000000</span>
+                    <div class="party-box">
+                        <div class="party-role">Bailleur (Propriétaire)</div>
+                        <div class="info-row">
+                            <span class="info-label">Nom et prénom :</span>
+                            <span th:text="${contract.landlordLastName + ' ' + contract.landlordFirstName}">NOM Prénom</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">N° CNI :</span>
+                            <span th:text="${contract.landlordIdCardNumber != null and !contract.landlordIdCardNumber.isEmpty() ? contract.landlordIdCardNumber : '—'}">—</span>
+                        </div>
+                        <div th:if="${contract.landlordPhone != null and !contract.landlordPhone.isEmpty()}" class="info-row">
+                            <span class="info-label">Téléphone :</span>
+                            <span th:text="${contract.landlordPhone}">—</span>
+                        </div>
                     </div>
                 </td>
                 <td>
-                    <div class="info-row"><span class="info-label">Preneur (Locataire)</span></div>
-                    <div class="info-row">
-                        <span class="info-label">Nom :</span>
-                        <span th:text="${contract.tenantLastName + ' ' + contract.tenantFirstName}">NOM Prénom</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Matricule :</span>
-                        <span th:text="${contract.tenantMatricule}">—</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Filière :</span>
-                        <span th:text="${contract.tenantFieldOfStudy}">—</span>
+                    <div class="party-box">
+                        <div class="party-role">Preneur (Locataire)</div>
+                        <div class="info-row">
+                            <span class="info-label">Nom et prénom :</span>
+                            <span th:text="${contract.tenantLastName + ' ' + contract.tenantFirstName}">NOM Prénom</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Matricule :</span>
+                            <span th:text="${contract.tenantMatricule != null and !contract.tenantMatricule.isEmpty() ? contract.tenantMatricule : '—'}">—</span>
+                        </div>
+                        <div th:if="${contract.tenantFieldOfStudy != null and !contract.tenantFieldOfStudy.isEmpty()}" class="info-row">
+                            <span class="info-label">Filière :</span>
+                            <span th:text="${contract.tenantFieldOfStudy}">—</span>
+                        </div>
+                        <div th:if="${contract.tenantPhone != null and !contract.tenantPhone.isEmpty()}" class="info-row">
+                            <span class="info-label">Téléphone :</span>
+                            <span th:text="${contract.tenantPhone}">—</span>
+                        </div>
                     </div>
                 </td>
             </tr>
         </tbody>
     </table>
 
-    <!-- Garant -->
+    <!-- ══ ARTICLE 2 — GARANT ══ -->
     <div class="section-title">Article 2 — Garant</div>
     <div th:if="${contract.guarantorLastName != null and !contract.guarantorLastName.isEmpty()}">
         <table class="two-col">
@@ -218,22 +341,22 @@
                 <tr>
                     <td>
                         <div class="info-row">
-                            <span class="info-label">Nom :</span>
+                            <span class="info-label">Nom et prénom :</span>
                             <span th:text="${contract.guarantorLastName + ' ' + contract.guarantorFirstName}">NOM Prénom</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">N° CNI :</span>
-                            <span th:text="${contract.guarantorIdCard}">—</span>
+                            <span th:text="${contract.guarantorIdCard != null and !contract.guarantorIdCard.isEmpty() ? contract.guarantorIdCard : '—'}">—</span>
                         </div>
                     </td>
                     <td>
                         <div class="info-row">
                             <span class="info-label">Téléphone :</span>
-                            <span th:text="${contract.guarantorPhone}">—</span>
+                            <span th:text="${contract.guarantorPhone != null and !contract.guarantorPhone.isEmpty() ? contract.guarantorPhone : '—'}">—</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Lien avec le locataire :</span>
-                            <span th:text="${contract.guarantorRelationship}">—</span>
+                            <span th:text="${contract.guarantorRelationship != null and !contract.guarantorRelationship.isEmpty() ? contract.guarantorRelationship : '—'}">—</span>
                         </div>
                     </td>
                 </tr>
@@ -241,28 +364,26 @@
         </table>
     </div>
     <div th:if="${contract.guarantorLastName == null or contract.guarantorLastName.isEmpty()}">
-        <div class="info-row" style="color: #888; font-style: italic;">Aucun garant renseigné.</div>
+        <p class="guarantor-absent">Aucun garant renseigné pour ce contrat.</p>
     </div>
 
-    <!-- Bien loué -->
+    <!-- ══ ARTICLE 3 — BIEN LOUÉ ══ -->
     <div class="section-title">Article 3 — Désignation du bien</div>
     <div class="info-row">
         <span class="info-label">Adresse :</span>
-        <span th:text="${contract.propertyAddress}">Adresse du bien</span>,
-        <span th:text="${contract.propertyCity}">Yaoundé</span>
+        <span th:text="${contract.propertyAddress}">Adresse du bien</span>
+        <span th:if="${contract.propertyCity != null and !contract.propertyCity.isEmpty()}">, <span th:text="${contract.propertyCity}">Yaoundé</span></span>
     </div>
-    <div class="info-row">
+    <div th:if="${contract.propertyDescription != null and !contract.propertyDescription.isEmpty()}" class="info-row">
         <span class="info-label">Description :</span>
         <span th:text="${contract.propertyDescription}">—</span>
     </div>
-    <div th:if="${contract.amenities != null and !contract.amenities.isEmpty()}">
-        <div class="info-row">
-            <span class="info-label">Équipements :</span>
-            <span th:text="${contract.amenities}">—</span>
-        </div>
+    <div th:if="${contract.amenities != null and !contract.amenities.isEmpty()}" class="info-row">
+        <span class="info-label">Équipements :</span>
+        <span th:text="${contract.amenities}">—</span>
     </div>
 
-    <!-- Durée -->
+    <!-- ══ ARTICLE 4 — DURÉE ══ -->
     <div class="section-title">Article 4 — Durée du bail</div>
     <table class="two-col">
         <tbody>
@@ -283,7 +404,7 @@
         </tbody>
     </table>
 
-    <!-- Conditions financières -->
+    <!-- ══ ARTICLE 5 — CONDITIONS FINANCIÈRES ══ -->
     <div class="section-title">Article 5 — Conditions financières</div>
     <table class="amounts-table">
         <thead>
@@ -298,66 +419,88 @@
                 <td class="amount-value" th:text="${contract.formattedMonthlyRent}">0</td>
             </tr>
             <tr>
-                <td>Caution (dépôt de garantie)</td>
+                <td>Caution — dépôt de garantie</td>
                 <td class="amount-value" th:text="${contract.formattedSecurityDeposit}">0</td>
             </tr>
             <tr>
-                <td>Honoraires d'agence (TANK'IMMO SAS)</td>
+                <td>Honoraires d'agence (<span th:text="${contract.agencyName}">TANK'IMMO SAS</span>)</td>
                 <td class="amount-value" th:text="${contract.formattedAgencyFee}">0</td>
+            </tr>
+            <tr class="total-row">
+                <td>Total dû à l'entrée dans les lieux</td>
+                <td class="amount-value" th:text="${contract.formattedTotalDue}">0</td>
             </tr>
         </tbody>
     </table>
 
-    <!-- Clauses particulières -->
-    <div class="section-title">Article 6 — Clauses particulières</div>
+    <!-- ══ ARTICLE 6 — MODALITÉS DE PAIEMENT ══ -->
+    <div class="section-title">Article 6 — Modalités de paiement</div>
+    <div class="info-row">
+        Le loyer mensuel est dû en totalité le <strong>1er de chaque mois</strong>, payable via Mobile Money (Orange Money ou MTN Mobile Money)
+        ou tout autre moyen convenu entre les parties. Le paiement est sécurisé par la plateforme Ndobaâk.
+        Tout retard de paiement supérieur à <strong>7 jours calendaires</strong> constitue un manquement aux obligations locataires.
+    </div>
+
+    <!-- ══ ARTICLE 7 — CLAUSES PARTICULIÈRES ══ -->
+    <div class="section-title">Article 7 — Clauses particulières</div>
     <div th:if="${contract.specialClauses != null and !contract.specialClauses.isEmpty()}">
         <div class="clause-block" th:text="${contract.specialClauses}">Clauses particulières</div>
     </div>
     <div th:if="${contract.specialClauses == null or contract.specialClauses.isEmpty()}">
-        <div class="clause-block" style="color: #888; font-style: italic;">
-            Néant — aucune clause particulière n'a été ajoutée à ce contrat.
-        </div>
+        <div class="clause-block clause-empty">Néant — aucune clause particulière n'a été ajoutée à ce contrat.</div>
     </div>
 
-    <!-- Obligations -->
-    <div class="section-title">Article 7 — Obligations des parties</div>
+    <!-- ══ ARTICLE 8 — OBLIGATIONS ══ -->
+    <div class="section-title">Article 8 — Obligations des parties</div>
+    <div class="obligation-item">
+        <span class="info-label">Le bailleur s'engage à :</span>
+        maintenir le logement en bon état d'habitabilité, garantir la jouissance paisible des lieux,
+        effectuer les réparations non imputables au locataire, et respecter la vie privée du preneur.
+    </div>
+    <div class="obligation-item">
+        <span class="info-label">Le locataire s'engage à :</span>
+        payer le loyer aux dates convenues, user des lieux en bon père de famille, ne pas sous-louer
+        sans accord écrit du bailleur, et restituer le bien en bon état à l'échéance du bail.
+    </div>
+
+    <!-- ══ ARTICLE 9 — RÉSILIATION ══ -->
+    <div class="section-title">Article 9 — Résiliation</div>
     <div class="info-row">
-        <span class="info-label">Le bailleur s'engage à :</span> maintenir le logement en bon état d'habitabilité,
-        garantir la jouissance paisible du bien, et effectuer les réparations locatives non imputables au locataire.
-    </div>
-    <div class="info-row" style="margin-top: 6px;">
-        <span class="info-label">Le locataire s'engage à :</span> payer le loyer aux dates convenues,
-        utiliser les lieux en bon père de famille, et restituer le bien en bon état à l'échéance du bail.
+        Chaque partie peut résilier le présent contrat en adressant un préavis écrit d'au moins <strong>un (1) mois</strong>
+        avant la date de prise d'effet souhaitée. En cas de manquement grave à ses obligations par l'une des parties,
+        l'autre partie peut demander la résiliation immédiate avec recours aux voies légales prévues par la législation camerounaise.
     </div>
 
-    <!-- Signatures -->
-    <div class="section-title">Article 8 — Signatures</div>
-    <table class="signatures-block">
+    <!-- ══ ARTICLE 10 — SIGNATURES ══ -->
+    <div class="section-title">Article 10 — Signatures</div>
+    <table class="signatures-table">
         <tbody>
             <tr>
                 <td>
                     <div class="signature-box">
-                        <div class="signature-title">Le Bailleur</div>
+                        <div class="signature-role">Le Bailleur</div>
                         <div class="signature-name" th:text="${contract.landlordLastName + ' ' + contract.landlordFirstName}">NOM Prénom</div>
-                        <div class="signature-line">Signature et date</div>
+                        <div th:if="${contract.landlordPhone != null and !contract.landlordPhone.isEmpty()}" class="signature-contact" th:text="${contract.landlordPhone}">—</div>
+                        <div class="signature-line">Signature précédée de la mention « Lu et approuvé »</div>
                     </div>
                 </td>
                 <td>
                     <div class="signature-box">
-                        <div class="signature-title">Le Locataire</div>
+                        <div class="signature-role">Le Locataire</div>
                         <div class="signature-name" th:text="${contract.tenantLastName + ' ' + contract.tenantFirstName}">NOM Prénom</div>
-                        <div class="signature-line">Signature et date</div>
+                        <div th:if="${contract.tenantPhone != null and !contract.tenantPhone.isEmpty()}" class="signature-contact" th:text="${contract.tenantPhone}">—</div>
+                        <div class="signature-line">Signature précédée de la mention « Lu et approuvé »</div>
                     </div>
                 </td>
             </tr>
         </tbody>
     </table>
 
-    <!-- Footer -->
+    <!-- ══ FOOTER ══ -->
     <div class="footer">
         <p th:text="${contract.agencyName + ' — ' + contract.agencyAddress}">TANK'IMMO SAS</p>
-        <p>Agence immobilière agréée — Activités encadrées par TANK'IMMO SAS</p>
-        <p>Document généré via la plateforme Ndobaâk — Réf. <span th:text="${contract.bookingReference}">NDK-000</span></p>
+        <p>Agence immobilière agréée — Document généré via la plateforme Ndobaâk</p>
+        <p>Réf. <span th:text="${contract.bookingReference}">NDK-000</span> — <span th:text="${contract.generationDate}">01/01/2026</span></p>
     </div>
 
 </div>
