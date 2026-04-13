@@ -87,6 +87,23 @@
           />
         </div>
       }
+
+      @if (canRetry()) {
+        <p-divider />
+        <p-message
+          severity="warn"
+          styleClass="w-full mb-3"
+          text="Le virement automatique a échoué après confirmation des deux parties. Vous pouvez le relancer manuellement."
+        />
+        <p-button
+          label="Relancer le virement"
+          icon="pi pi-refresh"
+          severity="warn"
+          [loading]="retrying()"
+          (onClick)="retryTransfer()"
+          styleClass="w-full sm:w-auto"
+        />
+      }
     </p-card>
   }
 </div>

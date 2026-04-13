@@ -358,4 +358,11 @@ export class RentalCycleService {
       {},
     );
   }
+
+  retryTransfer(bookingId: number): Observable<KeyHandoverResponse> {
+    return this.http.post<KeyHandoverResponse>(
+      `${this.apiUrl}/admin/bookings/${bookingId}/retry-transfer`,
+      {},
+    );
+  }
 }

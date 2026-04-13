@@ -56,6 +56,7 @@ export class KeyHandover implements OnInit {
   protected handover = signal<KeyHandoverResponse | null>(null);
   protected loading = signal(true);
   protected confirming = signal(false);
+  protected retrying = signal(false);
   protected notFound = signal(false);
 
   protected readonly userRole = this.authService.userRole;
@@ -67,6 +68,17 @@ export class KeyHandover implements OnInit {
     if (role === 'LANDLORD') return !h.landlordConfirmed;
     if (role === 'STUDENT') return !h.tenantConfirmed;
     return false;
+  });
+
+  protected canRetry = computed(() => {
+    const h = this.handover();
+    if (!h) return false;
+    return (
+      this.userRole() === 'ADMIN' &&
+      h.landlordConfirmed &&
+      h.tenantConfirmed &&
+      !h.transferInitiated
+    );
   });
 
   protected timelineEvents = computed<TimelineEvent[]>(() => {
@@ -147,6 +159,29 @@ export class KeyHandover implements OnInit {
           detail: err?.error?.message || "Une erreur est survenue lors de la confirmation.",
         });
         this.confirming.set(false);
+      },
+    });
+  }
+
+  protected retryTransfer(): void {
+    this.retrying.set(true);
+    this.rentalCycleService.retryTransfer(this.bookingId()).subscribe({
+      next: (updated) => {
+        this.handover.set(updated);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Virement relancé',
+          detail: "Le virement a été initié avec succès.",
+        });
+        this.retrying.set(false);
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Échec du virement',
+          detail: err?.error?.message || "Impossible de relancer le virement. Réessayez ultérieurement.",
+        });
+        this.retrying.set(false);
       },
     });
   }
