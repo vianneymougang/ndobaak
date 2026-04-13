@@ -92,7 +92,7 @@ public class KeyHandoverService {
         handover.setLandlordConfirmedAt(LocalDateTime.now());
 
         if (handover.isTenantConfirmed()) {
-            initiateTransferAndFinalize(handover, booking);
+            finalizeHandover(handover, booking);
         }
 
         return mapper.toResponse(keyHandoverRepository.save(handover));
@@ -114,6 +114,16 @@ public class KeyHandoverService {
         handover.setTenantConfirmed(true);
         handover.setTenantConfirmedAt(LocalDateTime.now());
 
+        if (handover.isLandlordConfirmed()) {
+            finalizeHandover(handover, booking);
+        }
+
+        return mapper.toResponse(keyHandoverRepository.save(handover));
+    }
+
+    private void finalizeHandover(KeyHandover handover, Booking booking) {
+        Long bookingId = booking.getId();
+
         booking.setStatus(BookingStatus.KEYS_HANDED_OVER);
         bookingRepository.save(booking);
 
@@ -128,9 +138,7 @@ public class KeyHandoverService {
                         "bookingId", bookingId.toString(),
                         "tenantName", booking.getStudent().getFirstName() + " " + booking.getStudent().getLastName()
                 ),
-                Map.of(
-                        "bookingId", bookingId.toString()
-                )
+                Map.of("bookingId", bookingId.toString())
         );
 
         notificationDispatcher.dispatch(
@@ -140,19 +148,11 @@ public class KeyHandoverService {
                 "La remise des clés a été confirmée. Bienvenue dans votre nouveau logement !",
                 bookingId,
                 "BOOKING",
-                Map.of(
-                        "bookingId", bookingId.toString()
-                ),
-                Map.of(
-                        "bookingId", bookingId.toString()
-                )
+                Map.of("bookingId", bookingId.toString()),
+                Map.of("bookingId", bookingId.toString())
         );
 
-        if (handover.isLandlordConfirmed()) {
-            initiateTransferAndFinalize(handover, booking);
-        }
-
-        return mapper.toResponse(keyHandoverRepository.save(handover));
+        initiateTransferAndFinalize(handover, booking);
     }
 
     @Transactional
