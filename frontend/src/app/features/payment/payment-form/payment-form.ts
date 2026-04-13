@@ -21,7 +21,7 @@ import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { BookingService } from '../../../core/services/booking';
 import { PaymentService } from '../../../core/services/payment';
 import { BookingResponse } from '../../../core/models/booking.models';
-import { MobileMoneyOperator } from '../../../core/models/payment.models';
+import { PaymentChannel } from '../../../core/models/payment.models';
 
 @Component({
   selector: 'app-payment-form',
@@ -56,15 +56,35 @@ export class PaymentForm implements OnInit {
 
   protected readonly BLOCK_THRESHOLD = 500_000;
 
-  protected readonly operatorOptions: { label: string; value: MobileMoneyOperator }[] = [
+  protected readonly operatorOptions: { label: string; value: PaymentChannel }[] = [
     { label: 'MTN Mobile Money', value: 'MTN_MOMO' },
     { label: 'Orange Money', value: 'ORANGE_MONEY' },
+    { label: 'Carte bancaire', value: 'CARD' },
   ];
 
   protected form = this.fb.nonNullable.group({
-    operator: [null as MobileMoneyOperator | null, Validators.required],
+    operator: [null as PaymentChannel | null, Validators.required],
     phoneNumber: ['', [Validators.required, Validators.pattern(/^6[0-9]{8}$/)]],
   });
+
+  protected isCardSelected = signal(false);
+
+  constructor() {
+    this.form.controls.operator.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(operator => {
+        const phoneCtrl = this.form.controls.phoneNumber;
+        if (operator === 'CARD') {
+          phoneCtrl.clearValidators();
+          phoneCtrl.setValue('');
+          this.isCardSelected.set(true);
+        } else {
+          phoneCtrl.setValidators([Validators.required, Validators.pattern(/^6[0-9]{8}$/)]);
+          this.isCardSelected.set(false);
+        }
+        phoneCtrl.updateValueAndValidity();
+      });
+  }
 
   protected needsSplitPayment = computed(() => {
     const b = this.booking();
