@@ -2,7 +2,6 @@ package com.ndobaak.backend.payment.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndobaak.backend.auth.service.CustomOAuth2UserService;
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
 import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.common.enums.PaymentStatus;
 import com.ndobaak.backend.common.enums.PaymentType;
@@ -83,7 +82,7 @@ class PaymentControllerTest {
     void initiatePaymentShouldReturn201() throws Exception {
         InitiatePaymentRequest request = new InitiatePaymentRequest();
         request.setBookingId(1L);
-        request.setOperator(MobileMoneyOperator.MTN_MOMO);
+        request.setOperator(PaymentChannel.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
 
         PaymentResponse response = buildPaymentResponse(1L, PaymentStatus.PROCESSING);
@@ -112,7 +111,7 @@ class PaymentControllerTest {
     void initiatePaymentShouldReturn400OnBusinessError() throws Exception {
         InitiatePaymentRequest request = new InitiatePaymentRequest();
         request.setBookingId(1L);
-        request.setOperator(MobileMoneyOperator.MTN_MOMO);
+        request.setOperator(PaymentChannel.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
 
         when(paymentService.initiatePayment(any()))
@@ -215,7 +214,7 @@ class PaymentControllerTest {
     @WithMockUser(roles = "STUDENT")
     void payInstallmentShouldReturn201() throws Exception {
         PayInstallmentRequest request = new PayInstallmentRequest();
-        request.setOperator(MobileMoneyOperator.MTN_MOMO);
+        request.setOperator(PaymentChannel.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
 
         when(paymentService.payInstallment(eq(1L), any()))

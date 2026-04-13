@@ -1,6 +1,6 @@
 package com.ndobaak.backend.payment.gateway;
 
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
+import com.ndobaak.backend.common.enums.PaymentChannel;
 
 import java.math.BigDecimal;
 
@@ -11,7 +11,7 @@ public record PaymentGatewayRequest(
         String payerName,
         String payerEmail,
         String phoneNumber,
-        MobileMoneyOperator operator,
+        PaymentChannel operator,
         String description,
         String callbackUrl
 ) {

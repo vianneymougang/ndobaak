@@ -1,6 +1,6 @@
 package com.ndobaak.backend.payment.gateway;
 
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
+import com.ndobaak.backend.common.enums.PaymentChannel;
 
 import java.math.BigDecimal;
 
@@ -8,7 +8,7 @@ public interface PaymentGateway {
 
     String getProviderName();
 
-    boolean supports(MobileMoneyOperator operator);
+    boolean supports(PaymentChannel channel);
 
     boolean isAvailable();
 

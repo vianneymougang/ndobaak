@@ -1,6 +1,6 @@
 package com.ndobaak.backend.payment.gateway.mock;
 
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
+import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.payment.gateway.PaymentGateway;
 import com.ndobaak.backend.payment.gateway.PaymentGatewayRequest;
 import com.ndobaak.backend.payment.gateway.PaymentInitiationResult;
@@ -32,7 +32,7 @@ public class MockPaymentGateway implements PaymentGateway {
     }
 
     @Override
-    public boolean supports(MobileMoneyOperator operator) {
+    public boolean supports(PaymentChannel channel) {
         return true;
     }
 

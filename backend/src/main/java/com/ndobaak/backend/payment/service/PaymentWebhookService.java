@@ -4,7 +4,6 @@ import com.ndobaak.backend.booking.entity.Booking;
 import com.ndobaak.backend.booking.repository.BookingRepository;
 import com.ndobaak.backend.common.enums.BookingStatus;
 import com.ndobaak.backend.common.enums.InstallmentStatus;
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
 import com.ndobaak.backend.common.enums.PaymentMethod;
 import com.ndobaak.backend.common.enums.PaymentStatus;
 import com.ndobaak.backend.common.enums.PaymentType;
@@ -173,8 +172,7 @@ public class PaymentWebhookService {
         nextBlock.setPayment(nextPayment);
         installmentRepository.save(nextBlock);
 
-        PaymentGateway gateway = gatewayRouter.resolveGateway(
-                MobileMoneyOperator.valueOf(completedPayment.getChannel().name()));
+        PaymentGateway gateway = gatewayRouter.resolveGateway(completedPayment.getChannel());
         BigDecimal totalCharged = nextBlock.getAmount();
         String description = "Bloc " + nextBlock.getInstallmentNumber()
                 + "/" + schedule.getNumberOfInstallments()
@@ -187,7 +185,7 @@ public class PaymentWebhookService {
                 completedPayment.getPayerName(),
                 completedPayment.getBooking().getStudent().getEmail(),
                 completedPayment.getPhoneNumber(),
-                MobileMoneyOperator.valueOf(completedPayment.getChannel().name()),
+                completedPayment.getChannel(),
                 description,
                 paymentProperties.getFrontendCallbackUrl()
         );

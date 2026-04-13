@@ -2,7 +2,6 @@ package com.ndobaak.backend.subscription.service;
 
 import com.ndobaak.backend.auth.entity.User;
 import com.ndobaak.backend.auth.service.AuthService;
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
 import com.ndobaak.backend.common.enums.NotificationType;
 import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.common.enums.PaymentMethod;
@@ -344,7 +343,7 @@ public class SubscriptionService {
                 .amount(SUBSCRIPTION_AMOUNT)
                 .commission(BigDecimal.ZERO)
                 .paymentMethod(PaymentMethod.MOBILE_MONEY)
-                .channel(PaymentChannel.valueOf(request.getOperator().name()))
+                .channel(request.getOperator())
                 .paymentType(PaymentType.SUBSCRIPTION)
                 .transactionId(reference)
                 .status(PaymentStatus.PENDING)

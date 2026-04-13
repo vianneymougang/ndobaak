@@ -1,6 +1,6 @@
 package com.ndobaak.backend.payment.gateway;
 
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
+import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.common.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,17 +23,17 @@ public class PaymentGatewayRouter {
                 gateways.stream().map(PaymentGateway::getProviderName).toList());
     }
 
-    public PaymentGateway resolveGateway(MobileMoneyOperator operator) {
+    public PaymentGateway resolveGateway(PaymentChannel channel) {
         PaymentGateway primary = findByName(properties.getPrimaryGateway());
-        if (primary != null && primary.supports(operator) && primary.isAvailable()) {
+        if (primary != null && primary.supports(channel) && primary.isAvailable()) {
             return primary;
         }
 
         log.warn("Primary gateway '{}' unavailable or unsupported for {}. Trying fallback...",
-                properties.getPrimaryGateway(), operator);
+                properties.getPrimaryGateway(), channel);
 
         return gateways.stream()
-                .filter(g -> g.supports(operator))
+                .filter(g -> g.supports(channel))
                 .filter(PaymentGateway::isAvailable)
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(

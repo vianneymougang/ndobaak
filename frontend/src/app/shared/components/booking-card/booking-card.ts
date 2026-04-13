@@ -95,7 +95,12 @@ export class BookingCard {
     () => this.viewMode() === 'landlord' && this.booking().status === 'PENDING',
   );
 
-  protected canPay = computed(
+  protected canApply = computed(
     () => this.viewMode() === 'student' && this.booking().status === 'CONFIRMED',
   );
+
+  protected canViewLease = computed(() => {
+    const s = this.booking().status;
+    return s === 'LEASE_GENERATED' || s === 'LEASE_SIGNED' || s === 'PAYMENT_HELD';
+  });
 }
