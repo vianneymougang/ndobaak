@@ -234,14 +234,18 @@ public class LeaseContractService {
         BigDecimal monthlyRent = booking.getMonthlyRent() != null
                 ? booking.getMonthlyRent() : booking.getTotalAmount();
 
+        BigDecimal totalDue = monthlyRent.add(request.securityDeposit()).add(agencyFee);
+
         return new LeaseContractPdfData(
                 landlord.getLastName(),
                 landlord.getFirstName(),
                 landlord.getIdCardNumber() != null ? landlord.getIdCardNumber() : "",
+                landlord.getPhone() != null ? landlord.getPhone() : "",
                 student.getLastName(),
                 student.getFirstName(),
                 studentMatricule,
                 studentFieldOfStudy,
+                student.getPhone() != null ? student.getPhone() : "",
                 guarantorLastName,
                 guarantorFirstName,
                 guarantorIdCard,
@@ -254,6 +258,7 @@ public class LeaseContractService {
                 nf.format(monthlyRent),
                 nf.format(request.securityDeposit()),
                 nf.format(agencyFee),
+                nf.format(totalDue),
                 request.startDate().format(DATE_FORMATTER),
                 request.endDate().format(DATE_FORMATTER),
                 "NDK-" + booking.getId(),
