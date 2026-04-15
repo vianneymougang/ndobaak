@@ -7,10 +7,12 @@ import com.ndobaak.backend.booking.entity.Booking;
 import com.ndobaak.backend.booking.repository.BookingRepository;
 import com.ndobaak.backend.common.enums.BookingStatus;
 import com.ndobaak.backend.common.enums.LeaseStatus;
+import com.ndobaak.backend.common.enums.NotificationType;
 import com.ndobaak.backend.common.enums.UserRole;
 import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.media.service.StorageService;
+import com.ndobaak.backend.notification.service.NotificationDispatcher;
 import com.ndobaak.backend.rentalcycle.dto.LeaseContractPdfData;
 import com.ndobaak.backend.rentalcycle.dto.request.GenerateLeaseRequest;
 import com.ndobaak.backend.rentalcycle.dto.response.LeaseContractResponse;
@@ -34,6 +36,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +52,7 @@ public class LeaseContractService {
     private final BookingRepository bookingRepository;
     private final StorageService storageService;
     private final ContractPdfGenerator pdfGenerator;
+    private final NotificationDispatcher notificationDispatcher;
     private final RentalCycleMapper mapper;
 
     @Transactional(rollbackFor = Exception.class)
@@ -101,6 +105,34 @@ public class LeaseContractService {
 
         booking.setStatus(BookingStatus.LEASE_GENERATED);
         bookingRepository.save(booking);
+
+        String listingTitle = booking.getListing().getTitle();
+        Map<String, Object> emailVars = Map.of(
+                "bookingId", bookingId.toString(),
+                "listingTitle", listingTitle
+        );
+
+        notificationDispatcher.dispatch(
+                booking.getListing().getLandlord().getId(),
+                NotificationType.LEASE_READY,
+                "Contrat de bail disponible",
+                "Le contrat de bail pour \"" + listingTitle + "\" est prêt. Veuillez le signer.",
+                bookingId,
+                "BOOKING",
+                emailVars,
+                Map.of()
+        );
+
+        notificationDispatcher.dispatch(
+                booking.getStudent().getId(),
+                NotificationType.LEASE_READY,
+                "Contrat de bail disponible",
+                "Le contrat de bail pour \"" + listingTitle + "\" est disponible. Le propriétaire doit signer en premier.",
+                bookingId,
+                "BOOKING",
+                emailVars,
+                Map.of()
+        );
 
         return mapper.toResponse(lease);
     }
@@ -167,6 +199,35 @@ public class LeaseContractService {
             booking.setStatus(BookingStatus.LEASE_SIGNED);
             bookingRepository.save(booking);
 
+            String listingTitle = booking.getListing().getTitle();
+            Map<String, Object> emailVars = Map.of(
+                    "bookingId", bookingId.toString(),
+                    "listingTitle", listingTitle
+            );
+            Map<String, String> smsVars = Map.of("bookingId", bookingId.toString());
+
+            notificationDispatcher.dispatch(
+                    booking.getListing().getLandlord().getId(),
+                    NotificationType.LEASE_SIGNED,
+                    "Contrat de bail signé",
+                    "Le contrat de bail pour \"" + listingTitle + "\" a été signé par les deux parties.",
+                    bookingId,
+                    "BOOKING",
+                    emailVars,
+                    smsVars
+            );
+
+            notificationDispatcher.dispatch(
+                    booking.getStudent().getId(),
+                    NotificationType.LEASE_SIGNED,
+                    "Contrat de bail signé",
+                    "Félicitations ! Votre contrat de bail pour \"" + listingTitle + "\" est maintenant signé.",
+                    bookingId,
+                    "BOOKING",
+                    emailVars,
+                    smsVars
+            );
+
         } else {
             throw new AccessDeniedException("Seul le propriétaire ou le locataire peut signer ce contrat.");
         }
@@ -192,49 +253,20 @@ public class LeaseContractService {
                                                GenerateLeaseRequest request, BigDecimal agencyFee) {
         User student = booking.getStudent();
         Landlord landlord = (Landlord) booking.getListing().getLandlord();
-
-        String studentMatricule = "";
-        String studentFieldOfStudy = "";
-        if (student instanceof Student s) {
-            studentMatricule = s.getMatricule() != null ? s.getMatricule() : "";
-            studentFieldOfStudy = s.getFieldOfStudy() != null ? s.getFieldOfStudy() : "";
-        }
-
-        List<Guarantor> guarantors = application.getGuarantors();
-        String guarantorLastName = "";
-        String guarantorFirstName = "";
-        String guarantorIdCard = "";
-        String guarantorPhone = "";
-        String guarantorRelationship = "";
-
-        if (!guarantors.isEmpty()) {
-            Guarantor g = guarantors.get(0);
-            guarantorLastName = g.getLastName();
-            guarantorFirstName = g.getFirstName();
-            guarantorIdCard = g.getIdCardNumber();
-            guarantorPhone = g.getPhone();
-            guarantorRelationship = g.getRelationshipToTenant();
-        }
-
-        String address = "";
-        String city = "Yaoundé";
-        if (booking.getListing().getLocation() != null) {
-            var location = booking.getListing().getLocation();
-            address = location.getAddress() != null ? location.getAddress() : "";
-            city = location.getCity() != null ? location.getCity() : "Yaoundé";
-        }
-
-        String amenities = booking.getListing().getAmenities().stream()
-                .map(a -> a.getName())
-                .collect(Collectors.joining(", "));
+        String[] academicInfo = extractStudentAcademicInfo(student);
+        String[] guarantorInfo = extractPrimaryGuarantorInfo(application.getGuarantors());
+        String[] locationInfo = extractListingLocation(booking);
 
         NumberFormat nf = NumberFormat.getInstance(Locale.FRENCH);
         nf.setMaximumFractionDigits(0);
 
         BigDecimal monthlyRent = booking.getMonthlyRent() != null
                 ? booking.getMonthlyRent() : booking.getTotalAmount();
-
         BigDecimal totalDue = monthlyRent.add(request.securityDeposit()).add(agencyFee);
+
+        String amenities = booking.getListing().getAmenities().stream()
+                .map(a -> a.getName())
+                .collect(Collectors.joining(", "));
 
         return new LeaseContractPdfData(
                 landlord.getLastName(),
@@ -243,16 +275,10 @@ public class LeaseContractService {
                 landlord.getPhone() != null ? landlord.getPhone() : "",
                 student.getLastName(),
                 student.getFirstName(),
-                studentMatricule,
-                studentFieldOfStudy,
+                academicInfo[0], academicInfo[1],
                 student.getPhone() != null ? student.getPhone() : "",
-                guarantorLastName,
-                guarantorFirstName,
-                guarantorIdCard,
-                guarantorPhone,
-                guarantorRelationship,
-                address,
-                city,
+                guarantorInfo[0], guarantorInfo[1], guarantorInfo[2], guarantorInfo[3], guarantorInfo[4],
+                locationInfo[0], locationInfo[1],
                 booking.getListing().getDescription() != null ? booking.getListing().getDescription() : "",
                 amenities,
                 nf.format(monthlyRent),
@@ -266,5 +292,38 @@ public class LeaseContractService {
                 AGENCY_NAME,
                 AGENCY_ADDRESS
         );
+    }
+
+    private String[] extractStudentAcademicInfo(User student) {
+        if (student instanceof Student s) {
+            return new String[]{
+                    s.getMatricule() != null ? s.getMatricule() : "",
+                    s.getFieldOfStudy() != null ? s.getFieldOfStudy() : ""
+            };
+        }
+        return new String[]{"", ""};
+    }
+
+    private String[] extractPrimaryGuarantorInfo(List<Guarantor> guarantors) {
+        if (!guarantors.isEmpty()) {
+            Guarantor g = guarantors.get(0);
+            return new String[]{
+                    g.getLastName(), g.getFirstName(),
+                    g.getIdCardNumber(), g.getPhone(),
+                    g.getRelationshipToTenant()
+            };
+        }
+        return new String[]{"", "", "", "", ""};
+    }
+
+    private String[] extractListingLocation(Booking booking) {
+        if (booking.getListing().getLocation() != null) {
+            var location = booking.getListing().getLocation();
+            return new String[]{
+                    location.getAddress() != null ? location.getAddress() : "",
+                    location.getCity() != null ? location.getCity() : "Yaoundé"
+            };
+        }
+        return new String[]{"", "Yaoundé"};
     }
 }

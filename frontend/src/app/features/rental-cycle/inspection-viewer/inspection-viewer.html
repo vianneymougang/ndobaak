@@ -1,0 +1,132 @@
+<p-toast />
+
+<div class="max-w-4xl mx-auto px-4 py-6">
+  <h1 class="text-2xl font-semibold text-[var(--color-ndb-text)] mb-6">
+    États des lieux
+  </h1>
+
+  @if (loading()) {
+    <div class="space-y-4">
+      @for (_ of [1, 2]; track $index) {
+        <p-skeleton height="8rem" styleClass="mb-4" />
+      }
+    </div>
+  } @else if (inspections().length === 0) {
+    <p-message
+      severity="info"
+      text="Aucun état des lieux n'a encore été réalisé pour cette réservation."
+      styleClass="w-full"
+    />
+  } @else {
+    @for (inspection of inspections(); track inspection.id) {
+      <p-card styleClass="mb-6">
+        <ng-template #header>
+          <div class="flex items-center justify-between px-4 pt-4">
+            <div class="flex items-center gap-3">
+              <h2 class="text-lg font-semibold">
+                {{ typeLabels[inspection.type] }}
+              </h2>
+              <p-tag
+                [severity]="statusSeverity[inspection.status]"
+                [value]="statusLabels[inspection.status]"
+              />
+            </div>
+            @if (canSign(inspection)) {
+              <p-button
+                label="Signer"
+                icon="pi pi-pen-to-square"
+                [loading]="signing()"
+                (onClick)="signInspection(inspection)"
+              />
+            }
+          </div>
+        </ng-template>
+
+        <div class="text-sm text-[var(--color-ndb-text-muted)] mb-4">
+          <span class="mr-4">
+            <i class="pi pi-calendar mr-1"></i>
+            {{ inspection.conductedAt | date: 'dd/MM/yyyy HH:mm' }}
+          </span>
+          <span>
+            <i class="pi pi-user mr-1"></i>
+            Signataires :
+            <span [class]="inspection.landlordSigned ? 'text-green-600' : 'text-[var(--color-ndb-text-muted)]'">
+              Propriétaire {{ inspection.landlordSigned ? '✓' : '(en attente)' }}
+            </span>
+            &nbsp;·&nbsp;
+            <span [class]="inspection.tenantSigned ? 'text-green-600' : 'text-[var(--color-ndb-text-muted)]'">
+              Locataire {{ inspection.tenantSigned ? '✓' : '(en attente)' }}
+            </span>
+          </span>
+        </div>
+
+        @if (inspection.observations) {
+          <p class="text-sm text-[var(--color-ndb-text-muted)] italic mb-4">
+            {{ inspection.observations }}
+          </p>
+        }
+
+        @if (inspection.items.length > 0) {
+          <p-divider />
+          <h3 class="font-medium mb-3">Éléments inspectés</h3>
+          <p-accordion>
+            @for (item of inspection.items; track item.id) {
+              <p-accordion-panel [value]="item.id.toString()">
+                <p-accordion-header>
+                  <div class="flex items-center justify-between w-full mr-4">
+                    <span>{{ item.location }} — {{ item.element }}</span>
+                    <p-tag
+                      [severity]="conditionSeverity[item.condition]"
+                      [value]="conditionLabels[item.condition]"
+                    />
+                  </div>
+                </p-accordion-header>
+                <p-accordion-content>
+                  @if (item.observations) {
+                    <p class="text-sm text-[var(--color-ndb-text-muted)] mb-3">
+                      {{ item.observations }}
+                    </p>
+                  }
+                  @let itemPhotos = getPhotosForItem(inspection, item);
+                  @if (itemPhotos.length > 0) {
+                    <p-galleria
+                      [value]="itemPhotos"
+                      [numVisible]="3"
+                      [showThumbnails]="true"
+                      [containerStyle]="{'max-width': '400px'}"
+                    >
+                      <ng-template #item let-photo>
+                        <img [src]="photo.itemImageSrc" [alt]="photo.alt" class="w-full" />
+                      </ng-template>
+                      <ng-template #thumbnail let-photo>
+                        <img [src]="photo.thumbnailImageSrc" [alt]="photo.alt" class="w-16 h-12 object-cover" />
+                      </ng-template>
+                    </p-galleria>
+                  }
+                </p-accordion-content>
+              </p-accordion-panel>
+            }
+          </p-accordion>
+        }
+
+        @let generalPhotos = getGeneralPhotos(inspection);
+        @if (generalPhotos.length > 0) {
+          <p-divider />
+          <h3 class="font-medium mb-3">Photos générales</h3>
+          <p-galleria
+            [value]="generalPhotos"
+            [numVisible]="4"
+            [showThumbnails]="true"
+          >
+            <ng-template #item let-photo>
+              <img [src]="photo.itemImageSrc" [alt]="photo.alt" class="max-w-full max-h-96 object-contain" />
+            </ng-template>
+            <ng-template #thumbnail let-photo>
+              <img [src]="photo.thumbnailImageSrc" [alt]="photo.alt" class="w-20 h-14 object-cover" />
+            </ng-template>
+          </p-galleria>
+        }
+      </p-card>
+    }
+  }
+</div>

@@ -44,6 +44,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -103,7 +104,7 @@ class PaymentInitiationServiceTest {
     void initiateIntegralPaymentShouldCreatePaymentAndCallGateway() {
         when(authService.getAuthenticatedUser()).thenReturn(student);
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
-        when(paymentRepository.findByBookingId(1L)).thenReturn(Collections.emptyList());
+        when(paymentRepository.existsByBookingIdAndStatus(eq(1L), any(PaymentStatus.class))).thenReturn(false);
         when(paymentProperties.getInstallmentThreshold()).thenReturn(new BigDecimal("500000"));
         when(paymentProperties.getCommissionRate()).thenReturn(new BigDecimal("0.05"));
         when(paymentProperties.getFrontendCallbackUrl()).thenReturn("http://localhost:4200/callback");
@@ -141,7 +142,7 @@ class PaymentInitiationServiceTest {
         booking.setTotalAmount(new BigDecimal("600000"));
         when(authService.getAuthenticatedUser()).thenReturn(student);
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
-        when(paymentRepository.findByBookingId(1L)).thenReturn(Collections.emptyList());
+        when(paymentRepository.existsByBookingIdAndStatus(eq(1L), any(PaymentStatus.class))).thenReturn(false);
         when(paymentProperties.getInstallmentThreshold()).thenReturn(new BigDecimal("500000"));
         when(paymentProperties.getCommissionRate()).thenReturn(new BigDecimal("0.05"));
         when(paymentProperties.getFrontendCallbackUrl()).thenReturn("http://localhost:4200/callback");
@@ -194,11 +195,9 @@ class PaymentInitiationServiceTest {
 
     @Test
     void initiatePaymentShouldThrowWhenProcessingPaymentExists() {
-        Payment existing = Payment.builder().status(PaymentStatus.PROCESSING)
-                .paymentType(PaymentType.INTEGRAL).build();
         when(authService.getAuthenticatedUser()).thenReturn(student);
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
-        when(paymentRepository.findByBookingId(1L)).thenReturn(List.of(existing));
+        when(paymentRepository.existsByBookingIdAndStatus(1L, PaymentStatus.PROCESSING)).thenReturn(true);
 
         InitiatePaymentRequest request = new InitiatePaymentRequest();
         request.setBookingId(1L);
@@ -210,11 +209,10 @@ class PaymentInitiationServiceTest {
 
     @Test
     void initiatePaymentShouldThrowWhenAlreadyPaid() {
-        Payment existing = Payment.builder().status(PaymentStatus.COMPLETED)
-                .paymentType(PaymentType.INTEGRAL).build();
         when(authService.getAuthenticatedUser()).thenReturn(student);
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
-        when(paymentRepository.findByBookingId(1L)).thenReturn(List.of(existing));
+        when(paymentRepository.existsByBookingIdAndStatus(1L, PaymentStatus.PROCESSING)).thenReturn(false);
+        when(paymentRepository.existsByBookingIdAndStatus(1L, PaymentStatus.COMPLETED)).thenReturn(true);
         when(scheduleRepository.findByBookingId(1L)).thenReturn(Optional.empty());
 
         InitiatePaymentRequest request = new InitiatePaymentRequest();

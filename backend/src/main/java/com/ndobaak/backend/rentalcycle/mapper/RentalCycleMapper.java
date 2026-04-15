@@ -2,13 +2,21 @@ package com.ndobaak.backend.rentalcycle.mapper;
 
 import com.ndobaak.backend.media.service.StorageService;
 import com.ndobaak.backend.rentalcycle.dto.response.GuarantorResponse;
+import com.ndobaak.backend.rentalcycle.dto.response.InspectionItemResponse;
+import com.ndobaak.backend.rentalcycle.dto.response.InspectionPhotoResponse;
+import com.ndobaak.backend.rentalcycle.dto.response.KeyHandoverResponse;
 import com.ndobaak.backend.rentalcycle.dto.response.LandlordDocumentResponse;
 import com.ndobaak.backend.rentalcycle.dto.response.LeaseContractResponse;
+import com.ndobaak.backend.rentalcycle.dto.response.PropertyInspectionResponse;
 import com.ndobaak.backend.rentalcycle.dto.response.TenantApplicationResponse;
 import com.ndobaak.backend.rentalcycle.dto.response.TenantDocumentResponse;
 import com.ndobaak.backend.rentalcycle.entity.Guarantor;
+import com.ndobaak.backend.rentalcycle.entity.InspectionItem;
+import com.ndobaak.backend.rentalcycle.entity.InspectionPhoto;
+import com.ndobaak.backend.rentalcycle.entity.KeyHandover;
 import com.ndobaak.backend.rentalcycle.entity.LandlordDocument;
 import com.ndobaak.backend.rentalcycle.entity.LeaseContract;
+import com.ndobaak.backend.rentalcycle.entity.PropertyInspection;
 import com.ndobaak.backend.rentalcycle.entity.TenantApplication;
 import com.ndobaak.backend.rentalcycle.entity.TenantDocument;
 import lombok.RequiredArgsConstructor;
@@ -90,6 +98,64 @@ public class RentalCycleMapper {
                 guarantor.getPhone(),
                 guarantor.getAddress(),
                 guarantor.getRelationshipToTenant()
+        );
+    }
+
+    public PropertyInspectionResponse toResponse(PropertyInspection inspection) {
+        return new PropertyInspectionResponse(
+                inspection.getId(),
+                inspection.getBooking().getId(),
+                inspection.getType(),
+                inspection.getConductedAt(),
+                inspection.getAgentId(),
+                inspection.getStatus(),
+                inspection.isLandlordSigned(),
+                inspection.isTenantSigned(),
+                inspection.getLandlordSignedAt(),
+                inspection.getTenantSignedAt(),
+                inspection.getObservations(),
+                inspection.getItems().stream().map(this::toResponse).toList(),
+                inspection.getPhotos().stream().map(this::toResponse).toList(),
+                inspection.getCreatedAt()
+        );
+    }
+
+    public InspectionItemResponse toResponse(InspectionItem item) {
+        return new InspectionItemResponse(
+                item.getId(),
+                item.getLocation(),
+                item.getElement(),
+                item.getCondition(),
+                item.getObservations(),
+                item.getCreatedAt()
+        );
+    }
+
+    public InspectionPhotoResponse toResponse(InspectionPhoto photo) {
+        return new InspectionPhotoResponse(
+                photo.getId(),
+                photo.getInspection().getId(),
+                photo.getItem() != null ? photo.getItem().getId() : null,
+                storageService.resolvePublicUrl(photo.getStorageUrl()),
+                photo.getCaption(),
+                photo.getCreatedAt()
+        );
+    }
+
+    public KeyHandoverResponse toResponse(KeyHandover handover) {
+        return new KeyHandoverResponse(
+                handover.getId(),
+                handover.getBooking().getId(),
+                handover.getMoveInInspection().getId(),
+                handover.getHandoverDate(),
+                handover.isLandlordConfirmed(),
+                handover.isTenantConfirmed(),
+                handover.getLandlordConfirmedAt(),
+                handover.getTenantConfirmedAt(),
+                handover.isTransferInitiated(),
+                handover.getTransferDate(),
+                handover.getObservations(),
+                handover.getCreatedAt()
         );
     }
 }

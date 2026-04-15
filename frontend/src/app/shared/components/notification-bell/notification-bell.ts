@@ -4,7 +4,6 @@ import {
   inject,
   signal,
   OnInit,
-  OnDestroy,
   DestroyRef,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -32,7 +31,7 @@ import { NotificationResponse } from '../../../core/models/notification-models';
   templateUrl: './notification-bell.html',
   styleUrl: './notification-bell.scss',
 })
-export class NotificationBell implements OnInit, OnDestroy {
+export class NotificationBell implements OnInit {
   private notificationService = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
 
@@ -43,8 +42,6 @@ export class NotificationBell implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.pollUnreadCount();
   }
-
-  ngOnDestroy(): void {}
 
   private pollUnreadCount(): void {
     timer(0, 30_000)
@@ -104,6 +101,14 @@ export class NotificationBell implements OnInit, OnDestroy {
       REVIEW_POSTED: 'pi-star',
       LISTING_APPROVED: 'pi-verified',
       LISTING_REJECTED: 'pi-ban',
+      LANDLORD_DOCUMENT_APPROVED: 'pi-file-check',
+      LANDLORD_DOCUMENT_REJECTED: 'pi-file-times',
+      APPLICATION_APPROVED: 'pi-check-circle',
+      APPLICATION_REJECTED: 'pi-times-circle',
+      LEASE_READY: 'pi-file-edit',
+      LEASE_SIGNED: 'pi-file-check',
+      KEYS_HANDED_OVER: 'pi-key',
+      TRANSFER_FAILED: 'pi-exclamation-circle',
     };
     return icons[type] ?? 'pi-bell';
   }
@@ -115,6 +120,7 @@ export class NotificationBell implements OnInit, OnDestroy {
       LISTING: `/listings/${notification.referenceId}`,
       PAYMENT: `/transactions`,
       REVIEW: `/listings/${notification.referenceId}`,
+      LANDLORD_DOCUMENT: `/landlord/documents`,
     };
     return routes[notification.referenceType] ?? null;
   }

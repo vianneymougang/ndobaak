@@ -217,6 +217,24 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'bookings/:bookingId/inspection',
+        title: 'État des lieux',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/rental-cycle/inspection-viewer/inspection-viewer').then(
+            (m) => m.InspectionViewer,
+          ),
+      },
+      {
+        path: 'bookings/:bookingId/key-handover',
+        title: 'Remise des clés',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/rental-cycle/key-handover/key-handover').then(
+            (m) => m.KeyHandover,
+          ),
+      },
+      {
         path: 'notifications',
         title: 'Notifications',
         canActivate: [authGuard],

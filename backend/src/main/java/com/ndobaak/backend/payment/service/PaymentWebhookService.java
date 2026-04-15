@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -124,6 +123,7 @@ public class PaymentWebhookService {
             bookingRepository.save(booking);
             log.info("Rental cycle payment held: bookingId={}, reference={}", booking.getId(),
                     payment.getTransactionId());
+            notificationService.sendPaymentCompletionNotifications(payment, booking);
             return;
         }
 
@@ -138,11 +138,9 @@ public class PaymentWebhookService {
     }
 
     private boolean triggerNextBlock(Payment completedPayment, PaymentSchedule schedule) {
-        List<Installment> pendingBlocks = installmentRepository.findByPaymentScheduleId(schedule.getId())
-                .stream()
-                .filter(i -> i.getStatus() == InstallmentStatus.PENDING && i.getPayment() == null)
-                .sorted(Comparator.comparingInt(Installment::getInstallmentNumber))
-                .toList();
+        List<Installment> pendingBlocks = installmentRepository
+                .findByPaymentScheduleIdAndStatusAndPaymentIsNullOrderByInstallmentNumberAsc(
+                        schedule.getId(), InstallmentStatus.PENDING);
 
         if (pendingBlocks.isEmpty()) {
             return false;
@@ -253,13 +251,7 @@ public class PaymentWebhookService {
         if (payment.getBooking() == null) {
             return;
         }
-        installmentRepository.findByPaymentScheduleId(
-                scheduleRepository.findByBookingId(payment.getBooking().getId())
-                        .map(PaymentSchedule::getId)
-                        .orElse(-1L)
-        ).stream()
-                .filter(i -> i.getPayment() != null && i.getPayment().getId().equals(payment.getId()))
-                .findFirst()
+        installmentRepository.findByPaymentId(payment.getId())
                 .ifPresent(installment -> {
                     installment.setStatus(InstallmentStatus.PAID);
                     installment.setPaidAt(LocalDateTime.now());
