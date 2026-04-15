@@ -48,6 +48,10 @@ export interface TenantApplicationResponse {
 export interface ValidationDecisionRequest {
   status: 'APPROVED' | 'REJECTED';
   comment?: string;
+  startDate?: string;
+  endDate?: string;
+  securityDeposit?: number;
+  specialClauses?: string;
 }
 
 export interface LandlordDocumentResponse {
@@ -162,13 +166,6 @@ export interface KeyHandoverResponse {
   createdAt: string;
 }
 
-export interface GenerateLeaseRequest {
-  startDate: string;
-  endDate: string;
-  securityDeposit: number;
-  specialClauses?: string;
-}
-
 @Injectable({
   providedIn: 'root',
 })
@@ -269,13 +266,6 @@ export class RentalCycleService {
     return this.http.post<LeaseContractResponse>(
       `${this.apiUrl}/bookings/${bookingId}/lease/sign`,
       {},
-    );
-  }
-
-  generateLease(bookingId: number, request: GenerateLeaseRequest): Observable<LeaseContractResponse> {
-    return this.http.post<LeaseContractResponse>(
-      `${this.apiUrl}/admin/bookings/${bookingId}/lease`,
-      request,
     );
   }
 
