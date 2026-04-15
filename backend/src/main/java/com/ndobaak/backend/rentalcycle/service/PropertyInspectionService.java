@@ -8,6 +8,7 @@ import com.ndobaak.backend.common.enums.InspectionType;
 import com.ndobaak.backend.common.enums.UserRole;
 import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
+import com.ndobaak.backend.common.util.FileValidator;
 import com.ndobaak.backend.media.service.StorageService;
 import com.ndobaak.backend.rentalcycle.dto.request.InspectionItemRequest;
 import com.ndobaak.backend.rentalcycle.dto.request.InspectionRequest;
@@ -30,14 +31,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class PropertyInspectionService {
-
-    private static final Set<String> ALLOWED_MIME_TYPES = Set.of("image/jpeg", "image/png", "image/webp");
-    private static final long MAX_PHOTO_SIZE = 10L * 1024 * 1024;
 
     private final PropertyInspectionRepository inspectionRepository;
     private final InspectionItemRepository itemRepository;
@@ -96,14 +93,6 @@ public class PropertyInspectionService {
                                                MultipartFile file, Long itemId) {
         PropertyInspection inspection = findInspectionForBooking(bookingId, inspectionId);
 
-        String contentType = file.getContentType();
-        if (contentType == null || !ALLOWED_MIME_TYPES.contains(contentType)) {
-            throw new BusinessException("Format de fichier non accepté. Formats acceptés : JPEG, PNG, WebP.");
-        }
-        if (file.getSize() > MAX_PHOTO_SIZE) {
-            throw new BusinessException("La photo ne doit pas dépasser 10 Mo.");
-        }
-
         InspectionItem item = null;
         if (itemId != null) {
             item = itemRepository.findById(itemId)
@@ -115,6 +104,7 @@ public class PropertyInspectionService {
 
         String storageUrl;
         try {
+            FileValidator.validateImageFile(file);
             storageUrl = storageService.upload(
                     "inspection-photos",
                     file.getOriginalFilename(),
