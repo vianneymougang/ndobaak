@@ -46,4 +46,8 @@ export interface UserProfile {
   fieldOfStudy?: string;
   yearOfStudy?: number;
   verified?: boolean;
+  idCardNumber?: string;
+  taxId?: string;
+  mobileMoneyPhone?: string;
+  notchPayAccountId?: string;
 }

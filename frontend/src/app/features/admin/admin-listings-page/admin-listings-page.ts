@@ -1,7 +1,6 @@
 import {
   Component,
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   inject,
   signal,
   OnInit,
@@ -51,7 +50,6 @@ import { ListingDetailDrawer } from '../shared/listing-detail-drawer/listing-det
 export class AdminListingsPage implements OnInit {
   private adminService = inject(AdminService);
   private destroyRef = inject(DestroyRef);
-  private cdr = inject(ChangeDetectorRef);
 
   protected stats = signal<GlobalStats | null>(null);
   protected listings = signal<ListingResponse[]>([]);
@@ -137,7 +135,6 @@ export class AdminListingsPage implements OnInit {
     this.adminService.getGlobalStats().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.stats.set(data);
-        this.cdr.markForCheck();
       },
     });
   }

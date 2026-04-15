@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap, catchError, switchMap, finalize } from 'rxjs';
+import { Observable, tap, catchError, switchMap, finalize, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   AuthResponse,
@@ -74,10 +74,13 @@ export class AuthService {
   logout(): void {
     this.http
       .post(`${this.apiUrl}/auth/logout`, {}, { withCredentials: true })
-      .pipe(finalize(() => {
-        this.currentUser.set(null);
-        this.router.navigate(['/']);
-      }))
+      .pipe(
+        catchError(() => of(null)),
+        finalize(() => {
+          this.currentUser.set(null);
+          this.router.navigate(['/']);
+        })
+      )
       .subscribe();
   }
 }

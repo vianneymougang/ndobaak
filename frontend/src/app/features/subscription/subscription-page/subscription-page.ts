@@ -5,12 +5,12 @@ import {
   signal,
   computed,
   OnInit,
-  OnDestroy,
   DestroyRef,
 } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { timer, switchMap, takeWhile, catchError, of } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
@@ -47,7 +47,7 @@ import { PaymentChannel } from '../../../core/models/payment.models';
   templateUrl: './subscription-page.html',
   styleUrl: './subscription-page.scss',
 })
-export class SubscriptionPage implements OnInit, OnDestroy {
+export class SubscriptionPage implements OnInit {
   private subscriptionService = inject(SubscriptionService);
   private messageService = inject(MessageService);
   private destroyRef = inject(DestroyRef);
@@ -58,7 +58,6 @@ export class SubscriptionPage implements OnInit, OnDestroy {
   protected submitting = signal(false);
   protected cancellingAutoRenew = signal(false);
   protected cancellingPending = signal(false);
-  private pollInterval: ReturnType<typeof setInterval> | null = null;
   protected isRenewal = signal(false);
   protected dialogVisible = false;
 
@@ -100,10 +99,6 @@ export class SubscriptionPage implements OnInit, OnDestroy {
     this.loadSubscription();
   }
 
-  ngOnDestroy(): void {
-    this.stopPolling();
-  }
-
   protected loadSubscription(): void {
     this.loading.set(true);
     this.subscriptionService
@@ -115,50 +110,32 @@ export class SubscriptionPage implements OnInit, OnDestroy {
           this.loading.set(false);
           if (sub?.status === 'PENDING_PAYMENT') {
             this.startPolling();
-          } else {
-            this.stopPolling();
           }
         },
         error: () => {
           this.subscription.set(null);
           this.loading.set(false);
-          this.stopPolling();
         },
       });
   }
 
   private startPolling(): void {
-    if (this.pollInterval) return;
-    this.pollInterval = setInterval(() => this.pollSubscription(), 5000);
-  }
-
-  private stopPolling(): void {
-    if (this.pollInterval) {
-      clearInterval(this.pollInterval);
-      this.pollInterval = null;
-    }
-  }
-
-  private pollSubscription(): void {
-    this.subscriptionService
-      .getMySubscription()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (sub) => {
-          this.subscription.set(sub);
-          if (sub?.status !== 'PENDING_PAYMENT') {
-            this.stopPolling();
-            if (sub?.status === 'ACTIVE') {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Abonnement activé',
-                detail: 'Votre abonnement est maintenant actif. Bonne publication !',
-              });
-            }
-          }
-        },
-        error: () => this.stopPolling(),
-      });
+    timer(5000, 5000).pipe(
+      switchMap(() => this.subscriptionService.getMySubscription().pipe(
+        catchError(() => of(this.subscription())),
+      )),
+      takeWhile(sub => sub?.status === 'PENDING_PAYMENT', true),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(sub => {
+      this.subscription.set(sub);
+      if (sub?.status === 'ACTIVE') {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Abonnement activé',
+          detail: 'Votre abonnement est maintenant actif. Bonne publication !',
+        });
+      }
+    });
   }
 
   protected openSubscribeDialog(): void {
