@@ -112,6 +112,7 @@
     /* ── Status bg tints ── */
     --color-ndb-green-bg:      #D8F3DC;
     --color-ndb-warn-bg:       #F9E5A0;
+    --color-ndb-warn-dark:     #92400E;
     --color-ndb-error-bg:      #FEE2E2;
 
     /* ── Error variants ── */

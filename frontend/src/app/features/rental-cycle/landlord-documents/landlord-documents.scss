@@ -72,8 +72,8 @@
    DOUBLE-BEZEL CARD ARCHITECTURE
    ══════════════════════════════════════════════ */
 .document-card-shell {
-  background: rgba(27, 67, 50, 0.03);
-  border: 1px solid rgba(27, 67, 50, 0.08);
+  background: color-mix(in srgb, var(--color-ndb-forest) 3%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ndb-forest) 8%, transparent);
   border-radius: 2rem;
   padding: 0.5rem;
   transition: all 700ms cubic-bezier(0.32, 0.72, 0, 1);
@@ -142,7 +142,7 @@
   &:hover,
   &.drag-active {
     border-color: var(--color-ndb-gold);
-    background: rgba(212, 160, 23, 0.05);
+    background: color-mix(in srgb, var(--color-ndb-gold) 5%, transparent);
     transform: scale(1.02);
   }
 }
@@ -300,7 +300,7 @@
 
   &.status-pending {
     background: var(--color-ndb-warn-bg);
-    color: #92400E;
+    color: var(--color-ndb-warn-dark);
   }
 
   &.status-approved {

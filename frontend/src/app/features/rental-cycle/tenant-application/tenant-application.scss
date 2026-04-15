@@ -66,8 +66,8 @@
    ══════════════════════════════════════════════ */
 .section-card-shell,
 .status-card-shell {
-  background: rgba(27, 67, 50, 0.03);
-  border: 1px solid rgba(27, 67, 50, 0.08);
+  background: color-mix(in srgb, var(--color-ndb-forest) 3%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ndb-forest) 8%, transparent);
   border-radius: 2rem;
   padding: 0.5rem;
   animation: fadeSlideUp 800ms cubic-bezier(0.32, 0.72, 0, 1) backwards 200ms;
@@ -442,7 +442,7 @@
   &.status-submitted,
   &.status-review {
     background: var(--color-ndb-warn-bg);
-    color: #92400E;
+    color: var(--color-ndb-warn-dark);
   }
 
   &.status-approved {

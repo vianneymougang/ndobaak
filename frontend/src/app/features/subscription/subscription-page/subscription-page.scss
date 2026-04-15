@@ -277,15 +277,15 @@
   display: flex;
   align-items: flex-start;
   gap: 0.875rem;
-  background: color-mix(in srgb, #ef4444 8%, transparent);
-  border: 1px solid color-mix(in srgb, #ef4444 30%, transparent);
+  background: color-mix(in srgb, var(--color-ndb-error) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ndb-error) 30%, transparent);
   border-radius: 12px;
   padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
 
   i {
     font-size: 1.25rem;
-    color: #ef4444;
+    color: var(--color-ndb-error);
     flex-shrink: 0;
     margin-top: 0.125rem;
   }
@@ -298,7 +298,7 @@
 
   strong {
     font-size: 0.9375rem;
-    color: #b91c1c;
+    color: var(--color-ndb-error-darker);
   }
 
   span {
@@ -374,7 +374,7 @@
   align-items: center;
   gap: 0.375rem;
   font-size: 0.8125rem;
-  color: var(--p-inputtext-invalid-border-color, #ef4444);
+  color: var(--p-inputtext-invalid-border-color, var(--color-ndb-error));
 }
 
 @media (max-width: 640px) {
