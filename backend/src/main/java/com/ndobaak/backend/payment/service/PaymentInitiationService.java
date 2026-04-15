@@ -35,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -230,10 +229,8 @@ public class PaymentInitiationService {
                 "Le paiement n'est possible qu'après signature du contrat par les deux parties.");
         }
 
-        boolean hasActivePayment = paymentRepository.findByBookingId(bookingId).stream()
-                .anyMatch(p -> p.getStatus() == PaymentStatus.PENDING
-                        || p.getStatus() == PaymentStatus.PROCESSING);
-        if (hasActivePayment) {
+        if (paymentRepository.existsByBookingIdAndStatus(bookingId, PaymentStatus.PENDING)
+                || paymentRepository.existsByBookingIdAndStatus(bookingId, PaymentStatus.PROCESSING)) {
             throw new BusinessException("Un paiement est déjà en cours pour cette réservation.");
         }
 
@@ -299,17 +296,11 @@ public class PaymentInitiationService {
     }
 
     private void validateNoActivePayment(Booking booking) {
-        List<Payment> existingPayments = paymentRepository.findByBookingId(booking.getId());
-
-        boolean hasProcessing = existingPayments.stream()
-                .anyMatch(p -> p.getStatus() == PaymentStatus.PROCESSING);
-        if (hasProcessing) {
+        if (paymentRepository.existsByBookingIdAndStatus(booking.getId(), PaymentStatus.PROCESSING)) {
             throw new BusinessException("Un paiement est déjà en cours pour cette réservation.");
         }
 
-        boolean hasCompleted = existingPayments.stream()
-                .anyMatch(p -> p.getStatus() == PaymentStatus.COMPLETED);
-        if (hasCompleted) {
+        if (paymentRepository.existsByBookingIdAndStatus(booking.getId(), PaymentStatus.COMPLETED)) {
             boolean allBlocksCompleted = scheduleRepository.findByBookingId(booking.getId())
                     .map(s -> s.getInstallments().stream()
                             .allMatch(i -> i.getStatus() == InstallmentStatus.PAID))
