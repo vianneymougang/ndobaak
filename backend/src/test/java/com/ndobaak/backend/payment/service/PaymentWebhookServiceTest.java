@@ -3,6 +3,7 @@ package com.ndobaak.backend.payment.service;
 import com.ndobaak.backend.auth.entity.Student;
 import com.ndobaak.backend.booking.entity.Booking;
 import com.ndobaak.backend.common.enums.BookingStatus;
+import com.ndobaak.backend.common.enums.InstallmentStatus;
 import com.ndobaak.backend.common.enums.PaymentStatus;
 import com.ndobaak.backend.common.enums.PaymentType;
 import com.ndobaak.backend.common.enums.ScheduleFrequency;
@@ -39,6 +40,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -194,7 +196,9 @@ class PaymentWebhookServiceTest {
         when(gateway.parseWebhookPayload("payload")).thenReturn(event);
         when(paymentRepository.findByProviderReference("ref-block-2")).thenReturn(Optional.of(payment));
         when(scheduleRepository.findByBookingId(1L)).thenReturn(Optional.of(schedule));
-        when(installmentRepository.findByPaymentScheduleId(1L)).thenReturn(Collections.emptyList());
+        when(installmentRepository.findByPaymentScheduleIdAndStatusAndPaymentIsNullOrderByInstallmentNumberAsc(
+                eq(1L), any())).thenReturn(Collections.emptyList());
+        when(installmentRepository.findByPaymentId(2L)).thenReturn(Optional.empty());
 
         service.handleWebhook("mock", "payload", "sig");
 

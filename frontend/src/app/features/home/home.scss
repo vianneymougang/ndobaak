@@ -109,7 +109,7 @@
 .search-select {
   @apply flex-1;
 
-  ::ng-deep .p-select {
+  :host ::ng-deep .p-select {
     width: 100%;
     height: 48px;
     background: color-mix(in srgb, white 90%, transparent);

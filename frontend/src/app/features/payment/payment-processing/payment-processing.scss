@@ -23,10 +23,23 @@
   }
 }
 
+.processing-header {
+  @apply flex flex-col items-center gap-2;
+}
+
 .processing-title {
   @apply text-xl font-bold m-0;
   font-family: var(--font-urbanist);
   color: var(--color-ndb-navy);
+}
+
+.operator-badge {
+  @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium;
+  background: color-mix(in srgb, var(--color-ndb-primary) 8%, transparent);
+  color: var(--color-ndb-primary);
+  border: 1px solid color-mix(in srgb, var(--color-ndb-primary) 20%, transparent);
+
+  i { @apply text-xs; }
 }
 
 .processing-desc {
@@ -35,9 +48,41 @@
   max-width: 320px;
 }
 
+.processing-steps {
+  @apply flex items-center gap-1 w-full px-2;
+}
+
+.step {
+  @apply flex flex-col items-center gap-1 text-xs flex-1;
+  color: var(--color-ndb-muted);
+  text-align: center;
+
+  i { @apply text-base; }
+
+  &--done {
+    color: var(--color-ndb-success);
+  }
+
+  &--active {
+    color: var(--color-ndb-primary);
+    font-weight: 600;
+  }
+
+  &--pending {
+    color: var(--color-ndb-border);
+  }
+}
+
+.step-connector {
+  @apply flex-1 h-px;
+  background: var(--color-ndb-border);
+  max-width: 32px;
+}
+
 .elapsed {
   @apply text-xs m-0;
   color: var(--color-ndb-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .timeout-icon {

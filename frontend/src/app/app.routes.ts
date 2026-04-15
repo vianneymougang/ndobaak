@@ -162,6 +162,16 @@ export const routes: Routes = [
             (m) => m.LandlordDocuments,
           ),
       },
+      {
+        path: 'listings/create',
+        title: 'Publier une annonce',
+        loadComponent: () => import('./features/listing/create/create').then((m) => m.Create),
+      },
+      {
+        path: 'listings/:id/edit',
+        title: 'Modifier l\'annonce',
+        loadComponent: () => import('./features/listing/create/create').then((m) => m.Create),
+      },
     ],
   },
   {
@@ -176,12 +186,6 @@ export const routes: Routes = [
         path: 'search',
         title: 'Rechercher',
         loadComponent: () => import('./features/search/search').then((m) => m.Search),
-      },
-      {
-        path: 'listings/create',
-        title: 'Publier une annonce',
-        canActivate: [authGuard, roleGuard('LANDLORD')],
-        loadComponent: () => import('./features/listing/create/create').then((m) => m.Create),
       },
       {
         path: 'listings/:id',
@@ -201,6 +205,33 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/rental-cycle/tenant-application/tenant-application').then(
             (m) => m.TenantApplication,
+          ),
+      },
+      {
+        path: 'bookings/:bookingId/lease',
+        title: 'Contrat de bail',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/rental-cycle/lease-viewer/lease-viewer').then(
+            (m) => m.LeaseViewer,
+          ),
+      },
+      {
+        path: 'bookings/:bookingId/inspection',
+        title: 'État des lieux',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/rental-cycle/inspection-viewer/inspection-viewer').then(
+            (m) => m.InspectionViewer,
+          ),
+      },
+      {
+        path: 'bookings/:bookingId/key-handover',
+        title: 'Remise des clés',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/rental-cycle/key-handover/key-handover').then(
+            (m) => m.KeyHandover,
           ),
       },
       {

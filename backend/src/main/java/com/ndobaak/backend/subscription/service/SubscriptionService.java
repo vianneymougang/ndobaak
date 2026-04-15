@@ -2,7 +2,6 @@ package com.ndobaak.backend.subscription.service;
 
 import com.ndobaak.backend.auth.entity.User;
 import com.ndobaak.backend.auth.service.AuthService;
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
 import com.ndobaak.backend.common.enums.NotificationType;
 import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.common.enums.PaymentMethod;
@@ -136,6 +135,36 @@ public class SubscriptionService {
         SubscriptionResponse response = subscriptionMapper.toResponse(subscription);
         response.setPaymentReference(reference);
         return response;
+    }
+
+    @Transactional
+    public void cancelPendingSubscription() {
+        User landlord = authService.getAuthenticatedUser();
+
+        Subscription subscription = subscriptionRepository.findByLandlordId(landlord.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Aucun abonnement trouvé."));
+
+        if (subscription.getStatus() != SubscriptionStatus.PENDING_PAYMENT) {
+            throw new BusinessException("Seul un paiement en cours peut être annulé.");
+        }
+
+        Payment lastPayment = subscription.getLastPayment();
+        if (lastPayment != null && lastPayment.getProviderReference() != null) {
+            try {
+                PaymentGateway gateway = gatewayRouter.resolveGatewayByProvider(lastPayment.getProviderName());
+                gateway.cancelPayment(lastPayment.getProviderReference());
+            } catch (Exception e) {
+                log.warn("Failed to cancel payment on gateway: ref={}, error={}",
+                        lastPayment.getProviderReference(), e.getMessage());
+            }
+            lastPayment.setStatus(PaymentStatus.FAILED);
+            paymentRepository.save(lastPayment);
+        }
+
+        subscription.setStatus(SubscriptionStatus.CANCELLED);
+        subscriptionRepository.save(subscription);
+
+        log.info("Pending subscription cancelled for landlord={}", landlord.getId());
     }
 
     @Transactional
@@ -314,7 +343,7 @@ public class SubscriptionService {
                 .amount(SUBSCRIPTION_AMOUNT)
                 .commission(BigDecimal.ZERO)
                 .paymentMethod(PaymentMethod.MOBILE_MONEY)
-                .channel(PaymentChannel.valueOf(request.getOperator().name()))
+                .channel(request.getOperator())
                 .paymentType(PaymentType.SUBSCRIPTION)
                 .transactionId(reference)
                 .status(PaymentStatus.PENDING)
@@ -340,6 +369,12 @@ public class SubscriptionService {
                 paymentProperties.getFrontendCallbackUrl()
         );
 
-        return gateway.initiatePayment(gatewayRequest);
+        PaymentInitiationResult result = gateway.initiatePayment(gatewayRequest);
+        try {
+            gateway.triggerCharge(result.providerReference(), gatewayRequest);
+        } catch (Exception e) {
+            log.warn("USSD push failed for subscription (non-fatal): reference={}, error={}", reference, e.getMessage());
+        }
+        return result;
     }
 }

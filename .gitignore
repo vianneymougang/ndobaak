@@ -35,3 +35,10 @@ docs/
 
 # === Docker ===
 docker-data/
+
+# === Local tooling ===
+.kiro/
+.mcp.json
+
+# === E2E auth state ===
+frontend/e2e/.auth/

@@ -10,6 +10,7 @@ import {
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { timer, switchMap, takeWhile, catchError, of } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
@@ -23,7 +24,7 @@ import { MessageService } from 'primeng/api';
 import { NgmMotionDirective } from '@scripttype/ng-motion';
 import { SubscriptionService } from '../../../core/services/subscription';
 import { Subscription, SubscriptionStatus } from '../../../core/models/subscription.models';
-import { MobileMoneyOperator } from '../../../core/models/payment.models';
+import { PaymentChannel } from '../../../core/models/payment.models';
 
 @Component({
   selector: 'app-subscription-page',
@@ -56,16 +57,17 @@ export class SubscriptionPage implements OnInit {
   protected loading = signal(true);
   protected submitting = signal(false);
   protected cancellingAutoRenew = signal(false);
+  protected cancellingPending = signal(false);
   protected isRenewal = signal(false);
   protected dialogVisible = false;
 
-  protected readonly operatorOptions: { label: string; value: MobileMoneyOperator }[] = [
+  protected readonly operatorOptions: { label: string; value: PaymentChannel }[] = [
     { label: 'MTN Mobile Money', value: 'MTN_MOMO' },
     { label: 'Orange Money', value: 'ORANGE_MONEY' },
   ];
 
   protected form = this.fb.nonNullable.group({
-    operator: [null as MobileMoneyOperator | null, Validators.required],
+    operator: [null as PaymentChannel | null, Validators.required],
     phoneNumber: ['', [Validators.required, Validators.pattern(/^6[0-9]{8}$/)]],
   });
 
@@ -106,12 +108,34 @@ export class SubscriptionPage implements OnInit {
         next: (sub) => {
           this.subscription.set(sub);
           this.loading.set(false);
+          if (sub?.status === 'PENDING_PAYMENT') {
+            this.startPolling();
+          }
         },
         error: () => {
           this.subscription.set(null);
           this.loading.set(false);
         },
       });
+  }
+
+  private startPolling(): void {
+    timer(5000, 5000).pipe(
+      switchMap(() => this.subscriptionService.getMySubscription().pipe(
+        catchError(() => of(this.subscription())),
+      )),
+      takeWhile(sub => sub?.status === 'PENDING_PAYMENT', true),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(sub => {
+      this.subscription.set(sub);
+      if (sub?.status === 'ACTIVE') {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Abonnement activé',
+          detail: 'Votre abonnement est maintenant actif. Bonne publication !',
+        });
+      }
+    });
   }
 
   protected openSubscribeDialog(): void {
@@ -146,6 +170,7 @@ export class SubscriptionPage implements OnInit {
         this.submitting.set(false);
         this.dialogVisible = false;
         this.subscription.set(sub);
+        this.startPolling();
         this.messageService.add({
           severity: 'success',
           summary: 'Demande envoyée',
@@ -161,6 +186,32 @@ export class SubscriptionPage implements OnInit {
         });
       },
     });
+  }
+
+  protected cancelPendingSubscriptionAction(): void {
+    this.cancellingPending.set(true);
+    this.subscriptionService
+      .cancelPendingSubscription()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.cancellingPending.set(false);
+          this.subscription.set(null);
+          this.messageService.add({
+            severity: 'info',
+            summary: 'Paiement annulé',
+            detail: 'Vous pouvez relancer un abonnement avec le bon numéro.',
+          });
+        },
+        error: (err) => {
+          this.cancellingPending.set(false);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erreur',
+            detail: err?.error?.message ?? 'Impossible d\'annuler le paiement. Réessayez.',
+          });
+        },
+      });
   }
 
   protected cancelAutoRenewAction(): void {

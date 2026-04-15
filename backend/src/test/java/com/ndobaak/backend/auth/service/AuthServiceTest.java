@@ -299,6 +299,7 @@ class AuthServiceTest {
     private void setupSecurityContext(String email) {
         Authentication authentication = mock(Authentication.class);
         when(authentication.getName()).thenReturn(email);
+        when(authentication.isAuthenticated()).thenReturn(true);
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);

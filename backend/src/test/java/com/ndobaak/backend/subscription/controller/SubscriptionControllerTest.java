@@ -2,7 +2,6 @@ package com.ndobaak.backend.subscription.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndobaak.backend.auth.service.CustomOAuth2UserService;
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
 import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.common.enums.SubscriptionStatus;
 import com.ndobaak.backend.common.exception.BusinessException;
@@ -70,7 +69,7 @@ class SubscriptionControllerTest {
 
     private SubscribeRequest buildRequest() {
         SubscribeRequest request = new SubscribeRequest();
-        request.setOperator(MobileMoneyOperator.MTN_MOMO);
+        request.setOperator(PaymentChannel.MTN_MOMO);
         request.setPhoneNumber("677000001");
         return request;
     }

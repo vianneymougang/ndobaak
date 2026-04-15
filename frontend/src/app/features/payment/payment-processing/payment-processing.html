@@ -18,20 +18,42 @@
         </div>
       </div>
 
-      <h1 class="processing-title">Confirmez sur votre téléphone</h1>
+      <div class="processing-header">
+        <h1 class="processing-title">Confirmez sur votre téléphone</h1>
+        <span class="operator-badge">
+          <i class="pi pi-wallet" aria-hidden="true"></i>
+          {{ operatorLabel() }}
+        </span>
+      </div>
+
       <p class="processing-desc">
-        Une demande de paiement a été envoyée sur votre téléphone.
-        Composez votre code PIN Mobile Money pour confirmer.
+        Ouvrez votre application {{ operatorLabel() }} ou composez votre code PIN
+        pour confirmer la transaction.
       </p>
 
-      <p-progressSpinner
-        strokeWidth="3"
-        [style]="{ width: '48px', height: '48px' }"
-        ariaLabel="Vérification du paiement en cours"
-      />
+      <div class="processing-steps">
+        <div class="step step--done">
+          <i class="pi pi-check-circle" aria-hidden="true"></i>
+          <span>Paiement initié</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step step--active">
+          <p-progressSpinner
+            strokeWidth="4"
+            [style]="{ width: '18px', height: '18px' }"
+            ariaLabel="En attente"
+          />
+          <span>Attente de confirmation</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step step--pending">
+          <i class="pi pi-circle" aria-hidden="true"></i>
+          <span>Traitement</span>
+        </div>
+      </div>
 
       <p class="elapsed">
-        En attente depuis {{ elapsedSeconds() }}s...
+        En attente depuis {{ elapsedSeconds() }}s
       </p>
 
       <p-button

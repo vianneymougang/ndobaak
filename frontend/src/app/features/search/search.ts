@@ -11,6 +11,7 @@ import {
   PLATFORM_ID,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { debounceTime } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -139,7 +140,7 @@ export class Search implements OnInit {
 
   ngOnInit(): void {
     this.geolocationService.requestPosition().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
-    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+    this.route.queryParams.pipe(debounceTime(300), takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       this.keyword = params['keyword'] ?? '';
       this.roomType = params['roomType'] ?? '';
       this.priceMin = params['priceMin'] ? +params['priceMin'] : null;

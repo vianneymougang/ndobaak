@@ -15,6 +15,7 @@ import com.ndobaak.backend.common.exception.ForbiddenException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.payment.dto.InitiatePaymentRequest;
 import com.ndobaak.backend.payment.dto.PayInstallmentRequest;
+import com.ndobaak.backend.payment.dto.PaymentInitiationResponse;
 import com.ndobaak.backend.payment.dto.PaymentResponse;
 import com.ndobaak.backend.payment.entity.Installment;
 import com.ndobaak.backend.payment.entity.Payment;
@@ -34,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -101,7 +101,7 @@ public class PaymentInitiationService {
                 .amount(firstBlockAmount)
                 .commission(commission)
                 .paymentMethod(PaymentMethod.MOBILE_MONEY)
-                .channel(PaymentChannel.valueOf(request.getOperator().name()))
+                .channel(request.getOperator())
                 .paymentType(paymentType)
                 .transactionId(reference)
                 .status(PaymentStatus.PENDING)
@@ -140,7 +140,11 @@ public class PaymentInitiationService {
         payment.setProviderReference(result.providerReference());
         paymentRepository.save(payment);
 
-        gateway.triggerCharge(result.providerReference(), gatewayRequest);
+        try {
+            gateway.triggerCharge(result.providerReference(), gatewayRequest);
+        } catch (Exception e) {
+            log.warn("USSD push failed (non-fatal): reference={}, error={}", reference, e.getMessage());
+        }
 
         log.info("Payment initiated: reference={}, provider={}, amount={} XAF, split={}",
                 reference, gateway.getProviderName(), totalCharged, isSplit);
@@ -173,7 +177,7 @@ public class PaymentInitiationService {
                 .amount(installment.getAmount())
                 .commission(commission)
                 .paymentMethod(PaymentMethod.MOBILE_MONEY)
-                .channel(PaymentChannel.valueOf(request.getOperator().name()))
+                .channel(request.getOperator())
                 .paymentType(PaymentType.INSTALLMENT)
                 .transactionId(reference)
                 .status(PaymentStatus.PENDING)
@@ -186,7 +190,7 @@ public class PaymentInitiationService {
         installmentRepository.save(installment);
 
         PaymentGateway gateway = gatewayRouter.resolveGateway(request.getOperator());
-        BigDecimal totalCharged = installment.getAmount().add(commission);
+        BigDecimal totalCharged = installment.getAmount();
 
         PaymentGatewayRequest gatewayRequest = new PaymentGatewayRequest(
                 reference,
@@ -212,6 +216,68 @@ public class PaymentInitiationService {
         return response;
     }
 
+    @Transactional
+    public PaymentInitiationResponse initiateBookingPayment(Long bookingId, Long studentId) {
+        Booking booking = findBookingById(bookingId);
+
+        if (!booking.getStudent().getId().equals(studentId)) {
+            throw new ForbiddenException("Vous n'êtes pas autorisé à initier le paiement pour cette réservation.");
+        }
+
+        if (booking.getStatus() != BookingStatus.LEASE_SIGNED) {
+            throw new BusinessException(
+                "Le paiement n'est possible qu'après signature du contrat par les deux parties.");
+        }
+
+        if (paymentRepository.existsByBookingIdAndStatus(bookingId, PaymentStatus.PENDING)
+                || paymentRepository.existsByBookingIdAndStatus(bookingId, PaymentStatus.PROCESSING)) {
+            throw new BusinessException("Un paiement est déjà en cours pour cette réservation.");
+        }
+
+        String reference = "NDK-" + bookingId + "-" + System.currentTimeMillis();
+        String payerName = booking.getStudent().getFirstName() + " " + booking.getStudent().getLastName();
+        String description = "Réservation Ndobaâk #" + bookingId;
+
+        BigDecimal commission = booking.getTotalAmount()
+                .multiply(paymentProperties.getCommissionRate())
+                .setScale(0, RoundingMode.CEILING);
+
+        Payment payment = Payment.builder()
+                .booking(booking)
+                .amount(booking.getTotalAmount())
+                .commission(commission)
+                .paymentMethod(PaymentMethod.MOBILE_MONEY)
+                .paymentType(PaymentType.INTEGRAL)
+                .transactionId(reference)
+                .status(PaymentStatus.PENDING)
+                .payerName(payerName)
+                .build();
+        payment = paymentRepository.save(payment);
+
+        PaymentGateway gateway = gatewayRouter.resolveGatewayByProvider(
+                paymentProperties.getPrimaryGateway());
+
+        PaymentInitiationResult result = gateway.initiateRedirectPayment(
+                reference,
+                booking.getTotalAmount(),
+                "XAF",
+                payerName,
+                booking.getStudent().getEmail(),
+                description,
+                paymentProperties.getFrontendCallbackUrl()
+        );
+
+        payment.setStatus(PaymentStatus.PROCESSING);
+        payment.setProviderName(gateway.getProviderName());
+        payment.setProviderReference(result.providerReference());
+        paymentRepository.save(payment);
+
+        log.info("Rental cycle payment initiated: bookingId={}, reference={}, provider={}",
+                bookingId, reference, gateway.getProviderName());
+
+        return new PaymentInitiationResponse(result.authorizationUrl(), reference);
+    }
+
     private Booking findBookingById(Long bookingId) {
         return bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking", "id", bookingId));
@@ -230,17 +296,11 @@ public class PaymentInitiationService {
     }
 
     private void validateNoActivePayment(Booking booking) {
-        List<Payment> existingPayments = paymentRepository.findByBookingId(booking.getId());
-
-        boolean hasProcessing = existingPayments.stream()
-                .anyMatch(p -> p.getStatus() == PaymentStatus.PROCESSING);
-        if (hasProcessing) {
+        if (paymentRepository.existsByBookingIdAndStatus(booking.getId(), PaymentStatus.PROCESSING)) {
             throw new BusinessException("Un paiement est déjà en cours pour cette réservation.");
         }
 
-        boolean hasCompleted = existingPayments.stream()
-                .anyMatch(p -> p.getStatus() == PaymentStatus.COMPLETED);
-        if (hasCompleted) {
+        if (paymentRepository.existsByBookingIdAndStatus(booking.getId(), PaymentStatus.COMPLETED)) {
             boolean allBlocksCompleted = scheduleRepository.findByBookingId(booking.getId())
                     .map(s -> s.getInstallments().stream()
                             .allMatch(i -> i.getStatus() == InstallmentStatus.PAID))

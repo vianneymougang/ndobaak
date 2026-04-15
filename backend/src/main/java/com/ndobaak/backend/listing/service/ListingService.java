@@ -29,26 +29,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ndobaak.backend.common.util.FileValidator;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class ListingService {
 
     private static final double MAX_CAMPUS_DISTANCE_KM = 10.0;
     private static final String WEBP_CONTENT_TYPE = "image/webp";
-    private static final long MAX_UPLOAD_SIZE = 10 * 1024 * 1024;
-    private static final Set<String> ALLOWED_MIME_TYPES = Set.of("image/jpeg", "image/png", "image/webp");
-
-    private static final byte[] JPEG_MAGIC = {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF};
-    private static final byte[] PNG_MAGIC = {(byte) 0x89, 0x50, 0x4E, 0x47};
-    private static final byte[] RIFF_MAGIC = {0x52, 0x49, 0x46, 0x46};
-    private static final byte[] WEBP_MAGIC = {0x57, 0x45, 0x42, 0x50};
 
     private final ListingRepository listingRepository;
     private final AmenityRepository amenityRepository;
@@ -145,7 +136,7 @@ public class ListingService {
 
     @Transactional
     public synchronized ListingResponse uploadPhoto(Long listingId, MultipartFile file) throws IOException {
-        validateUploadedFile(file);
+        FileValidator.validateImageFile(file);
         Listing listing = getOwnedListing(listingId);
 
         int photoCount = photoRepository.countByListingId(listingId);
@@ -349,40 +340,4 @@ public class ListingService {
         }
     }
 
-    private void validateUploadedFile(MultipartFile file) throws IOException {
-        if (file.isEmpty()) {
-            throw new BusinessException("Le fichier est vide.");
-        }
-        if (file.getSize() > MAX_UPLOAD_SIZE) {
-            throw new BusinessException("Le fichier dépasse la taille maximale de 10 Mo.");
-        }
-        String contentType = file.getContentType();
-        if (contentType == null || !ALLOWED_MIME_TYPES.contains(contentType)) {
-            throw new BusinessException("Format de fichier non accepté. Formats autorisés : JPEG, PNG, WebP.");
-        }
-        validateMagicBytes(file.getInputStream());
-    }
-
-    private void validateMagicBytes(InputStream inputStream) throws IOException {
-        byte[] header = new byte[12];
-        int bytesRead = inputStream.read(header);
-        if (bytesRead < 4) {
-            throw new BusinessException("Format de fichier non accepté. Formats autorisés : JPEG, PNG, WebP.");
-        }
-
-        boolean isJpeg = bytesRead >= 3
-                && header[0] == JPEG_MAGIC[0] && header[1] == JPEG_MAGIC[1] && header[2] == JPEG_MAGIC[2];
-        boolean isPng = bytesRead >= 4
-                && header[0] == PNG_MAGIC[0] && header[1] == PNG_MAGIC[1]
-                && header[2] == PNG_MAGIC[2] && header[3] == PNG_MAGIC[3];
-        boolean isWebp = bytesRead >= 12
-                && header[0] == RIFF_MAGIC[0] && header[1] == RIFF_MAGIC[1]
-                && header[2] == RIFF_MAGIC[2] && header[3] == RIFF_MAGIC[3]
-                && header[8] == WEBP_MAGIC[0] && header[9] == WEBP_MAGIC[1]
-                && header[10] == WEBP_MAGIC[2] && header[11] == WEBP_MAGIC[3];
-
-        if (!isJpeg && !isPng && !isWebp) {
-            throw new BusinessException("Format de fichier non accepté. Formats autorisés : JPEG, PNG, WebP.");
-        }
-    }
 }

@@ -3,7 +3,6 @@ package com.ndobaak.backend.subscription.service;
 import com.ndobaak.backend.auth.entity.Landlord;
 import com.ndobaak.backend.auth.entity.User;
 import com.ndobaak.backend.auth.service.AuthService;
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
 import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.common.enums.NotificationType;
 import com.ndobaak.backend.common.enums.SubscriptionStatus;
@@ -78,7 +77,7 @@ class SubscriptionServiceTest {
     @BeforeEach
     void setUp() {
         landlord = buildLandlord(10L, "Alice", "Martin", "alice@example.com");
-        subscribeRequest = buildSubscribeRequest(MobileMoneyOperator.MTN_MOMO, "677000001");
+        subscribeRequest = buildSubscribeRequest(PaymentChannel.MTN_MOMO, "677000001");
         savedPayment = buildPayment(1L);
         initiationResult = new PaymentInitiationResult("PROV-REF-001", "https://pay.example.com/auth", "PENDING");
         subscriptionResponse = SubscriptionResponse.builder()
@@ -95,7 +94,7 @@ class SubscriptionServiceTest {
         when(subscriptionRepository.existsByLandlordIdAndStatus(10L, SubscriptionStatus.ACTIVE)).thenReturn(false);
         when(subscriptionRepository.findByLandlordId(10L)).thenReturn(Optional.empty());
         when(paymentRepository.save(any(Payment.class))).thenReturn(savedPayment);
-        when(gatewayRouter.resolveGateway(MobileMoneyOperator.MTN_MOMO)).thenReturn(paymentGateway);
+        when(gatewayRouter.resolveGateway(PaymentChannel.MTN_MOMO)).thenReturn(paymentGateway);
         when(paymentGateway.getProviderName()).thenReturn("NotchPay");
         when(paymentGateway.initiatePayment(any(PaymentGatewayRequest.class))).thenReturn(initiationResult);
         when(subscriptionRepository.save(any(Subscription.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -117,7 +116,7 @@ class SubscriptionServiceTest {
         when(subscriptionRepository.existsByLandlordIdAndStatus(10L, SubscriptionStatus.ACTIVE)).thenReturn(false);
         when(subscriptionRepository.findByLandlordId(10L)).thenReturn(Optional.of(existing));
         when(paymentRepository.save(any(Payment.class))).thenReturn(savedPayment);
-        when(gatewayRouter.resolveGateway(MobileMoneyOperator.MTN_MOMO)).thenReturn(paymentGateway);
+        when(gatewayRouter.resolveGateway(PaymentChannel.MTN_MOMO)).thenReturn(paymentGateway);
         when(paymentGateway.getProviderName()).thenReturn("NotchPay");
         when(paymentGateway.initiatePayment(any(PaymentGatewayRequest.class))).thenReturn(initiationResult);
         when(subscriptionRepository.save(any(Subscription.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -149,7 +148,7 @@ class SubscriptionServiceTest {
         when(subscriptionRepository.existsByLandlordIdAndStatus(10L, SubscriptionStatus.ACTIVE)).thenReturn(false);
         when(subscriptionRepository.findByLandlordId(10L)).thenReturn(Optional.empty());
         when(paymentRepository.save(any(Payment.class))).thenReturn(savedPayment);
-        when(gatewayRouter.resolveGateway(MobileMoneyOperator.MTN_MOMO)).thenReturn(paymentGateway);
+        when(gatewayRouter.resolveGateway(PaymentChannel.MTN_MOMO)).thenReturn(paymentGateway);
         when(paymentGateway.getProviderName()).thenReturn("NotchPay");
         when(paymentGateway.initiatePayment(any(PaymentGatewayRequest.class))).thenReturn(initiationResult);
         when(subscriptionRepository.save(any(Subscription.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -167,7 +166,7 @@ class SubscriptionServiceTest {
         when(authService.getAuthenticatedUser()).thenReturn(landlord);
         when(subscriptionRepository.findByLandlordId(10L)).thenReturn(Optional.of(subscription));
         when(paymentRepository.save(any(Payment.class))).thenReturn(savedPayment);
-        when(gatewayRouter.resolveGateway(MobileMoneyOperator.MTN_MOMO)).thenReturn(paymentGateway);
+        when(gatewayRouter.resolveGateway(PaymentChannel.MTN_MOMO)).thenReturn(paymentGateway);
         when(paymentGateway.getProviderName()).thenReturn("NotchPay");
         when(paymentGateway.initiatePayment(any(PaymentGatewayRequest.class))).thenReturn(initiationResult);
         when(subscriptionRepository.save(any(Subscription.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -349,7 +348,7 @@ class SubscriptionServiceTest {
         return user;
     }
 
-    private SubscribeRequest buildSubscribeRequest(MobileMoneyOperator operator, String phoneNumber) {
+    private SubscribeRequest buildSubscribeRequest(PaymentChannel operator, String phoneNumber) {
         SubscribeRequest request = new SubscribeRequest();
         request.setOperator(operator);
         request.setPhoneNumber(phoneNumber);

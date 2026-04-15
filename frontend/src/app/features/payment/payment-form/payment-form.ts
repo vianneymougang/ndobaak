@@ -18,11 +18,10 @@ import { DividerModule } from 'primeng/divider';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageModule } from 'primeng/message';
 import { NgmMotionDirective } from '@scripttype/ng-motion';
-import { MessageService } from 'primeng/api';
 import { BookingService } from '../../../core/services/booking';
 import { PaymentService } from '../../../core/services/payment';
 import { BookingResponse } from '../../../core/models/booking.models';
-import { MobileMoneyOperator } from '../../../core/models/payment.models';
+import { PaymentChannel } from '../../../core/models/payment.models';
 
 @Component({
   selector: 'app-payment-form',
@@ -48,7 +47,6 @@ export class PaymentForm implements OnInit {
   private fb = inject(FormBuilder);
   private bookingService = inject(BookingService);
   private paymentService = inject(PaymentService);
-  private messageService = inject(MessageService);
   private destroyRef = inject(DestroyRef);
 
   protected booking = signal<BookingResponse | null>(null);
@@ -58,15 +56,35 @@ export class PaymentForm implements OnInit {
 
   protected readonly BLOCK_THRESHOLD = 500_000;
 
-  protected readonly operatorOptions: { label: string; value: MobileMoneyOperator }[] = [
+  protected readonly operatorOptions: { label: string; value: PaymentChannel }[] = [
     { label: 'MTN Mobile Money', value: 'MTN_MOMO' },
     { label: 'Orange Money', value: 'ORANGE_MONEY' },
+    { label: 'Carte bancaire', value: 'CARD' },
   ];
 
   protected form = this.fb.nonNullable.group({
-    operator: [null as MobileMoneyOperator | null, Validators.required],
+    operator: [null as PaymentChannel | null, Validators.required],
     phoneNumber: ['', [Validators.required, Validators.pattern(/^6[0-9]{8}$/)]],
   });
+
+  protected isCardSelected = signal(false);
+
+  constructor() {
+    this.form.controls.operator.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(operator => {
+        const phoneCtrl = this.form.controls.phoneNumber;
+        if (operator === 'CARD') {
+          phoneCtrl.clearValidators();
+          phoneCtrl.setValue('');
+          this.isCardSelected.set(true);
+        } else {
+          phoneCtrl.setValidators([Validators.required, Validators.pattern(/^6[0-9]{8}$/)]);
+          this.isCardSelected.set(false);
+        }
+        phoneCtrl.updateValueAndValidity();
+      });
+  }
 
   protected needsSplitPayment = computed(() => {
     const b = this.booking();
@@ -107,11 +125,7 @@ export class PaymentForm implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erreur',
-          detail: 'Impossible de charger les détails de la réservation.',
-        });
+        this.apiError.set('Impossible de charger les détails de la réservation. Veuillez réessayer.');
       },
     });
   }
@@ -141,19 +155,14 @@ export class PaymentForm implements OnInit {
         next: (payment) => {
           this.submitting.set(false);
           this.router.navigate(['/bookings', booking.id, 'pay', 'processing'], {
-            queryParams: { paymentId: payment.id },
+            queryParams: { paymentId: payment.id, operator: operator },
           });
         },
         error: (err) => {
           this.submitting.set(false);
-          const message =
-            err?.error?.message ?? 'Impossible d\'initier le paiement. Veuillez réessayer.';
-          this.apiError.set(message);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erreur de paiement',
-            detail: message,
-          });
+          this.apiError.set(
+            err?.error?.message ?? 'Impossible d\'initier le paiement. Veuillez réessayer.'
+          );
         },
       });
   }

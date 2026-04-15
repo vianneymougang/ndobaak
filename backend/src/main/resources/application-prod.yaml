@@ -43,6 +43,12 @@ app:
 
   frontend-url: ${FRONTEND_URL}
 
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
+
 logging:
   level:
     cm.ndobaak: INFO

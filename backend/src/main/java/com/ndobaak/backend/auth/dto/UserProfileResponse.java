@@ -25,7 +25,6 @@ public class UserProfileResponse {
 
     private Boolean verified;
 
-    // Landlord fields
     private String idCardNumber;
     private String taxId;
     private String mobileMoneyPhone;

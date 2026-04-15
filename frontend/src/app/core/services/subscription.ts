@@ -32,4 +32,8 @@ export class SubscriptionService {
   cancelAutoRenew(): Observable<Subscription> {
     return this.http.put<Subscription>(`${this.apiUrl}/subscriptions/cancel-auto-renew`, {});
   }
+
+  cancelPendingSubscription(): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/subscriptions/pending`);
+  }
 }

@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed, OnInit, OnDestroy, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { StepperModule } from 'primeng/stepper';
@@ -16,8 +16,8 @@ import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { MessageService } from 'primeng/api';
-import { concat, EMPTY, switchMap } from 'rxjs';
-import { finalize, tap } from 'rxjs/operators';
+import { EMPTY, merge, switchMap } from 'rxjs';
+import { catchError, finalize, tap } from 'rxjs/operators';
 import { ListingService } from '../../../core/services/listing';
 import { ListingResponse, RoomType, CreateListingRequest, PhotoResponse } from '../../../core/models/listing.models';
 import { AMENITY_CONFIG } from '../../../core/models/amenity.config';
@@ -64,12 +64,14 @@ interface PendingPhoto {
 })
 export class Create implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
   private listingService = inject(ListingService);
   private subscriptionService = inject(SubscriptionService);
   private messageService = inject(MessageService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
+  protected isEditMode = signal(false);
   protected activeStep = signal(1);
   protected saving = signal(false);
   protected submitting = signal(false);
@@ -148,13 +150,52 @@ export class Create implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.checkSubscription();
-    this.infoForm.get('description')?.valueChanges.pipe(
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.isEditMode.set(true);
+      this.loadExistingListing(Number(id));
+    } else {
+      this.checkSubscription();
+    }
+  }
+
+  private loadExistingListing(id: number): void {
+    this.listingService.getListingById(id).pipe(
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe(() => {});
-    this.infoForm.get('title')?.valueChanges.pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(() => {});
+    ).subscribe({
+      next: (listing) => {
+        this.listing.set(listing);
+        this.photos.set(listing.photos);
+        this.patchForms(listing);
+      },
+      error: () => {
+        this.router.navigate(['/landlord/listings']);
+      },
+    });
+  }
+
+  private patchForms(listing: ListingResponse): void {
+    this.infoForm.patchValue({
+      title: listing.title,
+      description: listing.description,
+      roomType: listing.roomType,
+      monthlyPrice: listing.monthlyPrice,
+      availableRooms: listing.availableRooms,
+      availableDate: listing.availableDate ? new Date(listing.availableDate) : null,
+    });
+
+    if (listing.location) {
+      this.locationForm.patchValue({
+        address: listing.location.address,
+        neighborhood: listing.location.neighborhood ?? '',
+        city: listing.location.city,
+        latitude: listing.location.latitude,
+        longitude: listing.location.longitude,
+      });
+    }
+
+    const amenityNames = new Set(listing.amenities.map((a) => a.name));
+    this.amenities.update((list) => list.map((a) => ({ ...a, selected: amenityNames.has(a.name) })));
   }
 
   private checkSubscription(): void {
@@ -168,11 +209,11 @@ export class Create implements OnInit, OnDestroy {
             summary: 'Abonnement requis',
             detail: 'Un abonnement actif est requis pour publier une annonce.',
           });
-          this.router.navigate(['/subscription']);
+          this.router.navigate(['/landlord/subscription']);
         }
       },
       error: () => {
-        this.router.navigate(['/subscription']);
+        this.router.navigate(['/landlord/subscription']);
       },
     });
   }
@@ -265,21 +306,31 @@ export class Create implements OnInit, OnDestroy {
     this.uploadProgress.set(0);
     this.uploadTotal.set(filesToUpload.length);
 
-    const uploads = filesToUpload.map((file, index) =>
-      this.listingService.uploadPhoto(currentListing.id, file).pipe(
+    const uploads = filesToUpload.map((file, index) => {
+      const pending = newPending[index];
+      return this.listingService.uploadPhoto(currentListing.id, file).pipe(
         tap((updated) => {
           this.listing.set(updated);
           this.photos.set(updated.photos);
-          this.uploadProgress.set(index + 1);
-
-          const pendingUrl = newPending[index].localUrl;
-          URL.revokeObjectURL(pendingUrl);
-          this.pendingPhotos.update((list) => list.filter((p) => p.localUrl !== pendingUrl));
+          this.uploadProgress.update((n) => n + 1);
+          URL.revokeObjectURL(pending.localUrl);
+          this.pendingPhotos.update((list) => list.filter((p) => p.localUrl !== pending.localUrl));
+        }),
+        catchError((err) => {
+          URL.revokeObjectURL(pending.localUrl);
+          this.pendingPhotos.update((list) => list.filter((p) => p.localUrl !== pending.localUrl));
+          const detail = err?.error?.message ?? `Echec de l'upload de "${file.name}".`;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erreur upload',
+            detail,
+          });
+          return EMPTY;
         })
-      )
-    );
+      );
+    });
 
-    concat(...uploads)
+    merge(...uploads)
       .pipe(
         finalize(() => {
           this.uploadingPhotos.set(false);
@@ -288,19 +339,7 @@ export class Create implements OnInit, OnDestroy {
         }),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe({
-        error: (err) => {
-          this.pendingPhotos.update((list) => {
-            list.forEach((p) => URL.revokeObjectURL(p.localUrl));
-            return [];
-          });
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erreur',
-            detail: 'Echec de l\'upload d\'une ou plusieurs photos.',
-          });
-        },
-      });
+      .subscribe();
 
     input.value = '';
   }
@@ -325,7 +364,7 @@ export class Create implements OnInit, OnDestroy {
     });
   }
 
-  protected saveDraft(): void {
+  protected saveDraft(onSuccess?: () => void): void {
     this.saving.set(true);
     const request = this.buildRequest();
     const currentListing = this.listing();
@@ -344,8 +383,9 @@ export class Create implements OnInit, OnDestroy {
         this.messageService.add({
           severity: 'success',
           summary: 'Sauvegarde',
-          detail: 'Brouillon sauvegarde avec succes.',
+          detail: 'Modifications enregistrées.',
         });
+        onSuccess?.();
       },
       error: (err) => {
         this.saving.set(false);
@@ -355,13 +395,14 @@ export class Create implements OnInit, OnDestroy {
             summary: 'Abonnement requis',
             detail: 'Un abonnement actif est requis pour publier une annonce.',
           });
-          this.router.navigate(['/subscription']);
+          this.router.navigate(['/landlord/subscription']);
           return;
         }
+        const detail = err?.error?.message ?? 'Echec de la sauvegarde.';
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur',
-          detail: 'Echec de la sauvegarde.',
+          detail,
         });
       },
     });
@@ -395,7 +436,7 @@ export class Create implements OnInit, OnDestroy {
             summary: 'Abonnement requis',
             detail: 'Un abonnement actif est requis pour publier une annonce.',
           });
-          this.router.navigate(['/subscription']);
+          this.router.navigate(['/landlord/subscription']);
           return;
         }
         this.messageService.add({

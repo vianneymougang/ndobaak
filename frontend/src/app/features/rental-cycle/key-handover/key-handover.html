@@ -1,0 +1,109 @@
+<p-toast />
+
+<div class="max-w-2xl mx-auto px-4 py-6">
+  <h1 class="text-2xl font-semibold text-[var(--color-ndb-text)] mb-6">
+    Remise des clés
+  </h1>
+
+  @if (loading()) {
+    <p-card>
+      <p-skeleton height="2rem" styleClass="mb-4" />
+      <p-skeleton height="6rem" />
+    </p-card>
+  } @else if (notFound()) {
+    <p-message
+      severity="info"
+      text="La remise des clés n'a pas encore été planifiée pour cette réservation."
+      styleClass="w-full"
+    />
+  } @else if (handover()) {
+    <p-card>
+      <ng-template #header>
+        <div class="flex items-center justify-between px-4 pt-4">
+          <div>
+            <h2 class="text-lg font-semibold">Suivi de la remise des clés</h2>
+            <p class="text-sm text-[var(--color-ndb-text-muted)] mt-1">
+              Date prévue : {{ handover()!.handoverDate | date: 'dd/MM/yyyy HH:mm' }}
+            </p>
+          </div>
+          @if (handover()!.transferInitiated) {
+            <p-tag severity="success" value="Virement effectué" icon="pi pi-check-circle" />
+          } @else if (handover()!.landlordConfirmed && handover()!.tenantConfirmed) {
+            <p-tag severity="info" value="Virement en cours" icon="pi pi-spin pi-spinner" />
+          } @else {
+            <p-tag severity="warn" value="En attente de confirmation" icon="pi pi-clock" />
+          }
+        </div>
+      </ng-template>
+
+      <p-timeline [value]="timelineEvents()" styleClass="my-4">
+        <ng-template #marker let-event>
+          <div
+            class="flex items-center justify-center w-8 h-8 rounded-full border-2"
+            [class]="event.done
+              ? 'bg-[var(--color-ndb-primary)] border-[var(--color-ndb-primary)] text-white'
+              : 'bg-white border-gray-300 text-gray-400'"
+          >
+            <i [class]="event.icon + ' text-sm'"></i>
+          </div>
+        </ng-template>
+        <ng-template #content let-event>
+          <div class="pb-4">
+            <p class="font-medium" [class]="event.done ? 'text-[var(--color-ndb-text)]' : 'text-gray-400'">
+              {{ event.label }}
+            </p>
+            @if (event.date && event.done) {
+              <p class="text-xs text-[var(--color-ndb-text-muted)] mt-0.5">
+                {{ event.date | date: 'dd/MM/yyyy HH:mm' }}
+              </p>
+            }
+          </div>
+        </ng-template>
+      </p-timeline>
+
+      @if (handover()!.observations) {
+        <p-divider />
+        <p class="text-sm text-[var(--color-ndb-text-muted)] italic">
+          {{ handover()!.observations }}
+        </p>
+      }
+
+      @if (canConfirm()) {
+        <p-divider />
+        <div class="flex flex-col gap-3">
+          <p class="text-sm text-[var(--color-ndb-text)]">
+            @if (userRole() === 'LANDLORD') {
+              Confirmez la remise des clés au locataire pour déclencher le virement du loyer.
+            } @else {
+              Confirmez avoir bien reçu les clés de votre logement.
+            }
+          </p>
+          <p-button
+            [label]="userRole() === 'LANDLORD' ? 'Confirmer la remise des clés' : 'Confirmer la réception des clés'"
+            icon="pi pi-key"
+            [loading]="confirming()"
+            (onClick)="confirmHandover()"
+            styleClass="w-full sm:w-auto"
+          />
+        </div>
+      }
+
+      @if (canRetry()) {
+        <p-divider />
+        <p-message
+          severity="warn"
+          styleClass="w-full mb-3"
+          text="Le virement automatique a échoué après confirmation des deux parties. Vous pouvez le relancer manuellement."
+        />
+        <p-button
+          label="Relancer le virement"
+          icon="pi pi-refresh"
+          severity="warn"
+          [loading]="retrying()"
+          (onClick)="retryTransfer()"
+          styleClass="w-full sm:w-auto"
+        />
+      }
+    </p-card>
+  }
+</div>

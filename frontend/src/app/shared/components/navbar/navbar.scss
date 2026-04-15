@@ -268,7 +268,7 @@
 
   &--cta {
     background: color-mix(in srgb, var(--color-ndb-gold) 10%, transparent);
-    color: #92600a;
+    color: var(--color-ndb-gold-dark);
     margin-bottom: 4px;
 
     i {
@@ -277,7 +277,7 @@
 
     &:hover {
       background: color-mix(in srgb, var(--color-ndb-gold) 18%, transparent);
-      color: #78500a;
+      color: var(--color-ndb-warn-dark);
     }
   }
 }

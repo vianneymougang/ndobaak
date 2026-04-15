@@ -5,7 +5,7 @@ import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.booking.entity.Booking;
 import com.ndobaak.backend.booking.repository.BookingRepository;
 import com.ndobaak.backend.common.enums.BookingStatus;
-import com.ndobaak.backend.common.enums.MobileMoneyOperator;
+import com.ndobaak.backend.common.enums.PaymentChannel;
 import com.ndobaak.backend.common.enums.InstallmentStatus;
 import com.ndobaak.backend.common.enums.PaymentStatus;
 import com.ndobaak.backend.common.enums.PaymentType;
@@ -44,6 +44,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -103,7 +104,7 @@ class PaymentInitiationServiceTest {
     void initiateIntegralPaymentShouldCreatePaymentAndCallGateway() {
         when(authService.getAuthenticatedUser()).thenReturn(student);
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
-        when(paymentRepository.findByBookingId(1L)).thenReturn(Collections.emptyList());
+        when(paymentRepository.existsByBookingIdAndStatus(eq(1L), any(PaymentStatus.class))).thenReturn(false);
         when(paymentProperties.getInstallmentThreshold()).thenReturn(new BigDecimal("500000"));
         when(paymentProperties.getCommissionRate()).thenReturn(new BigDecimal("0.05"));
         when(paymentProperties.getFrontendCallbackUrl()).thenReturn("http://localhost:4200/callback");
@@ -119,7 +120,7 @@ class PaymentInitiationServiceTest {
 
         InitiatePaymentRequest request = new InitiatePaymentRequest();
         request.setBookingId(1L);
-        request.setOperator(MobileMoneyOperator.MTN_MOMO);
+        request.setOperator(PaymentChannel.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
 
         PaymentResponse response = service.initiatePayment(request);
@@ -141,7 +142,7 @@ class PaymentInitiationServiceTest {
         booking.setTotalAmount(new BigDecimal("600000"));
         when(authService.getAuthenticatedUser()).thenReturn(student);
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
-        when(paymentRepository.findByBookingId(1L)).thenReturn(Collections.emptyList());
+        when(paymentRepository.existsByBookingIdAndStatus(eq(1L), any(PaymentStatus.class))).thenReturn(false);
         when(paymentProperties.getInstallmentThreshold()).thenReturn(new BigDecimal("500000"));
         when(paymentProperties.getCommissionRate()).thenReturn(new BigDecimal("0.05"));
         when(paymentProperties.getFrontendCallbackUrl()).thenReturn("http://localhost:4200/callback");
@@ -156,7 +157,7 @@ class PaymentInitiationServiceTest {
 
         InitiatePaymentRequest request = new InitiatePaymentRequest();
         request.setBookingId(1L);
-        request.setOperator(MobileMoneyOperator.ORANGE_MONEY);
+        request.setOperator(PaymentChannel.ORANGE_MONEY);
         request.setPhoneNumber("+237690000000");
 
         service.initiatePayment(request);
@@ -194,11 +195,9 @@ class PaymentInitiationServiceTest {
 
     @Test
     void initiatePaymentShouldThrowWhenProcessingPaymentExists() {
-        Payment existing = Payment.builder().status(PaymentStatus.PROCESSING)
-                .paymentType(PaymentType.INTEGRAL).build();
         when(authService.getAuthenticatedUser()).thenReturn(student);
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
-        when(paymentRepository.findByBookingId(1L)).thenReturn(List.of(existing));
+        when(paymentRepository.existsByBookingIdAndStatus(1L, PaymentStatus.PROCESSING)).thenReturn(true);
 
         InitiatePaymentRequest request = new InitiatePaymentRequest();
         request.setBookingId(1L);
@@ -210,11 +209,10 @@ class PaymentInitiationServiceTest {
 
     @Test
     void initiatePaymentShouldThrowWhenAlreadyPaid() {
-        Payment existing = Payment.builder().status(PaymentStatus.COMPLETED)
-                .paymentType(PaymentType.INTEGRAL).build();
         when(authService.getAuthenticatedUser()).thenReturn(student);
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
-        when(paymentRepository.findByBookingId(1L)).thenReturn(List.of(existing));
+        when(paymentRepository.existsByBookingIdAndStatus(1L, PaymentStatus.PROCESSING)).thenReturn(false);
+        when(paymentRepository.existsByBookingIdAndStatus(1L, PaymentStatus.COMPLETED)).thenReturn(true);
         when(scheduleRepository.findByBookingId(1L)).thenReturn(Optional.empty());
 
         InitiatePaymentRequest request = new InitiatePaymentRequest();
@@ -260,7 +258,7 @@ class PaymentInitiationServiceTest {
         when(paymentMapper.toResponse(any())).thenReturn(dummyResponse);
 
         PayInstallmentRequest request = new PayInstallmentRequest();
-        request.setOperator(MobileMoneyOperator.MTN_MOMO);
+        request.setOperator(PaymentChannel.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
 
         service.payInstallment(1L, request);
@@ -281,7 +279,7 @@ class PaymentInitiationServiceTest {
         when(installmentRepository.findById(1L)).thenReturn(Optional.of(installment));
 
         PayInstallmentRequest request = new PayInstallmentRequest();
-        request.setOperator(MobileMoneyOperator.MTN_MOMO);
+        request.setOperator(PaymentChannel.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
 
         assertThatThrownBy(() -> service.payInstallment(1L, request))

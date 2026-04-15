@@ -7,7 +7,8 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'auth/reset-password', renderMode: RenderMode.Prerender },
   { path: 'auth/oauth2/callback', renderMode: RenderMode.Client },
 
-  { path: 'listings/create', renderMode: RenderMode.Client },
+  { path: 'landlord/listings/create', renderMode: RenderMode.Client },
+  { path: 'landlord/listings/:id/edit', renderMode: RenderMode.Client },
   { path: 'my-bookings', renderMode: RenderMode.Client },
   { path: 'landlord', renderMode: RenderMode.Client },
   { path: 'landlord/dashboard', renderMode: RenderMode.Client },

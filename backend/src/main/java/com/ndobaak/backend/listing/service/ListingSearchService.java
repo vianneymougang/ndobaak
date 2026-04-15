@@ -176,7 +176,7 @@ public class ListingSearchService {
             boolean hasUserCoords = request.getUserLat() != null && request.getUserLng() != null;
             filtered = filtered.stream()
                     .filter(r -> {
-                        Double distance = hasUserCoords ? r.getDistanceFromUser() : r.getDistanceToCampus();
+                        Double distance = r.getDistanceToCampus();
                         return distance != null && distance <= request.getMaxDistance();
                     })
                     .toList();
@@ -206,7 +206,7 @@ public class ListingSearchService {
             case "PRICE_ASC" -> sorted.sort(Comparator.comparing(ListingSearchResponse::getMonthlyPrice));
             case "PRICE_DESC" -> sorted.sort(Comparator.comparing(ListingSearchResponse::getMonthlyPrice).reversed());
             case "DISTANCE_ASC" -> sorted.sort(Comparator.comparing(
-                    r -> r.getDistanceFromUser() != null ? r.getDistanceFromUser() : r.getDistanceToCampus(),
+                    ListingSearchResponse::getDistanceToCampus,
                     Comparator.nullsLast(Comparator.naturalOrder())));
             case "RATING_DESC" -> sorted.sort(Comparator.comparing(
                     ListingSearchResponse::getAvgRating, Comparator.nullsLast(Comparator.reverseOrder())));
