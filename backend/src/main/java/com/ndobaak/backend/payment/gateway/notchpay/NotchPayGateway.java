@@ -10,7 +10,6 @@ import com.ndobaak.backend.payment.gateway.PaymentVerificationResult;
 import com.ndobaak.backend.payment.gateway.WebhookEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
@@ -31,7 +30,6 @@ import java.util.HexFormat;
 import java.util.Map;
 
 @Component
-@ConditionalOnProperty(name = "app.payment.primary-gateway", havingValue = "notchpay", matchIfMissing = true)
 public class NotchPayGateway implements PaymentGateway {
 
     private static final Logger log = LoggerFactory.getLogger(NotchPayGateway.class);
