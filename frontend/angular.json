@@ -82,6 +82,7 @@
                 }
               ],
               "outputMode": "static",
+              "prerender": false,
               "budgets": [
                 {
                   "type": "initial",
