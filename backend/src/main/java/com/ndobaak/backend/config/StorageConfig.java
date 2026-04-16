@@ -38,7 +38,7 @@ public class StorageConfig {
 
     @Bean
     public S3Client s3Client() {
-        S3Client.Builder builder = S3Client.builder()
+        var builder = S3Client.builder()
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(accessKey, secretKey)));
