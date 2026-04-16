@@ -5,7 +5,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideHttpClient, withFetch, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
-import { of, catchError } from 'rxjs';
+import { of, catchError, timeout } from 'rxjs';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth-interceptor';
@@ -15,7 +15,7 @@ import { AppTitleStrategy } from './core/strategies/app-title-strategy';
 function initAuth(authService: AuthService, platformId: object) {
   return () => {
     if (!isPlatformBrowser(platformId)) return of(null);
-    return authService.loadCurrentUser().pipe(catchError(() => of(null)));
+    return authService.loadCurrentUser().pipe(timeout(5000), catchError(() => of(null)));
   };
 }
 
