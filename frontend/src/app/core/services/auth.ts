@@ -49,13 +49,12 @@ export class AuthService {
     return this.http.get<UserProfile>(`${this.apiUrl}/auth/me`, { withCredentials: true }).pipe(
       tap((user) => {
         this.currentUser.set(user);
-        this.initialized.set(true);
       }),
       catchError((err) => {
         this.currentUser.set(null);
-        this.initialized.set(true);
         throw err;
       }),
+      finalize(() => this.initialized.set(true)),
     );
   }
 
