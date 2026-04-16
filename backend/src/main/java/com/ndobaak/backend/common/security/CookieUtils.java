@@ -15,7 +15,7 @@ public final class CookieUtils {
         ResponseCookie cookie = ResponseCookie.from(ACCESS_COOKIE, token)
                 .httpOnly(true)
                 .secure(secure)
-                .sameSite("Strict")
+                .sameSite(secure ? "None" : "Strict")
                 .path("/api/v1")
                 .maxAge(maxAgeSeconds)
                 .build();
@@ -27,7 +27,7 @@ public final class CookieUtils {
         ResponseCookie cookie = ResponseCookie.from(REFRESH_COOKIE, token)
                 .httpOnly(true)
                 .secure(secure)
-                .sameSite("Strict")
+                .sameSite(secure ? "None" : "Strict")
                 .path("/api/v1/auth")
                 .maxAge(maxAgeSeconds)
                 .build();
