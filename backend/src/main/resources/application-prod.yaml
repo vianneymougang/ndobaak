@@ -31,8 +31,7 @@ app:
     secure-cookies: true
 
   storage:
-    endpoint: https://s3.amazonaws.com
-    public-url: ${STORAGE_PUBLIC_URL:https://ndobaak-media.s3.amazonaws.com}
+    public-url: ${STORAGE_PUBLIC_URL:https://ndobaak-media.s3.eu-central-1.amazonaws.com}
     access-key: ${AWS_ACCESS_KEY}
     secret-key: ${AWS_SECRET_KEY}
     bucket: ndobaak-media

@@ -21,7 +21,7 @@ public class StorageConfig {
 
     private static final Logger log = LoggerFactory.getLogger(StorageConfig.class);
 
-    @Value("${app.storage.endpoint}")
+    @Value("${app.storage.endpoint:}")
     private String endpoint;
 
     @Value("${app.storage.access-key}")
@@ -38,13 +38,16 @@ public class StorageConfig {
 
     @Bean
     public S3Client s3Client() {
-        S3Client client = S3Client.builder()
-                .endpointOverride(URI.create(endpoint))
+        S3Client.Builder builder = S3Client.builder()
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(accessKey, secretKey)))
-                .forcePathStyle(true)
-                .build();
+                        AwsBasicCredentials.create(accessKey, secretKey)));
+
+        if (endpoint != null && !endpoint.isBlank()) {
+            builder.endpointOverride(URI.create(endpoint)).forcePathStyle(true);
+        }
+
+        S3Client client = builder.build();
 
         initBucket(client);
 
