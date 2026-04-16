@@ -76,7 +76,7 @@ BEGIN
       AND id NOT IN (SELECT location_id FROM listing WHERE location_id IS NOT NULL);
   END IF;
 
-  DELETE FROM notification WHERE user_id = ANY(test_user_ids);
+  DELETE FROM notification WHERE recipient_id = ANY(test_user_ids);
   DELETE FROM users WHERE id = ANY(test_user_ids);
 
 END $$;
