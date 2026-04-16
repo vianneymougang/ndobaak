@@ -64,10 +64,7 @@ public class StorageConfig {
             applyPublicReadPolicy(client);
         } catch (Exception e) {
             log.warn("Could not verify bucket '{}': {}", bucket, e.getMessage());
-            return;
         }
-
-        applyPublicReadPolicy(client);
     }
 
     private void applyPublicReadPolicy(S3Client client) {
