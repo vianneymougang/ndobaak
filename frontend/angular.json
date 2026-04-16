@@ -79,6 +79,10 @@
                 {
                   "replace": "src/app/app.routes.server.ts",
                   "with": "src/app/app.routes.server.cloudflare.ts"
+                },
+                {
+                  "replace": "src/app/app.config.ts",
+                  "with": "src/app/app.config.cloudflare.ts"
                 }
               ],
               "outputMode": "static",

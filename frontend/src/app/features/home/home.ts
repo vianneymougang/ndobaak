@@ -27,7 +27,7 @@ export class Home implements OnInit {
   protected isLandlord = computed(() => this.authService.userRole() === 'LANDLORD');
   protected isStudent = computed(() => this.authService.userRole() === 'STUDENT');
 
-  protected readonly heroImageUrl = `url('${environment.mediaBaseUrl}/static/hero.jpg')`;
+  protected readonly heroImageUrl = `url('/hero.jpg')`;
 
   protected popularListings = signal<ListingSearchResponse[]>([]);
 
