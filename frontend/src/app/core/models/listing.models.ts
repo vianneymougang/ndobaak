@@ -17,6 +17,12 @@ export interface PhotoResponse {
   thumbnailUrl?: string;
   mediumUrl?: string;
   displayOrder: number;
+  status?: 'PROCESSING' | 'READY';
+}
+
+export interface PhotoUploadAck {
+  photoId: number;
+  listingId: number;
 }
 
 export interface AmenityResponse {

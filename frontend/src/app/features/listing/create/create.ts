@@ -16,7 +16,7 @@ import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { MessageService } from 'primeng/api';
-import { EMPTY, merge, switchMap } from 'rxjs';
+import { EMPTY, merge, switchMap, timer } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { ListingService } from '../../../core/services/listing';
 import { ListingResponse, RoomType, CreateListingRequest, PhotoResponse } from '../../../core/models/listing.models';
@@ -306,15 +306,13 @@ export class Create implements OnInit, OnDestroy {
     this.uploadProgress.set(0);
     this.uploadTotal.set(filesToUpload.length);
 
+    const listingId = currentListing.id;
+
     const uploads = filesToUpload.map((file, index) => {
       const pending = newPending[index];
-      return this.listingService.uploadPhoto(currentListing.id, file).pipe(
-        tap((updated) => {
-          this.listing.set(updated);
-          this.photos.set(updated.photos);
+      return this.listingService.uploadPhoto(listingId, file).pipe(
+        tap(() => {
           this.uploadProgress.update((n) => n + 1);
-          URL.revokeObjectURL(pending.localUrl);
-          this.pendingPhotos.update((list) => list.filter((p) => p.localUrl !== pending.localUrl));
         }),
         catchError((err) => {
           URL.revokeObjectURL(pending.localUrl);
@@ -336,6 +334,17 @@ export class Create implements OnInit, OnDestroy {
           this.uploadingPhotos.set(false);
           this.uploadProgress.set(0);
           this.uploadTotal.set(0);
+          timer(2500)
+            .pipe(
+              switchMap(() => this.listingService.getListingById(listingId)),
+              takeUntilDestroyed(this.destroyRef)
+            )
+            .subscribe((reloaded) => {
+              this.listing.set(reloaded);
+              this.photos.set(reloaded.photos);
+              this.pendingPhotos().forEach((p) => URL.revokeObjectURL(p.localUrl));
+              this.pendingPhotos.set([]);
+            });
         }),
         takeUntilDestroyed(this.destroyRef)
       )

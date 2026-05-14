@@ -2,7 +2,13 @@ package com.ndobaak.backend.listing.controller;
 
 import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.common.enums.RoomType;
-import com.ndobaak.backend.listing.dto.*;
+import com.ndobaak.backend.listing.dto.CreateListingRequest;
+import com.ndobaak.backend.listing.dto.ListingResponse;
+import com.ndobaak.backend.listing.dto.ListingSearchRequest;
+import com.ndobaak.backend.listing.dto.ListingSearchResponse;
+import com.ndobaak.backend.listing.dto.PhotoUploadAck;
+import com.ndobaak.backend.listing.dto.SearchPageResponse;
+import com.ndobaak.backend.listing.dto.UpdateListingRequest;
 import com.ndobaak.backend.listing.service.ListingSearchService;
 import com.ndobaak.backend.listing.service.ListingService;
 import com.ndobaak.backend.listing.service.ListingViewService;
@@ -85,9 +91,9 @@ public class ListingController {
     }
 
     @PostMapping(value = "/{id}/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ListingResponse> uploadPhoto(@PathVariable Long id,
-                                                       @RequestParam("file") MultipartFile file) throws IOException {
-        return ResponseEntity.ok(listingService.uploadPhoto(id, file));
+    public ResponseEntity<PhotoUploadAck> uploadPhoto(@PathVariable Long id,
+                                                      @RequestParam("file") MultipartFile file) throws IOException {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(listingService.uploadPhoto(id, file));
     }
 
     @DeleteMapping("/{id}/photos/{photoId}")

@@ -1,6 +1,7 @@
 package com.ndobaak.backend.listing.dto;
 
 import com.ndobaak.backend.common.enums.ListingStatus;
+import com.ndobaak.backend.common.enums.PhotoStatus;
 import com.ndobaak.backend.common.enums.RoomType;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,6 +53,7 @@ public class ListingResponse {
         private String thumbnailUrl;
         private String mediumUrl;
         private Integer displayOrder;
+        private PhotoStatus status;
     }
 
     @Getter

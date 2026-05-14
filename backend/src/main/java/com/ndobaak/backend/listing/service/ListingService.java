@@ -10,6 +10,7 @@ import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.listing.dto.CreateListingRequest;
 import com.ndobaak.backend.listing.dto.ListingResponse;
 import com.ndobaak.backend.listing.dto.LocationRequest;
+import com.ndobaak.backend.listing.dto.PhotoUploadAck;
 import com.ndobaak.backend.listing.dto.UpdateListingRequest;
 import com.ndobaak.backend.listing.dto.UpdateLocationRequest;
 import com.ndobaak.backend.listing.entity.Amenity;
@@ -20,7 +21,6 @@ import com.ndobaak.backend.listing.mapper.ListingMapper;
 import com.ndobaak.backend.listing.repository.AmenityRepository;
 import com.ndobaak.backend.listing.repository.ListingRepository;
 import com.ndobaak.backend.listing.repository.PhotoRepository;
-import com.ndobaak.backend.media.service.ImageProcessingService;
 import com.ndobaak.backend.media.service.StorageService;
 import com.ndobaak.backend.subscription.service.LandlordCapabilityPolicy;
 import org.springframework.security.core.Authentication;
@@ -29,8 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ndobaak.backend.common.util.FileValidator;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -39,30 +37,30 @@ import java.util.List;
 public class ListingService {
 
     private static final double MAX_CAMPUS_DISTANCE_KM = 10.0;
-    private static final String WEBP_CONTENT_TYPE = "image/webp";
 
     private final ListingRepository listingRepository;
     private final AmenityRepository amenityRepository;
     private final PhotoRepository photoRepository;
     private final StorageService storageService;
-    private final ImageProcessingService imageProcessingService;
     private final AuthService authService;
     private final ListingMapper listingMapper;
     private final LandlordCapabilityPolicy landlordCapabilityPolicy;
+    private final PhotoUploadService photoUploadService;
 
     public ListingService(ListingRepository listingRepository, AmenityRepository amenityRepository,
                           PhotoRepository photoRepository, StorageService storageService,
-                          ImageProcessingService imageProcessingService, AuthService authService,
+                          AuthService authService,
                           ListingMapper listingMapper,
-                          LandlordCapabilityPolicy landlordCapabilityPolicy) {
+                          LandlordCapabilityPolicy landlordCapabilityPolicy,
+                          PhotoUploadService photoUploadService) {
         this.listingRepository = listingRepository;
         this.amenityRepository = amenityRepository;
         this.photoRepository = photoRepository;
         this.storageService = storageService;
-        this.imageProcessingService = imageProcessingService;
         this.authService = authService;
         this.listingMapper = listingMapper;
         this.landlordCapabilityPolicy = landlordCapabilityPolicy;
+        this.photoUploadService = photoUploadService;
     }
 
     @Transactional
@@ -134,56 +132,8 @@ public class ListingService {
         return listingMapper.toResponse(listing, false);
     }
 
-    @Transactional
-    public synchronized ListingResponse uploadPhoto(Long listingId, MultipartFile file) throws IOException {
-        FileValidator.validateImageFile(file);
-        Listing listing = getOwnedListing(listingId);
-
-        int photoCount = photoRepository.countByListingId(listingId);
-        if (photoCount >= 10) {
-            throw new BusinessException("Maximum 10 photos per listing");
-        }
-
-        ImageProcessingService.ProcessedImages processed = imageProcessingService.process(file.getInputStream());
-
-        String folder = "listings/" + listingId;
-
-        String originalKey = storageService.upload(folder + "/original",
-                "photo.webp",
-                new ByteArrayInputStream(processed.original()),
-                processed.original().length,
-                WEBP_CONTENT_TYPE);
-
-        String mediumKey = storageService.upload(folder + "/medium",
-                "photo.webp",
-                new ByteArrayInputStream(processed.medium()),
-                processed.medium().length,
-                WEBP_CONTENT_TYPE);
-
-        String thumbnailKey = storageService.upload(folder + "/thumbnail",
-                "photo.webp",
-                new ByteArrayInputStream(processed.thumbnail()),
-                processed.thumbnail().length,
-                WEBP_CONTENT_TYPE);
-
-        int nextOrder = photoRepository.findMaxDisplayOrderByListingId(listingId)
-                .map(max -> max + 1)
-                .orElse(0);
-
-        Photo photo = Photo.builder()
-                .url(originalKey)
-                .mediumUrl(mediumKey)
-                .thumbnailUrl(thumbnailKey)
-                .fileSize((long) processed.original().length)
-                .displayOrder(nextOrder)
-                .listing(listing)
-                .build();
-
-        photoRepository.save(photo);
-
-        Listing updatedListing = listingRepository.findByIdWithDetails(listingId)
-                .orElseThrow(() -> new ResourceNotFoundException("Listing", "id", listingId));
-        return listingMapper.toResponse(updatedListing, false);
+    public PhotoUploadAck uploadPhoto(Long listingId, MultipartFile file) throws IOException {
+        return photoUploadService.scheduleUpload(listingId, file);
     }
 
     @Transactional
@@ -194,7 +144,7 @@ public class ListingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Photo", "id", photoId));
 
         if (!photo.getListing().getId().equals(listingId)) {
-            throw new ForbiddenException("Photo does not belong to this listing");
+            throw new ForbiddenException("Cette photo n'appartient pas à cette annonce.");
         }
 
         storageService.delete(photo.getUrl());
@@ -208,21 +158,21 @@ public class ListingService {
         Listing listing = getOwnedListing(listingId);
 
         if (listing.getTitle() == null || listing.getTitle().length() < 10) {
-            throw new BusinessException("Title must be at least 10 characters");
+            throw new BusinessException("Le titre doit contenir au moins 10 caractères.");
         }
         if (listing.getDescription() == null || listing.getDescription().length() < 50) {
-            throw new BusinessException("Description must be at least 50 characters");
+            throw new BusinessException("La description doit contenir au moins 50 caractères.");
         }
         if (listing.getMonthlyPrice() == null || listing.getMonthlyPrice().signum() <= 0) {
-            throw new BusinessException("Price must be greater than 0");
+            throw new BusinessException("Le prix doit être supérieur à 0.");
         }
 
         int photoCount = photoRepository.countByListingId(listingId);
         if (photoCount < 3) {
-            throw new BusinessException("At least 3 photos are required to submit for review");
+            throw new BusinessException("Au moins 3 photos sont requises pour soumettre l'annonce.");
         }
         if (photoCount > 10) {
-            throw new BusinessException("Maximum 10 photos allowed");
+            throw new BusinessException("Maximum 10 photos autorisées.");
         }
 
         if (listing.getLocation() != null) {
@@ -231,7 +181,7 @@ public class ListingService {
                     listing.getLocation().getLongitude(),
                     GeoUtils.CAMPUS_LAT, GeoUtils.CAMPUS_LNG);
             if (distance > MAX_CAMPUS_DISTANCE_KM) {
-                throw new BusinessException("Listing must be within 10km of campus");
+                throw new BusinessException("L'annonce doit se trouver à moins de 10 km du campus.");
             }
             listing.getLocation().setDistanceToCampus(GeoUtils.roundDistance(distance));
         }
@@ -278,7 +228,7 @@ public class ListingService {
 
         User currentUser = authService.getAuthenticatedUser();
         if (!listing.getLandlord().getId().equals(currentUser.getId())) {
-            throw new ForbiddenException("You can only manage your own listings");
+            throw new ForbiddenException("Vous ne pouvez gérer que vos propres annonces.");
         }
         return listing;
     }

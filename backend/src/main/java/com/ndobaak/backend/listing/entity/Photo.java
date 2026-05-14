@@ -1,7 +1,10 @@
 package com.ndobaak.backend.listing.entity;
 
+import com.ndobaak.backend.common.enums.PhotoStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -48,6 +51,11 @@ public class Photo {
 
     @Column(name = "display_order")
     private Integer displayOrder;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private PhotoStatus status = PhotoStatus.READY;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

@@ -60,6 +60,7 @@ public class ListingMapper {
                 .thumbnailUrl(storageService.resolvePublicUrl(photo.getThumbnailUrl()))
                 .mediumUrl(storageService.resolvePublicUrl(photo.getMediumUrl()))
                 .displayOrder(photo.getDisplayOrder())
+                .status(photo.getStatus())
                 .build();
     }
 

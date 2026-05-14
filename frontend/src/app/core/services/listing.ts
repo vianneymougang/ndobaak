@@ -7,6 +7,7 @@ import {
   ListingResponse,
   ListingSearchResponse,
   NearbyListingResponse,
+  PhotoUploadAck,
   SearchPageResponse,
 } from '../models/listing.models';
 
@@ -25,10 +26,10 @@ export class ListingService {
     return this.http.put<ListingResponse>(`${this.apiUrl}/listings/${id}`, request);
   }
 
-  uploadPhoto(listingId: number, file: File): Observable<ListingResponse> {
+  uploadPhoto(listingId: number, file: File): Observable<PhotoUploadAck> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post<ListingResponse>(`${this.apiUrl}/listings/${listingId}/photos`, formData);
+    return this.http.post<PhotoUploadAck>(`${this.apiUrl}/listings/${listingId}/photos`, formData);
   }
 
   deletePhoto(listingId: number, photoId: number): Observable<void> {
