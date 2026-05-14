@@ -2,7 +2,7 @@ package com.ndobaak.backend.payment.controller;
 
 import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.payment.dto.PaymentInitiationResponse;
-import com.ndobaak.backend.payment.service.PaymentService;
+import com.ndobaak.backend.payment.service.PaymentInitiationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class BookingPaymentController {
 
-    private final PaymentService paymentService;
+    private final PaymentInitiationService initiationService;
     private final AuthService authService;
 
     @PostMapping("/{id}/payment/initiate")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<PaymentInitiationResponse> initiatePayment(@PathVariable Long id) {
         Long studentId = authService.getAuthenticatedUser().getId();
-        return ResponseEntity.ok(paymentService.initiateBookingPayment(id, studentId));
+        return ResponseEntity.ok(initiationService.initiateBookingPayment(id, studentId));
     }
 }

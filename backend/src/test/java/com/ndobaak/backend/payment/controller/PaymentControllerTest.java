@@ -17,7 +17,10 @@ import com.ndobaak.backend.payment.dto.PayInstallmentRequest;
 import com.ndobaak.backend.payment.dto.PaymentResponse;
 import com.ndobaak.backend.payment.dto.PaymentScheduleResponse;
 import com.ndobaak.backend.payment.dto.ReceiptResponse;
-import com.ndobaak.backend.payment.service.PaymentService;
+import com.ndobaak.backend.payment.service.PaymentInitiationService;
+import com.ndobaak.backend.payment.service.PaymentQueryService;
+import com.ndobaak.backend.payment.service.PaymentScheduleService;
+import com.ndobaak.backend.payment.service.PaymentWebhookService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -56,7 +59,13 @@ class PaymentControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private PaymentService paymentService;
+    private PaymentInitiationService initiationService;
+    @MockitoBean
+    private PaymentWebhookService webhookService;
+    @MockitoBean
+    private PaymentQueryService queryService;
+    @MockitoBean
+    private PaymentScheduleService scheduleService;
     @MockitoBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
     @MockitoBean
@@ -85,9 +94,7 @@ class PaymentControllerTest {
         request.setOperator(PaymentChannel.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
 
-        PaymentResponse response = buildPaymentResponse(1L, PaymentStatus.PROCESSING);
-
-        when(paymentService.initiatePayment(any())).thenReturn(response);
+        when(initiationService.initiatePayment(any())).thenReturn(buildPaymentResponse(1L, PaymentStatus.PROCESSING));
 
         mockMvc.perform(post("/payments/initiate")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -114,7 +121,7 @@ class PaymentControllerTest {
         request.setOperator(PaymentChannel.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
 
-        when(paymentService.initiatePayment(any()))
+        when(initiationService.initiatePayment(any()))
                 .thenThrow(new BusinessException("Réservation non confirmée"));
 
         mockMvc.perform(post("/payments/initiate")
@@ -125,7 +132,7 @@ class PaymentControllerTest {
 
     @Test
     void webhookShouldReturn200OnValidPayload() throws Exception {
-        doNothing().when(paymentService).handleWebhook(eq("notchpay"), any(), any());
+        doNothing().when(webhookService).handleWebhook(eq("notchpay"), any(), any());
 
         mockMvc.perform(post("/payments/webhook/notchpay")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -133,13 +140,13 @@ class PaymentControllerTest {
                         .content("{\"event\":\"payment.complete\",\"reference\":\"ref-123\"}"))
                 .andExpect(status().isOk());
 
-        verify(paymentService).handleWebhook(eq("notchpay"), any(), eq("valid-sig"));
+        verify(webhookService).handleWebhook(eq("notchpay"), any(), eq("valid-sig"));
     }
 
     @Test
     void webhookShouldReturn400OnInvalidSignature() throws Exception {
         doThrow(new BusinessException("Signature webhook invalide."))
-                .when(paymentService).handleWebhook(eq("notchpay"), any(), any());
+                .when(webhookService).handleWebhook(eq("notchpay"), any(), any());
 
         mockMvc.perform(post("/payments/webhook/notchpay")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -151,8 +158,7 @@ class PaymentControllerTest {
     @Test
     @WithMockUser
     void getPaymentsByBookingShouldReturn200() throws Exception {
-        PaymentResponse response = buildPaymentResponse(1L, PaymentStatus.COMPLETED);
-        when(paymentService.getPaymentsByBooking(1L)).thenReturn(List.of(response));
+        when(queryService.getPaymentsByBooking(1L)).thenReturn(List.of(buildPaymentResponse(1L, PaymentStatus.COMPLETED)));
 
         mockMvc.perform(get("/payments/booking/1"))
                 .andExpect(status().isOk())
@@ -163,7 +169,7 @@ class PaymentControllerTest {
     @Test
     @WithMockUser
     void getPaymentsByBookingShouldReturn403WhenUnauthorized() throws Exception {
-        when(paymentService.getPaymentsByBooking(1L))
+        when(queryService.getPaymentsByBooking(1L))
                 .thenThrow(new ForbiddenException("Accès interdit"));
 
         mockMvc.perform(get("/payments/booking/1"))
@@ -173,10 +179,10 @@ class PaymentControllerTest {
     @Test
     @WithMockUser
     void getTransactionHistoryShouldReturn200() throws Exception {
-        PaymentResponse response = buildPaymentResponse(1L, PaymentStatus.COMPLETED);
-        Page<PaymentResponse> page = new PageImpl<>(List.of(response), PageRequest.of(0, 20), 1);
+        Page<PaymentResponse> page = new PageImpl<>(
+                List.of(buildPaymentResponse(1L, PaymentStatus.COMPLETED)), PageRequest.of(0, 20), 1);
 
-        when(paymentService.getTransactionHistory(any())).thenReturn(page);
+        when(queryService.getTransactionHistory(any())).thenReturn(page);
 
         mockMvc.perform(get("/payments/history"))
                 .andExpect(status().isOk())
@@ -193,7 +199,7 @@ class PaymentControllerTest {
                 .status(PaymentStatus.COMPLETED)
                 .build();
 
-        when(paymentService.getReceipt(1L)).thenReturn(receipt);
+        when(queryService.getReceipt(1L)).thenReturn(receipt);
 
         mockMvc.perform(get("/payments/1/receipt"))
                 .andExpect(status().isOk())
@@ -203,7 +209,7 @@ class PaymentControllerTest {
     @Test
     @WithMockUser
     void getReceiptShouldReturn400WhenNotCompleted() throws Exception {
-        when(paymentService.getReceipt(1L))
+        when(queryService.getReceipt(1L))
                 .thenThrow(new BusinessException("Reçu non disponible"));
 
         mockMvc.perform(get("/payments/1/receipt"))
@@ -217,7 +223,7 @@ class PaymentControllerTest {
         request.setOperator(PaymentChannel.MTN_MOMO);
         request.setPhoneNumber("+237670000000");
 
-        when(paymentService.payInstallment(eq(1L), any()))
+        when(initiationService.payInstallment(eq(1L), any()))
                 .thenReturn(buildPaymentResponse(2L, PaymentStatus.PROCESSING));
 
         mockMvc.perform(post("/payments/installments/1/pay")
@@ -237,7 +243,7 @@ class PaymentControllerTest {
                 .numberOfInstallments(6)
                 .build();
 
-        when(paymentService.getPaymentSchedule(1L)).thenReturn(schedule);
+        when(scheduleService.getPaymentSchedule(1L)).thenReturn(schedule);
 
         mockMvc.perform(get("/payments/schedule/1"))
                 .andExpect(status().isOk())
@@ -248,7 +254,7 @@ class PaymentControllerTest {
     @Test
     @WithMockUser
     void getPaymentScheduleShouldReturn404WhenNotFound() throws Exception {
-        when(paymentService.getPaymentSchedule(999L))
+        when(scheduleService.getPaymentSchedule(999L))
                 .thenThrow(new ResourceNotFoundException("Aucun échéancier trouvé"));
 
         mockMvc.perform(get("/payments/schedule/999"))

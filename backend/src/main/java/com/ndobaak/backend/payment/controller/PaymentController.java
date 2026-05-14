@@ -5,7 +5,10 @@ import com.ndobaak.backend.payment.dto.PayInstallmentRequest;
 import com.ndobaak.backend.payment.dto.PaymentResponse;
 import com.ndobaak.backend.payment.dto.PaymentScheduleResponse;
 import com.ndobaak.backend.payment.dto.ReceiptResponse;
-import com.ndobaak.backend.payment.service.PaymentService;
+import com.ndobaak.backend.payment.service.PaymentInitiationService;
+import com.ndobaak.backend.payment.service.PaymentQueryService;
+import com.ndobaak.backend.payment.service.PaymentScheduleService;
+import com.ndobaak.backend.payment.service.PaymentWebhookService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -28,18 +31,26 @@ import java.util.List;
 @RequestMapping("/payments")
 public class PaymentController {
 
-    private final PaymentService paymentService;
+    private final PaymentInitiationService initiationService;
+    private final PaymentWebhookService webhookService;
+    private final PaymentQueryService queryService;
+    private final PaymentScheduleService scheduleService;
 
-    public PaymentController(PaymentService paymentService) {
-        this.paymentService = paymentService;
+    public PaymentController(PaymentInitiationService initiationService,
+                             PaymentWebhookService webhookService,
+                             PaymentQueryService queryService,
+                             PaymentScheduleService scheduleService) {
+        this.initiationService = initiationService;
+        this.webhookService = webhookService;
+        this.queryService = queryService;
+        this.scheduleService = scheduleService;
     }
 
     @PostMapping("/initiate")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<PaymentResponse> initiatePayment(
             @Valid @RequestBody InitiatePaymentRequest request) {
-        PaymentResponse response = paymentService.initiatePayment(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(initiationService.initiatePayment(request));
     }
 
     @PostMapping("/webhook/{provider}")
@@ -48,31 +59,26 @@ public class PaymentController {
             HttpServletRequest request) throws IOException {
         String payload = new String(request.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         String signature = request.getHeader("x-notch-signature");
-
-        paymentService.handleWebhook(provider, payload, signature);
+        webhookService.handleWebhook(provider, payload, signature);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/booking/{bookingId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<PaymentResponse>> getPaymentsByBooking(
-            @PathVariable Long bookingId) {
-        List<PaymentResponse> payments = paymentService.getPaymentsByBooking(bookingId);
-        return ResponseEntity.ok(payments);
+    public ResponseEntity<List<PaymentResponse>> getPaymentsByBooking(@PathVariable Long bookingId) {
+        return ResponseEntity.ok(queryService.getPaymentsByBooking(bookingId));
     }
 
     @GetMapping("/history")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Page<PaymentResponse>> getTransactionHistory(Pageable pageable) {
-        Page<PaymentResponse> history = paymentService.getTransactionHistory(pageable);
-        return ResponseEntity.ok(history);
+        return ResponseEntity.ok(queryService.getTransactionHistory(pageable));
     }
 
     @GetMapping("/{id}/receipt")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ReceiptResponse> getReceipt(@PathVariable Long id) {
-        ReceiptResponse receipt = paymentService.getReceipt(id);
-        return ResponseEntity.ok(receipt);
+        return ResponseEntity.ok(queryService.getReceipt(id));
     }
 
     @PostMapping("/installments/{id}/pay")
@@ -80,15 +86,12 @@ public class PaymentController {
     public ResponseEntity<PaymentResponse> payInstallment(
             @PathVariable Long id,
             @Valid @RequestBody PayInstallmentRequest request) {
-        PaymentResponse response = paymentService.payInstallment(id, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(initiationService.payInstallment(id, request));
     }
 
     @GetMapping("/schedule/{bookingId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<PaymentScheduleResponse> getPaymentSchedule(
-            @PathVariable Long bookingId) {
-        PaymentScheduleResponse schedule = paymentService.getPaymentSchedule(bookingId);
-        return ResponseEntity.ok(schedule);
+    public ResponseEntity<PaymentScheduleResponse> getPaymentSchedule(@PathVariable Long bookingId) {
+        return ResponseEntity.ok(scheduleService.getPaymentSchedule(bookingId));
     }
 }
