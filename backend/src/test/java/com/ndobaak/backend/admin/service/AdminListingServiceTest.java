@@ -102,7 +102,7 @@ class AdminListingServiceTest {
 
         assertThatThrownBy(() -> adminListingService.validateListing(1L))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("PENDING_REVIEW");
+                .hasMessageContaining("en attente de validation");
     }
 
     @Test
@@ -116,7 +116,7 @@ class AdminListingServiceTest {
 
         assertThatThrownBy(() -> adminListingService.validateListing(1L))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("between 3 and 10 photos");
+                .hasMessageContaining("entre 3 et 10 photos");
     }
 
     @Test
@@ -162,6 +162,6 @@ class AdminListingServiceTest {
 
         assertThatThrownBy(() -> adminListingService.rejectListing(1L, motifRequest(RejectionMotif.OTHER)))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("PENDING_REVIEW");
+                .hasMessageContaining("en attente de validation");
     }
 }

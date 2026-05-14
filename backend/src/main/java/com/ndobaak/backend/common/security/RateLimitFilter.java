@@ -2,6 +2,7 @@ package com.ndobaak.backend.common.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ndobaak.backend.common.dto.ApiError;
+import com.ndobaak.backend.common.exception.ErrorCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -82,8 +83,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private void writeRateLimitResponse(HttpServletResponse response) throws IOException {
         ApiError error = ApiError.builder()
-            .status(HttpStatus.TOO_MANY_REQUESTS.value())
-            .message("Trop de tentatives. Veuillez patienter quelques instants avant de réessayer.")
+            .code(ErrorCode.RATE_LIMIT_EXCEEDED.name())
+            .message(ErrorCode.RATE_LIMIT_EXCEEDED.getMessage())
+            .retryable(ErrorCode.RATE_LIMIT_EXCEEDED.isRetryable())
             .build();
 
         response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());

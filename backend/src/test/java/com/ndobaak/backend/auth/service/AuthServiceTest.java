@@ -96,7 +96,7 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.registerStudent(request))
                 .isInstanceOf(DuplicateResourceException.class)
-                .hasMessageContaining("Email already registered");
+                .hasMessageContaining("email est déjà utilisé");
     }
 
     @Test
@@ -168,7 +168,7 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.login(request))
                 .isInstanceOf(UnauthorizedException.class)
-                .hasMessageContaining("Invalid credentials");
+                .hasMessageContaining("Identifiants invalides");
     }
 
     @Test
@@ -202,7 +202,7 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.login(request))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("Email or phone is required");
+                .hasMessageContaining("email ou un numéro de téléphone");
     }
 
     @Test
@@ -293,7 +293,7 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.changePassword(request))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("Current password is incorrect");
+                .hasMessageContaining("mot de passe actuel est incorrect");
     }
 
     private void setupSecurityContext(String email) {

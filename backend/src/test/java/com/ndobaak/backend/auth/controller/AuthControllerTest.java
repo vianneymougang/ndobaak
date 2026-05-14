@@ -7,6 +7,7 @@ import com.ndobaak.backend.auth.service.CustomOAuth2UserService;
 import com.ndobaak.backend.auth.service.PasswordResetService;
 import com.ndobaak.backend.common.enums.UserRole;
 import com.ndobaak.backend.common.exception.DuplicateResourceException;
+import com.ndobaak.backend.common.exception.ErrorCode;
 import com.ndobaak.backend.common.exception.UnauthorizedException;
 import com.ndobaak.backend.common.security.JwtAuthenticationFilter;
 import com.ndobaak.backend.common.security.JwtProperties;
@@ -90,7 +91,12 @@ class AuthControllerTest {
         mockMvc.perform(post("/auth/register/student")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message").value("Les informations envoyées sont invalides."))
+                .andExpect(jsonPath("$.retryable").value(false))
+                .andExpect(jsonPath("$.status").doesNotExist())
+                .andExpect(jsonPath("$.timestamp").doesNotExist());
     }
 
     @Test
@@ -122,7 +128,9 @@ class AuthControllerTest {
         mockMvc.perform(post("/auth/register/student")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("DUPLICATE_RESOURCE"))
+                .andExpect(jsonPath("$.retryable").value(false));
     }
 
     @Test
@@ -146,12 +154,15 @@ class AuthControllerTest {
         request.setEmail("jean@test.com");
         request.setPassword("wrong");
 
-        when(authService.login(any())).thenThrow(new UnauthorizedException("Invalid credentials"));
+        when(authService.login(any())).thenThrow(new UnauthorizedException(ErrorCode.INVALID_CREDENTIALS));
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("INVALID_CREDENTIALS"))
+                .andExpect(jsonPath("$.message").value("Identifiants invalides."))
+                .andExpect(jsonPath("$.retryable").value(false));
     }
 
     @Test

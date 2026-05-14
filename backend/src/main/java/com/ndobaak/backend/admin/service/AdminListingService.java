@@ -76,12 +76,12 @@ public class AdminListingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Listing", "id", listingId));
 
         if (listing.getStatus() != ListingStatus.PENDING_REVIEW) {
-            throw new BusinessException("Only listings with PENDING_REVIEW status can be validated");
+            throw new BusinessException("Seules les annonces en attente de validation peuvent être approuvées.");
         }
 
         int photoCount = photoRepository.countByListingId(listingId);
         if (photoCount < 3 || photoCount > 10) {
-            throw new BusinessException("Listing must have between 3 and 10 photos");
+            throw new BusinessException("L'annonce doit contenir entre 3 et 10 photos.");
         }
 
         listing.setStatus(ListingStatus.PUBLISHED);
@@ -112,7 +112,7 @@ public class AdminListingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Listing", "id", listingId));
 
         if (listing.getStatus() != ListingStatus.PENDING_REVIEW) {
-            throw new BusinessException("Only listings with PENDING_REVIEW status can be rejected");
+            throw new BusinessException("Seules les annonces en attente de validation peuvent être rejetées.");
         }
 
         String reason = buildRejectionMessage(request.getMotif(), request.getAdditionalReason());

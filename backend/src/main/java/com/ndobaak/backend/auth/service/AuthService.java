@@ -8,6 +8,7 @@ import com.ndobaak.backend.auth.mapper.UserMapper;
 import com.ndobaak.backend.auth.repository.UserRepository;
 import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.DuplicateResourceException;
+import com.ndobaak.backend.common.exception.ErrorCode;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.common.exception.UnauthorizedException;
 import com.ndobaak.backend.common.security.JwtProperties;
@@ -85,16 +86,16 @@ public class AuthService {
         User user;
         if (StringUtils.hasText(request.getEmail())) {
             user = userRepository.findByEmail(request.getEmail())
-                    .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
+                    .orElseThrow(() -> new UnauthorizedException(ErrorCode.INVALID_CREDENTIALS));
         } else if (StringUtils.hasText(request.getPhone())) {
             user = userRepository.findByPhone(PhoneNormalizer.normalize(request.getPhone()))
-                    .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
+                    .orElseThrow(() -> new UnauthorizedException(ErrorCode.INVALID_CREDENTIALS));
         } else {
-            throw new BusinessException("Email or phone is required");
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Un email ou un numéro de téléphone est requis.");
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new UnauthorizedException("Invalid credentials");
+            throw new UnauthorizedException(ErrorCode.INVALID_CREDENTIALS);
         }
 
         return generateTokens(user);
@@ -102,12 +103,12 @@ public class AuthService {
 
     public AuthResponse refreshToken(String refreshToken) {
         if (!jwtTokenProvider.validateToken(refreshToken)) {
-            throw new UnauthorizedException("Invalid or expired refresh token");
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED, "Session expirée. Veuillez vous reconnecter.");
         }
 
         String email = jwtTokenProvider.getEmailFromToken(refreshToken);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UnauthorizedException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException(ErrorCode.UNAUTHORIZED, "Session invalide. Veuillez vous reconnecter."));
 
         return generateTokens(user);
     }
@@ -129,7 +130,7 @@ public class AuthService {
         }
         if (StringUtils.hasText(request.getPhone())) {
             if (!request.getPhone().equals(user.getPhone()) && userRepository.existsByPhone(request.getPhone())) {
-                throw new DuplicateResourceException("Phone number already in use");
+                throw new DuplicateResourceException("Ce numéro de téléphone est déjà utilisé.");
             }
             user.setPhone(request.getPhone());
         }
@@ -146,7 +147,7 @@ public class AuthService {
         User user = getAuthenticatedUser();
 
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
-            throw new BusinessException("Current password is incorrect");
+            throw new BusinessException("Le mot de passe actuel est incorrect.");
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
@@ -157,7 +158,7 @@ public class AuthService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()
                 || "anonymousUser".equals(authentication.getName())) {
-            throw new UnauthorizedException("Authentication required");
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED);
         }
         String email = authentication.getName();
         return userRepository.findByEmail(email)
@@ -166,10 +167,10 @@ public class AuthService {
 
     private void validateUniqueEmailAndPhone(String email, String phone) {
         if (userRepository.existsByEmail(email)) {
-            throw new DuplicateResourceException("Email already registered");
+            throw new DuplicateResourceException("Cet email est déjà utilisé.");
         }
         if (userRepository.existsByPhone(phone)) {
-            throw new DuplicateResourceException("Phone number already registered");
+            throw new DuplicateResourceException("Ce numéro de téléphone est déjà utilisé.");
         }
     }
 
