@@ -4,20 +4,19 @@ import com.ndobaak.backend.auth.dto.*;
 import com.ndobaak.backend.auth.entity.Landlord;
 import com.ndobaak.backend.auth.entity.Student;
 import com.ndobaak.backend.auth.entity.User;
-import com.ndobaak.backend.auth.mapper.UserMapper;
 import com.ndobaak.backend.auth.repository.UserRepository;
 import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.DuplicateResourceException;
 import com.ndobaak.backend.common.exception.UnauthorizedException;
 import com.ndobaak.backend.common.security.JwtProperties;
 import com.ndobaak.backend.common.security.JwtTokenProvider;
-import com.ndobaak.backend.notification.service.NotificationPreferenceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,9 +41,7 @@ class AuthServiceTest {
     @Mock
     private JwtProperties jwtProperties;
     @Mock
-    private UserMapper userMapper;
-    @Mock
-    private NotificationPreferenceService notificationPreferenceService;
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private AuthService authService;
@@ -235,66 +232,6 @@ class AuthServiceTest {
                 .isInstanceOf(UnauthorizedException.class);
     }
 
-    @Test
-    void getCurrentUserShouldReturnProfile() {
-        setupSecurityContext("jean@test.com");
-
-        Student student = Student.builder()
-                .email("jean@test.com").firstName("Jean").build();
-        student.setId(1L);
-
-        UserProfileResponse profileResponse = UserProfileResponse.builder()
-                .id(1L).firstName("Jean").email("jean@test.com").build();
-
-        when(userRepository.findByEmail("jean@test.com")).thenReturn(Optional.of(student));
-        when(userMapper.toProfileResponse(student)).thenReturn(profileResponse);
-
-        UserProfileResponse result = authService.getCurrentUser();
-
-        assertThat(result.getFirstName()).isEqualTo("Jean");
-        assertThat(result.getId()).isEqualTo(1L);
-    }
-
-    @Test
-    void changePasswordShouldUpdateWhenOldPasswordCorrect() {
-        setupSecurityContext("jean@test.com");
-
-        Student student = Student.builder()
-                .email("jean@test.com").password("$2a$10$old").build();
-        student.setId(1L);
-
-        when(userRepository.findByEmail("jean@test.com")).thenReturn(Optional.of(student));
-        when(passwordEncoder.matches("oldPassword", "$2a$10$old")).thenReturn(true);
-        when(passwordEncoder.encode("newPassword")).thenReturn("$2a$10$new");
-
-        ChangePasswordRequest request = new ChangePasswordRequest();
-        request.setOldPassword("oldPassword");
-        request.setNewPassword("newPassword");
-
-        authService.changePassword(request);
-
-        verify(userRepository).save(student);
-        assertThat(student.getPassword()).isEqualTo("$2a$10$new");
-    }
-
-    @Test
-    void changePasswordShouldFailWhenOldPasswordWrong() {
-        setupSecurityContext("jean@test.com");
-
-        Student student = Student.builder()
-                .email("jean@test.com").password("$2a$10$old").build();
-
-        when(userRepository.findByEmail("jean@test.com")).thenReturn(Optional.of(student));
-        when(passwordEncoder.matches("wrongOld", "$2a$10$old")).thenReturn(false);
-
-        ChangePasswordRequest request = new ChangePasswordRequest();
-        request.setOldPassword("wrongOld");
-        request.setNewPassword("newPassword");
-
-        assertThatThrownBy(() -> authService.changePassword(request))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("mot de passe actuel est incorrect");
-    }
 
     private void setupSecurityContext(String email) {
         Authentication authentication = mock(Authentication.class);

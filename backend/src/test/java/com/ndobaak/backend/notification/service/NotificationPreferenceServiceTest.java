@@ -165,24 +165,24 @@ class NotificationPreferenceServiceTest {
     }
 
     @Test
-    void createDefaultPreferences_savesAllNotificationTypes() {
+    void onUserRegistered_savesAllNotificationTypes() {
         Student user = buildUser(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(preferenceRepository.findAllByUserId(1L)).thenReturn(List.of());
 
-        preferenceService.createDefaultPreferences(1L);
+        preferenceService.onUserRegistered(new com.ndobaak.backend.auth.event.UserRegisteredEvent(1L));
 
         verify(preferenceRepository, times(NotificationType.values().length)).save(any());
     }
 
     @Test
-    void createDefaultPreferences_skipsAlreadyExistingTypes() {
+    void onUserRegistered_skipsAlreadyExistingTypes() {
         Student user = buildUser(1L);
         NotificationTypePreference existing = buildPref(user, NotificationType.BOOKING_CREATED, true, true);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(preferenceRepository.findAllByUserId(1L)).thenReturn(List.of(existing));
 
-        preferenceService.createDefaultPreferences(1L);
+        preferenceService.onUserRegistered(new com.ndobaak.backend.auth.event.UserRegisteredEvent(1L));
 
         int expectedSaves = NotificationType.values().length - 1;
         verify(preferenceRepository, times(expectedSaves)).save(any());

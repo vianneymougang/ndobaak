@@ -1,10 +1,14 @@
 package com.ndobaak.backend.auth.service;
 
-import com.ndobaak.backend.auth.dto.*;
+import com.ndobaak.backend.auth.dto.AuthResponse;
+import com.ndobaak.backend.auth.dto.LoginRequest;
+import com.ndobaak.backend.auth.dto.RefreshTokenRequest;
+import com.ndobaak.backend.auth.dto.RegisterLandlordRequest;
+import com.ndobaak.backend.auth.dto.RegisterStudentRequest;
 import com.ndobaak.backend.auth.entity.Landlord;
 import com.ndobaak.backend.auth.entity.Student;
 import com.ndobaak.backend.auth.entity.User;
-import com.ndobaak.backend.auth.mapper.UserMapper;
+import com.ndobaak.backend.auth.event.UserRegisteredEvent;
 import com.ndobaak.backend.auth.repository.UserRepository;
 import com.ndobaak.backend.common.exception.BusinessException;
 import com.ndobaak.backend.common.exception.DuplicateResourceException;
@@ -14,7 +18,7 @@ import com.ndobaak.backend.common.exception.UnauthorizedException;
 import com.ndobaak.backend.common.security.JwtProperties;
 import com.ndobaak.backend.common.security.JwtTokenProvider;
 import com.ndobaak.backend.common.util.PhoneNormalizer;
-import com.ndobaak.backend.notification.service.NotificationPreferenceService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,18 +33,16 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtProperties jwtProperties;
-    private final UserMapper userMapper;
-    private final NotificationPreferenceService notificationPreferenceService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
                        JwtTokenProvider jwtTokenProvider, JwtProperties jwtProperties,
-                       UserMapper userMapper, NotificationPreferenceService notificationPreferenceService) {
+                       ApplicationEventPublisher eventPublisher) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.jwtProperties = jwtProperties;
-        this.userMapper = userMapper;
-        this.notificationPreferenceService = notificationPreferenceService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -59,7 +61,7 @@ public class AuthService {
                 .build();
 
         student = (Student) userRepository.save(student);
-        notificationPreferenceService.createDefaultPreferences(student.getId());
+        eventPublisher.publishEvent(new UserRegisteredEvent(student.getId()));
         return generateTokens(student);
     }
 
@@ -78,7 +80,7 @@ public class AuthService {
                 .build();
 
         landlord = (Landlord) userRepository.save(landlord);
-        notificationPreferenceService.createDefaultPreferences(landlord.getId());
+        eventPublisher.publishEvent(new UserRegisteredEvent(landlord.getId()));
         return generateTokens(landlord);
     }
 
@@ -111,47 +113,6 @@ public class AuthService {
                 .orElseThrow(() -> new UnauthorizedException(ErrorCode.UNAUTHORIZED, "Session invalide. Veuillez vous reconnecter."));
 
         return generateTokens(user);
-    }
-
-    public UserProfileResponse getCurrentUser() {
-        User user = getAuthenticatedUser();
-        return userMapper.toProfileResponse(user);
-    }
-
-    @Transactional
-    public UserProfileResponse updateProfile(UpdateProfileRequest request) {
-        User user = getAuthenticatedUser();
-
-        if (StringUtils.hasText(request.getFirstName())) {
-            user.setFirstName(request.getFirstName());
-        }
-        if (StringUtils.hasText(request.getLastName())) {
-            user.setLastName(request.getLastName());
-        }
-        if (StringUtils.hasText(request.getPhone())) {
-            if (!request.getPhone().equals(user.getPhone()) && userRepository.existsByPhone(request.getPhone())) {
-                throw new DuplicateResourceException("Ce numéro de téléphone est déjà utilisé.");
-            }
-            user.setPhone(request.getPhone());
-        }
-        if (request.getProfilePhotoUrl() != null) {
-            user.setProfilePhotoUrl(request.getProfilePhotoUrl());
-        }
-
-        userRepository.save(user);
-        return userMapper.toProfileResponse(user);
-    }
-
-    @Transactional
-    public void changePassword(ChangePasswordRequest request) {
-        User user = getAuthenticatedUser();
-
-        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
-            throw new BusinessException("Le mot de passe actuel est incorrect.");
-        }
-
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user);
     }
 
     public User getAuthenticatedUser() {

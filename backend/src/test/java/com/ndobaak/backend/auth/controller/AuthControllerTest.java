@@ -5,6 +5,7 @@ import com.ndobaak.backend.auth.dto.*;
 import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.auth.service.CustomOAuth2UserService;
 import com.ndobaak.backend.auth.service.PasswordResetService;
+import com.ndobaak.backend.auth.service.UserProfileService;
 import com.ndobaak.backend.common.enums.UserRole;
 import com.ndobaak.backend.common.exception.DuplicateResourceException;
 import com.ndobaak.backend.common.exception.ErrorCode;
@@ -40,6 +41,8 @@ class AuthControllerTest {
 
     @MockitoBean
     private AuthService authService;
+    @MockitoBean
+    private UserProfileService userProfileService;
     @MockitoBean
     private PasswordResetService passwordResetService;
     @MockitoBean
@@ -176,7 +179,7 @@ class AuthControllerTest {
                 .role(UserRole.STUDENT)
                 .build();
 
-        when(authService.getCurrentUser()).thenReturn(profile);
+        when(userProfileService.getCurrentUser()).thenReturn(profile);
 
         mockMvc.perform(get("/auth/me"))
                 .andExpect(status().isOk())

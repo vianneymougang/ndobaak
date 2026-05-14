@@ -3,6 +3,7 @@ package com.ndobaak.backend.auth.controller;
 import com.ndobaak.backend.auth.dto.*;
 import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.auth.service.PasswordResetService;
+import com.ndobaak.backend.auth.service.UserProfileService;
 import com.ndobaak.backend.common.security.CookieUtils;
 import com.ndobaak.backend.common.security.JwtProperties;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,12 +17,14 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserProfileService userProfileService;
     private final PasswordResetService passwordResetService;
     private final JwtProperties jwtProperties;
 
-    public AuthController(AuthService authService, PasswordResetService passwordResetService,
-                          JwtProperties jwtProperties) {
+    public AuthController(AuthService authService, UserProfileService userProfileService,
+                          PasswordResetService passwordResetService, JwtProperties jwtProperties) {
         this.authService = authService;
+        this.userProfileService = userProfileService;
         this.passwordResetService = passwordResetService;
         this.jwtProperties = jwtProperties;
     }
@@ -66,17 +69,17 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponse> getCurrentUser() {
-        return ResponseEntity.ok(authService.getCurrentUser());
+        return ResponseEntity.ok(userProfileService.getCurrentUser());
     }
 
     @PutMapping("/me")
     public ResponseEntity<UserProfileResponse> updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
-        return ResponseEntity.ok(authService.updateProfile(request));
+        return ResponseEntity.ok(userProfileService.updateProfile(request));
     }
 
     @PutMapping("/me/password")
     public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
-        authService.changePassword(request);
+        userProfileService.changePassword(request);
         return ResponseEntity.ok().build();
     }
 

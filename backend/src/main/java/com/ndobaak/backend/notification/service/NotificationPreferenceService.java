@@ -1,6 +1,7 @@
 package com.ndobaak.backend.notification.service;
 
 import com.ndobaak.backend.auth.entity.User;
+import com.ndobaak.backend.auth.event.UserRegisteredEvent;
 import com.ndobaak.backend.auth.repository.UserRepository;
 import com.ndobaak.backend.common.enums.NotificationType;
 import com.ndobaak.backend.common.exception.BusinessException;
@@ -9,6 +10,7 @@ import com.ndobaak.backend.notification.dto.NotificationTypePreferenceResponse;
 import com.ndobaak.backend.notification.dto.UpdatePreferenceRequest;
 import com.ndobaak.backend.notification.entity.NotificationTypePreference;
 import com.ndobaak.backend.notification.repository.NotificationTypePreferenceRepository;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,9 +78,10 @@ public class NotificationPreferenceService {
         return toResponse(pref);
     }
 
+    @EventListener
     @Transactional
-    public void createDefaultPreferences(Long userId) {
-        initDefaultPreferences(userId);
+    public void onUserRegistered(UserRegisteredEvent event) {
+        initDefaultPreferences(event.userId());
     }
 
     private void initDefaultPreferences(Long userId) {
