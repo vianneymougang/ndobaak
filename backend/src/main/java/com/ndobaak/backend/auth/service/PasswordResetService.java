@@ -7,6 +7,7 @@ import com.ndobaak.backend.auth.entity.User;
 import com.ndobaak.backend.auth.repository.PasswordResetTokenRepository;
 import com.ndobaak.backend.auth.repository.UserRepository;
 import com.ndobaak.backend.common.exception.BusinessException;
+import com.ndobaak.backend.common.exception.ErrorCode;
 import com.ndobaak.backend.common.service.EmailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -81,11 +82,11 @@ public class PasswordResetService {
                 .orElseThrow(() -> new BusinessException("Lien de réinitialisation invalide ou expiré."));
 
         if (resetToken.isExpired()) {
-            throw new BusinessException("Ce lien de réinitialisation a expiré. Veuillez en demander un nouveau.");
+            throw new BusinessException(ErrorCode.RESET_TOKEN_EXPIRED);
         }
 
         if (resetToken.isUsed()) {
-            throw new BusinessException("Ce lien de réinitialisation a déjà été utilisé.");
+            throw new BusinessException(ErrorCode.RESET_TOKEN_USED);
         }
 
         User user = resetToken.getUser();

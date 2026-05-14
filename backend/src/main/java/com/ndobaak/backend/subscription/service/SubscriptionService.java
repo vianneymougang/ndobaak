@@ -9,6 +9,7 @@ import com.ndobaak.backend.common.enums.PaymentStatus;
 import com.ndobaak.backend.common.enums.PaymentType;
 import com.ndobaak.backend.common.enums.SubscriptionStatus;
 import com.ndobaak.backend.common.exception.BusinessException;
+import com.ndobaak.backend.common.exception.ErrorCode;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.notification.service.NotificationDispatcher;
 import com.ndobaak.backend.payment.entity.Payment;
@@ -75,7 +76,7 @@ public class SubscriptionService {
         User landlord = authService.getAuthenticatedUser();
 
         if (subscriptionRepository.existsByLandlordIdAndStatus(landlord.getId(), SubscriptionStatus.ACTIVE)) {
-            throw new BusinessException("Vous avez déjà un abonnement actif.");
+            throw new BusinessException(ErrorCode.SUBSCRIPTION_ALREADY_ACTIVE);
         }
 
         Subscription subscription = subscriptionRepository.findByLandlordId(landlord.getId())
@@ -115,7 +116,7 @@ public class SubscriptionService {
                 .orElseThrow(() -> new ResourceNotFoundException("Aucun abonnement trouvé."));
 
         if (subscription.getStatus() == SubscriptionStatus.PENDING_PAYMENT) {
-            throw new BusinessException("Un paiement d'abonnement est déjà en cours.");
+            throw new BusinessException(ErrorCode.SUBSCRIPTION_PAYMENT_IN_PROGRESS);
         }
 
         String reference = UUID.randomUUID().toString();

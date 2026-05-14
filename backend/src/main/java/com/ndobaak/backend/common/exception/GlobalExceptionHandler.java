@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
                 .message(resolveMessage(ex))
                 .retryable(ex.isRetryable())
                 .build();
-        return ResponseEntity.badRequest().body(error);
+        return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).body(error);
     }
 
     @ExceptionHandler({UnauthorizedException.class, BadCredentialsException.class})

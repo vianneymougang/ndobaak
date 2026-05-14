@@ -1,6 +1,7 @@
 package com.ndobaak.backend.common.util;
 
 import com.ndobaak.backend.common.exception.BusinessException;
+import com.ndobaak.backend.common.exception.ErrorCode;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -40,17 +41,17 @@ public final class FileValidator {
 
     private static void validateSize(MultipartFile file) {
         if (file.isEmpty()) {
-            throw new BusinessException("Le fichier est vide.");
+            throw new BusinessException(ErrorCode.INVALID_FILE_FORMAT, "Le fichier est vide.");
         }
         if (file.getSize() > MAX_FILE_SIZE) {
-            throw new BusinessException("Le fichier dépasse la taille maximale de 10 Mo.");
+            throw new BusinessException(ErrorCode.UPLOAD_TOO_LARGE, "Le fichier dépasse la taille maximale de 10 Mo.");
         }
     }
 
     private static void validateMimeType(MultipartFile file, Set<String> allowed, String errorMessage) {
         String contentType = file.getContentType();
         if (contentType == null || !allowed.contains(contentType)) {
-            throw new BusinessException(errorMessage);
+            throw new BusinessException(ErrorCode.INVALID_FILE_FORMAT, errorMessage);
         }
     }
 
@@ -58,7 +59,7 @@ public final class FileValidator {
         byte[] header = new byte[12];
         int bytesRead = inputStream.read(header);
         if (bytesRead < 4) {
-            throw new BusinessException("Format de fichier non accepté. Formats autorisés : JPEG, PNG, WebP.");
+            throw new BusinessException(ErrorCode.INVALID_FILE_FORMAT, "Format de fichier non accepté. Formats autorisés : JPEG, PNG, WebP.");
         }
 
         boolean isJpeg = bytesRead >= 3
@@ -73,7 +74,7 @@ public final class FileValidator {
                 && header[10] == WEBP_MAGIC[2] && header[11] == WEBP_MAGIC[3];
 
         if (!isJpeg && !isPng && !isWebp) {
-            throw new BusinessException("Format de fichier non accepté. Formats autorisés : JPEG, PNG, WebP.");
+            throw new BusinessException(ErrorCode.INVALID_FILE_FORMAT, "Format de fichier non accepté. Formats autorisés : JPEG, PNG, WebP.");
         }
     }
 
@@ -81,7 +82,7 @@ public final class FileValidator {
         byte[] header = new byte[12];
         int bytesRead = inputStream.read(header);
         if (bytesRead < 4) {
-            throw new BusinessException("Format de fichier non accepté. Formats autorisés : JPEG, PNG, WebP, PDF.");
+            throw new BusinessException(ErrorCode.INVALID_FILE_FORMAT, "Format de fichier non accepté. Formats autorisés : JPEG, PNG, WebP, PDF.");
         }
 
         boolean isJpeg = bytesRead >= 3
@@ -99,7 +100,7 @@ public final class FileValidator {
                 && header[2] == PDF_MAGIC[2] && header[3] == PDF_MAGIC[3];
 
         if (!isJpeg && !isPng && !isWebp && !isPdf) {
-            throw new BusinessException("Format de fichier non accepté. Formats autorisés : JPEG, PNG, WebP, PDF.");
+            throw new BusinessException(ErrorCode.INVALID_FILE_FORMAT, "Format de fichier non accepté. Formats autorisés : JPEG, PNG, WebP, PDF.");
         }
     }
 }

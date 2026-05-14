@@ -5,6 +5,7 @@ import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.common.enums.ListingStatus;
 import com.ndobaak.backend.geo.GeoUtils;
 import com.ndobaak.backend.common.exception.BusinessException;
+import com.ndobaak.backend.common.exception.ErrorCode;
 import com.ndobaak.backend.common.exception.ForbiddenException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.listing.dto.CreateListingRequest;
@@ -68,14 +69,14 @@ public class ListingService {
         User landlord = authService.getAuthenticatedUser();
 
         if (!landlordCapabilityPolicy.hasActiveSubscription(landlord.getId())) {
-            throw new BusinessException(
+            throw new BusinessException(ErrorCode.SUBSCRIPTION_REQUIRED,
                     "Vous devez souscrire à un abonnement pour publier des annonces.");
         }
 
         long currentListingCount = listingRepository.countByLandlordId(landlord.getId());
         int maxListings = landlordCapabilityPolicy.getMaxListings(landlord.getId());
         if (currentListingCount >= maxListings) {
-            throw new BusinessException(
+            throw new BusinessException(ErrorCode.LISTING_LIMIT_REACHED,
                     "Vous avez atteint la limite de " + maxListings
                             + " annonces autorisées par votre abonnement.");
         }
@@ -158,21 +159,21 @@ public class ListingService {
         Listing listing = getOwnedListing(listingId);
 
         if (listing.getTitle() == null || listing.getTitle().length() < 10) {
-            throw new BusinessException("Le titre doit contenir au moins 10 caractères.");
+            throw new BusinessException(ErrorCode.LISTING_INCOMPLETE, "Le titre doit contenir au moins 10 caractères.");
         }
         if (listing.getDescription() == null || listing.getDescription().length() < 50) {
-            throw new BusinessException("La description doit contenir au moins 50 caractères.");
+            throw new BusinessException(ErrorCode.LISTING_INCOMPLETE, "La description doit contenir au moins 50 caractères.");
         }
         if (listing.getMonthlyPrice() == null || listing.getMonthlyPrice().signum() <= 0) {
-            throw new BusinessException("Le prix doit être supérieur à 0.");
+            throw new BusinessException(ErrorCode.LISTING_INCOMPLETE, "Le prix doit être supérieur à 0.");
         }
 
         int photoCount = photoRepository.countByListingId(listingId);
         if (photoCount < 3) {
-            throw new BusinessException("Au moins 3 photos sont requises pour soumettre l'annonce.");
+            throw new BusinessException(ErrorCode.LISTING_INCOMPLETE, "Au moins 3 photos sont requises pour soumettre l'annonce.");
         }
         if (photoCount > 10) {
-            throw new BusinessException("Maximum 10 photos autorisées.");
+            throw new BusinessException(ErrorCode.PHOTO_LIMIT_REACHED, "Maximum 10 photos autorisées.");
         }
 
         if (listing.getLocation() != null) {
@@ -181,7 +182,7 @@ public class ListingService {
                     listing.getLocation().getLongitude(),
                     GeoUtils.CAMPUS_LAT, GeoUtils.CAMPUS_LNG);
             if (distance > MAX_CAMPUS_DISTANCE_KM) {
-                throw new BusinessException("L'annonce doit se trouver à moins de 10 km du campus.");
+                throw new BusinessException(ErrorCode.LISTING_TOO_FAR_FROM_CAMPUS);
             }
             listing.getLocation().setDistanceToCampus(GeoUtils.roundDistance(distance));
         }

@@ -4,6 +4,7 @@ import com.ndobaak.backend.auth.entity.User;
 import com.ndobaak.backend.auth.service.AuthService;
 import com.ndobaak.backend.common.enums.PhotoStatus;
 import com.ndobaak.backend.common.exception.BusinessException;
+import com.ndobaak.backend.common.exception.ErrorCode;
 import com.ndobaak.backend.common.exception.ForbiddenException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.common.util.FileValidator;
@@ -62,7 +63,7 @@ public class PhotoUploadService {
 
         int photoCount = photoRepository.countByListingId(listingId);
         if (photoCount >= 10) {
-            throw new BusinessException("Maximum 10 photos par annonce.");
+            throw new BusinessException(ErrorCode.PHOTO_LIMIT_REACHED);
         }
 
         byte[] bytes = file.getBytes();

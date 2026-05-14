@@ -11,6 +11,7 @@ import com.ndobaak.backend.common.enums.BookingStatus;
 import com.ndobaak.backend.common.enums.ListingStatus;
 import com.ndobaak.backend.common.enums.NotificationType;
 import com.ndobaak.backend.common.exception.BusinessException;
+import com.ndobaak.backend.common.exception.ErrorCode;
 import com.ndobaak.backend.common.exception.ForbiddenException;
 import com.ndobaak.backend.common.exception.ResourceNotFoundException;
 import com.ndobaak.backend.listing.entity.Listing;
@@ -57,17 +58,17 @@ public class BookingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Listing", "id", request.getListingId()));
 
         if (listing.getStatus() != ListingStatus.PUBLISHED) {
-            throw new BusinessException("Cette annonce n'est pas disponible à la réservation");
+            throw new BusinessException(ErrorCode.BOOKING_UNAVAILABLE);
         }
 
         if (!request.getEndDate().isAfter(request.getStartDate())) {
-            throw new BusinessException("La date de fin doit être après la date de début");
+            throw new BusinessException(ErrorCode.BOOKING_DATE_INVALID, "La date de fin doit être après la date de début.");
         }
 
         boolean hasActiveBooking = bookingRepository.existsByStudentIdAndListingIdAndStatusIn(
                 student.getId(), listing.getId(), List.of(BookingStatus.PENDING, BookingStatus.CONFIRMED));
         if (hasActiveBooking) {
-            throw new BusinessException("Vous avez déjà une réservation active pour cette annonce");
+            throw new BusinessException(ErrorCode.BOOKING_CONFLICT);
         }
 
         long months = ChronoUnit.MONTHS.between(request.getStartDate(), request.getEndDate());
@@ -143,7 +144,7 @@ public class BookingService {
             throw new ForbiddenException("Vous ne pouvez confirmer que les réservations de vos annonces");
         }
         if (booking.getStatus() != BookingStatus.PENDING) {
-            throw new BusinessException("Seules les réservations en attente peuvent être confirmées");
+            throw new BusinessException(ErrorCode.BOOKING_INVALID_STATUS, "Seules les réservations en attente peuvent être confirmées.");
         }
 
         booking.setStatus(BookingStatus.CONFIRMED);
@@ -184,7 +185,7 @@ public class BookingService {
             throw new ForbiddenException("Vous ne pouvez rejeter que les réservations de vos annonces");
         }
         if (booking.getStatus() != BookingStatus.PENDING) {
-            throw new BusinessException("Seules les réservations en attente peuvent être rejetées");
+            throw new BusinessException(ErrorCode.BOOKING_INVALID_STATUS, "Seules les réservations en attente peuvent être rejetées.");
         }
 
         booking.setStatus(BookingStatus.CANCELLED);
@@ -218,7 +219,7 @@ public class BookingService {
         checkBookingAccess(booking, currentUser);
 
         if (booking.getStatus() != BookingStatus.PENDING && booking.getStatus() != BookingStatus.CONFIRMED) {
-            throw new BusinessException("Seules les réservations en attente ou confirmées peuvent être annulées");
+            throw new BusinessException(ErrorCode.BOOKING_INVALID_STATUS, "Seules les réservations en attente ou confirmées peuvent être annulées.");
         }
 
         Long otherUserId = currentUser.getId().equals(booking.getStudent().getId())
