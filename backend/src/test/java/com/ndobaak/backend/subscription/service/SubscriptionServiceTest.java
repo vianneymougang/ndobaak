@@ -16,6 +16,7 @@ import com.ndobaak.backend.payment.gateway.PaymentGatewayRouter;
 import com.ndobaak.backend.payment.gateway.PaymentInitiationResult;
 import com.ndobaak.backend.payment.gateway.PaymentProperties;
 import com.ndobaak.backend.payment.repository.PaymentRepository;
+import com.ndobaak.backend.subscription.config.SubscriptionProperties;
 import com.ndobaak.backend.subscription.dto.SubscribeRequest;
 import com.ndobaak.backend.subscription.dto.SubscriptionMapper;
 import com.ndobaak.backend.subscription.dto.SubscriptionResponse;
@@ -56,6 +57,8 @@ class SubscriptionServiceTest {
     private PaymentGatewayRouter gatewayRouter;
     @Mock
     private PaymentProperties paymentProperties;
+    @Mock
+    private SubscriptionProperties subscriptionProperties;
     @Mock
     private AuthService authService;
     @Mock
@@ -100,6 +103,7 @@ class SubscriptionServiceTest {
         when(subscriptionRepository.save(any(Subscription.class))).thenAnswer(inv -> inv.getArgument(0));
         when(subscriptionMapper.toResponse(any(Subscription.class))).thenReturn(subscriptionResponse);
         when(paymentProperties.getFrontendCallbackUrl()).thenReturn("https://ndobaak.com/callback");
+        when(subscriptionProperties.getAmount()).thenReturn(BigDecimal.valueOf(100_000));
 
         SubscriptionResponse result = subscriptionService.subscribe(subscribeRequest);
 
@@ -122,6 +126,7 @@ class SubscriptionServiceTest {
         when(subscriptionRepository.save(any(Subscription.class))).thenAnswer(inv -> inv.getArgument(0));
         when(subscriptionMapper.toResponse(any(Subscription.class))).thenReturn(subscriptionResponse);
         when(paymentProperties.getFrontendCallbackUrl()).thenReturn("https://ndobaak.com/callback");
+        when(subscriptionProperties.getAmount()).thenReturn(BigDecimal.valueOf(100_000));
 
         subscriptionService.subscribe(subscribeRequest);
 
@@ -154,6 +159,7 @@ class SubscriptionServiceTest {
         when(subscriptionRepository.save(any(Subscription.class))).thenAnswer(inv -> inv.getArgument(0));
         when(subscriptionMapper.toResponse(any(Subscription.class))).thenReturn(mutableResponse);
         when(paymentProperties.getFrontendCallbackUrl()).thenReturn("https://ndobaak.com/callback");
+        when(subscriptionProperties.getAmount()).thenReturn(BigDecimal.valueOf(100_000));
 
         SubscriptionResponse result = subscriptionService.subscribe(subscribeRequest);
 
@@ -172,6 +178,7 @@ class SubscriptionServiceTest {
         when(subscriptionRepository.save(any(Subscription.class))).thenAnswer(inv -> inv.getArgument(0));
         when(subscriptionMapper.toResponse(any(Subscription.class))).thenReturn(subscriptionResponse);
         when(paymentProperties.getFrontendCallbackUrl()).thenReturn("https://ndobaak.com/callback");
+        when(subscriptionProperties.getAmount()).thenReturn(BigDecimal.valueOf(100_000));
 
         SubscriptionResponse result = subscriptionService.renew(subscribeRequest);
 
@@ -253,42 +260,6 @@ class SubscriptionServiceTest {
     }
 
     @Test
-    void hasActiveSubscriptionShouldReturnTrueWhenActive() {
-        when(subscriptionRepository.existsByLandlordIdAndStatus(10L, SubscriptionStatus.ACTIVE)).thenReturn(true);
-
-        assertThat(subscriptionService.hasActiveSubscription(10L)).isTrue();
-    }
-
-    @Test
-    void hasActiveSubscriptionShouldReturnFalseWhenNotActive() {
-        when(subscriptionRepository.existsByLandlordIdAndStatus(10L, SubscriptionStatus.ACTIVE)).thenReturn(false);
-
-        assertThat(subscriptionService.hasActiveSubscription(10L)).isFalse();
-    }
-
-    @Test
-    void getMaxListingsShouldReturnLimitFromActiveSubscription() {
-        Subscription subscription = buildSubscription(5L, SubscriptionStatus.ACTIVE);
-        subscription.setMaxListings(20);
-        when(subscriptionRepository.findByLandlordIdAndStatus(10L, SubscriptionStatus.ACTIVE))
-                .thenReturn(Optional.of(subscription));
-
-        int max = subscriptionService.getMaxListings(10L);
-
-        assertThat(max).isEqualTo(20);
-    }
-
-    @Test
-    void getMaxListingsShouldReturnZeroWhenNoActiveSubscription() {
-        when(subscriptionRepository.findByLandlordIdAndStatus(10L, SubscriptionStatus.ACTIVE))
-                .thenReturn(Optional.empty());
-
-        int max = subscriptionService.getMaxListings(10L);
-
-        assertThat(max).isZero();
-    }
-
-    @Test
     void deactivateExpiredSubscriptionsShouldMarkExpiredAndDispatchNotification() {
         Subscription subscription = buildSubscription(5L, SubscriptionStatus.ACTIVE);
         subscription.setEndDate(LocalDate.now().minusDays(1));
@@ -302,33 +273,6 @@ class SubscriptionServiceTest {
         verify(notificationDispatcher).dispatch(
                 eq(10L),
                 eq(NotificationType.SUBSCRIPTION_EXPIRED),
-                anyString(),
-                anyString(),
-                eq(5L),
-                eq("SUBSCRIPTION"),
-                anyMap(),
-                anyMap()
-        );
-    }
-
-    @Test
-    void activateSubscriptionShouldSetActiveStatusAndDispatchNotification() {
-        Payment payment = buildPayment(1L);
-        Subscription subscription = buildSubscription(5L, SubscriptionStatus.PENDING_PAYMENT);
-        subscription.setLastPayment(payment);
-
-        when(paymentRepository.findById(1L)).thenReturn(Optional.of(payment));
-        when(subscriptionRepository.findAll()).thenReturn(List.of(subscription));
-        when(subscriptionRepository.save(any(Subscription.class))).thenAnswer(inv -> inv.getArgument(0));
-
-        subscriptionService.activateSubscription(1L);
-
-        assertThat(subscription.getStatus()).isEqualTo(SubscriptionStatus.ACTIVE);
-        assertThat(subscription.getStartDate()).isNotNull();
-        assertThat(subscription.getEndDate()).isEqualTo(subscription.getStartDate().plusYears(1));
-        verify(notificationDispatcher).dispatch(
-                eq(10L),
-                eq(NotificationType.SUBSCRIPTION_ACTIVATED),
                 anyString(),
                 anyString(),
                 eq(5L),

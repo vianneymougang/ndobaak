@@ -44,6 +44,8 @@ twilio:
   enabled: ${TWILIO_ENABLED:false}
 
 app:
+  subscription:
+    amount: ${SUBSCRIPTION_AMOUNT:100000}
   payment:
     commission-rate: 0.07
     installment-threshold: 500000

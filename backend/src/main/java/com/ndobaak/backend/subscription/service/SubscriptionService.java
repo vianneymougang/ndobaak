@@ -18,6 +18,7 @@ import com.ndobaak.backend.payment.gateway.PaymentGatewayRouter;
 import com.ndobaak.backend.payment.gateway.PaymentInitiationResult;
 import com.ndobaak.backend.payment.gateway.PaymentProperties;
 import com.ndobaak.backend.payment.repository.PaymentRepository;
+import com.ndobaak.backend.subscription.config.SubscriptionProperties;
 import com.ndobaak.backend.subscription.dto.SubscribeRequest;
 import com.ndobaak.backend.subscription.dto.SubscriptionResponse;
 import com.ndobaak.backend.subscription.dto.SubscriptionMapper;
@@ -25,7 +26,6 @@ import com.ndobaak.backend.subscription.entity.Subscription;
 import com.ndobaak.backend.subscription.repository.SubscriptionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +40,6 @@ import java.util.UUID;
 public class SubscriptionService {
 
     private static final Logger log = LoggerFactory.getLogger(SubscriptionService.class);
-    private static final BigDecimal SUBSCRIPTION_AMOUNT = BigDecimal.valueOf(100_000);
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final String RENEW_URL = "https://ndobaak.com/subscription";
 
@@ -48,6 +47,7 @@ public class SubscriptionService {
     private final PaymentRepository paymentRepository;
     private final PaymentGatewayRouter gatewayRouter;
     private final PaymentProperties paymentProperties;
+    private final SubscriptionProperties subscriptionProperties;
     private final AuthService authService;
     private final NotificationDispatcher notificationDispatcher;
     private final SubscriptionMapper subscriptionMapper;
@@ -56,6 +56,7 @@ public class SubscriptionService {
                                 PaymentRepository paymentRepository,
                                 PaymentGatewayRouter gatewayRouter,
                                 PaymentProperties paymentProperties,
+                                SubscriptionProperties subscriptionProperties,
                                 AuthService authService,
                                 NotificationDispatcher notificationDispatcher,
                                 SubscriptionMapper subscriptionMapper) {
@@ -63,6 +64,7 @@ public class SubscriptionService {
         this.paymentRepository = paymentRepository;
         this.gatewayRouter = gatewayRouter;
         this.paymentProperties = paymentProperties;
+        this.subscriptionProperties = subscriptionProperties;
         this.authService = authService;
         this.notificationDispatcher = notificationDispatcher;
         this.subscriptionMapper = subscriptionMapper;
@@ -79,7 +81,7 @@ public class SubscriptionService {
         Subscription subscription = subscriptionRepository.findByLandlordId(landlord.getId())
                 .orElseGet(() -> Subscription.builder()
                         .landlord(landlord)
-                        .amount(SUBSCRIPTION_AMOUNT)
+                        .amount(subscriptionProperties.getAmount())
                         .maxListings(20)
                         .build());
 
@@ -189,85 +191,6 @@ public class SubscriptionService {
                 .orElse(null);
     }
 
-    @Transactional(readOnly = true)
-    public boolean hasActiveSubscription(Long landlordId) {
-        return subscriptionRepository.existsByLandlordIdAndStatus(landlordId, SubscriptionStatus.ACTIVE);
-    }
-
-    @Transactional(readOnly = true)
-    public int getMaxListings(Long landlordId) {
-        return subscriptionRepository.findByLandlordIdAndStatus(landlordId, SubscriptionStatus.ACTIVE)
-                .map(Subscription::getMaxListings)
-                .orElse(0);
-    }
-
-    @Transactional
-    public void activateSubscription(Long paymentId) {
-        paymentRepository.findById(paymentId).ifPresent(payment -> {
-            subscriptionRepository.findAll().stream()
-                    .filter(s -> s.getLastPayment() != null && s.getLastPayment().getId().equals(paymentId))
-                    .findFirst()
-                    .ifPresent(subscription -> {
-                        LocalDate start = LocalDate.now();
-                        if (subscription.getStatus() == SubscriptionStatus.ACTIVE) {
-                            start = subscription.getEndDate();
-                        }
-                        subscription.setStatus(SubscriptionStatus.ACTIVE);
-                        subscription.setStartDate(start);
-                        subscription.setEndDate(start.plusYears(1));
-                        subscriptionRepository.save(subscription);
-
-                        String landlordName = subscription.getLandlord().getFirstName();
-                        String endDateFormatted = subscription.getEndDate().format(DATE_FMT);
-
-                        notificationDispatcher.dispatch(
-                                subscription.getLandlord().getId(),
-                                NotificationType.SUBSCRIPTION_ACTIVATED,
-                                "Abonnement activé",
-                                "Votre abonnement Ndobaak est actif jusqu'au "
-                                        + endDateFormatted + ". Vous pouvez publier jusqu'à "
-                                        + subscription.getMaxListings() + " annonces.",
-                                subscription.getId(),
-                                "SUBSCRIPTION",
-                                Map.of(
-                                        "landlordName", landlordName,
-                                        "endDate", endDateFormatted,
-                                        "renewUrl", RENEW_URL
-                                ),
-                                Map.of()
-                        );
-
-                        log.info("Subscription activated for landlord={}, until={}",
-                                subscription.getLandlord().getId(), subscription.getEndDate());
-                    });
-        });
-    }
-
-    @Transactional
-    public void onSubscriptionPaymentFailed(Long paymentId) {
-        paymentRepository.findById(paymentId).ifPresent(payment -> {
-            subscriptionRepository.findAll().stream()
-                    .filter(s -> s.getLastPayment() != null && s.getLastPayment().getId().equals(paymentId))
-                    .findFirst()
-                    .ifPresent(subscription -> {
-                        subscription.setStatus(SubscriptionStatus.PENDING_PAYMENT);
-                        subscriptionRepository.save(subscription);
-
-                        notificationDispatcher.dispatch(
-                                subscription.getLandlord().getId(),
-                                NotificationType.PAYMENT_FAILED,
-                                "Échec du paiement d'abonnement",
-                                "Le paiement de votre abonnement a échoué. Veuillez réessayer.",
-                                subscription.getId(),
-                                "SUBSCRIPTION",
-                                Map.of("landlordName", subscription.getLandlord().getFirstName()),
-                                Map.of()
-                        );
-                    });
-        });
-    }
-
-    @Scheduled(cron = "0 0 2 * * *")
     @Transactional
     public void deactivateExpiredSubscriptions() {
         List<Subscription> expired = subscriptionRepository
@@ -298,7 +221,6 @@ public class SubscriptionService {
         }
     }
 
-    @Scheduled(cron = "0 0 9 * * *")
     @Transactional
     public void sendExpiryReminders() {
         LocalDate in30Days = LocalDate.now().plusDays(30);
@@ -340,7 +262,7 @@ public class SubscriptionService {
 
     private Payment createSubscriptionPayment(User landlord, SubscribeRequest request, String reference) {
         return Payment.builder()
-                .amount(SUBSCRIPTION_AMOUNT)
+                .amount(subscriptionProperties.getAmount())
                 .commission(BigDecimal.ZERO)
                 .paymentMethod(PaymentMethod.MOBILE_MONEY)
                 .channel(request.getOperator())
@@ -359,13 +281,13 @@ public class SubscriptionService {
 
         PaymentGatewayRequest gatewayRequest = new PaymentGatewayRequest(
                 reference,
-                SUBSCRIPTION_AMOUNT,
+                subscriptionProperties.getAmount(),
                 "XAF",
                 landlord.getFirstName() + " " + landlord.getLastName(),
                 landlord.getEmail(),
                 request.getPhoneNumber(),
                 request.getOperator(),
-                "Abonnement annuel Ndobaak - 100 000 FCFA",
+                "Abonnement annuel Ndobaak - " + subscriptionProperties.getAmount().toPlainString() + " FCFA",
                 paymentProperties.getFrontendCallbackUrl()
         );
 

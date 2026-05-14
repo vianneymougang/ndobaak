@@ -22,5 +22,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 
     List<Subscription> findByStatusAndEndDateBetween(SubscriptionStatus status, LocalDate from, LocalDate to);
 
+    Optional<Subscription> findByLastPaymentId(Long paymentId);
+
     long countByStatus(SubscriptionStatus status);
 }

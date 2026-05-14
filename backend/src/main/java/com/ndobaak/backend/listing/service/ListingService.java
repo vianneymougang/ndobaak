@@ -22,7 +22,7 @@ import com.ndobaak.backend.listing.repository.ListingRepository;
 import com.ndobaak.backend.listing.repository.PhotoRepository;
 import com.ndobaak.backend.media.service.ImageProcessingService;
 import com.ndobaak.backend.media.service.StorageService;
-import com.ndobaak.backend.subscription.service.SubscriptionService;
+import com.ndobaak.backend.subscription.service.LandlordCapabilityPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -48,13 +48,13 @@ public class ListingService {
     private final ImageProcessingService imageProcessingService;
     private final AuthService authService;
     private final ListingMapper listingMapper;
-    private final SubscriptionService subscriptionService;
+    private final LandlordCapabilityPolicy landlordCapabilityPolicy;
 
     public ListingService(ListingRepository listingRepository, AmenityRepository amenityRepository,
                           PhotoRepository photoRepository, StorageService storageService,
                           ImageProcessingService imageProcessingService, AuthService authService,
                           ListingMapper listingMapper,
-                          SubscriptionService subscriptionService) {
+                          LandlordCapabilityPolicy landlordCapabilityPolicy) {
         this.listingRepository = listingRepository;
         this.amenityRepository = amenityRepository;
         this.photoRepository = photoRepository;
@@ -62,20 +62,20 @@ public class ListingService {
         this.imageProcessingService = imageProcessingService;
         this.authService = authService;
         this.listingMapper = listingMapper;
-        this.subscriptionService = subscriptionService;
+        this.landlordCapabilityPolicy = landlordCapabilityPolicy;
     }
 
     @Transactional
     public ListingResponse createListing(CreateListingRequest request) {
         User landlord = authService.getAuthenticatedUser();
 
-        if (!subscriptionService.hasActiveSubscription(landlord.getId())) {
+        if (!landlordCapabilityPolicy.hasActiveSubscription(landlord.getId())) {
             throw new BusinessException(
                     "Vous devez souscrire à un abonnement pour publier des annonces.");
         }
 
         long currentListingCount = listingRepository.countByLandlordId(landlord.getId());
-        int maxListings = subscriptionService.getMaxListings(landlord.getId());
+        int maxListings = landlordCapabilityPolicy.getMaxListings(landlord.getId());
         if (currentListingCount >= maxListings) {
             throw new BusinessException(
                     "Vous avez atteint la limite de " + maxListings

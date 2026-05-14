@@ -22,7 +22,7 @@ import com.ndobaak.backend.payment.gateway.WebhookEvent;
 import com.ndobaak.backend.payment.repository.InstallmentRepository;
 import com.ndobaak.backend.payment.repository.PaymentRepository;
 import com.ndobaak.backend.payment.repository.PaymentScheduleRepository;
-import com.ndobaak.backend.subscription.service.SubscriptionService;
+import com.ndobaak.backend.subscription.service.SubscriptionPaymentEventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -45,7 +45,7 @@ public class PaymentWebhookService {
     private final BookingRepository bookingRepository;
     private final PaymentGatewayRouter gatewayRouter;
     private final PaymentProperties paymentProperties;
-    private final SubscriptionService subscriptionService;
+    private final SubscriptionPaymentEventHandler subscriptionEventHandler;
     private final PaymentNotificationService notificationService;
 
     public PaymentWebhookService(PaymentRepository paymentRepository,
@@ -54,7 +54,7 @@ public class PaymentWebhookService {
                                  BookingRepository bookingRepository,
                                  PaymentGatewayRouter gatewayRouter,
                                  PaymentProperties paymentProperties,
-                                 SubscriptionService subscriptionService,
+                                 SubscriptionPaymentEventHandler subscriptionEventHandler,
                                  PaymentNotificationService notificationService) {
         this.paymentRepository = paymentRepository;
         this.scheduleRepository = scheduleRepository;
@@ -62,7 +62,7 @@ public class PaymentWebhookService {
         this.bookingRepository = bookingRepository;
         this.gatewayRouter = gatewayRouter;
         this.paymentProperties = paymentProperties;
-        this.subscriptionService = subscriptionService;
+        this.subscriptionEventHandler = subscriptionEventHandler;
         this.notificationService = notificationService;
     }
 
@@ -109,7 +109,7 @@ public class PaymentWebhookService {
         paymentRepository.save(payment);
 
         if (payment.getPaymentType() == PaymentType.SUBSCRIPTION || payment.getBooking() == null) {
-            subscriptionService.activateSubscription(payment.getId());
+            subscriptionEventHandler.onPaymentSucceeded(payment.getId());
             log.info("Subscription payment completed: reference={}", payment.getTransactionId());
             return;
         }
@@ -211,7 +211,7 @@ public class PaymentWebhookService {
         paymentRepository.save(payment);
 
         if (payment.getPaymentType() == PaymentType.SUBSCRIPTION || payment.getBooking() == null) {
-            subscriptionService.onSubscriptionPaymentFailed(payment.getId());
+            subscriptionEventHandler.onPaymentFailed(payment.getId());
             log.warn("Subscription payment expired: reference={}", payment.getTransactionId());
             return;
         }
@@ -225,7 +225,7 @@ public class PaymentWebhookService {
         paymentRepository.save(payment);
 
         if (payment.getPaymentType() == PaymentType.SUBSCRIPTION || payment.getBooking() == null) {
-            subscriptionService.onSubscriptionPaymentFailed(payment.getId());
+            subscriptionEventHandler.onPaymentFailed(payment.getId());
             log.warn("Subscription payment canceled: reference={}", payment.getTransactionId());
             return;
         }
@@ -239,7 +239,7 @@ public class PaymentWebhookService {
         paymentRepository.save(payment);
 
         if (payment.getPaymentType() == PaymentType.SUBSCRIPTION || payment.getBooking() == null) {
-            subscriptionService.onSubscriptionPaymentFailed(payment.getId());
+            subscriptionEventHandler.onPaymentFailed(payment.getId());
             log.warn("Subscription payment failed: reference={}", payment.getTransactionId());
             return;
         }

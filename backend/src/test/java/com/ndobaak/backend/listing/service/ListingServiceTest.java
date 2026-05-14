@@ -57,7 +57,7 @@ class ListingServiceTest {
     @Mock
     private ListingMapper listingMapper;
     @Mock
-    private com.ndobaak.backend.subscription.service.SubscriptionService subscriptionService;
+    private com.ndobaak.backend.subscription.service.LandlordCapabilityPolicy landlordCapabilityPolicy;
 
     @InjectMocks
     private ListingService listingService;
@@ -71,8 +71,8 @@ class ListingServiceTest {
     void createListingShouldReturnDraft() {
         Landlord landlord = buildLandlord(2L);
         when(authService.getAuthenticatedUser()).thenReturn(landlord);
-        when(subscriptionService.hasActiveSubscription(2L)).thenReturn(true);
-        when(subscriptionService.getMaxListings(2L)).thenReturn(20);
+        when(landlordCapabilityPolicy.hasActiveSubscription(2L)).thenReturn(true);
+        when(landlordCapabilityPolicy.getMaxListings(2L)).thenReturn(20);
         when(listingRepository.countByLandlordId(2L)).thenReturn(0L);
 
         CreateListingRequest request = new CreateListingRequest();
@@ -104,8 +104,8 @@ class ListingServiceTest {
     void createListingWithLocationShouldCalculateDistance() {
         Landlord landlord = buildLandlord(2L);
         when(authService.getAuthenticatedUser()).thenReturn(landlord);
-        when(subscriptionService.hasActiveSubscription(2L)).thenReturn(true);
-        when(subscriptionService.getMaxListings(2L)).thenReturn(20);
+        when(landlordCapabilityPolicy.hasActiveSubscription(2L)).thenReturn(true);
+        when(landlordCapabilityPolicy.getMaxListings(2L)).thenReturn(20);
         when(listingRepository.countByLandlordId(2L)).thenReturn(0L);
 
         CreateListingRequest request = new CreateListingRequest();
@@ -136,8 +136,8 @@ class ListingServiceTest {
     void createListingWithAmenitiesShouldLinkThem() {
         Landlord landlord = buildLandlord(2L);
         when(authService.getAuthenticatedUser()).thenReturn(landlord);
-        when(subscriptionService.hasActiveSubscription(2L)).thenReturn(true);
-        when(subscriptionService.getMaxListings(2L)).thenReturn(20);
+        when(landlordCapabilityPolicy.hasActiveSubscription(2L)).thenReturn(true);
+        when(landlordCapabilityPolicy.getMaxListings(2L)).thenReturn(20);
         when(listingRepository.countByLandlordId(2L)).thenReturn(0L);
 
         Amenity wifi = new Amenity();
