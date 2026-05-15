@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -51,6 +50,7 @@ public class ReviewService {
     private final NotificationService notificationService;
     private final StorageService storageService;
     private final ReviewMapper reviewMapper;
+    private final ReviewPhotoUploadService reviewPhotoUploadService;
 
     public ReviewService(ReviewRepository reviewRepository,
                          ReviewReportRepository reviewReportRepository,
@@ -59,7 +59,8 @@ public class ReviewService {
                          AuthService authService,
                          NotificationService notificationService,
                          StorageService storageService,
-                         ReviewMapper reviewMapper) {
+                         ReviewMapper reviewMapper,
+                         ReviewPhotoUploadService reviewPhotoUploadService) {
         this.reviewRepository = reviewRepository;
         this.reviewReportRepository = reviewReportRepository;
         this.bookingRepository = bookingRepository;
@@ -68,10 +69,11 @@ public class ReviewService {
         this.notificationService = notificationService;
         this.storageService = storageService;
         this.reviewMapper = reviewMapper;
+        this.reviewPhotoUploadService = reviewPhotoUploadService;
     }
 
     @Transactional
-    public ReviewResponse createReview(CreateReviewRequest request, List<MultipartFile> photos) throws IOException {
+    public ReviewResponse createReview(CreateReviewRequest request, List<MultipartFile> photos) {
         User student = authService.getAuthenticatedUser();
         Long listingId = request.getListingId();
 
@@ -90,7 +92,12 @@ public class ReviewService {
             throw new BusinessException("Vous avez déjà laissé un avis pour ce logement.");
         }
 
-        List<String> photoKeys = uploadReviewPhotos(listingId, photos);
+        List<MultipartFile> validPhotos = photos != null
+                ? photos.stream().filter(p -> !p.isEmpty()).toList()
+                : List.of();
+        if (validPhotos.size() > MAX_PHOTOS) {
+            throw new BusinessException("Maximum " + MAX_PHOTOS + " photos par avis.");
+        }
 
         Review review = Review.builder()
                 .rating(request.getRating())
@@ -98,10 +105,12 @@ public class ReviewService {
                 .student(student)
                 .listing(listing)
                 .status(ReviewStatus.APPROVED)
-                .photoUrls(photoKeys)
+                .photoUrls(new ArrayList<>())
                 .build();
 
         Review saved = reviewRepository.save(review);
+
+        reviewPhotoUploadService.scheduleUploads(saved.getId(), listingId, validPhotos);
 
         notificationService.createNotification(
                 listing.getLandlord().getId(),
@@ -223,29 +232,4 @@ public class ReviewService {
                 .build();
     }
 
-    private List<String> uploadReviewPhotos(Long listingId, List<MultipartFile> photos) throws IOException {
-        if (photos == null || photos.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        if (photos.size() > MAX_PHOTOS) {
-            throw new BusinessException("Maximum " + MAX_PHOTOS + " photos par avis.");
-        }
-
-        List<String> keys = new ArrayList<>();
-        String folder = "reviews/" + listingId;
-
-        for (MultipartFile photo : photos) {
-            if (photo.isEmpty()) continue;
-
-            String key = storageService.upload(folder,
-                    photo.getOriginalFilename(),
-                    photo.getInputStream(),
-                    photo.getSize(),
-                    photo.getContentType());
-            keys.add(key);
-        }
-
-        return keys;
-    }
 }

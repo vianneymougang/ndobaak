@@ -70,7 +70,7 @@ class ReviewControllerTest {
 
     @Test
     @WithMockUser(roles = "STUDENT")
-    void createReviewShouldReturn201() throws Exception {
+    void createReviewShouldReturn202() throws Exception {
         String reviewJson = "{\"listingId\":100,\"rating\":4,\"comment\":\"Très bon logement, je recommande vivement\"}";
 
         MockMultipartFile reviewPart = new MockMultipartFile(
@@ -80,14 +80,14 @@ class ReviewControllerTest {
 
         mockMvc.perform(multipart("/reviews")
                         .file(reviewPart))
-                .andExpect(status().isCreated())
+                .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.rating").value(4));
     }
 
     @Test
     @WithMockUser(roles = "STUDENT")
-    void createReviewWithPhotosShouldReturn201() throws Exception {
+    void createReviewWithPhotosShouldReturn202() throws Exception {
         String reviewJson = "{\"listingId\":100,\"rating\":5,\"comment\":\"Excellent séjour dans ce logement\"}";
 
         MockMultipartFile reviewPart = new MockMultipartFile(
@@ -100,7 +100,7 @@ class ReviewControllerTest {
         mockMvc.perform(multipart("/reviews")
                         .file(reviewPart)
                         .file(photo))
-                .andExpect(status().isCreated());
+                .andExpect(status().isAccepted());
     }
 
     @Test

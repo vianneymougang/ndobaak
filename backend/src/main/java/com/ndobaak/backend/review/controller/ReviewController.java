@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -38,9 +37,9 @@ public class ReviewController {
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<ReviewResponse> createReview(
             @Valid @RequestPart("review") CreateReviewRequest request,
-            @RequestPart(value = "photos", required = false) List<MultipartFile> photos) throws IOException {
+            @RequestPart(value = "photos", required = false) List<MultipartFile> photos) {
         ReviewResponse response = reviewService.createReview(request, photos);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
     @GetMapping("/listings/{id}/reviews")

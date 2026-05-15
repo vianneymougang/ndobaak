@@ -17,6 +17,7 @@ import com.ndobaak.backend.listing.repository.ListingRepository;
 import com.ndobaak.backend.listing.repository.ReviewRepository;
 import com.ndobaak.backend.media.service.StorageService;
 import com.ndobaak.backend.notification.service.NotificationService;
+import com.ndobaak.backend.review.service.ReviewPhotoUploadService;
 import com.ndobaak.backend.review.dto.CreateReviewRequest;
 import com.ndobaak.backend.review.dto.RatingStatsResponse;
 import com.ndobaak.backend.review.dto.ReviewResponse;
@@ -31,8 +32,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +45,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -67,6 +65,8 @@ class ReviewServiceTest {
     private StorageService storageService;
     @Mock
     private ReviewMapper reviewMapper;
+    @Mock
+    private ReviewPhotoUploadService reviewPhotoUploadService;
 
     @InjectMocks
     private ReviewService reviewService;
@@ -121,7 +121,7 @@ class ReviewServiceTest {
     }
 
     @Test
-    void createReviewShouldPersistAndNotifyLandlord() throws IOException {
+    void createReviewShouldPersistAndNotifyLandlord() {
         Student student = buildStudent(1L);
         Listing listing = buildListing(100L);
         CreateReviewRequest request = buildRequest(100L);
@@ -186,24 +186,18 @@ class ReviewServiceTest {
     }
 
     @Test
-    void createReviewShouldUploadPhotos() throws IOException {
+    void createReviewShouldDelegatePhotoUpload() {
         Student student = buildStudent(1L);
         Listing listing = buildListing(100L);
         CreateReviewRequest request = buildRequest(100L);
 
         MultipartFile photo = mock(MultipartFile.class);
         when(photo.isEmpty()).thenReturn(false);
-        when(photo.getOriginalFilename()).thenReturn("test.jpg");
-        when(photo.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[0]));
-        when(photo.getSize()).thenReturn(1024L);
-        when(photo.getContentType()).thenReturn("image/jpeg");
 
         when(authService.getAuthenticatedUser()).thenReturn(student);
         when(listingRepository.findById(100L)).thenReturn(Optional.of(listing));
         when(bookingRepository.existsByStudentIdAndListingIdAndStatusIn(any(), any(), any())).thenReturn(true);
         when(reviewRepository.existsByStudentIdAndListingId(any(), any())).thenReturn(false);
-        when(storageService.upload(anyString(), anyString(), any(), anyLong(), anyString()))
-                .thenReturn("reviews/100/test.jpg");
         when(reviewRepository.save(any())).thenAnswer(inv -> {
             Review r = inv.getArgument(0);
             r.setId(1L);
@@ -213,7 +207,7 @@ class ReviewServiceTest {
 
         reviewService.createReview(request, List.of(photo));
 
-        verify(storageService).upload(eq("reviews/100"), eq("test.jpg"), any(), eq(1024L), eq("image/jpeg"));
+        verify(reviewPhotoUploadService).scheduleUploads(eq(1L), eq(100L), any());
     }
 
     @Test
