@@ -64,8 +64,8 @@ class BookingControllerTest {
     private BookingResponse buildResponse(Long id, BookingStatus status) {
         return BookingResponse.builder()
                 .id(id)
-                .startDate(LocalDate.of(2026, 5, 1))
-                .endDate(LocalDate.of(2026, 8, 1))
+                .startDate(LocalDate.of(2026, 9, 1))
+                .endDate(LocalDate.of(2026, 12, 1))
                 .monthlyRent(new BigDecimal("35000"))
                 .totalAmount(new BigDecimal("105000"))
                 .status(status)
@@ -78,8 +78,8 @@ class BookingControllerTest {
     void createBookingShouldReturn201() throws Exception {
         CreateBookingRequest request = new CreateBookingRequest();
         request.setListingId(1L);
-        request.setStartDate(LocalDate.of(2026, 5, 1));
-        request.setEndDate(LocalDate.of(2026, 8, 1));
+        request.setStartDate(LocalDate.of(2026, 9, 1));
+        request.setEndDate(LocalDate.of(2026, 12, 1));
 
         when(bookingService.createBooking(any())).thenReturn(buildResponse(1L, BookingStatus.PENDING));
 
@@ -105,8 +105,8 @@ class BookingControllerTest {
     void createBookingShouldReturn400OnBusinessError() throws Exception {
         CreateBookingRequest request = new CreateBookingRequest();
         request.setListingId(1L);
-        request.setStartDate(LocalDate.of(2026, 5, 1));
-        request.setEndDate(LocalDate.of(2026, 8, 1));
+        request.setStartDate(LocalDate.of(2026, 9, 1));
+        request.setEndDate(LocalDate.of(2026, 12, 1));
 
         when(bookingService.createBooking(any()))
                 .thenThrow(new BusinessException("Annonce non disponible"));

@@ -122,7 +122,7 @@ class PhotoUploadServiceTest {
 
         assertThatThrownBy(() -> photoUploadService.scheduleUpload(10L, file))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("Maximum 10 photos");
+                .hasMessageContaining("maximum de photos");
     }
 
     @Test
