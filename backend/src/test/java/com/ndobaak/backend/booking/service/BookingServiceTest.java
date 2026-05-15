@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -56,6 +57,8 @@ class BookingServiceTest {
     private NotificationDispatcher notificationDispatcher;
     @Mock
     private BookingMapper bookingMapper;
+    @Spy
+    private BookingStateMachine bookingStateMachine;
 
     @InjectMocks
     private BookingService bookingService;
@@ -373,7 +376,7 @@ class BookingServiceTest {
 
         assertThatThrownBy(() -> bookingService.confirmBooking(1L))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("en attente");
+                .hasMessageContaining("modifiée");
     }
 
     @Test
@@ -473,7 +476,7 @@ class BookingServiceTest {
 
         assertThatThrownBy(() -> bookingService.cancelBooking(1L))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("en attente ou confirmées");
+                .hasMessageContaining("modifiée");
     }
 
     @Test

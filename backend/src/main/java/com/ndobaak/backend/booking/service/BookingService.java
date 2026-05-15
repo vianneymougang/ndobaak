@@ -39,15 +39,17 @@ public class BookingService {
     private final AuthService authService;
     private final NotificationDispatcher notificationDispatcher;
     private final BookingMapper bookingMapper;
+    private final BookingStateMachine stateMachine;
 
     public BookingService(BookingRepository bookingRepository, ListingRepository listingRepository,
                           AuthService authService, NotificationDispatcher notificationDispatcher,
-                          BookingMapper bookingMapper) {
+                          BookingMapper bookingMapper, BookingStateMachine stateMachine) {
         this.bookingRepository = bookingRepository;
         this.listingRepository = listingRepository;
         this.authService = authService;
         this.notificationDispatcher = notificationDispatcher;
         this.bookingMapper = bookingMapper;
+        this.stateMachine = stateMachine;
     }
 
     @Transactional
@@ -143,11 +145,8 @@ public class BookingService {
         if (!booking.getListing().getLandlord().getId().equals(landlord.getId())) {
             throw new ForbiddenException("Vous ne pouvez confirmer que les réservations de vos annonces");
         }
-        if (booking.getStatus() != BookingStatus.PENDING) {
-            throw new BusinessException(ErrorCode.BOOKING_INVALID_STATUS, "Seules les réservations en attente peuvent être confirmées.");
-        }
 
-        booking.setStatus(BookingStatus.CONFIRMED);
+        stateMachine.confirm(booking);
         booking.setLandlordResponseDate(LocalDateTime.now());
         booking = bookingRepository.save(booking);
 
@@ -184,11 +183,8 @@ public class BookingService {
         if (!booking.getListing().getLandlord().getId().equals(landlord.getId())) {
             throw new ForbiddenException("Vous ne pouvez rejeter que les réservations de vos annonces");
         }
-        if (booking.getStatus() != BookingStatus.PENDING) {
-            throw new BusinessException(ErrorCode.BOOKING_INVALID_STATUS, "Seules les réservations en attente peuvent être rejetées.");
-        }
 
-        booking.setStatus(BookingStatus.CANCELLED);
+        stateMachine.reject(booking);
         booking.setCancellationReason(reason);
         booking.setLandlordResponseDate(LocalDateTime.now());
         booking = bookingRepository.save(booking);
@@ -218,15 +214,11 @@ public class BookingService {
         Booking booking = findBookingById(bookingId);
         checkBookingAccess(booking, currentUser);
 
-        if (booking.getStatus() != BookingStatus.PENDING && booking.getStatus() != BookingStatus.CONFIRMED) {
-            throw new BusinessException(ErrorCode.BOOKING_INVALID_STATUS, "Seules les réservations en attente ou confirmées peuvent être annulées.");
-        }
-
         Long otherUserId = currentUser.getId().equals(booking.getStudent().getId())
                 ? booking.getListing().getLandlord().getId()
                 : booking.getStudent().getId();
 
-        booking.setStatus(BookingStatus.CANCELLED);
+        stateMachine.cancel(booking);
         booking.setCancellationReason("Annulé par l'utilisateur");
         booking = bookingRepository.save(booking);
 
