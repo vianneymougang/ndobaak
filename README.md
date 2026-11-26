@@ -1,54 +1,61 @@
 # Ndobaâk
 
-Plateforme de logement étudiant pour la zone Eyang près du campus IUSJC, Yaoundé, Cameroun. Elle met en relation étudiants et propriétaires avec recherche géolocalisée, gestion des annonces et validation administrative.
+A student housing platform for the Eyang area, around a university campus in Yaoundé, Cameroon. Students search for housing on a map, book it and pay by mobile money. Landlords publish listings and follow the whole rental cycle, from the application to handing over the keys.
 
-## Stack technique
+My role: project lead and sole developer.
 
-| Couche          | Technologie                                    |
-| --------------- | ---------------------------------------------- |
-| Frontend        | Angular 21 · PrimeNG 21 · Tailwind CSS 4 · Bun |
-| Backend         | Spring Boot 3.5 · Java 21 · Maven              |
-| Base de données | PostgreSQL 18 · Flyway (migrations versionées) |
-| Stockage        | MinIO (S3-compatible, auto-hébergé)            |
-| Auth            | JWT stateless · OAuth2 Google (prévu)          |
-| API Docs        | SpringDoc OpenAPI (Swagger UI)                 |
-| Infra local     | Docker Compose                                 |
+Status: built, not deployed.
 
-## Démarrage rapide
+## Features
 
-### Prérequis
+For students:
 
-- Java 21+
-- Bun 1.3+
-- Docker & Docker Compose
+- Search with filters, as a paged list or on a map (Leaflet and OpenStreetMap)
+- Booking requests, accepted or declined by the landlord
+- Mobile money payment through NotchPay
+- Tenant application file, lease and move-in inspection
+- Reviews with photos
 
-### 1 — Infrastructure locale
+For landlords:
+
+- Listings created in several steps, with 3 to 10 photos resized to three sizes
+- Identity and land title checks
+- Booking management and a dashboard with their figures
+- The rental cycle: application, lease, inspection, key handover
+
+For admins: moderation of listings and accounts, finances and a dashboard.
+
+Notifications go in-app, by email or by SMS, depending on how urgent the event is.
+
+## Stack
+
+| Layer | Technology |
+| --- | --- |
+| Frontend | Angular 21, PrimeNG 21, Tailwind CSS 4, Bun |
+| Backend | Spring Boot 3.5, Java 21, Maven |
+| Database | PostgreSQL, Flyway migrations |
+| File storage | MinIO locally, AWS S3 in production |
+| Authentication | Stateless JWT, Google OAuth2 |
+| Payments | NotchPay (a mock gateway in development) |
+| SMS | Twilio |
+| API docs | SpringDoc OpenAPI (Swagger UI) |
+| CI/CD | GitLab CI, Docker images on AWS ECR |
+
+Booking states change in one place, `BookingStateMachine`. Long tasks such as document checks and image processing answer `202 Accepted` and notify the result later. Every API error returns `{ code, message, retryable }`.
+
+## How to run it locally
+
+You need Docker with Docker Compose, Bun 1.3 or later, and Java 21 if you want to run the backend outside Docker.
+
+Start the backend with PostgreSQL, pgAdmin, Mailpit and MinIO:
 
 ```bash
 docker compose up -d
 ```
 
-| Service  | URL                   | Identifiants par défaut      |
-| -------- | --------------------- | ---------------------------- |
-| pgAdmin  | http://localhost:5050 | admin@ndobaak.com / admin    |
-| Mailtrap | http://localhost:1080 | mailtrap / mailtrap          |
-| MinIO    | http://localhost:9001 | ndobaak / ndobaak_minio_2026 |
+With the default values from `docker-compose.yml`, payments go through the mock gateway and Google sign-in is off. Flyway runs the migrations when the backend starts.
 
-### 2 — Backend
-
-```bash
-cd backend
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
-```
-
-Flyway applique automatiquement les migrations au démarrage.
-
-| Endpoint | URL                                          |
-| -------- | -------------------------------------------- |
-| API      | http://localhost:8080/api/v1                 |
-| Swagger  | http://localhost:8080/api/v1/swagger-ui.html |
-
-### 3 — Frontend
+Start the frontend:
 
 ```bash
 cd frontend
@@ -56,90 +63,38 @@ bun install
 bun start
 ```
 
-Application accessible sur http://localhost:4200.
+The app runs on http://localhost:4200 and sends `/api` calls to `localhost:8080`.
 
-### Compte administrateur par défaut
+| Service | URL |
+| --- | --- |
+| API | http://localhost:8080/api/v1 |
+| Swagger UI | http://localhost:8080/api/v1/swagger-ui.html |
+| pgAdmin | http://localhost:5050 |
+| Mailpit (catches all emails) | http://localhost:1080 |
+| MinIO console | http://localhost:9001 |
 
-| Champ        | Valeur            |
-| ------------ | ----------------- |
-| Email        | admin@ndobaak.com |
-| Mot de passe | Admin@ndobaak2026 |
-| Rôle         | SUPER_ADMIN       |
+Migrations create local test accounts for each role (admin, student, landlord). You can find them in the Flyway migrations under `backend/src/main/resources/db/migration`.
 
-> Créé par la migration Flyway V3, mot de passe corrigé par V4.
+The `Makefile` has shortcuts: `make infra` starts only PostgreSQL, Mailpit and MinIO, and `make backend` then runs the backend with Maven.
 
-## Structure du projet
+## Tests
 
-```
-ndobaak/
-├── backend/
-│   └── src/main/java/com/ndobaak/backend/
-│       ├── admin/          # Validation des annonces (approve/reject)
-│       ├── auth/           # Authentification JWT, entités User/Student/Landlord/Admin
-│       ├── common/         # BaseEntity, enums, exceptions, sécurité JWT
-│       ├── config/         # SecurityConfig, CorsConfig, StorageConfig
-│       ├── listing/        # Annonces, recherche, localisation, photos, avis
-│       └── media/          # Traitement d'images (thumbnailator) + MinIO
-├── frontend/
-│   └── src/app/
-│       ├── core/           # Services (auth, listing, api), guards, interceptor, models
-│       ├── features/       # Pages : auth, home, listing, search
-│       └── shared/         # Composants : navbar, footer, layout, listing-card, star-rating
-├── docs/                   # Cahiers d'analyse/conception, backlog, diagrammes, maquettes
-└── docker-compose.yml
+```bash
+cd backend && ./mvnw test          # unit and integration tests
+cd frontend && bun run test        # frontend unit tests
+cd frontend && bunx playwright test   # end-to-end tests, with backend and frontend running
 ```
 
-## Base de données — Migrations Flyway
+## Repository layout
 
-| Version | Description                                            | Statut      |
-| ------- | ------------------------------------------------------ | ----------- |
-| V1      | Schéma initial (structure complète en français)        | ✅ Appliqué |
-| V2      | Renommage schéma → anglais (tables + colonnes + enums) | ✅ Appliqué |
-| V3      | Seed admin par défaut                                  | ✅ Appliqué |
-| V4      | Correction hash BCrypt admin                           | ✅ Appliqué |
+```
+backend/src/main/java/com/ndobaak/backend/
+  admin/  auth/  booking/  dashboard/  geo/  listing/  media/
+  notification/  payment/  rentalcycle/  review/  subscription/
+frontend/src/app/
+  core/  features/  shared/
+frontend/e2e/        Playwright scenarios
+docs/                analysis and design documents, diagrams (in French)
+```
 
-## Avancement Sprint 1
-
-### Backend — Implémenté
-
-| Module    | Contenu                                                                                                                                      |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `common`  | BaseEntity, enums (UserRole, UserStatus, ListingStatus, RoomType, PaymentStatus), exceptions métier, ApiError                                |
-| `auth`    | Entités User/Student/Landlord/Admin (SINGLE_TABLE), JWT (provider + filter + properties), AuthService, AuthController (7 endpoints)          |
-| `listing` | Entités Listing/Location/Photo/Amenity/Review, ListingService, ListingSearchService (filtres multi-critères + pagination), ListingController |
-| `admin`   | AdminListingService, AdminController (approve/reject)                                                                                        |
-| `media`   | StorageService (MinIO), ImageProcessingService (multi-résolution)                                                                            |
-| `config`  | SecurityConfig (JWT + routes), CorsConfig, StorageConfig                                                                                     |
-
-### Frontend — Implémenté
-
-| Couche        | Contenu                                                                                                      |
-| ------------- | ------------------------------------------------------------------------------------------------------------ |
-| `core`        | AuthService (signals), ListingService, ApiService, AuthGuard, RoleGuard, AuthInterceptor, modèles TypeScript |
-| `shared`      | Navbar, Footer, Layout, ListingCard, StarRating                                                              |
-| `features`    | Login (email + téléphone), Register, Home, Search, ListingDetail, ListingCreate, MyListings                  |
-| Routing       | Routes lazy-loaded avec guards auth + rôle                                                                   |
-| Design system | Tokens PrimeNG (palette orange + navy), Tailwind CSS 4, Poppins/Inter                                        |
-
-### Tests — Stubs présents
-
-- `AuthServiceTest`, `ListingServiceTest`, `ListingSearchServiceTest`, `AdminListingServiceTest`
-- Tests d'intégration conditionnels (`SPRING_INTEGRATION_TESTS=true`)
-
-## Endpoints API principaux
-
-| Méthode | Route                                 | Accès       |
-| ------- | ------------------------------------- | ----------- |
-| POST    | `/api/v1/auth/register/student`       | Public      |
-| POST    | `/api/v1/auth/register/landlord`      | Public      |
-| POST    | `/api/v1/auth/login`                  | Public      |
-| POST    | `/api/v1/auth/refresh`                | Public      |
-| GET     | `/api/v1/auth/me`                     | Authentifié |
-| GET     | `/api/v1/listings/search`             | Public      |
-| GET     | `/api/v1/listings/{id}`               | Public      |
-| POST    | `/api/v1/listings`                    | Landlord    |
-| GET     | `/api/v1/admin/listings/pending`      | Admin       |
-| PUT     | `/api/v1/admin/listings/{id}/approve` | Admin       |
-| PUT     | `/api/v1/admin/listings/{id}/reject`  | Admin       |
-
-Documentation complète : http://localhost:8080/api/v1/swagger-ui.html
+The code is in English. The user interface is in French.
